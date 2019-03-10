@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -57,6 +58,8 @@
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
+#include <libstdhl/File>
+
 #include <fstream>
 #include <iostream>
 #include <stack>
@@ -68,8 +71,8 @@ char AstDumpDotPass::id = 0;
 
 static libpass::PassRegistration< AstDumpDotPass > PASS(
     "AstDumpDotPass",
-    "generates a DOT graph of the AST and dumps it to './out/*' for now",
-    "ast-dump-dot",
+    "generates DOT graph of the AST and dumps to specified output path",
+    "ast-dump",
     0 );
 
 class AstDumpDotVisitor final : public RecursiveVisitor
@@ -102,7 +105,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     };
 
   public:
-    AstDumpDotVisitor( std::ostream& stream );
+    AstDumpDotVisitor( std::ostream& stream, const u1 dumpSpan );
 
     void setDumpNodeLocation( u1 dumpNodeLocation );
 
@@ -177,6 +180,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( DefaultCase& node ) override;
     void visit( VariableBinding& node ) override;
     void visit( Token& node ) override;
+    void visit( Span& node ) override;
 
   private:
     void dumpNode( const Node& node, const std::string& name );
@@ -188,12 +192,14 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
   private:
     std::ostream& m_stream;
+    const u1 m_dumpSpan;
     std::stack< void* > m_parentNodes; /**< holds the parent nodes of DotLink */
     u1 m_dumpNodeLocation = false;     /**< dump node source code location */
 };
 
-AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
+AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream, const u1 dumpSpan )
 : m_stream( stream )
+, m_dumpSpan( dumpSpan )
 , m_parentNodes()
 , m_dumpNodeLocation( false )
 {
@@ -214,6 +220,7 @@ void AstDumpDotVisitor::visit( Specification& specification )
 
         specification.header()->accept( *this );
         specification.definitions()->accept( *this );
+        specification.spans()->accept( *this );
     }
 
     m_stream << "}\n";
@@ -255,6 +262,7 @@ void AstDumpDotVisitor::visit( Initializer& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "Initializer" );
+    node.delimiterToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
     node.arguments()->accept( *this );
     node.rightBraceToken()->accept( *this );
@@ -680,8 +688,18 @@ void AstDumpDotVisitor::visit( Token& node )
     {
         DotLink link( this, &node );
         dumpNode( node, "Token\n" + node.tokenString() );
+        RecursiveVisitor::visit( node );
     }
-    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( Span& node )
+{
+    if( m_dumpSpan )
+    {
+        DotLink link( this, &node );
+        dumpNode( node, "Span\n" + node.kindName() + " " + std::to_string( node.length() ) );
+        RecursiveVisitor::visit( node );
+    }
 }
 
 void AstDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
@@ -775,15 +793,12 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     const auto& data = pr.output< SourceToAstPass >();
     const auto& specification = data->specification();
 
-    const auto previousPass = libpass::PassRegistry::passInfo( pr.previousPass() );
-    const std::string outputFilePath =
-        "./obj/out." + previousPass.name() + ".dot";  // TODO: add command-line switch
-    const u1 dumpNodeLocation = true;                 // TODO: add command-line switch
+    const u1 dumpNodeLocation = true;  // TODO: add command-line switch
 
     const auto printDotGraph = [&]( std::ostream& out ) {
         out << "digraph \"main\" {\n";
 
-        AstDumpDotVisitor visitor{ out };
+        AstDumpDotVisitor visitor{ out, dumpSpan() };
         visitor.setDumpNodeLocation( dumpNodeLocation );
 
         visitor.visit( *specification );
@@ -791,13 +806,29 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
         out << "}\n";
     };
 
-    if( outputFilePath == "stdout" )
+    if( outputPath() == "" )
     {
+        log.debug( "writing dot graph to 'stdout'" );
         printDotGraph( std::cout );
     }
     else
     {
-        log.debug( "writing dot graph to '" + outputFilePath + "'" );
+        const auto previousPass = libpass::PassRegistry::passInfo( pr.previousPass() );
+        const std::string outputFile = specification->name() + "." + previousPass.name() + ".dot";
+
+        if( not libstdhl::File::Path::exists( outputPath() ) )
+        {
+            try
+            {
+                libstdhl::File::Path::create( outputPath() );
+            }
+            catch( const std::domain_error& e )
+            {
+                log.error( e.what() );
+            }
+        }
+
+        const auto outputFilePath = outputPath() + "/" + outputFile;
 
         std::ofstream dotFile( outputFilePath );
         if( not dotFile.is_open() )
@@ -806,12 +837,32 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
             return false;
         }
 
+        log.debug( "writing dot graph to '" + outputFilePath + "'" );
         printDotGraph( dotFile );
     }
 
     return true;
 }
 
+void AstDumpDotPass::setOutputPath( const std::string& outputPath )
+{
+    m_outputPath = outputPath;
+}
+
+const std::string& AstDumpDotPass::outputPath( void ) const
+{
+    return m_outputPath;
+}
+
+void AstDumpDotPass::setDumpSpan( const u1 enable )
+{
+    m_dumpSpan = enable;
+}
+
+u1 AstDumpDotPass::dumpSpan( void ) const
+{
+    return m_dumpSpan;
+}
 //
 //  Local variables:
 //  mode: c++

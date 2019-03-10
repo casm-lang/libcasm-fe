@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<bison-xml-report version="3.1" bug-report="bug-bison@gnu.org" url="http://www.gnu.org/software/bison/">
+<bison-xml-report version="3.2" bug-report="bug-bison@gnu.org" url="http://www.gnu.org/software/bison/">
 
   <filename>../../obj/src/GrammarParser.yy</filename>
 

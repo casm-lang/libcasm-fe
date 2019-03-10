@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -161,7 +162,7 @@ void ConsistencyCheckVisitor::visit( VariableDefinition& node )
 void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 {
     m_functionInitially = true;
-    node.initializers()->accept( *this );
+    node.initially()->accept( *this );
     m_functionInitially = false;
 
     node.identifier()->accept( *this );

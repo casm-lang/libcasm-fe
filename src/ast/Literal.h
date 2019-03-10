@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -60,6 +61,9 @@ namespace libcasm_fe
 
             explicit Literal( Node::ID id );
 
+            void setSpans( const Spans::Ptr& spans );
+            const Spans::Ptr& spans( void ) const;
+
             void setLeftBracket( const Token::Ptr& leftBracket );
             const Token::Ptr& leftBracket( void ) const;
 
@@ -69,6 +73,7 @@ namespace libcasm_fe
           private:
             Token::Ptr m_leftBracket;
             Token::Ptr m_rightBracket;
+            Spans::Ptr m_spans;
         };
 
         using Literals = NodeList< Literal >;
@@ -94,10 +99,17 @@ namespace libcasm_fe
 
             void setValue( const libcasm_ir::Constant::Ptr& value );
 
+            void setRadix( const libstdhl::Type::Radix radix );
+
+            libstdhl::Type::Radix radix( void ) const;
+
+            std::string toString( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             libcasm_ir::Constant::Ptr m_value;
+            libstdhl::Type::Radix m_radix;
         };
 
         class ReferenceLiteral final : public Literal

@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -44,7 +45,6 @@
 #include "Logger.h"
 
 #include "Exception.h"
-#include "SourceLocation.h"
 
 #include <libstdhl/String>
 
@@ -54,7 +54,8 @@ using namespace libcasm_fe;
 
 static const auto fileNameNull = std::string();
 
-static libstdhl::Log::Items to_location_items( const std::vector< SourceLocation >& locations )
+static libstdhl::Log::Items to_location_items(
+    const std::vector< libstdhl::SourceLocation >& locations )
 {
     libstdhl::Log::Items items;
     for( const auto& location : locations )
@@ -77,7 +78,7 @@ static libstdhl::Log::Items to_location_items( const std::vector< SourceLocation
 }
 
 void libcasm_fe::Logger::error(
-    const std::vector< SourceLocation >& locations,
+    const std::vector< libstdhl::SourceLocation >& locations,
     const std::string& message,
     libcasm_fe::Code errorCode )
 {
@@ -118,7 +119,7 @@ void libcasm_fe::Logger::error( const Exception& exception )
 }
 
 void libcasm_fe::Logger::warning(
-    const std::vector< SourceLocation >& locations, const std::string& message )
+    const std::vector< libstdhl::SourceLocation >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( message ) );
@@ -126,7 +127,7 @@ void libcasm_fe::Logger::warning(
 }
 
 void libcasm_fe::Logger::info(
-    const std::vector< SourceLocation >& locations, const std::string& message )
+    const std::vector< libstdhl::SourceLocation >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( message ) );
@@ -134,7 +135,7 @@ void libcasm_fe::Logger::info(
 }
 
 void libcasm_fe::Logger::hint(
-    const std::vector< SourceLocation >& locations, const std::string& message )
+    const std::vector< libstdhl::SourceLocation >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( message ) );
@@ -142,7 +143,7 @@ void libcasm_fe::Logger::hint(
 }
 
 void libcasm_fe::Logger::debug(
-    const std::vector< SourceLocation >& locations, const std::string& message )
+    const std::vector< libstdhl::SourceLocation >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( message ) );

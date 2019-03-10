@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -225,7 +226,7 @@ void AstToCasmIRVisitor::visit( FunctionDefinition& node )
         // node.attributes()->accept( *this ); // TODO
 
         m_init_flag = true;
-        node.initializers()->accept( *this );
+        node.initially()->accept( *this );
         m_init_flag = false;
     }
 }

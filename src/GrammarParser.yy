@@ -1,10 +1,11 @@
 //
-//  Copyright (C) 2014-2018 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2019 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -51,7 +52,7 @@
 
 %define api.token.constructor
 %define api.value.type variant
-%define api.location.type {SourceLocation}
+%define api.location.type {libstdhl::SourceLocation}
 
 %define parse.assert
 %define parse.trace
@@ -65,7 +66,6 @@
     {
         class Lexer;
         class Logger;
-        class SourceLocation;
     }
 
     #include <libcasm-fe/Specification>
@@ -73,6 +73,8 @@
     #include <libcasm-fe/ast/Expression>
     #include <libcasm-fe/ast/Rule>
     #include <libcasm-fe/ast/Token>
+
+    #include <libstdhl/SourceLocation>
 
     using namespace libcasm_fe;
     using namespace Ast;
@@ -88,7 +90,7 @@
 {
     #include <libcasm-fe/Exception>
     #include <libcasm-fe/Logger>
-    #include "../../src/SourceLocation.h"
+
     #include "../../src/Lexer.h"
     #include "../../src/various/GrammarToken.h"
 
@@ -97,9 +99,7 @@
     #undef yylex
     #define yylex m_lexer.nextToken
 
-    static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-
-    static BasicType::Ptr createVoidType( SourceLocation& sourceLocation )
+    static BasicType::Ptr createVoidType( libstdhl::SourceLocation& sourceLocation )
     {
         const auto type = libstdhl::Memory::get< libcasm_ir::VoidType >();
         const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
@@ -109,7 +109,7 @@
         return node;
     }
 
-    static BasicType::Ptr createRuleRefType( SourceLocation& sourceLocation )
+    static BasicType::Ptr createRuleRefType( libstdhl::SourceLocation& sourceLocation )
     {
         const auto type = libstdhl::Memory::get< libcasm_ir::RuleReferenceType >();
         const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
@@ -119,7 +119,7 @@
         return node;
     }
 
-    static BasicType::Ptr createAgentType( SourceLocation& sourceLocation )
+    static BasicType::Ptr createAgentType( libstdhl::SourceLocation& sourceLocation )
     {
         const auto name = Ast::make< Identifier >( sourceLocation, "Agent" );
         const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
@@ -127,7 +127,7 @@
         return node;
     }
 
-    static FunctionDefinition::Ptr createProgramFunction( SourceLocation& sourceLocation )
+    static FunctionDefinition::Ptr createProgramFunction( libstdhl::SourceLocation& sourceLocation, const Initializers::Ptr& initializers )
     {
         const auto agentType = createAgentType( sourceLocation );
         const auto ruleRefType = createRuleRefType( sourceLocation );
@@ -137,10 +137,12 @@
 
         const auto program = Ast::make< Identifier >( sourceLocation, "program" );
         const auto defined = Ast::make< Defined >(
-            sourceLocation, uToken, uToken, Ast::make< UndefLiteral >( sourceLocation ), uToken );
+            sourceLocation, Token::unresolved(), Token::unresolved(), Ast::make< UndefLiteral >( sourceLocation ), Token::unresolved() );
+
+        const auto initially = Ast::make< Initially >( sourceLocation, Token::unresolved(), Token::unresolved(), initializers, Token::unresolved() );
 
         return Ast::make< FunctionDefinition >(
-            sourceLocation, uToken, program, uToken, argTypes, uToken, ruleRefType, defined );
+            sourceLocation, Token::unresolved(), program, Token::unresolved(), argTypes, Token::unresolved(), ruleRefType, defined, initially );
     }
 
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
@@ -155,13 +157,13 @@
 END       0 "end of file"
 {{grammartoken}}
 
-%token <std::string> BINARY      "binary"
-%token <std::string> HEXADECIMAL "hexadecimal"
-%token <std::string> INTEGER     "integer"
-%token <std::string> RATIONAL    "rational"
-%token <std::string> DECIMAL     "decimal"
-%token <std::string> STRING      "string"
-%token <std::string> IDENTIFIER  "identifier"
+%token <ValueLiteral::Ptr> BINARY      "binary"
+%token <ValueLiteral::Ptr> HEXADECIMAL "hexadecimal"
+%token <ValueLiteral::Ptr> INTEGER     "integer"
+%token <ValueLiteral::Ptr> RATIONAL    "rational"
+%token <ValueLiteral::Ptr> DECIMAL     "decimal"
+%token <ValueLiteral::Ptr> STRING      "string"
+%token <Identifier::Ptr>  IDENTIFIER  "identifier"
 
 %type <Specification::Ptr> Specification
 
@@ -306,6 +308,7 @@ Specification
   {
       m_specification.setHeader( $1 );
       m_specification.setDefinitions( $2 );
+      m_specification.setSpans( m_lexer.fetchSpansAndReset() );
   }
 ;
 
@@ -401,14 +404,14 @@ InitDefinition
           @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
       singleAgent->setTargetType( DirectCallExpression::TargetType::CONSTANT );
 
-      auto programFunction = createProgramFunction( @$ );
-      auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      const auto initializers = Ast::make< Initializers >( @$ );
+      const auto programFunction = createProgramFunction( @$, initializers );
+      const auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       programArguments->add( singleAgent );
 
-      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, uToken, $2 );
-      const auto initializers = Ast::make< Initializers >( @$ );
+      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, Token::unresolved(), $2 );
       const auto initializer = Ast::make< Initializer >(
-          @$, uToken, programArguments, uToken, uToken, ruleReference );
+          @$, Token::unresolved(), programArguments, Token::unresolved(), Token::unresolved(), ruleReference );
       initializers->add( initializer );
 
       // apply the name of the program declaration to the initializer functions
@@ -418,24 +421,22 @@ InitDefinition
               asIdentifierPath( programFunction->identifier() ) );
       }
 
-      programFunction->setInitializers( initializers );
       $$->setProgramFunction( programFunction );
   }
 | INIT LCURPAREN Initializers RCURPAREN
   {
       $$ = Ast::make< InitDefinition >( @$, $1, $2, $3, $4 );
 
-      auto programFunction = createProgramFunction( @$ );
+      const auto programFunction = createProgramFunction( @$, $3 );
 
       // apply the name of the program declaration to the initializer functions
-      auto initializers = $3;
+      const auto initializers = programFunction->initially()->initializers();
       for( auto& initializer : *initializers )
       {
           initializer->updateRule()->function()->setIdentifier(
               asIdentifierPath( programFunction->identifier() ) );
       }
 
-      programFunction->setInitializers( initializers );
       $$->setProgramFunction( programFunction );
   }
 ;
@@ -473,7 +474,7 @@ RuleDefinition
   {
       const auto params = Ast::make< NodeList< VariableDefinition > >( @$ );
       const auto vType = createVoidType( @$ );
-      $$ = Ast::make< RuleDefinition >( @$, $1, $2, params, uToken, vType, $3, $4 );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, params, Token::unresolved(), vType, $3, $4 );
   }
 | RULE Identifier MAPS Type EQUAL Rule
   {
@@ -483,7 +484,7 @@ RuleDefinition
 | RULE Identifier LPAREN Parameters RPAREN EQUAL Rule
   {
       const auto vType = createVoidType( @$ );
-      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, uToken, vType, $6, $7 );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, Token::unresolved(), vType, $6, $7 );
       $$->setLeftBracketToken( $3 );
       $$->setRightBracketToken( $5 );
   }
@@ -507,15 +508,14 @@ RuleDefinition
 FunctionDefinition
 : FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
-      $$ = Ast::make< FunctionDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
+      $$ = Ast::make< FunctionDefinition >( @$, $1, $2, $3, $4, $5, $6, $7, $8 );
 
       // apply the name of the function declaration to the initializer functions
-      auto initially = $8;
+      const auto initially = $$->initially();
       for( auto& initializer : *initially->initializers() )
       {
           initializer->updateRule()->function()->setIdentifier( asIdentifierPath( $2 ) );
       }
-      $$->setInitializers( initially->initializers() );
   }
 ;
 
@@ -1198,6 +1198,7 @@ UndefinedLiteral
 : UNDEF
   {
       $$ = Ast::make< UndefLiteral >( @$ );
+      $$->setSpans( $1->spans() );
   }
 ;
 
@@ -1207,11 +1208,13 @@ BooleanLiteral
   {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
       $$ = Ast::make< ValueLiteral >( @$, value );
+      $$->setSpans( $1->spans() );
   }
 | FALSE
   {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( false );
       $$ = Ast::make< ValueLiteral >( @$, value );
+      $$->setSpans( $1->spans() );
   }
 ;
 
@@ -1219,15 +1222,7 @@ BooleanLiteral
 IntegerLiteral
 : INTEGER
   {
-      try
-      {
-          const auto value = libstdhl::Memory::get< libcasm_ir::IntegerConstant >( $1, libstdhl::Type::DECIMAL );
-          $$ = Ast::make< ValueLiteral >( @$, value );
-      }
-      catch( const std::domain_error& e )
-      {
-          throw syntax_error( @$, e.what() );
-      }
+      $$ = $1;
   }
 ;
 
@@ -1235,15 +1230,7 @@ IntegerLiteral
 RationalLiteral
 : RATIONAL
   {
-      try
-      {
-          const auto value = libstdhl::Memory::get< libcasm_ir::RationalConstant >( $1 );
-          $$ = Ast::make< ValueLiteral >( @$, value );
-      }
-      catch( const std::domain_error& e )
-      {
-          throw syntax_error( @$, e.what() );
-      }
+      $$ = $1;
   }
 ;
 
@@ -1251,15 +1238,7 @@ RationalLiteral
 DecimalLiteral
 : DECIMAL
   {
-      try
-      {
-          const auto value = libstdhl::Memory::get< libcasm_ir::DecimalConstant >( $1 );
-          $$ = Ast::make< ValueLiteral >( @$, value );
-      }
-      catch( const std::domain_error& e )
-      {
-          throw syntax_error( @$, e.what() );
-      }
+      $$ = $1;
   }
 ;
 
@@ -1267,27 +1246,11 @@ DecimalLiteral
 BinaryLiteral
 : BINARY
   {
-      try
-      {
-          const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( $1, libstdhl::Type::BINARY );
-          $$ = Ast::make< ValueLiteral >( @$, value );
-      }
-      catch( const std::domain_error& e )
-      {
-          throw syntax_error( @$, e.what() );
-      }
+      $$ = $1;
   }
 | HEXADECIMAL
   {
-      try
-      {
-          const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( $1, libstdhl::Type::HEXADECIMAL );
-          $$ = Ast::make< ValueLiteral >( @$, value );
-      }
-      catch( const std::domain_error& e )
-      {
-          throw syntax_error( @$, e.what() );
-      }
+      $$ = $1;
   }
 ;
 
@@ -1295,15 +1258,7 @@ BinaryLiteral
 StringLiteral
 : STRING
   {
-      try
-      {
-          const auto value = libstdhl::Memory::get< libcasm_ir::StringConstant >( $1 );
-          $$ = Ast::make< ValueLiteral >( @$, value );
-      }
-      catch( const std::domain_error& e )
-      {
-          throw syntax_error( @$, e.what() );
-      }
+      $$ = $1;
   }
 ;
 
@@ -1553,7 +1508,7 @@ MaybeDefined
   }
 | %empty
   {
-      $$ = Ast::make< Defined >( @$, uToken, uToken, Ast::make< UndefLiteral >( @$ ), uToken );
+      $$ = Ast::make< Defined >( @$, Token::unresolved(), Token::unresolved(), Ast::make< UndefLiteral >( @$ ), Token::unresolved() );
   }
 ;
 
@@ -1566,7 +1521,7 @@ MaybeInitially
 | %empty
   {
       const auto initializers = Ast::make< Initializers >( @$ );
-      $$ = Ast::make< Initially >( @$, uToken, uToken, initializers, uToken );
+      $$ = Ast::make< Initially >( @$, Token::unresolved(), Token::unresolved(), initializers, Token::unresolved() );
   }
 ;
 
@@ -1592,7 +1547,7 @@ Initializer
 : Term
   {
       const auto arguments = Ast::make< Expressions >( @$ );
-      $$ = Ast::make< Initializer >( @$, uToken, arguments, uToken, uToken, $1 );
+      $$ = Ast::make< Initializer >( @$, Token::unresolved(), arguments, Token::unresolved(), Token::unresolved(), $1 );
       $$->updateRule()->setSourceLocation( @$ );
       $$->updateRule()->function()->setSourceLocation( @$ );
   }
@@ -1623,11 +1578,12 @@ Initializer
 Identifier
 : IDENTIFIER
   {
-      $$ = Ast::make< Identifier >( @$, $1 );
+      $$ = $1;
   }
 | IN // allow in keyword as identifier
   {
       $$ = Ast::make< Identifier >( @$, "in" );
+      $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
 ;
 
@@ -1659,7 +1615,7 @@ Variable
 | Identifier
   {
       const auto unresolvedType = Ast::make< UnresolvedType >( @$ );
-      $$ = Ast::make< VariableDefinition >( @$, $1, uToken, unresolvedType );
+      $$ = Ast::make< VariableDefinition >( @$, $1, Token::unresolved(), unresolvedType );
   }
 ;
 
@@ -1819,7 +1775,7 @@ ExpressionAttribute
 
 %%
 
-void Parser::error( const SourceLocation& location, const std::string& message )
+void Parser::error( const libstdhl::SourceLocation& location, const std::string& message )
 {
     m_log.error( {location}, message, Code::SyntaxError );
 }

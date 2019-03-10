@@ -42,37 +42,96 @@
 //  statement from your version.
 //
 
-/**
-   @brief    TODO
+#include "Span.h"
 
-   TODO
-*/
+#include <libstdhl/SourceLocation>
 
-#ifndef _LIBCASM_FE_CASMFE_H_
-#define _LIBCASM_FE_CASMFE_H_
+using namespace libcasm_fe;
+using namespace Ast;
 
-#include <libstdhl/Memory>
-#include <libstdhl/Type>
+//
+//
+// Span
+//
 
-namespace libcasm_fe
+Span::Span( const Grammar::Span kind, const std::size_t length )
+: Node( Node::ID::SPAN )
+, m_kind( kind )
+, m_length( length )
 {
-    using u1 = libstdhl::u1;
-    using u8 = libstdhl::u8;
-    using u16 = libstdhl::u16;
-    using u32 = libstdhl::u32;
-    using u64 = libstdhl::u64;
-
-    using i8 = libstdhl::i8;
-    using i16 = libstdhl::i16;
-    using i32 = libstdhl::i32;
-    using i64 = libstdhl::i64;
-
-    class CasmFE
-    {
-    };
 }
 
-#endif  // _LIBCASM_FE_CASMFE_H_
+const Grammar::Span Span::kind( void ) const
+{
+    return m_kind;
+}
+
+std::string Span::kindName( void ) const
+{
+    switch( kind() )
+    {
+        case Grammar::Span::SPACE:
+        {
+            return "space";
+        }
+        case Grammar::Span::NEWLINE:
+        {
+            return "newline";
+        }
+        case Grammar::Span::TABULATOR:
+        {
+            return "tabulator";
+        }
+        case Grammar::Span::INLINE_COMMENT:
+        {
+            return "inline comment";
+        }
+        case Grammar::Span::BLOCK_COMMENT:
+        {
+            return "block comment";
+        }
+    }
+}
+
+const std::size_t Span::length( void ) const
+{
+    return m_length;
+}
+
+std::string Span::toString( void ) const
+{
+    switch( kind() )
+    {
+        case Grammar::Span::SPACE:
+        {
+            return std::string( length(), ' ' );
+        }
+        case Grammar::Span::NEWLINE:
+        {
+            return std::string( length(), '\n' );
+        }
+        case Grammar::Span::TABULATOR:
+        {
+            return std::string( length(), '\t' );
+        }
+        case Grammar::Span::INLINE_COMMENT:
+        {
+            return sourceLocation().read();
+        }
+        case Grammar::Span::BLOCK_COMMENT:
+        {
+            return sourceLocation().read();
+        }
+    }
+
+    assert( " error! " );
+    return std::string();
+}
+
+void Span::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
 
 //
 //  Local variables:

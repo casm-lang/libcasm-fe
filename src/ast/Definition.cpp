@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -179,7 +180,8 @@ FunctionDefinition::FunctionDefinition(
     const Types::Ptr& argumentTypes,
     const Token::Ptr& mapsToken,
     const Type::Ptr& returnType,
-    const Defined::Ptr& defined )
+    const Defined::Ptr& defined,
+    const Initially::Ptr& initially )
 : Definition( Node::ID::FUNCTION_DEFINITION, identifier )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
@@ -189,7 +191,7 @@ FunctionDefinition::FunctionDefinition(
 , m_colonToken( colonToken )
 , m_classification( Classification::UNKNOWN )
 , m_symbolic( false )
-, m_initializers( std::make_shared< Initializers >() )
+, m_initially( initially )
 , m_isProgram( identifier->name() == "program" )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
@@ -289,14 +291,9 @@ u1 FunctionDefinition::symbolic( void ) const
     return m_symbolic;
 }
 
-void FunctionDefinition::setInitializers( const Initializers::Ptr& initializers )
+const Initially::Ptr& FunctionDefinition::initially( void ) const
 {
-    m_initializers = initializers;
-}
-
-const Initializers::Ptr& FunctionDefinition::initializers( void ) const
-{
-    return m_initializers;
+    return m_initially;
 }
 
 void FunctionDefinition::accept( Visitor& visitor )

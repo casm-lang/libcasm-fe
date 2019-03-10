@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -59,6 +60,16 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         u1 run( libpass::PassResult& pr ) override;
+
+        void setOutputPath( const std::string& outputPath );
+        const std::string& outputPath( void ) const;
+
+        void setDumpSpan( const u1 enable );
+        u1 dumpSpan( void ) const;
+
+      private:
+        std::string m_outputPath;
+        u1 m_dumpSpan = false;
     };
 }
 

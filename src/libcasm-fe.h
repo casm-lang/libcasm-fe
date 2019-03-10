@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -54,6 +55,7 @@
 #include <libcasm-fe/analyze/SymbolResolverPass>
 #include <libcasm-fe/analyze/TypeCheckPass>
 #include <libcasm-fe/analyze/TypeInferencePass>
+#include <libcasm-fe/ast/Span>
 #include <libcasm-fe/execute/NumericExecutionPass>
 #include <libcasm-fe/execute/UpdateSet>
 //#include <libcasm-fe/execute/SymbolicExecutionPass>

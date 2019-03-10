@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -47,7 +48,8 @@
 #include <libcasm-fe/CasmFE>
 
 #include <libcasm-fe/Codes>
-#include <libcasm-fe/SourceLocation>
+
+#include <libstdhl/SourceLocation>
 
 #include <exception>
 #include <string>
@@ -60,24 +62,25 @@ namespace libcasm_fe
       public:
         Exception( const std::string& msg, Code errorCode );
         Exception(
-            const SourceLocation& location,
+            const libstdhl::SourceLocation& location,
             const std::string& msg,
             const std::vector< std::string >& backtrace,
             Code errorCode );
-        Exception( const SourceLocation& location, const std::string& msg, Code errorCode );
         Exception(
-            const std::vector< SourceLocation >& locations,
+            const libstdhl::SourceLocation& location, const std::string& msg, Code errorCode );
+        Exception(
+            const std::vector< libstdhl::SourceLocation >& locations,
             const std::string& msg,
             Code errorCode );
         Exception(
-            const std::vector< SourceLocation >& locations,
+            const std::vector< libstdhl::SourceLocation >& locations,
             const std::string& msg,
             const std::vector< std::string >& backtrace,
             Code errorCode );
 
         const char* what( void ) const noexcept override;
 
-        const std::vector< SourceLocation >& locations( void ) const noexcept;
+        const std::vector< libstdhl::SourceLocation >& locations( void ) const noexcept;
 
         const std::vector< std::string >& backtrace( void ) const noexcept;
 
@@ -85,7 +88,7 @@ namespace libcasm_fe
 
       private:
         const std::string m_msg;
-        const std::vector< SourceLocation > m_locations;
+        const std::vector< libstdhl::SourceLocation > m_locations;
         const std::vector< std::string > m_backtrace;
         const Code m_errorCode;
     };

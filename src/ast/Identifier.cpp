@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -43,14 +44,14 @@
 
 #include "Identifier.h"
 
+#include <libcasm-fe/ast/Token>
+
 #include "../various/GrammarToken.h"
 
 #include <cassert>
 
 using namespace libcasm_fe;
 using namespace Ast;
-
-static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 
 static const std::string DELIMITER( "::" );
 
@@ -62,7 +63,8 @@ static const std::string DELIMITER( "::" );
 Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )
 , m_name( name )
-, m_doubleColon( uToken )
+, m_doubleColon( Token::unresolved() )
+, m_spans( std::make_shared< Spans >() )
 {
 }
 
@@ -80,6 +82,16 @@ void Identifier::setDoubleColon( const Token::Ptr& doubleColon )
 const Token::Ptr& Identifier::doubleColon( void ) const
 {
     return m_doubleColon;
+}
+
+void Identifier::setSpans( const Spans::Ptr& spans )
+{
+    m_spans = spans;
+}
+
+const Spans::Ptr& Identifier::spans( void ) const
+{
+    return m_spans;
 }
 
 void Identifier::accept( Visitor& visitor )

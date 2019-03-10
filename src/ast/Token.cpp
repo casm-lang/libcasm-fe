@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -53,15 +54,32 @@ using namespace Ast;
 // Token
 //
 
+const Token::Ptr& Token::unresolved( void )
+{
+    static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+    return uToken;
+}
+
 Token::Token( const libcasm_fe::Grammar::Token token )
 : Node( Node::ID::TOKEN )
 , m_token( token )
+, m_spans( std::make_shared< Spans >() )
 {
 }
 
 libcasm_fe::Grammar::Token Token::token( void ) const
 {
     return m_token;
+}
+
+void Token::setSpans( const Spans::Ptr& spans )
+{
+    m_spans = spans;
+}
+
+const Spans::Ptr& Token::spans( void ) const
+{
+    return m_spans;
 }
 
 std::string Token::tokenString( void ) const

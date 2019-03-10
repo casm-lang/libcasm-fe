@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -72,8 +73,6 @@ static libpass::PassRegistration< SymbolResolverPass > PASS(
     "resolves AST identifiers of type-, call-, ... nodes",
     "ast-sym-resolve",
     0 );
-
-static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 
 class SymbolResolveVisitor final : public RecursiveVisitor
 {
@@ -317,12 +316,12 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         const auto agentEnumerators = std::make_shared< Enumerators >();
         agentEnumerators->add( agent );
         const auto agentEnum = std::make_shared< EnumerationDefinition >(
-            uToken,
+            Token::unresolved(),
             std::make_shared< Identifier >( AGENT ),
-            uToken,
-            uToken,
+            Token::unresolved(),
+            Token::unresolved(),
             agentEnumerators,
-            uToken );
+            Token::unresolved() );
 
         const auto kind = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
         kind->add( SINGLE_AGENT_CONSTANT );

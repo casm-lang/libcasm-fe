@@ -42,37 +42,37 @@
 //  statement from your version.
 //
 
-/**
-   @brief    TODO
+#include "Lexer.h"
 
-   TODO
-*/
+#include <libcasm-fe/Logger>
 
-#ifndef _LIBCASM_FE_CASMFE_H_
-#define _LIBCASM_FE_CASMFE_H_
+using namespace libcasm_fe;
 
-#include <libstdhl/Memory>
-#include <libstdhl/Type>
-
-namespace libcasm_fe
+Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
+: yyFlexLexer( in, out )
+, m_log( log )
+, m_loc()
+, m_strbuf()
+, m_spans( std::make_shared< Spans >() )
 {
-    using u1 = libstdhl::u1;
-    using u8 = libstdhl::u8;
-    using u16 = libstdhl::u16;
-    using u32 = libstdhl::u32;
-    using u64 = libstdhl::u64;
-
-    using i8 = libstdhl::i8;
-    using i16 = libstdhl::i16;
-    using i32 = libstdhl::i32;
-    using i64 = libstdhl::i64;
-
-    class CasmFE
-    {
-    };
 }
 
-#endif  // _LIBCASM_FE_CASMFE_H_
+void Lexer::setFileName( const std::string& fileName )
+{
+    m_loc.begin.fileName = m_loc.end.fileName = std::make_shared< std::string >( fileName );
+}
+
+Spans::Ptr Lexer::fetchSpansAndReset( void )
+{
+    const auto currentSpans = m_spans;
+    m_spans = std::make_shared< Spans >();
+    return currentSpans;
+}
+
+void Lexer::LexerError( const char* msg )
+{
+    m_log.error( { m_loc }, msg, Code::SyntaxError );
+}
 
 //
 //  Local variables:

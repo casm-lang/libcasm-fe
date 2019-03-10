@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -117,6 +118,7 @@ namespace libcasm_fe
         class DefaultCase;
         class VariableBinding;
         class Token;
+        class Span;
 
         /**
          * @extends CasmFE
@@ -195,6 +197,7 @@ namespace libcasm_fe
             virtual void visit( DefaultCase& node ) = 0;
             virtual void visit( VariableBinding& node ) = 0;
             virtual void visit( Token& node ) = 0;
+            virtual void visit( Span& node ) = 0;
         };
     }
 }

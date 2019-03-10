@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -46,13 +47,16 @@
 
 #include <string>
 
+#include <libcasm-fe/ast/Span>
+
 #include "various/FlexLexer.h"
 #include "various/GrammarParser.tab.h"
+
+#include <libstdhl/SourceLocation>
 
 namespace libcasm_fe
 {
     class Logger;
-    class SourceLocation;
 
     class Lexer : public yyFlexLexer
     {
@@ -63,13 +67,16 @@ namespace libcasm_fe
 
         Parser::symbol_type nextToken();
 
+        Spans::Ptr fetchSpansAndReset( void );
+
       protected:
         void LexerError( const char* msg ) override;
 
       private:
         Logger& m_log;
-        SourceLocation m_loc;
+        libstdhl::SourceLocation m_loc;
         std::string m_strbuf;
+        Spans::Ptr m_spans;
     };
 }
 

@@ -42,37 +42,53 @@
 //  statement from your version.
 //
 
-/**
-   @brief    TODO
+#ifndef _LIBCASM_FE_SPAN_H_
+#define _LIBCASM_FE_SPAN_H_
 
-   TODO
-*/
-
-#ifndef _LIBCASM_FE_CASMFE_H_
-#define _LIBCASM_FE_CASMFE_H_
-
-#include <libstdhl/Memory>
-#include <libstdhl/Type>
+#include <libcasm-fe/ast/Node>
 
 namespace libcasm_fe
 {
-    using u1 = libstdhl::u1;
-    using u8 = libstdhl::u8;
-    using u16 = libstdhl::u16;
-    using u32 = libstdhl::u32;
-    using u64 = libstdhl::u64;
-
-    using i8 = libstdhl::i8;
-    using i16 = libstdhl::i16;
-    using i32 = libstdhl::i32;
-    using i64 = libstdhl::i64;
-
-    class CasmFE
+    namespace Grammar
     {
-    };
+        enum class Span
+        {
+            SPACE,
+            NEWLINE,
+            TABULATOR,
+            INLINE_COMMENT,
+            BLOCK_COMMENT,
+        };
+    }
+
+    namespace Ast
+    {
+        class Span : public Node
+        {
+          public:
+            using Ptr = std::shared_ptr< Span >;
+            Span( const Grammar::Span kind, const std::size_t length );
+
+            const Grammar::Span kind( void ) const;
+
+            std::string kindName( void ) const;
+
+            const std::size_t length( void ) const;
+
+            std::string toString( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Grammar::Span m_kind;
+            const std::size_t m_length;
+        };
+
+        using Spans = NodeList< Span >;
+    }
 }
 
-#endif  // _LIBCASM_FE_CASMFE_H_
+#endif  // _LIBCASM_FE_SPAN_H_
 
 //
 //  Local variables:

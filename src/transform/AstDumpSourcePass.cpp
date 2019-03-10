@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -68,8 +69,8 @@ char AstDumpSourcePass::id = 0;
 
 static libpass::PassRegistration< AstDumpSourcePass > PASS(
     "AstDumpSourcePass",
-    "outputs the parsed AST as a CASM input specification to stdout",
-    "ast-dump",
+    "generates CASM specification of the AST and emits to specified output path",
+    "ast-emit",
     0 );
 
 class AstDumpSourceVisitor final : public RecursiveVisitor
@@ -79,12 +80,15 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
 
     void visit( InitDefinition& node ) override;
     void visit( Initializer& node ) override;
+    void visit( RuleDefinition& node ) override;
     void visit( EmbracedExpression& node ) override;
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
     void visit( UnresolvedType& node ) override;
     void visit( Identifier& node ) override;
     void visit( Token& node ) override;
+    void visit( Span& node ) override;
+    void visit( Defined& node ) override;
 
   private:
     std::ostream& m_stream;
@@ -113,11 +117,29 @@ void AstDumpSourceVisitor::visit( InitDefinition& node )
 
 void AstDumpSourceVisitor::visit( Initializer& node )
 {
+    node.delimiterToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
     node.arguments()->accept( *this );
     node.rightBraceToken()->accept( *this );
     node.mapsToken()->accept( *this );
     node.value()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( RuleDefinition& node )
+{
+    node.attributes()->accept( *this );
+    node.ruleToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.leftBracketToken()->accept( *this );
+    node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
+    node.mapsToken()->accept( *this );
+    if( node.mapsToken()->token() != Grammar::Token::UNRESOLVED )
+    {
+        node.returnType()->accept( *this );
+    }
+    node.assignmentToken()->accept( *this );
+    node.rule()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( EmbracedExpression& node )
@@ -131,24 +153,14 @@ void AstDumpSourceVisitor::visit( EmbracedExpression& node )
 
 void AstDumpSourceVisitor::visit( UndefLiteral& node )
 {
+    RecursiveVisitor::visit( node );
     m_stream << "undef";
 }
 
 void AstDumpSourceVisitor::visit( ValueLiteral& node )
 {
-    const auto value_is_string = node.value()->type().isString();
-
-    if( value_is_string )
-    {
-        m_stream << "\"";
-    }
-    m_stream << node.value()->name();
-
-    if( value_is_string )
-    {
-        m_stream << "\"";
-    }
-    m_stream << " ";  // TODO: FIXME: @ppaulweber: remove this when spans (space etc.) are ready
+    RecursiveVisitor::visit( node );
+    m_stream << node.toString();
 }
 
 void AstDumpSourceVisitor::visit( UnresolvedType& node )
@@ -157,9 +169,8 @@ void AstDumpSourceVisitor::visit( UnresolvedType& node )
 
 void AstDumpSourceVisitor::visit( Identifier& node )
 {
-    node.doubleColon()->accept( *this );
+    RecursiveVisitor::visit( node );
     m_stream << node.name();
-    m_stream << " ";  // TODO: FIXME: @ppaulweber: remove this when spans (space etc.) are ready
 }
 
 void AstDumpSourceVisitor::visit( Token& node )
@@ -168,8 +179,23 @@ void AstDumpSourceVisitor::visit( Token& node )
     {
         return;
     }
+    RecursiveVisitor::visit( node );
     m_stream << node.tokenString();
-    m_stream << " ";  // TODO: FIXME: @ppaulweber: remove this when spans (space etc.) are ready
+}
+
+void AstDumpSourceVisitor::visit( Span& node )
+{
+    RecursiveVisitor::visit( node );
+    m_stream << node.toString();
+}
+
+void AstDumpSourceVisitor::visit( Defined& node )
+{
+    if( node.definedToken()->token() == Grammar::Token::UNRESOLVED )
+    {
+        return;
+    }
+    RecursiveVisitor::visit( node );
 }
 
 void AstDumpSourcePass::usage( libpass::PassUsage& pu )
@@ -191,8 +217,7 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 
     specification->header()->accept( visitor );
     specification->definitions()->accept( visitor );
-    outputStream
-        << "\n";  // TODO: FIXME: @ppaulweber: remove this when spans (space etc.) are ready
+    specification->spans()->accept( visitor );
 
     return true;
 }

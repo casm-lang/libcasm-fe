@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -47,11 +48,10 @@
 
 #include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Literal>
+#include <libcasm-fe/ast/Token>
 
 using namespace libcasm_fe;
 using namespace Ast;
-
-static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 
 //
 //
@@ -65,7 +65,7 @@ SkipRule::SkipRule( const Token::Ptr& skipToken )
 }
 
 SkipRule::SkipRule( void )
-: SkipRule( uToken )
+: SkipRule( Token::unresolved() )
 {
 }
 
@@ -106,7 +106,8 @@ ConditionalRule::ConditionalRule(
     const Expression::Ptr& condition,
     const Token::Ptr& thenToken,
     const Rule::Ptr& thenRule )
-: ConditionalRule( ifToken, condition, thenToken, thenRule, uToken, std::make_shared< SkipRule >() )
+: ConditionalRule(
+      ifToken, condition, thenToken, thenRule, Token::unresolved(), std::make_shared< SkipRule >() )
 {
 }
 
@@ -328,7 +329,7 @@ ForallRule::ForallRule(
       variables,
       inToken,
       universe,
-      uToken,
+      Token::unresolved(),
       std::make_shared< ValueLiteral >(
           libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true ) ),
       doToken,
@@ -572,7 +573,7 @@ UpdateRule::UpdateRule(
 
 UpdateRule::UpdateRule(
     const DirectCallExpression::Ptr& function, const Expression::Ptr& expression )
-: UpdateRule( function, uToken, expression )
+: UpdateRule( function, Token::unresolved(), expression )
 {
 }
 

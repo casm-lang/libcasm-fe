@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -63,11 +64,15 @@ namespace libcasm_fe
             void setDoubleColon( const Token::Ptr& doubleColon );
             const Token::Ptr& doubleColon( void ) const;
 
+            void setSpans( const Spans::Ptr& spans );
+            const Spans::Ptr& spans( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             std::string m_name;
             Token::Ptr m_doubleColon;
+            Spans::Ptr m_spans;
         };
 
         using Identifiers = NodeList< Identifier >;
@@ -124,7 +129,7 @@ namespace libcasm_fe
         };
 
         template < typename T, typename... Args >
-        typename T::Ptr make( const SourceLocation& sourceLocation, Args&&... args )
+        typename T::Ptr make( const libstdhl::SourceLocation& sourceLocation, Args&&... args )
         {
             auto node = std::make_shared< T >( std::forward< Args >( args )... );
             node->setSourceLocation( sourceLocation );

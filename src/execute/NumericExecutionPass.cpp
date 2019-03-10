@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -88,10 +89,7 @@ namespace RT = libcasm_rt;
 char NumericExecutionPass::id = 0;
 
 static libpass::PassRegistration< NumericExecutionPass > PASS(
-    "NumericExecutionPass",
-    "execute numerically over the AST input specification",
-    "ast-exec-num",
-    0 );
+    "NumericExecutionPass", "execute numerically over the AST input specification", "ast-exec", 0 );
 
 class ConstantStack : public Stack< IR::Constant >
 {
@@ -302,6 +300,8 @@ class ExecutionVisitor final : public EmptyVisitor
 
     void execute( const Definition::Ptr& definition );
 
+    void visit( Initially& node ) override;
+
     void visit( Initializer& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
@@ -476,6 +476,12 @@ void ExecutionVisitor::execute( const Definition::Ptr& definition )
         makeFrame( nullptr, definition.get(), definition->maximumNumberOfLocals() ) );
     definition->accept( *this );
     m_frameStack.pop();
+}
+
+void ExecutionVisitor::visit( Initially& node )
+{
+    // just evaluate the encapsulated initializers
+    node.initializers()->accept( *this );
 }
 
 void ExecutionVisitor::visit( Initializer& node )
@@ -1667,7 +1673,7 @@ void StateInitializationVisitor::visit( FunctionDefinition& node )
     Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
     ExecutionVisitor executionVisitor(
         m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant() );
-    node.initializers()->accept( executionVisitor );
+    node.initially()->accept( executionVisitor );
     transaction.merge();
 }
 
@@ -2027,12 +2033,19 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
     const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
-    static std::once_flag constantHandlerFlag;
-    std::call_once( constantHandlerFlag, []() {
-        auto constantHandler = std::make_unique< ConstantHandler >();
-        IR::ConstantHandlerManager::instance().registerConstantHandler(
-            std::move( constantHandler ) );
-    } );
+    static u1 constantHandlerFlag = false;
+    static std::mutex constantHandlerLock;
+    static auto constantHandlerInitialization = []() {
+        std::lock_guard< std::mutex > guard( constantHandlerLock );
+        if( not constantHandlerFlag )
+        {
+            auto constantHandler = std::make_unique< ConstantHandler >();
+            IR::ConstantHandlerManager::instance().registerConstantHandler(
+                std::move( constantHandler ) );
+            constantHandlerFlag = true;
+        }
+    };
+    constantHandlerInitialization();
 
     ExecutionLocationRegistry locationRegistry;
     Storage globalState;

@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -45,13 +46,13 @@
 #define _LIBCASM_FE_NODE_H_
 
 #include <libcasm-fe/CasmFE>
-#include <libcasm-fe/SourceLocation>
 #include <libcasm-fe/ast/Visitor>
 
 #include <libcasm-ir/Property>
 #include <libcasm-ir/Type>
 
 #include <libstdhl/List>
+#include <libstdhl/SourceLocation>
 
 namespace libcasm_fe
 {
@@ -143,6 +144,7 @@ namespace libcasm_fe
                 DEFAULT_CASE,
                 VARIABLE_BINDING,
                 TOKEN,
+                SPAN,
             };
 
           public:
@@ -153,8 +155,8 @@ namespace libcasm_fe
 
             ID id( void ) const;
 
-            void setSourceLocation( const SourceLocation& sourceLocation );
-            const SourceLocation& sourceLocation( void ) const;
+            void setSourceLocation( const libstdhl::SourceLocation& sourceLocation );
+            const libstdhl::SourceLocation& sourceLocation( void ) const;
 
             /**
              * @return A short description about the node type.
@@ -171,7 +173,7 @@ namespace libcasm_fe
 
           private:
             const ID m_id;
-            SourceLocation m_sourceLocation;
+            libstdhl::SourceLocation m_sourceLocation;
         };
 
         template < typename T >

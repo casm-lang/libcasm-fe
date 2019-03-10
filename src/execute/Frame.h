@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -46,6 +47,8 @@
 
 #include <libcasm-fe/ast/Expression>
 
+#include <libstdhl/SourceLocation>
+
 namespace libcasm_fe
 {
     class Frame
@@ -77,7 +80,7 @@ namespace libcasm_fe
         Frame* top( void ) const;
 
         std::vector< std::string > generateBacktrace(
-            SourceLocation problemLocation, const libcasm_ir::Constant& agentId ) const;
+            libstdhl::SourceLocation problemLocation, const libcasm_ir::Constant& agentId ) const;
 
       private:
         std::vector< std::unique_ptr< Frame > > m_frames;

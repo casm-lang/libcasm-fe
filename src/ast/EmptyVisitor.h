@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -122,6 +123,7 @@ namespace libcasm_fe
             void visit( DefaultCase& node ) override;
             void visit( VariableBinding& node ) override;
             void visit( Token& node ) override;
+            void visit( Span& node ) override;
         };
     }
 }

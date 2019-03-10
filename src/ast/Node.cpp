@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -59,12 +60,12 @@ Node::ID Node::id( void ) const
     return m_id;
 }
 
-void Node::setSourceLocation( const SourceLocation& sourceLocation )
+void Node::setSourceLocation( const libstdhl::SourceLocation& sourceLocation )
 {
     m_sourceLocation = sourceLocation;
 }
 
-const SourceLocation& Node::sourceLocation( void ) const
+const libstdhl::SourceLocation& Node::sourceLocation( void ) const
 {
     return m_sourceLocation;
 }
@@ -327,6 +328,10 @@ std::string Node::description( void ) const
         case ID::TOKEN:
         {
             return "token";
+        }
+        case ID::SPAN:
+        {
+            return "span";
         }
     }
 

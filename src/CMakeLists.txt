@@ -5,6 +5,7 @@
 #   Developed by: Philipp Paulweber
 #                 Emmanuel Pescosta
 #                 Florian Hahn
+#                 Ioan Molnar
 #                 <https://github.com/casm-lang/libcasm-fe>
 #
 #   This file is part of libcasm-fe.
@@ -51,6 +52,7 @@ include_directories(
 
 add_library( ${PROJECT}-cpp OBJECT
   Exception.cpp
+  Lexer.cpp
   Logger.cpp
   Namespace.cpp
   Specification.cpp
@@ -66,6 +68,7 @@ add_library( ${PROJECT}-cpp OBJECT
   ast/Node.cpp
   ast/RecursiveVisitor.cpp
   ast/Rule.cpp
+  ast/Span.cpp
   ast/Token.cpp
   ast/Type.cpp
 
@@ -121,7 +124,6 @@ ecm_generate_headers( ${PROJECT}_HEADERS_CPP
     Exception
     Logger
     Namespace
-    SourceLocation
     Specification
     TypeInfo
   PREFIX
@@ -258,6 +260,7 @@ ecm_generate_headers( ${PROJECT}_AST_HEADERS_CPP
     Node
     RecursiveVisitor
     Rule
+    Span
     Token
     Type
     Visitor

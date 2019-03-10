@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -45,18 +46,18 @@
 
 #include "../various/GrammarToken.h"
 
+#include <libcasm-fe/ast/Token>
+
 #include <cassert>
 
 using namespace libcasm_fe;
 using namespace Ast;
 
-static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-
 Attribute::Attribute( Node::ID type, const Identifier::Ptr& identifier )
 : Node( type )
 , m_identifier( identifier )
-, m_leftBrace( uToken )
-, m_rightBrace( uToken )
+, m_leftBrace( Token::unresolved() )
+, m_rightBrace( Token::unresolved() )
 {
 }
 

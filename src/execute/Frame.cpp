@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -147,7 +148,8 @@ static std::string generateBuiltinTraceLine( Frame* frame )
     return libstdhl::String::format( "Builtin %s(%s)", name.c_str(), args.c_str() );
 }
 
-static std::string generateCalleeTraceLine( Frame* frame, const SourceLocation& problemLocation )
+static std::string generateCalleeTraceLine(
+    Frame* frame, const libstdhl::SourceLocation& problemLocation )
 {
     const auto callee = frame->callee();
     assert( callee != nullptr );
@@ -237,7 +239,7 @@ static std::string generateCalleeTraceLine( Frame* frame, const SourceLocation& 
 }
 
 std::vector< std::string > FrameStack::generateBacktrace(
-    SourceLocation problemLocation, const libcasm_ir::Constant& agentId ) const
+    libstdhl::SourceLocation problemLocation, const libcasm_ir::Constant& agentId ) const
 {
     std::vector< std::string > backtrace;
     backtrace.reserve( m_frames.size() );

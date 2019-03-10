@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -100,8 +101,8 @@ void RecursiveVisitor::visit( FunctionDefinition& node )
     node.argumentTypes()->accept( *this );
     node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
-    node.initializers()->accept( *this );
     node.defined()->accept( *this );
+    node.initially()->accept( *this );
 }
 
 void RecursiveVisitor::visit( DerivedDefinition& node )
@@ -175,20 +176,26 @@ void RecursiveVisitor::visit( InvariantDefinition& node )
 
 void RecursiveVisitor::visit( UndefLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
+    node.spans()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ValueLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
+    node.spans()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ReferenceLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.at()->accept( *this );
     node.identifier()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ListLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.leftBracket()->accept( *this );
     node.expressions()->accept( *this );
     node.rightBracket()->accept( *this );
@@ -196,6 +203,7 @@ void RecursiveVisitor::visit( ListLiteral& node )
 
 void RecursiveVisitor::visit( RangeLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.leftBracket()->accept( *this );
     node.left()->accept( *this );
     node.dotdot()->accept( *this );
@@ -205,6 +213,7 @@ void RecursiveVisitor::visit( RangeLiteral& node )
 
 void RecursiveVisitor::visit( TupleLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.leftBracket()->accept( *this );
     node.expressions()->accept( *this );
     node.rightBracket()->accept( *this );
@@ -212,6 +221,7 @@ void RecursiveVisitor::visit( TupleLiteral& node )
 
 void RecursiveVisitor::visit( RecordLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.leftBracket()->accept( *this );
     node.namedExpressions()->accept( *this );
     node.rightBracket()->accept( *this );
@@ -578,6 +588,7 @@ void RecursiveVisitor::visit( Defined& node )
 void RecursiveVisitor::visit( Identifier& node )
 {
     node.doubleColon()->accept( *this );
+    node.spans()->accept( *this );
 }
 
 void RecursiveVisitor::visit( IdentifierPath& node )
@@ -594,6 +605,11 @@ void RecursiveVisitor::visit( VariableBinding& node )
 }
 
 void RecursiveVisitor::visit( Token& node )
+{
+    node.spans()->accept( *this );
+}
+
+void RecursiveVisitor::visit( Span& node )
 {
 }
 

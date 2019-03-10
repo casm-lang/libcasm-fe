@@ -1,10 +1,11 @@
 %{
-//  Copyright (C) 2014-2018 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2019 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -45,8 +46,11 @@
 
 #include <libcasm-fe/Codes>
 #include <libcasm-fe/Logger>
+#include <libcasm-fe/ast/Span>
+
 #include "various/GrammarToken.h"
-#include "../../src/SourceLocation.h"
+
+#include <libstdhl/SourceLocation>
 
 using namespace libcasm_fe;
 
@@ -60,7 +64,9 @@ using namespace libcasm_fe;
 
 // Code run each time a token is matched, see GrammarToken.hpp.
 #define YY_TOKEN_ACTION( TOKEN ) \
-    return Parser::make_##TOKEN( Ast::make< Ast::Token >( m_loc, Grammar::Token:: TOKEN ), m_loc );
+    const auto token = Ast::make< Ast::Token >( m_loc, Grammar::Token:: TOKEN ); \
+    token->setSpans( fetchSpansAndReset() ); \
+    return Parser::make_##TOKEN( token, m_loc );
 
 %}
 
@@ -84,49 +90,118 @@ using namespace libcasm_fe;
 %}
 
 0[bB][01][01\']*[01]* {
-    return Parser::make_BINARY( yytext + 2, m_loc );
+    // BINARY
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( yytext + 2, libstdhl::Type::BINARY );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+        valueLiteral->setRadix( libstdhl::Type::Radix::BINARY );
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_BINARY( valueLiteral, m_loc );
 }
 
 0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* {
-    return Parser::make_HEXADECIMAL( yytext + 2, m_loc );
+    // HEXADECIMAL
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( yytext + 2, libstdhl::Type::HEXADECIMAL );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+        valueLiteral->setRadix( libstdhl::Type::Radix::HEXADECIMAL );
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_HEXADECIMAL( valueLiteral, m_loc );
 }
 
 0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
-    return Parser::make_RATIONAL( yytext + 2, m_loc );
+    // RATIONAL
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::RationalConstant >( yytext + 2 );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_RATIONAL( valueLiteral, m_loc );
 }
 
 [0-9][0-9\']*[0-9]* {
-    return Parser::make_INTEGER( yytext, m_loc );
+    // INTEGER
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::IntegerConstant >( yytext, libstdhl::Type::DECIMAL );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_INTEGER( valueLiteral, m_loc );
 }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? {
-    return Parser::make_DECIMAL( yytext, m_loc );
+    // DECIMAL
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::DecimalConstant >( yytext );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_DECIMAL( valueLiteral, m_loc );
 }
 
 {{grammartoken}}
 
 [a-zA-Z_][a-zA-Z0-9\_]* {
-    return Parser::make_IDENTIFIER( yytext, m_loc );
+    // IDENTIFIER
+    const auto identifier = Ast::make< Identifier >( m_loc, yytext );
+    identifier->setSpans( fetchSpansAndReset() );
+    return Parser::make_IDENTIFIER( identifier, m_loc );
 }
 
 [\x20]+ { // space
-    // TODO: @moiova add span space creation of length yyleng here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::SPACE, yyleng);
+    m_spans->add(span);
     m_loc.step();
 }
 
 [\r]+ { // carriage return
-    // TODO: @moiova add span carriage return creation of length yyleng here
     m_loc.step();
 }
 
 [\t]+ { // tabulator
-    // TODO: @moiova add span tabulator creation of length yyleng here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::TABULATOR, yyleng );
+    m_spans->add(span);
     m_loc.step();
 }
 
 [\n]+ { // newline
     m_loc.lines( yyleng );
-    // TODO: @moiova add span newline creation of length yyleng here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::NEWLINE, yyleng );
+    m_spans->add(span);
     m_loc.step();
 }
 
@@ -139,14 +214,43 @@ using namespace libcasm_fe;
     m_strbuf.append( yytext );
 }
 <LCOMMENT>\n {
-    unput( *yytext );
-    m_loc.columns( -1 );
-    // TODO: @moiova add span single line comment creation of m_strbuf here
-    m_loc.step();
-    BEGIN( INITIAL );
+    m_loc.lines( yyleng );
+    m_strbuf.append( yytext );
+    const auto firstCharacter = yyinput();
+    if( firstCharacter != '/' )
+    {
+        if( firstCharacter )
+        {
+            unput( firstCharacter );
+        }
+
+        const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+        m_spans->add( span );
+        m_loc.step();
+        BEGIN( INITIAL );
+    }
+    else
+    {
+        const auto secondCharacter = yyinput();
+        if( secondCharacter != '/' )
+        {
+            unput( secondCharacter );
+            unput( firstCharacter );
+            const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+            m_spans->add( span );
+            m_loc.step();
+            BEGIN( INITIAL );
+        }
+        else
+        {
+            m_strbuf.append( std::to_string( firstCharacter ));
+            m_strbuf.append( std::to_string( secondCharacter ));
+        }
+    }
 }
 <LCOMMENT><<EOF>> {
-    // TODO: @moiova add span single line comment creation of m_strbuf here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+    m_spans->add(span);
     BEGIN( INITIAL );
 }
 
@@ -157,7 +261,8 @@ using namespace libcasm_fe;
 }
 <COMMENT>"*/" {
     m_strbuf.append( yytext );
-    // TODO: @moiova add span single line comment creation of m_strbuf here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::BLOCK_COMMENT, m_strbuf.length() );
+    m_spans->add(span);
     m_loc.step();
     BEGIN( INITIAL );
 }
@@ -203,7 +308,18 @@ using namespace libcasm_fe;
 }
 <STRING>\" {
     BEGIN( INITIAL );
-    return Parser::make_STRING( m_strbuf, m_loc );
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::StringConstant >( m_strbuf );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_STRING( valueLiteral, m_loc );
 }
 
 . {
@@ -213,24 +329,6 @@ using namespace libcasm_fe;
 }
 
 %%
-
-Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
-: yyFlexLexer( in, out )
-, m_log( log )
-, m_loc()
-, m_strbuf()
-{
-}
-
-void Lexer::setFileName( const std::string& fileName )
-{
-    m_loc.begin.fileName = m_loc.end.fileName = std::make_shared< std::string >( fileName );
-}
-
-void Lexer::LexerError( const char* msg )
-{
-    m_log.error( {m_loc}, msg, Code::SyntaxError );
-}
 
 //  
 //  Local variables:

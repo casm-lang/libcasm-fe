@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -45,6 +46,7 @@
 #define _LIBCASM_FE_TOKEN_H_
 
 #include <libcasm-fe/ast/Node>
+#include <libcasm-fe/ast/Span>
 
 namespace libcasm_fe
 {
@@ -60,9 +62,14 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Token >;
 
+            static const Token::Ptr& unresolved( void );
+
             Token( const libcasm_fe::Grammar::Token token );
 
             libcasm_fe::Grammar::Token token( void ) const;
+
+            void setSpans( const Spans::Ptr& spans );
+            const Spans::Ptr& spans( void ) const;
 
             std::string tokenString( void ) const;
 
@@ -70,6 +77,7 @@ namespace libcasm_fe
 
           private:
             libcasm_fe::Grammar::Token m_token;
+            Spans::Ptr m_spans;
         };
     }
 }

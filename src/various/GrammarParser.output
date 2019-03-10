@@ -391,13 +391,13 @@ error (256) 8 21 26 27 31 54 67 68 71 72 88 118 122 126 158 216
 ">=" <Ast::Token::Ptr> (327) 105
 "{|" <Ast::Token::Ptr> (328) 69 71
 "|}" <Ast::Token::Ptr> (329) 69 71
-"binary" <std::string> (330) 152
-"hexadecimal" <std::string> (331) 153
-"integer" <std::string> (332) 149
-"rational" <std::string> (333) 150
-"decimal" <std::string> (334) 151
-"string" <std::string> (335) 154
-"identifier" <std::string> (336) 194
+"binary" <ValueLiteral::Ptr> (330) 152
+"hexadecimal" <ValueLiteral::Ptr> (331) 153
+"integer" <ValueLiteral::Ptr> (332) 149
+"rational" <ValueLiteral::Ptr> (333) 150
+"decimal" <ValueLiteral::Ptr> (334) 151
+"string" <ValueLiteral::Ptr> (335) 154
+"identifier" <Identifier::Ptr> (336) 194
 BASIC_TYPE (337)
 CALL (338)
 UPLUS (339)

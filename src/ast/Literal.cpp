@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -45,19 +46,33 @@
 
 #include "../various/GrammarToken.h"
 
+#include <libcasm-fe/ast/Token>
+
 #include "Definition.h"
 #include "Type.h"
+
+#include <libstdhl/File>
+#include <libstdhl/String>
 
 using namespace libcasm_fe;
 using namespace Ast;
 
-static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-
 Literal::Literal( Node::ID id )
 : Expression( id )
-, m_leftBracket( uToken )
-, m_rightBracket( uToken )
+, m_leftBracket( Token::unresolved() )
+, m_rightBracket( Token::unresolved() )
+, m_spans( std::make_shared< Spans >() )
 {
+}
+
+void Literal::setSpans( const Spans::Ptr& spans )
+{
+    m_spans = spans;
+}
+
+const Spans::Ptr& Literal::spans( void ) const
+{
+    return m_spans;
 }
 
 void Literal::setLeftBracket( const Token::Ptr& leftBracket )
@@ -107,6 +122,7 @@ void UndefLiteral::accept( Visitor& visitor )
 ValueLiteral::ValueLiteral( const libcasm_ir::Constant::Ptr& value )
 : Literal( Node::ID::VALUE_LITERAL )
 , m_value( value )
+, m_radix( libstdhl::Type::Radix::DECIMAL )
 {
     Expression::setType( value->type().ptr_type() );
 
@@ -123,6 +139,24 @@ void ValueLiteral::setValue( const libcasm_ir::Constant::Ptr& value )
 {
     m_value = value;
     Expression::setType( m_value->type().ptr_type() );
+}
+
+void ValueLiteral::setRadix( const libstdhl::Type::Radix radix )
+{
+    m_radix = radix;
+}
+
+libstdhl::Type::Radix ValueLiteral::radix( void ) const
+{
+    return m_radix;
+}
+
+std::string ValueLiteral::toString( void ) const
+{
+    const auto& begin = sourceLocation().begin;
+    const auto& end = sourceLocation().end;
+    const auto line = libstdhl::File::readLine( *begin.fileName, begin.line );
+    return line.substr( begin.column - 1, end.column - begin.column );
 }
 
 void ValueLiteral::accept( Visitor& visitor )

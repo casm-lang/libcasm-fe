@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -295,6 +296,10 @@ void EmptyVisitor::visit( VariableBinding& )
 }
 
 void EmptyVisitor::visit( Token& )
+{
+}
+
+void EmptyVisitor::visit( Span& )
 {
 }
 

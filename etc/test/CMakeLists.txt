@@ -5,6 +5,7 @@
 #   Developed by: Philipp Paulweber
 #                 Emmanuel Pescosta
 #                 Florian Hahn
+#                 Ioan Molnar
 #                 <https://github.com/casm-lang/libcasm-fe>
 #
 #   This file is part of libcasm-fe.
@@ -52,7 +53,10 @@ include_directories(
 
 add_library( ${PROJECT}-test OBJECT
   main.cpp
+  passes.cpp
   ast/NodeTest.cpp
+  ast/literal.cpp
+  ast/span.cpp
   main.cpp
 #  numeric/expression_evaluation.cpp  # TODO: FIXME: PPA: EPE we should enable this test ASAP
 #  symbolic/expression_evaluation.cpp # TODO: FIXME: PPA: EPE we should enable this test ASAP

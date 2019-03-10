@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -50,6 +51,7 @@
 #include <libcasm-fe/ast/Literal>
 #include <libcasm-fe/ast/Node>
 #include <libcasm-fe/ast/Rule>
+#include <libcasm-fe/ast/Span>
 
 namespace libcasm_fe
 {
@@ -82,6 +84,10 @@ namespace libcasm_fe
 
         const Ast::Definitions::Ptr& definitions( void ) const;
 
+        void setSpans( const Ast::Spans::Ptr& spans );
+
+        const Ast::Spans::Ptr& spans( void ) const;
+
         const Namespace::Ptr& symboltable( void ) const;
 
       private:
@@ -89,6 +95,7 @@ namespace libcasm_fe
         std::string m_name;
         Ast::HeaderDefinition::Ptr m_header;
         Ast::Definitions::Ptr m_definitions;
+        Ast::Spans::Ptr m_spans;
         Namespace::Ptr m_symboltable;
     };
 }

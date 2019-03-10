@@ -5,6 +5,7 @@
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
+//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -238,7 +239,7 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
         }
     }
 
-    node.initializers()->accept( *this );
+    node.initially()->accept( *this );
 }
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
