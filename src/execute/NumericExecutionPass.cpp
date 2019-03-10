@@ -2033,12 +2033,19 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
     const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
-    static std::once_flag constantHandlerFlag;
-    std::call_once( constantHandlerFlag, []() {
-        auto constantHandler = std::make_unique< ConstantHandler >();
-        IR::ConstantHandlerManager::instance().registerConstantHandler(
-            std::move( constantHandler ) );
-    } );
+    static u1 constantHandlerFlag = false;
+    static std::mutex constantHandlerLock;
+    static auto constantHandlerInitialization = []() {
+        std::lock_guard< std::mutex > guard( constantHandlerLock );
+        if( not constantHandlerFlag )
+        {
+            auto constantHandler = std::make_unique< ConstantHandler >();
+            IR::ConstantHandlerManager::instance().registerConstantHandler(
+                std::move( constantHandler ) );
+            constantHandlerFlag = true;
+        }
+    };
+    constantHandlerInitialization();
 
     ExecutionLocationRegistry locationRegistry;
     Storage globalState;
