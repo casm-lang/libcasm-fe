@@ -48,7 +48,7 @@
 
 %defines
 %define api.namespace {libcasm_fe}
-%define parser_class_name {Parser}
+%define api.parser.class {Parser}
 
 %define api.token.constructor
 %define api.value.type variant
