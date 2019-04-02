@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.2.
+// A Bison parser, made by GNU Bison 3.3.2.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
-// Copyright (C) 2002-2015, 2018 Free Software Foundation, Inc.
+// Copyright (C) 2002-2015, 2018-2019 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 64 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
+#line 64 "../../obj/src/GrammarParser.y" // lalr1.cc:401
 
     namespace libcasm_fe
     {
@@ -65,7 +65,7 @@
 
     #define YY_NULLPTR nullptr
 
-#line 69 "GrammarParser.tab.h" // lalr1.cc:403
+#line 69 "GrammarParser.tab.h" // lalr1.cc:401
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -74,8 +74,14 @@
 # include <string>
 # include <vector>
 
+#if defined __cplusplus
+# define YY_CPLUSPLUS __cplusplus
+#else
+# define YY_CPLUSPLUS 199711L
+#endif
+
 // Support move semantics when possible.
-#if defined __cplusplus && 201103L <= __cplusplus
+#if 201103L <= YY_CPLUSPLUS
 # define YY_MOVE           std::move
 # define YY_MOVE_OR_COPY   move
 # define YY_MOVE_REF(Type) Type&&
@@ -87,6 +93,22 @@
 # define YY_MOVE_REF(Type) Type&
 # define YY_RVREF(Type)    const Type&
 # define YY_COPY(Type)     const Type&
+#endif
+
+// Support noexcept when possible.
+#if 201103L <= YY_CPLUSPLUS
+# define YY_NOEXCEPT noexcept
+# define YY_NOTHROW
+#else
+# define YY_NOEXCEPT
+# define YY_NOTHROW throw ()
+#endif
+
+// Support constexpr when possible.
+#if 201703 <= YY_CPLUSPLUS
+# define YY_CONSTEXPR constexpr
+#else
+# define YY_CONSTEXPR
 #endif
 
 #include <typeinfo>
@@ -157,193 +179,79 @@
 # define YYDEBUG 1
 #endif
 
-#line 50 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
+#line 50 "../../obj/src/GrammarParser.y" // lalr1.cc:401
 namespace libcasm_fe {
-#line 163 "GrammarParser.tab.h" // lalr1.cc:403
+#line 185 "GrammarParser.tab.h" // lalr1.cc:401
 
-  /// A stack with random access from its top.
-  template <typename T, typename S = std::vector<T> >
-  class stack
+
+
+  /// A Bison parser.
+  class Parser
   {
   public:
-    // Hide our reversed order.
-    typedef typename S::reverse_iterator iterator;
-    typedef typename S::const_reverse_iterator const_iterator;
-    typedef typename S::size_type size_type;
-
-    stack (size_type n = 200)
-      : seq_ (n)
-    {}
-
-    /// Random access.
-    ///
-    /// Index 0 returns the topmost element.
-    T&
-    operator[] (size_type i)
-    {
-      return seq_[size () - 1 - i];
-    }
-
-    /// Random access.
-    ///
-    /// Index 0 returns the topmost element.
-    T&
-    operator[] (int i)
-    {
-      return operator[] (size_type (i));
-    }
-
-    /// Random access.
-    ///
-    /// Index 0 returns the topmost element.
-    const T&
-    operator[] (size_type i) const
-    {
-      return seq_[size () - 1 - i];
-    }
-
-    /// Random access.
-    ///
-    /// Index 0 returns the topmost element.
-    const T&
-    operator[] (int i) const
-    {
-      return operator[] (size_type (i));
-    }
-
-    /// Steal the contents of \a t.
-    ///
-    /// Close to move-semantics.
-    void
-    push (YY_MOVE_REF (T) t)
-    {
-      seq_.push_back (T ());
-      operator[](0).move (t);
-    }
-
-    void
-    pop (int n = 1)
-    {
-      for (; 0 < n; --n)
-        seq_.pop_back ();
-    }
-
-    void
-    clear ()
-    {
-      seq_.clear ();
-    }
-
-    size_type
-    size () const
-    {
-      return seq_.size ();
-    }
-
-    const_iterator
-    begin () const
-    {
-      return seq_.rbegin ();
-    }
-
-    const_iterator
-    end () const
-    {
-      return seq_.rend ();
-    }
-
-  private:
-    stack (const stack&);
-    stack& operator= (const stack&);
-    /// The wrapped container.
-    S seq_;
-  };
-
-  /// Present a slice of the top of a stack.
-  template <typename T, typename S = stack<T> >
-  class slice
-  {
-  public:
-    slice (const S& stack, int range)
-      : stack_ (stack)
-      , range_ (range)
-    {}
-
-    const T&
-    operator[] (int i) const
-    {
-      return stack_[range_ - i];
-    }
-
-  private:
-    const S& stack_;
-    int range_;
-  };
-
-
-
-  /// A char[S] buffer to store and retrieve objects.
+#ifndef YYSTYPE
+  /// A buffer to store and retrieve objects.
   ///
   /// Sort of a variant, but does not keep track of the nature
   /// of the stored data, since that knowledge is available
-  /// via the current state.
-  template <size_t S>
-  struct variant
+  /// via the current parser state.
+  class semantic_type
   {
+  public:
     /// Type of *this.
-    typedef variant<S> self_type;
+    typedef semantic_type self_type;
 
     /// Empty construction.
-    variant ()
+    semantic_type () YY_NOEXCEPT
       : yybuffer_ ()
       , yytypeid_ (YY_NULLPTR)
     {}
 
     /// Construct and fill.
     template <typename T>
-    variant (YY_RVREF (T) t)
+    semantic_type (YY_RVREF (T) t)
       : yytypeid_ (&typeid (T))
     {
-      YYASSERT (sizeof (T) <= S);
+      YYASSERT (sizeof (T) <= size);
       new (yyas_<T> ()) T (YY_MOVE (t));
     }
 
     /// Destruction, allowed only if empty.
-    ~variant ()
+    ~semantic_type () YY_NOEXCEPT
     {
       YYASSERT (!yytypeid_);
     }
 
+# if 201103L <= YY_CPLUSPLUS
+    /// Instantiate a \a T in here from \a t.
+    template <typename T, typename... U>
+    T&
+    emplace (U&&... u)
+    {
+      YYASSERT (!yytypeid_);
+      YYASSERT (sizeof (T) <= size);
+      yytypeid_ = & typeid (T);
+      return *new (yyas_<T> ()) T (std::forward <U>(u)...);
+    }
+# else
     /// Instantiate an empty \a T in here.
     template <typename T>
     T&
     emplace ()
     {
       YYASSERT (!yytypeid_);
-      YYASSERT (sizeof (T) <= S);
+      YYASSERT (sizeof (T) <= size);
       yytypeid_ = & typeid (T);
       return *new (yyas_<T> ()) T ();
     }
 
-# if defined __cplusplus && 201103L <= __cplusplus
-    /// Instantiate a \a T in here from \a t.
-    template <typename T, typename U>
-    T&
-    emplace (U&& u)
-    {
-      YYASSERT (!yytypeid_);
-      YYASSERT (sizeof (T) <= S);
-      yytypeid_ = & typeid (T);
-      return *new (yyas_<T> ()) T (std::forward <U>(u));
-    }
-# else
     /// Instantiate a \a T in here from \a t.
     template <typename T>
     T&
     emplace (const T& t)
     {
       YYASSERT (!yytypeid_);
-      YYASSERT (sizeof (T) <= S);
+      YYASSERT (sizeof (T) <= size);
       yytypeid_ = & typeid (T);
       return *new (yyas_<T> ()) T (t);
     }
@@ -370,75 +278,75 @@ namespace libcasm_fe {
     /// Accessor to a built \a T.
     template <typename T>
     T&
-    as ()
+    as () YY_NOEXCEPT
     {
       YYASSERT (yytypeid_);
       YYASSERT (*yytypeid_ == typeid (T));
-      YYASSERT (sizeof (T) <= S);
+      YYASSERT (sizeof (T) <= size);
       return *yyas_<T> ();
     }
 
     /// Const accessor to a built \a T (for %printer).
     template <typename T>
     const T&
-    as () const
+    as () const YY_NOEXCEPT
     {
       YYASSERT (yytypeid_);
       YYASSERT (*yytypeid_ == typeid (T));
-      YYASSERT (sizeof (T) <= S);
+      YYASSERT (sizeof (T) <= size);
       return *yyas_<T> ();
     }
 
-    /// Swap the content with \a other, of same type.
+    /// Swap the content with \a that, of same type.
     ///
     /// Both variants must be built beforehand, because swapping the actual
     /// data requires reading it (with as()), and this is not possible on
     /// unconstructed variants: it would require some dynamic testing, which
     /// should not be the variant's responsibility.
     /// Swapping between built and (possibly) non-built is done with
-    /// variant::move ().
+    /// self_type::move ().
     template <typename T>
     void
-    swap (self_type& other)
+    swap (self_type& that) YY_NOEXCEPT
     {
       YYASSERT (yytypeid_);
-      YYASSERT (*yytypeid_ == *other.yytypeid_);
-      std::swap (as<T> (), other.as<T> ());
+      YYASSERT (*yytypeid_ == *that.yytypeid_);
+      std::swap (as<T> (), that.as<T> ());
     }
 
-    /// Move the content of \a other to this.
+    /// Move the content of \a that to this.
     ///
-    /// Destroys \a other.
+    /// Destroys \a that.
     template <typename T>
     void
-    move (self_type& other)
+    move (self_type& that)
     {
-# if defined __cplusplus && 201103L <= __cplusplus
-      emplace<T> (std::move (other.as<T> ()));
+# if 201103L <= YY_CPLUSPLUS
+      emplace<T> (std::move (that.as<T> ()));
 # else
       emplace<T> ();
-      swap<T> (other);
+      swap<T> (that);
 # endif
-      other.destroy<T> ();
+      that.destroy<T> ();
     }
 
-# if defined __cplusplus && 201103L <= __cplusplus
-    /// Move the content of \a other to this.
+# if 201103L <= YY_CPLUSPLUS
+    /// Move the content of \a that to this.
     template <typename T>
     void
-    move (self_type&& other)
+    move (self_type&& that)
     {
-      emplace<T> (std::move (other.as<T> ()));
-      other.destroy<T> ();
+      emplace<T> (std::move (that.as<T> ()));
+      that.destroy<T> ();
     }
 #endif
 
-    /// Copy the content of \a other to this.
+    /// Copy the content of \a that to this.
     template <typename T>
     void
-    copy (const self_type& other)
+    copy (const self_type& that)
     {
-      emplace<T> (other.as<T> ());
+      emplace<T> (that.as<T> ());
     }
 
     /// Destroy the stored \a T.
@@ -453,12 +361,12 @@ namespace libcasm_fe {
   private:
     /// Prohibit blind copies.
     self_type& operator= (const self_type&);
-    variant (const self_type&);
+    semantic_type (const self_type&);
 
     /// Accessor to raw memory as \a T.
     template <typename T>
     T*
-    yyas_ ()
+    yyas_ () YY_NOEXCEPT
     {
       void *yyp = yybuffer_.yyraw;
       return static_cast<T*> (yyp);
@@ -467,30 +375,12 @@ namespace libcasm_fe {
     /// Const accessor to raw memory as \a T.
     template <typename T>
     const T*
-    yyas_ () const
+    yyas_ () const YY_NOEXCEPT
     {
       const void *yyp = yybuffer_.yyraw;
       return static_cast<const T*> (yyp);
      }
 
-    union
-    {
-      /// Strongest alignment constraints.
-      long double yyalign_me;
-      /// A buffer large enough to store any of the semantic values.
-      char yyraw[S];
-    } yybuffer_;
-
-    /// Whether the content is built: if defined, the name of the stored type.
-    const std::type_info *yytypeid_;
-  };
-
-
-  /// A Bison parser.
-  class Parser
-  {
-  public:
-#ifndef YYSTYPE
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
@@ -814,10 +704,24 @@ namespace libcasm_fe {
 
       // Type
       char dummy76[sizeof (libcasm_fe::Ast::Type::Ptr)];
-};
+    };
 
-    /// Symbol semantic values.
-    typedef variant<sizeof (union_type)> semantic_type;
+    /// The size of the largest semantic type.
+    enum { size = sizeof (union_type) };
+
+    /// A buffer to store semantic values.
+    union
+    {
+      /// Strongest alignment constraints.
+      long double yyalign_me;
+      /// A buffer large enough to store any of the semantic values.
+      char yyraw[size];
+    } yybuffer_;
+
+    /// Whether the content is built: if defined, the name of the stored type.
+    const std::type_info *yytypeid_;
+  };
+
 #else
     typedef YYSTYPE semantic_type;
 #endif
@@ -827,7 +731,18 @@ namespace libcasm_fe {
     /// Syntax errors thrown from user actions.
     struct syntax_error : std::runtime_error
     {
-      syntax_error (const location_type& l, const std::string& m);
+      syntax_error (const location_type& l, const std::string& m)
+        : std::runtime_error (m)
+        , location (l)
+      {}
+
+      syntax_error (const syntax_error& s)
+        : std::runtime_error (s.what ())
+        , location (s.location)
+      {}
+
+      ~syntax_error () YY_NOEXCEPT YY_NOTHROW;
+
       location_type location;
     };
 
@@ -949,1769 +864,1041 @@ namespace libcasm_fe {
       typedef Base super_type;
 
       /// Default constructor.
-      basic_symbol ();
+      basic_symbol ()
+        : value ()
+        , location ()
+      {}
 
-      /// Move or copy constructor.
-      basic_symbol (YY_RVREF (basic_symbol) other);
+#if 201103L <= YY_CPLUSPLUS
+      /// Move constructor.
+      basic_symbol (basic_symbol&& that);
+#endif
 
+      /// Copy constructor.
+      basic_symbol (const basic_symbol& that);
 
       /// Constructor for valueless symbols, and symbols from each type.
-      basic_symbol (typename Base::kind_type t, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Ast::Token::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Attribute::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Attributes::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (BasicAttribute::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (BasicType::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (BlockRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (CallExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (CallRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (CardinalityExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Case::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (CaseRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Cases::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (ChooseExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (ChooseRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (ConditionalExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (ConditionalRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Defined::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Definition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Definitions::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (DerivedDefinition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (DirectCallExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (EnumerationDefinition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (EnumeratorDefinition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Enumerators::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (ExistentialQuantifierExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Expression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (ExpressionAttribute::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Expressions::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (FixedSizedType::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (ForallRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (FunctionDefinition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (HeaderDefinition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Identifier::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (IdentifierPath::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (IndirectCallExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (InitDefinition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Initializer::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Initializers::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Initially::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (InvariantDefinition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (IterateRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (LetExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (LetRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (ListLiteral::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Literal::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (LiteralCallExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (MethodCallExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (NamedExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (NamedExpressions::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (RangeLiteral::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (RecordLiteral::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (RecordType::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (ReferenceLiteral::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (RelationType::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Rule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (RuleDefinition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Rules::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (SequenceRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (SkipRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Specification::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (TemplateType::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (TupleLiteral::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (TupleType::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (TypeCastingExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (Types::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (UndefLiteral::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (UniversalQuantifierExpression::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (UpdateRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (UsingDefinition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (ValueLiteral::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (VariableBinding::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (VariableBindings::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (VariableDefinition::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (VariableDefinitions::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (WhileRule::Ptr) v, YY_RVREF (location_type) l);
-      basic_symbol (typename Base::kind_type t, YY_RVREF (libcasm_fe::Ast::Type::Ptr) v, YY_RVREF (location_type) l);
-
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, location_type&& l)
+        : Base (t)
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const location_type& l)
+        : Base (t)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Ast::Token::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Ast::Token::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Attribute::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Attribute::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Attributes::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Attributes::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, BasicAttribute::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const BasicAttribute::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, BasicType::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const BasicType::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, BlockRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const BlockRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, CallExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const CallExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, CallRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const CallRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, CardinalityExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const CardinalityExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Case::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Case::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, CaseRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const CaseRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Cases::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Cases::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ChooseExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ChooseExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ChooseRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ConditionalExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ConditionalRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ConditionalRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Defined::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Defined::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Definition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Definition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Definitions::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Definitions::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, DerivedDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const DerivedDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, DirectCallExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const DirectCallExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, EnumerationDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const EnumerationDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, EnumeratorDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const EnumeratorDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Enumerators::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Enumerators::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ExistentialQuantifierExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ExistentialQuantifierExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Expression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Expression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ExpressionAttribute::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ExpressionAttribute::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Expressions::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Expressions::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, FixedSizedType::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const FixedSizedType::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ForallRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ForallRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, FunctionDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const FunctionDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, HeaderDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const HeaderDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Identifier::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Identifier::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, IdentifierPath::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const IdentifierPath::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, IndirectCallExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const IndirectCallExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, InitDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const InitDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Initializer::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Initializer::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Initializers::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Initializers::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Initially::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Initially::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, InvariantDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const InvariantDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, IterateRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const IterateRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, LetExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const LetExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, LetRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const LetRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ListLiteral::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ListLiteral::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Literal::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Literal::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, LiteralCallExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const LiteralCallExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, MethodCallExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const MethodCallExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, NamedExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const NamedExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, NamedExpressions::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const NamedExpressions::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, RangeLiteral::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const RangeLiteral::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, RecordLiteral::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const RecordLiteral::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, RecordType::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const RecordType::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ReferenceLiteral::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ReferenceLiteral::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, RelationType::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const RelationType::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Rule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Rule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, RuleDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Rules::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Rules::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, SequenceRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const SequenceRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, SkipRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const SkipRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Specification::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Specification::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, TemplateType::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const TemplateType::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, TupleLiteral::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const TupleLiteral::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, TupleType::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const TupleType::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, TypeCastingExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const TypeCastingExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Types::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Types::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, UndefLiteral::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const UndefLiteral::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, UniversalQuantifierExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const UniversalQuantifierExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, UpdateRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, UsingDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const UsingDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ValueLiteral::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ValueLiteral::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, VariableBinding::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const VariableBinding::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, VariableBindings::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const VariableBindings::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, VariableDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, VariableDefinitions::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const VariableDefinitions::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, WhileRule::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const WhileRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, libcasm_fe::Ast::Type::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const libcasm_fe::Ast::Type::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
 
       /// Destroy the symbol.
-      ~basic_symbol ();
+      ~basic_symbol ()
+      {
+        clear ();
+      }
 
       /// Destroy contents, and record that is empty.
-      void clear ();
-
-      /// Whether empty.
-      bool empty () const;
-
-      /// Destructive move, \a s is emptied into this.
-      void move (basic_symbol& s);
-
-      /// The semantic value.
-      semantic_type value;
-
-      /// The location.
-      location_type location;
-
-    private:
-#if defined __cplusplus && __cplusplus < 201103L
-      /// Assignment operator.
-      basic_symbol& operator= (const basic_symbol& other);
-#endif
-    };
-
-    /// Type access provider for token (enum) based symbols.
-    struct by_type
-    {
-      /// Default constructor.
-      by_type ();
-
-      /// Copy constructor.
-      by_type (const by_type& other);
-
-      /// The symbol type as needed by the constructor.
-      typedef token_type kind_type;
-
-      /// Constructor from (external) token numbers.
-      by_type (kind_type t);
-
-      /// Record that this symbol is empty.
-      void clear ();
-
-      /// Steal the symbol type from \a that.
-      void move (by_type& that);
-
-      /// The (internal) type number (corresponding to \a type).
-      /// \a empty when empty.
-      symbol_number_type type_get () const;
-
-      /// The token.
-      token_type token () const;
-
-      /// The symbol type.
-      /// \a empty_symbol when empty.
-      /// An int, not token_number_type, to be able to store empty_symbol.
-      int type;
-    };
-
-    /// "External" symbols: returned by the scanner.
-    typedef basic_symbol<by_type> symbol_type;
-
-    /// Build a parser object.
-    Parser (Logger& m_log_yyarg, Lexer& m_lexer_yyarg, Specification& m_specification_yyarg);
-    virtual ~Parser ();
-
-    /// Parse.  An alias for parse ().
-    /// \returns  0 iff parsing succeeded.
-    int operator() ();
-
-    /// Parse.
-    /// \returns  0 iff parsing succeeded.
-    virtual int parse ();
-
-#if YYDEBUG
-    /// The current debugging stream.
-    std::ostream& debug_stream () const YY_ATTRIBUTE_PURE;
-    /// Set the current debugging stream.
-    void set_debug_stream (std::ostream &);
-
-    /// Type for debugging levels.
-    typedef int debug_level_type;
-    /// The current debugging level.
-    debug_level_type debug_level () const YY_ATTRIBUTE_PURE;
-    /// Set the current debugging level.
-    void set_debug_level (debug_level_type l);
-#endif
-
-    /// Report a syntax error.
-    /// \param loc    where the syntax error is found.
-    /// \param msg    a description of the syntax error.
-    virtual void error (const location_type& loc, const std::string& msg);
-
-    /// Report a syntax error.
-    void error (const syntax_error& err);
-
-    // Symbol constructors declarations.
-    static
-    symbol_type
-    make_END (YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_CASM (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_INIT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_DERIVED (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_ENUMERATION (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_RULE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_USING (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_INVARIANT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_FUNCTION (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_INITIALLY (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_DEFINED (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_SEQ (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_ENDSEQ (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_PAR (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_ENDPAR (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_SKIP (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_LET (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_IN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_FORALL (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_CHOOSE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_ITERATE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_DO (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_IF (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_THEN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_ELSE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_CASE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_OF (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_DEFAULT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_HOLDS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_EXISTS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_WITH (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_AS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_WHILE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_UNDEF (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_FALSE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_TRUE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_AND (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_OR (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_XOR (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_IMPLIES (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_NOT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_PLUS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_MINUS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_EQUAL (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_LPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_RPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_LSQPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_RSQPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_LCURPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_RCURPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_COLON (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_DOUBLECOLON (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_UNDERLINE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_VERTICAL_BAR (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_AT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_COMMA (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_LESSER (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_GREATER (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_ASTERIX (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_SLASH (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_PERCENT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_CARET (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_MARK (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_DOTDOT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_DOT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_MAPS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_ARROW (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_UPDATE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_NEQUAL (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_LESSEQ (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_GREATEREQ (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_SEQ_BRACKET (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_ENDSEQ_BRACKET (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_BINARY (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_HEXADECIMAL (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_INTEGER (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_RATIONAL (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_DECIMAL (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_STRING (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_IDENTIFIER (YY_COPY (Identifier::Ptr) v, YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_BASIC_TYPE (YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_CALL (YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_UPLUS (YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_UMINUS (YY_COPY (location_type) l);
-
-    static
-    symbol_type
-    make_CALL_WITHOUT_ARGS (YY_COPY (location_type) l);
-
-
-
-  private:
-    /// This class is not copyable.
-    Parser (const Parser&);
-    Parser& operator= (const Parser&);
-
-    /// State numbers.
-    typedef int state_type;
-
-    /// Generate an error message.
-    /// \param yystate   the state where the error occurred.
-    /// \param yyla      the lookahead token.
-    virtual std::string yysyntax_error_ (state_type yystate,
-                                         const symbol_type& yyla) const;
-
-    /// Compute post-reduction state.
-    /// \param yystate   the current state
-    /// \param yysym     the nonterminal to push on the stack
-    state_type yy_lr_goto_state_ (state_type yystate, int yysym);
-
-    /// Whether the given \c yypact_ value indicates a defaulted state.
-    /// \param yyvalue   the value to check
-    static bool yy_pact_value_is_default_ (int yyvalue);
-
-    /// Whether the given \c yytable_ value indicates a syntax error.
-    /// \param yyvalue   the value to check
-    static bool yy_table_value_is_error_ (int yyvalue);
-
-    static const short yypact_ninf_;
-    static const short yytable_ninf_;
-
-    /// Convert a scanner token number \a t to a symbol number.
-    static token_number_type yytranslate_ (token_type t);
-
-    // Tables.
-  // YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
-  // STATE-NUM.
-  static const short yypact_[];
-
-  // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
-  // Performed when YYTABLE does not specify something else to do.  Zero
-  // means the default is an error.
-  static const unsigned char yydefact_[];
-
-  // YYPGOTO[NTERM-NUM].
-  static const short yypgoto_[];
-
-  // YYDEFGOTO[NTERM-NUM].
-  static const short yydefgoto_[];
-
-  // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
-  // positive, shift that token.  If negative, reduce the rule whose
-  // number is the opposite.  If YYTABLE_NINF, syntax error.
-  static const short yytable_[];
-
-  static const short yycheck_[];
-
-  // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
-  // symbol of state STATE-NUM.
-  static const unsigned char yystos_[];
-
-  // YYR1[YYN] -- Symbol number of symbol that rule YYN derives.
-  static const unsigned char yyr1_[];
-
-  // YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.
-  static const unsigned char yyr2_[];
-
-
-    /// Convert the symbol name \a n to a form suitable for a diagnostic.
-    static std::string yytnamerr_ (const char *n);
-
-
-    /// For a symbol, its name in clear.
-    static const char* const yytname_[];
-#if YYDEBUG
-  // YYRLINE[YYN] -- Source line where rule number YYN was defined.
-  static const unsigned short yyrline_[];
-    /// Report on the debug stream that the rule \a r is going to be reduced.
-    virtual void yy_reduce_print_ (int r);
-    /// Print the state stack on the debug stream.
-    virtual void yystack_print_ ();
-
-    // Debugging.
-    int yydebug_;
-    std::ostream* yycdebug_;
-
-    /// \brief Display a symbol type, value and location.
-    /// \param yyo    The output stream.
-    /// \param yysym  The symbol.
-    template <typename Base>
-    void yy_print_ (std::ostream& yyo, const basic_symbol<Base>& yysym) const;
-#endif
-
-    /// \brief Reclaim the memory associated to a symbol.
-    /// \param yymsg     Why this token is reclaimed.
-    ///                  If null, print nothing.
-    /// \param yysym     The symbol.
-    template <typename Base>
-    void yy_destroy_ (const char* yymsg, basic_symbol<Base>& yysym) const;
-
-  private:
-    /// Type access provider for state based symbols.
-    struct by_state
-    {
-      /// Default constructor.
-      by_state ();
-
-      /// The symbol type as needed by the constructor.
-      typedef state_type kind_type;
-
-      /// Constructor.
-      by_state (kind_type s);
-
-      /// Copy constructor.
-      by_state (const by_state& other);
-
-      /// Record that this symbol is empty.
-      void clear ();
-
-      /// Steal the symbol type from \a that.
-      void move (by_state& that);
-
-      /// The (internal) type number (corresponding to \a state).
-      /// \a empty_symbol when empty.
-      symbol_number_type type_get () const;
-
-      /// The state number used to denote an empty symbol.
-      enum { empty_state = -1 };
-
-      /// The state.
-      /// \a empty when empty.
-      state_type state;
-    };
-
-    /// "Internal" symbol: element of the stack.
-    struct stack_symbol_type : basic_symbol<by_state>
-    {
-      /// Superclass.
-      typedef basic_symbol<by_state> super_type;
-      /// Construct an empty symbol.
-      stack_symbol_type ();
-      /// Move or copy construction.
-      stack_symbol_type (YY_RVREF (stack_symbol_type) that);
-      /// Steal the contents from \a sym to build this.
-      stack_symbol_type (state_type s, YY_MOVE_REF (symbol_type) sym);
-#if defined __cplusplus && __cplusplus < 201103L
-      /// Assignment, needed by push_back by some old implementations.
-      /// Moves the contents of that.
-      stack_symbol_type& operator= (stack_symbol_type& that);
-#endif
-    };
-
-    /// Stack type.
-    typedef stack<stack_symbol_type> stack_type;
-
-    /// The stack.
-    stack_type yystack_;
-
-    /// Push a new state on the stack.
-    /// \param m    a debug message to display
-    ///             if null, no trace is output.
-    /// \param sym  the symbol
-    /// \warning the contents of \a s.value is stolen.
-    void yypush_ (const char* m, YY_MOVE_REF (stack_symbol_type) sym);
-
-    /// Push a new look ahead token on the state on the stack.
-    /// \param m    a debug message to display
-    ///             if null, no trace is output.
-    /// \param s    the state
-    /// \param sym  the symbol (for its value and location).
-    /// \warning the contents of \a sym.value is stolen.
-    void yypush_ (const char* m, state_type s, YY_MOVE_REF (symbol_type) sym);
-
-    /// Pop \a n symbols from the stack.
-    void yypop_ (int n = 1);
-
-    /// Constants.
-    enum
-    {
-      yyeof_ = 0,
-      yylast_ = 2703,     ///< Last index in yytable_.
-      yynnts_ = 91,  ///< Number of nonterminal symbols.
-      yyfinal_ = 13, ///< Termination state number.
-      yyterror_ = 1,
-      yyerrcode_ = 256,
-      yyntokens_ = 87  ///< Number of tokens.
-    };
-
-
-    // User arguments.
-    Logger& m_log;
-    Lexer& m_lexer;
-    Specification& m_specification;
-  };
-
-  // Symbol number corresponding to token number t.
-  inline
-  Parser::token_number_type
-  Parser::yytranslate_ (token_type t)
-  {
-    static
-    const token_number_type
-    translate_table[] =
-    {
-     0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
-      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
-      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
-      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86
-    };
-    const unsigned user_token_number_max_ = 341;
-    const token_number_type undef_token_ = 2;
-
-    if (static_cast<int> (t) <= yyeof_)
-      return yyeof_;
-    else if (static_cast<unsigned> (t) <= user_token_number_max_)
-      return translate_table[t];
-    else
-      return undef_token_;
-  }
-
-  inline
-  Parser::syntax_error::syntax_error (const location_type& l, const std::string& m)
-    : std::runtime_error (m)
-    , location (l)
-  {}
-
-  // basic_symbol.
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol ()
-    : value ()
-    , location ()
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (YY_RVREF (basic_symbol) other)
-    : Base (YY_MOVE (other))
-    , value ()
-    , location (YY_MOVE (other.location))
-  {
-    switch (other.type_get ())
-    {
-      case 3: // "CASM"
-      case 4: // "init"
-      case 5: // "derived"
-      case 6: // "enumeration"
-      case 7: // "rule"
-      case 8: // "using"
-      case 9: // "invariant"
-      case 10: // "function"
-      case 11: // "initially"
-      case 12: // "defined"
-      case 13: // "seq"
-      case 14: // "endseq"
-      case 15: // "par"
-      case 16: // "endpar"
-      case 17: // "skip"
-      case 18: // "let"
-      case 19: // "in"
-      case 20: // "forall"
-      case 21: // "choose"
-      case 22: // "iterate"
-      case 23: // "do"
-      case 24: // "if"
-      case 25: // "then"
-      case 26: // "else"
-      case 27: // "case"
-      case 28: // "of"
-      case 29: // "default"
-      case 30: // "holds"
-      case 31: // "exists"
-      case 32: // "with"
-      case 33: // "as"
-      case 34: // "while"
-      case 35: // "undef"
-      case 36: // "false"
-      case 37: // "true"
-      case 38: // "and"
-      case 39: // "or"
-      case 40: // "xor"
-      case 41: // "implies"
-      case 42: // "not"
-      case 43: // "+"
-      case 44: // "-"
-      case 45: // "="
-      case 46: // "("
-      case 47: // ")"
-      case 48: // "["
-      case 49: // "]"
-      case 50: // "{"
-      case 51: // "}"
-      case 52: // ":"
-      case 53: // "::"
-      case 54: // "_"
-      case 55: // "|"
-      case 56: // "@"
-      case 57: // ","
-      case 58: // "<"
-      case 59: // ">"
-      case 60: // "*"
-      case 61: // "/"
-      case 62: // "%"
-      case 63: // "^"
-      case 64: // "'"
-      case 65: // ".."
-      case 66: // "."
-      case 67: // "->"
-      case 68: // "=>"
-      case 69: // ":="
-      case 70: // "!="
-      case 71: // "<="
-      case 72: // ">="
-      case 73: // "{|"
-      case 74: // "|}"
-        value.YY_MOVE_OR_COPY< Ast::Token::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 175: // Attribute
-        value.YY_MOVE_OR_COPY< Attribute::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 174: // Attributes
-        value.YY_MOVE_OR_COPY< Attributes::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 176: // BasicAttribute
-        value.YY_MOVE_OR_COPY< BasicAttribute::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 151: // BasicType
-        value.YY_MOVE_OR_COPY< BasicType::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 113: // BlockRule
-        value.YY_MOVE_OR_COPY< BlockRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 122: // CallExpression
-        value.YY_MOVE_OR_COPY< CallExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 116: // CallRule
-        value.YY_MOVE_OR_COPY< CallRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 133: // CardinalityExpression
-        value.YY_MOVE_OR_COPY< CardinalityExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 108: // CaseLabel
-        value.YY_MOVE_OR_COPY< Case::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 106: // CaseRule
-        value.YY_MOVE_OR_COPY< CaseRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 107: // CaseLabels
-        value.YY_MOVE_OR_COPY< Cases::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 130: // ChooseExpression
-        value.YY_MOVE_OR_COPY< ChooseExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 111: // ChooseRule
-        value.YY_MOVE_OR_COPY< ChooseRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 129: // ConditionalExpression
-        value.YY_MOVE_OR_COPY< ConditionalExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 105: // ConditionalRule
-        value.YY_MOVE_OR_COPY< ConditionalRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 160: // MaybeDefined
-        value.YY_MOVE_OR_COPY< Defined::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 91: // AttributedDefinition
-      case 92: // Definition
-        value.YY_MOVE_OR_COPY< Definition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 90: // Definitions
-        value.YY_MOVE_OR_COPY< Definitions::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 95: // DerivedDefinition
-        value.YY_MOVE_OR_COPY< DerivedDefinition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 123: // DirectCallExpression
-        value.YY_MOVE_OR_COPY< DirectCallExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 94: // EnumerationDefinition
-        value.YY_MOVE_OR_COPY< EnumerationDefinition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 98: // EnumeratorDefinition
-        value.YY_MOVE_OR_COPY< EnumeratorDefinition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 99: // Enumerators
-        value.YY_MOVE_OR_COPY< Enumerators::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 132: // ExistentialQuantifierExpression
-        value.YY_MOVE_OR_COPY< ExistentialQuantifierExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 119: // Term
-      case 120: // SimpleOrClaspedTerm
-      case 121: // OperatorExpression
-        value.YY_MOVE_OR_COPY< Expression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 177: // ExpressionAttribute
-        value.YY_MOVE_OR_COPY< ExpressionAttribute::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 118: // Terms
-        value.YY_MOVE_OR_COPY< Expressions::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 156: // FixedSizedType
-        value.YY_MOVE_OR_COPY< FixedSizedType::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 110: // ForallRule
-        value.YY_MOVE_OR_COPY< ForallRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 97: // FunctionDefinition
-        value.YY_MOVE_OR_COPY< FunctionDefinition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 89: // Header
-        value.YY_MOVE_OR_COPY< HeaderDefinition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 81: // "identifier"
-      case 164: // Identifier
-        value.YY_MOVE_OR_COPY< Identifier::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 165: // IdentifierPath
-        value.YY_MOVE_OR_COPY< IdentifierPath::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 126: // IndirectCallExpression
-        value.YY_MOVE_OR_COPY< IndirectCallExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 93: // InitDefinition
-        value.YY_MOVE_OR_COPY< InitDefinition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 163: // Initializer
-        value.YY_MOVE_OR_COPY< Initializer::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 162: // Initializers
-        value.YY_MOVE_OR_COPY< Initializers::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 161: // MaybeInitially
-        value.YY_MOVE_OR_COPY< Initially::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 101: // InvariantDefinition
-        value.YY_MOVE_OR_COPY< InvariantDefinition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 112: // IterateRule
-        value.YY_MOVE_OR_COPY< IterateRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 128: // LetExpression
-        value.YY_MOVE_OR_COPY< LetExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 109: // LetRule
-        value.YY_MOVE_OR_COPY< LetRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 143: // ListLiteral
-        value.YY_MOVE_OR_COPY< ListLiteral::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 134: // Literal
-        value.YY_MOVE_OR_COPY< Literal::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 125: // LiteralCallExpression
-        value.YY_MOVE_OR_COPY< LiteralCallExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 124: // MethodCallExpression
-        value.YY_MOVE_OR_COPY< MethodCallExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 148: // Assignment
-        value.YY_MOVE_OR_COPY< NamedExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 147: // Assignments
-        value.YY_MOVE_OR_COPY< NamedExpressions::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 144: // RangeLiteral
-        value.YY_MOVE_OR_COPY< RangeLiteral::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 146: // RecordLiteral
-        value.YY_MOVE_OR_COPY< RecordLiteral::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 153: // RecordType
-        value.YY_MOVE_OR_COPY< RecordType::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 142: // ReferenceLiteral
-        value.YY_MOVE_OR_COPY< ReferenceLiteral::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 155: // RelationType
-        value.YY_MOVE_OR_COPY< RelationType::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 103: // Rule
-        value.YY_MOVE_OR_COPY< Rule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 96: // RuleDefinition
-        value.YY_MOVE_OR_COPY< RuleDefinition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 102: // Rules
-        value.YY_MOVE_OR_COPY< Rules::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 114: // SequenceRule
-        value.YY_MOVE_OR_COPY< SequenceRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 104: // SkipRule
-        value.YY_MOVE_OR_COPY< SkipRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 88: // Specification
-        value.YY_MOVE_OR_COPY< Specification::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 154: // TemplateType
-        value.YY_MOVE_OR_COPY< TemplateType::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 145: // TupleLiteral
-        value.YY_MOVE_OR_COPY< TupleLiteral::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 152: // TupleType
-        value.YY_MOVE_OR_COPY< TupleType::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 127: // TypeCastingExpression
-        value.YY_MOVE_OR_COPY< TypeCastingExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 149: // Types
-      case 157: // FunctionParameters
-      case 158: // MaybeFunctionParameters
-        value.YY_MOVE_OR_COPY< Types::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 135: // UndefinedLiteral
-        value.YY_MOVE_OR_COPY< UndefLiteral::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 131: // UniversalQuantifierExpression
-        value.YY_MOVE_OR_COPY< UniversalQuantifierExpression::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 115: // UpdateRule
-        value.YY_MOVE_OR_COPY< UpdateRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 100: // UsingDefinition
-        value.YY_MOVE_OR_COPY< UsingDefinition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 75: // "binary"
-      case 76: // "hexadecimal"
-      case 77: // "integer"
-      case 78: // "rational"
-      case 79: // "decimal"
-      case 80: // "string"
-      case 136: // BooleanLiteral
-      case 137: // IntegerLiteral
-      case 138: // RationalLiteral
-      case 139: // DecimalLiteral
-      case 140: // BinaryLiteral
-      case 141: // StringLiteral
-        value.YY_MOVE_OR_COPY< ValueLiteral::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 173: // VariableBinding
-        value.YY_MOVE_OR_COPY< VariableBinding::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 172: // VariableBindings
-        value.YY_MOVE_OR_COPY< VariableBindings::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 166: // Variable
-      case 169: // TypedVariable
-      case 170: // AttributedVariable
-      case 171: // TypedAttributedVariable
-        value.YY_MOVE_OR_COPY< VariableDefinition::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 159: // Parameters
-      case 167: // AttributedVariables
-      case 168: // TypedVariables
-        value.YY_MOVE_OR_COPY< VariableDefinitions::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 117: // WhileRule
-        value.YY_MOVE_OR_COPY< WhileRule::Ptr > (YY_MOVE (other.value));
-        break;
-
-      case 150: // Type
-        value.YY_MOVE_OR_COPY< libcasm_fe::Ast::Type::Ptr > (YY_MOVE (other.value));
-        break;
-
-      default:
-        break;
-    }
-
-  }
-
-
-  // Implementation of basic_symbol constructor for each type.
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (location_type) l)
-    : Base (t)
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Ast::Token::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Attribute::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Attributes::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (BasicAttribute::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (BasicType::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (BlockRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (CallExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (CallRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (CardinalityExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Case::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (CaseRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Cases::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (ChooseExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (ChooseRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (ConditionalExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (ConditionalRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Defined::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Definition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Definitions::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (DerivedDefinition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (DirectCallExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (EnumerationDefinition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (EnumeratorDefinition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Enumerators::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (ExistentialQuantifierExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Expression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (ExpressionAttribute::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Expressions::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (FixedSizedType::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (ForallRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (FunctionDefinition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (HeaderDefinition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Identifier::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (IdentifierPath::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (IndirectCallExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (InitDefinition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Initializer::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Initializers::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Initially::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (InvariantDefinition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (IterateRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (LetExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (LetRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (ListLiteral::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Literal::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (LiteralCallExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (MethodCallExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (NamedExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (NamedExpressions::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (RangeLiteral::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (RecordLiteral::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (RecordType::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (ReferenceLiteral::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (RelationType::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Rule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (RuleDefinition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Rules::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (SequenceRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (SkipRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Specification::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (TemplateType::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (TupleLiteral::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (TupleType::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (TypeCastingExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (Types::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (UndefLiteral::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (UniversalQuantifierExpression::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (UpdateRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (UsingDefinition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (ValueLiteral::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (VariableBinding::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (VariableBindings::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (VariableDefinition::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (VariableDefinitions::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (WhileRule::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, YY_RVREF (libcasm_fe::Ast::Type::Ptr) v, YY_RVREF (location_type) l)
-    : Base (t)
-    , value (YY_MOVE (v))
-    , location (YY_MOVE (l))
-  {}
-
-
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::~basic_symbol ()
-  {
-    clear ();
-  }
-
-  template <typename Base>
-  void
-  Parser::basic_symbol<Base>::clear ()
-  {
-    // User destructor.
-    symbol_number_type yytype = this->type_get ();
-    basic_symbol<Base>& yysym = *this;
-    (void) yysym;
-    switch (yytype)
-    {
-   default:
-      break;
-    }
-
-    // Type destructor.
-  switch (yytype)
+      void clear ()
+      {
+        // User destructor.
+        symbol_number_type yytype = this->type_get ();
+        basic_symbol<Base>& yysym = *this;
+        (void) yysym;
+        switch (yytype)
+        {
+       default:
+          break;
+        }
+
+        // Type destructor.
+switch (yytype)
     {
       case 3: // "CASM"
       case 4: // "init"
@@ -3114,12 +2301,2649 @@ namespace libcasm_fe {
         break;
     }
 
-    Base::clear ();
+        Base::clear ();
+      }
+
+      /// Whether empty.
+      bool empty () const YY_NOEXCEPT;
+
+      /// Destructive move, \a s is emptied into this.
+      void move (basic_symbol& s);
+
+      /// The semantic value.
+      semantic_type value;
+
+      /// The location.
+      location_type location;
+
+    private:
+#if YY_CPLUSPLUS < 201103L
+      /// Assignment operator.
+      basic_symbol& operator= (const basic_symbol& that);
+#endif
+    };
+
+    /// Type access provider for token (enum) based symbols.
+    struct by_type
+    {
+      /// Default constructor.
+      by_type ();
+
+#if 201103L <= YY_CPLUSPLUS
+      /// Move constructor.
+      by_type (by_type&& that);
+#endif
+
+      /// Copy constructor.
+      by_type (const by_type& that);
+
+      /// The symbol type as needed by the constructor.
+      typedef token_type kind_type;
+
+      /// Constructor from (external) token numbers.
+      by_type (kind_type t);
+
+      /// Record that this symbol is empty.
+      void clear ();
+
+      /// Steal the symbol type from \a that.
+      void move (by_type& that);
+
+      /// The (internal) type number (corresponding to \a type).
+      /// \a empty when empty.
+      symbol_number_type type_get () const YY_NOEXCEPT;
+
+      /// The token.
+      token_type token () const YY_NOEXCEPT;
+
+      /// The symbol type.
+      /// \a empty_symbol when empty.
+      /// An int, not token_number_type, to be able to store empty_symbol.
+      int type;
+    };
+
+    /// "External" symbols: returned by the scanner.
+    struct symbol_type : basic_symbol<by_type>
+    {
+      /// Superclass.
+      typedef basic_symbol<by_type> super_type;
+
+      /// Empty symbol.
+      symbol_type () {}
+
+      /// Constructor for valueless symbols, and symbols from each type.
+#if 201103L <= YY_CPLUSPLUS
+      symbol_type (int tok, location_type l)
+        : super_type(token_type (tok), std::move (l))
+      {
+        YYASSERT (tok == token::END || tok == token::BASIC_TYPE || tok == token::CALL || tok == token::UPLUS || tok == token::UMINUS || tok == token::CALL_WITHOUT_ARGS);
+      }
+#else
+      symbol_type (int tok, const location_type& l)
+        : super_type(token_type (tok), l)
+      {
+        YYASSERT (tok == token::END || tok == token::BASIC_TYPE || tok == token::CALL || tok == token::UPLUS || tok == token::UMINUS || tok == token::CALL_WITHOUT_ARGS);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      symbol_type (int tok, Ast::Token::Ptr v, location_type l)
+        : super_type(token_type (tok), std::move (v), std::move (l))
+      {
+        YYASSERT (tok == token::CASM || tok == token::INIT || tok == token::DERIVED || tok == token::ENUMERATION || tok == token::RULE || tok == token::USING || tok == token::INVARIANT || tok == token::FUNCTION || tok == token::INITIALLY || tok == token::DEFINED || tok == token::SEQ || tok == token::ENDSEQ || tok == token::PAR || tok == token::ENDPAR || tok == token::SKIP || tok == token::LET || tok == token::IN || tok == token::FORALL || tok == token::CHOOSE || tok == token::ITERATE || tok == token::DO || tok == token::IF || tok == token::THEN || tok == token::ELSE || tok == token::CASE || tok == token::OF || tok == token::DEFAULT || tok == token::HOLDS || tok == token::EXISTS || tok == token::WITH || tok == token::AS || tok == token::WHILE || tok == token::UNDEF || tok == token::FALSE || tok == token::TRUE || tok == token::AND || tok == token::OR || tok == token::XOR || tok == token::IMPLIES || tok == token::NOT || tok == token::PLUS || tok == token::MINUS || tok == token::EQUAL || tok == token::LPAREN || tok == token::RPAREN || tok == token::LSQPAREN || tok == token::RSQPAREN || tok == token::LCURPAREN || tok == token::RCURPAREN || tok == token::COLON || tok == token::DOUBLECOLON || tok == token::UNDERLINE || tok == token::VERTICAL_BAR || tok == token::AT || tok == token::COMMA || tok == token::LESSER || tok == token::GREATER || tok == token::ASTERIX || tok == token::SLASH || tok == token::PERCENT || tok == token::CARET || tok == token::MARK || tok == token::DOTDOT || tok == token::DOT || tok == token::MAPS || tok == token::ARROW || tok == token::UPDATE || tok == token::NEQUAL || tok == token::LESSEQ || tok == token::GREATEREQ || tok == token::SEQ_BRACKET || tok == token::ENDSEQ_BRACKET);
+      }
+#else
+      symbol_type (int tok, const Ast::Token::Ptr& v, const location_type& l)
+        : super_type(token_type (tok), v, l)
+      {
+        YYASSERT (tok == token::CASM || tok == token::INIT || tok == token::DERIVED || tok == token::ENUMERATION || tok == token::RULE || tok == token::USING || tok == token::INVARIANT || tok == token::FUNCTION || tok == token::INITIALLY || tok == token::DEFINED || tok == token::SEQ || tok == token::ENDSEQ || tok == token::PAR || tok == token::ENDPAR || tok == token::SKIP || tok == token::LET || tok == token::IN || tok == token::FORALL || tok == token::CHOOSE || tok == token::ITERATE || tok == token::DO || tok == token::IF || tok == token::THEN || tok == token::ELSE || tok == token::CASE || tok == token::OF || tok == token::DEFAULT || tok == token::HOLDS || tok == token::EXISTS || tok == token::WITH || tok == token::AS || tok == token::WHILE || tok == token::UNDEF || tok == token::FALSE || tok == token::TRUE || tok == token::AND || tok == token::OR || tok == token::XOR || tok == token::IMPLIES || tok == token::NOT || tok == token::PLUS || tok == token::MINUS || tok == token::EQUAL || tok == token::LPAREN || tok == token::RPAREN || tok == token::LSQPAREN || tok == token::RSQPAREN || tok == token::LCURPAREN || tok == token::RCURPAREN || tok == token::COLON || tok == token::DOUBLECOLON || tok == token::UNDERLINE || tok == token::VERTICAL_BAR || tok == token::AT || tok == token::COMMA || tok == token::LESSER || tok == token::GREATER || tok == token::ASTERIX || tok == token::SLASH || tok == token::PERCENT || tok == token::CARET || tok == token::MARK || tok == token::DOTDOT || tok == token::DOT || tok == token::MAPS || tok == token::ARROW || tok == token::UPDATE || tok == token::NEQUAL || tok == token::LESSEQ || tok == token::GREATEREQ || tok == token::SEQ_BRACKET || tok == token::ENDSEQ_BRACKET);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      symbol_type (int tok, Identifier::Ptr v, location_type l)
+        : super_type(token_type (tok), std::move (v), std::move (l))
+      {
+        YYASSERT (tok == token::IDENTIFIER);
+      }
+#else
+      symbol_type (int tok, const Identifier::Ptr& v, const location_type& l)
+        : super_type(token_type (tok), v, l)
+      {
+        YYASSERT (tok == token::IDENTIFIER);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      symbol_type (int tok, ValueLiteral::Ptr v, location_type l)
+        : super_type(token_type (tok), std::move (v), std::move (l))
+      {
+        YYASSERT (tok == token::BINARY || tok == token::HEXADECIMAL || tok == token::INTEGER || tok == token::RATIONAL || tok == token::DECIMAL || tok == token::STRING);
+      }
+#else
+      symbol_type (int tok, const ValueLiteral::Ptr& v, const location_type& l)
+        : super_type(token_type (tok), v, l)
+      {
+        YYASSERT (tok == token::BINARY || tok == token::HEXADECIMAL || tok == token::INTEGER || tok == token::RATIONAL || tok == token::DECIMAL || tok == token::STRING);
+      }
+#endif
+    };
+
+    /// Build a parser object.
+    Parser (Logger& m_log_yyarg, Lexer& m_lexer_yyarg, Specification& m_specification_yyarg);
+    virtual ~Parser ();
+
+    /// Parse.  An alias for parse ().
+    /// \returns  0 iff parsing succeeded.
+    int operator() ();
+
+    /// Parse.
+    /// \returns  0 iff parsing succeeded.
+    virtual int parse ();
+
+#if YYDEBUG
+    /// The current debugging stream.
+    std::ostream& debug_stream () const YY_ATTRIBUTE_PURE;
+    /// Set the current debugging stream.
+    void set_debug_stream (std::ostream &);
+
+    /// Type for debugging levels.
+    typedef int debug_level_type;
+    /// The current debugging level.
+    debug_level_type debug_level () const YY_ATTRIBUTE_PURE;
+    /// Set the current debugging level.
+    void set_debug_level (debug_level_type l);
+#endif
+
+    /// Report a syntax error.
+    /// \param loc    where the syntax error is found.
+    /// \param msg    a description of the syntax error.
+    virtual void error (const location_type& loc, const std::string& msg);
+
+    /// Report a syntax error.
+    void error (const syntax_error& err);
+
+    // Implementation of make_symbol for each symbol type.
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_END (location_type l)
+      {
+        return symbol_type (token::END, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_END (const location_type& l)
+      {
+        return symbol_type (token::END, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_CASM (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::CASM, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_CASM (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::CASM, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_INIT (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::INIT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_INIT (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::INIT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DERIVED (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DERIVED, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DERIVED (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DERIVED, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_ENUMERATION (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::ENUMERATION, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_ENUMERATION (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::ENUMERATION, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_RULE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::RULE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_RULE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::RULE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_USING (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::USING, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_USING (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::USING, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_INVARIANT (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::INVARIANT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_INVARIANT (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::INVARIANT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_FUNCTION (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::FUNCTION, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_FUNCTION (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::FUNCTION, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_INITIALLY (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::INITIALLY, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_INITIALLY (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::INITIALLY, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DEFINED (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DEFINED, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DEFINED (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DEFINED, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_SEQ (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::SEQ, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_SEQ (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::SEQ, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_ENDSEQ (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::ENDSEQ, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_ENDSEQ (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::ENDSEQ, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_PAR (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::PAR, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_PAR (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::PAR, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_ENDPAR (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::ENDPAR, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_ENDPAR (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::ENDPAR, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_SKIP (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::SKIP, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_SKIP (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::SKIP, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_LET (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::LET, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_LET (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::LET, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_IN (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::IN, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_IN (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::IN, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_FORALL (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::FORALL, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_FORALL (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::FORALL, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_CHOOSE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::CHOOSE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_CHOOSE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::CHOOSE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_ITERATE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::ITERATE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_ITERATE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::ITERATE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DO (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DO, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DO (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DO, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_IF (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::IF, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_IF (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::IF, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_THEN (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::THEN, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_THEN (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::THEN, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_ELSE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::ELSE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_ELSE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::ELSE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_CASE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::CASE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_CASE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::CASE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_OF (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::OF, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_OF (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::OF, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DEFAULT (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DEFAULT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DEFAULT (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DEFAULT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_HOLDS (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::HOLDS, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_HOLDS (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::HOLDS, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_EXISTS (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::EXISTS, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_EXISTS (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::EXISTS, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_WITH (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::WITH, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_WITH (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::WITH, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_AS (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::AS, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_AS (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::AS, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_WHILE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::WHILE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_WHILE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::WHILE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_UNDEF (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::UNDEF, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_UNDEF (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::UNDEF, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_FALSE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::FALSE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_FALSE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::FALSE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_TRUE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::TRUE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_TRUE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::TRUE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_AND (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::AND, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_AND (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::AND, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_OR (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::OR, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_OR (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::OR, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_XOR (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::XOR, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_XOR (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::XOR, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_IMPLIES (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::IMPLIES, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_IMPLIES (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::IMPLIES, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_NOT (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::NOT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_NOT (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::NOT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_PLUS (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::PLUS, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_PLUS (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::PLUS, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_MINUS (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::MINUS, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_MINUS (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::MINUS, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_EQUAL (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::EQUAL, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_EQUAL (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::EQUAL, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_LPAREN (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::LPAREN, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_LPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::LPAREN, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_RPAREN (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::RPAREN, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_RPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::RPAREN, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_LSQPAREN (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::LSQPAREN, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_LSQPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::LSQPAREN, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_RSQPAREN (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::RSQPAREN, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_RSQPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::RSQPAREN, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_LCURPAREN (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::LCURPAREN, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_LCURPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::LCURPAREN, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_RCURPAREN (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::RCURPAREN, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_RCURPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::RCURPAREN, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_COLON (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::COLON, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_COLON (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::COLON, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOUBLECOLON (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DOUBLECOLON, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOUBLECOLON (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DOUBLECOLON, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_UNDERLINE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::UNDERLINE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_UNDERLINE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::UNDERLINE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_VERTICAL_BAR (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::VERTICAL_BAR, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_VERTICAL_BAR (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::VERTICAL_BAR, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_AT (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::AT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_AT (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::AT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_COMMA (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::COMMA, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_COMMA (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::COMMA, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_LESSER (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::LESSER, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_LESSER (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::LESSER, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_GREATER (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::GREATER, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_GREATER (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::GREATER, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_ASTERIX (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::ASTERIX, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_ASTERIX (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::ASTERIX, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_SLASH (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::SLASH, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_SLASH (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::SLASH, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_PERCENT (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::PERCENT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_PERCENT (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::PERCENT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_CARET (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::CARET, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_CARET (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::CARET, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_MARK (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::MARK, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_MARK (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::MARK, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOTDOT (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DOTDOT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOTDOT (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DOTDOT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOT (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DOT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOT (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DOT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_MAPS (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::MAPS, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_MAPS (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::MAPS, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_ARROW (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::ARROW, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_ARROW (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::ARROW, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_UPDATE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::UPDATE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_UPDATE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::UPDATE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_NEQUAL (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::NEQUAL, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_NEQUAL (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::NEQUAL, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_LESSEQ (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::LESSEQ, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_LESSEQ (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::LESSEQ, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_GREATEREQ (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::GREATEREQ, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_GREATEREQ (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::GREATEREQ, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_SEQ_BRACKET (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::SEQ_BRACKET, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_SEQ_BRACKET (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::SEQ_BRACKET, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_ENDSEQ_BRACKET (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::ENDSEQ_BRACKET, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_ENDSEQ_BRACKET (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::ENDSEQ_BRACKET, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_BINARY (ValueLiteral::Ptr v, location_type l)
+      {
+        return symbol_type (token::BINARY, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_BINARY (const ValueLiteral::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::BINARY, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_HEXADECIMAL (ValueLiteral::Ptr v, location_type l)
+      {
+        return symbol_type (token::HEXADECIMAL, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_HEXADECIMAL (const ValueLiteral::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::HEXADECIMAL, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_INTEGER (ValueLiteral::Ptr v, location_type l)
+      {
+        return symbol_type (token::INTEGER, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_INTEGER (const ValueLiteral::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::INTEGER, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_RATIONAL (ValueLiteral::Ptr v, location_type l)
+      {
+        return symbol_type (token::RATIONAL, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_RATIONAL (const ValueLiteral::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::RATIONAL, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DECIMAL (ValueLiteral::Ptr v, location_type l)
+      {
+        return symbol_type (token::DECIMAL, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DECIMAL (const ValueLiteral::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DECIMAL, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_STRING (ValueLiteral::Ptr v, location_type l)
+      {
+        return symbol_type (token::STRING, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_STRING (const ValueLiteral::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::STRING, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_IDENTIFIER (Identifier::Ptr v, location_type l)
+      {
+        return symbol_type (token::IDENTIFIER, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_IDENTIFIER (const Identifier::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::IDENTIFIER, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_BASIC_TYPE (location_type l)
+      {
+        return symbol_type (token::BASIC_TYPE, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_BASIC_TYPE (const location_type& l)
+      {
+        return symbol_type (token::BASIC_TYPE, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_CALL (location_type l)
+      {
+        return symbol_type (token::CALL, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_CALL (const location_type& l)
+      {
+        return symbol_type (token::CALL, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_UPLUS (location_type l)
+      {
+        return symbol_type (token::UPLUS, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_UPLUS (const location_type& l)
+      {
+        return symbol_type (token::UPLUS, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_UMINUS (location_type l)
+      {
+        return symbol_type (token::UMINUS, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_UMINUS (const location_type& l)
+      {
+        return symbol_type (token::UMINUS, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_CALL_WITHOUT_ARGS (location_type l)
+      {
+        return symbol_type (token::CALL_WITHOUT_ARGS, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_CALL_WITHOUT_ARGS (const location_type& l)
+      {
+        return symbol_type (token::CALL_WITHOUT_ARGS, l);
+      }
+#endif
+
+
+  private:
+    /// This class is not copyable.
+    Parser (const Parser&);
+    Parser& operator= (const Parser&);
+
+    /// State numbers.
+    typedef int state_type;
+
+    /// Generate an error message.
+    /// \param yystate   the state where the error occurred.
+    /// \param yyla      the lookahead token.
+    virtual std::string yysyntax_error_ (state_type yystate,
+                                         const symbol_type& yyla) const;
+
+    /// Compute post-reduction state.
+    /// \param yystate   the current state
+    /// \param yysym     the nonterminal to push on the stack
+    state_type yy_lr_goto_state_ (state_type yystate, int yysym);
+
+    /// Whether the given \c yypact_ value indicates a defaulted state.
+    /// \param yyvalue   the value to check
+    static bool yy_pact_value_is_default_ (int yyvalue);
+
+    /// Whether the given \c yytable_ value indicates a syntax error.
+    /// \param yyvalue   the value to check
+    static bool yy_table_value_is_error_ (int yyvalue);
+
+    static const short yypact_ninf_;
+    static const short yytable_ninf_;
+
+    /// Convert a scanner token number \a t to a symbol number.
+    static token_number_type yytranslate_ (token_type t);
+
+    // Tables.
+  // YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
+  // STATE-NUM.
+  static const short yypact_[];
+
+  // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
+  // Performed when YYTABLE does not specify something else to do.  Zero
+  // means the default is an error.
+  static const unsigned char yydefact_[];
+
+  // YYPGOTO[NTERM-NUM].
+  static const short yypgoto_[];
+
+  // YYDEFGOTO[NTERM-NUM].
+  static const short yydefgoto_[];
+
+  // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
+  // positive, shift that token.  If negative, reduce the rule whose
+  // number is the opposite.  If YYTABLE_NINF, syntax error.
+  static const short yytable_[];
+
+  static const short yycheck_[];
+
+  // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
+  // symbol of state STATE-NUM.
+  static const unsigned char yystos_[];
+
+  // YYR1[YYN] -- Symbol number of symbol that rule YYN derives.
+  static const unsigned char yyr1_[];
+
+  // YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.
+  static const unsigned char yyr2_[];
+
+
+    /// Convert the symbol name \a n to a form suitable for a diagnostic.
+    static std::string yytnamerr_ (const char *n);
+
+
+    /// For a symbol, its name in clear.
+    static const char* const yytname_[];
+#if YYDEBUG
+  // YYRLINE[YYN] -- Source line where rule number YYN was defined.
+  static const unsigned short yyrline_[];
+    /// Report on the debug stream that the rule \a r is going to be reduced.
+    virtual void yy_reduce_print_ (int r);
+    /// Print the state stack on the debug stream.
+    virtual void yystack_print_ ();
+
+    /// Debugging level.
+    int yydebug_;
+    /// Debug stream.
+    std::ostream* yycdebug_;
+
+    /// \brief Display a symbol type, value and location.
+    /// \param yyo    The output stream.
+    /// \param yysym  The symbol.
+    template <typename Base>
+    void yy_print_ (std::ostream& yyo, const basic_symbol<Base>& yysym) const;
+#endif
+
+    /// \brief Reclaim the memory associated to a symbol.
+    /// \param yymsg     Why this token is reclaimed.
+    ///                  If null, print nothing.
+    /// \param yysym     The symbol.
+    template <typename Base>
+    void yy_destroy_ (const char* yymsg, basic_symbol<Base>& yysym) const;
+
+  private:
+    /// Type access provider for state based symbols.
+    struct by_state
+    {
+      /// Default constructor.
+      by_state () YY_NOEXCEPT;
+
+      /// The symbol type as needed by the constructor.
+      typedef state_type kind_type;
+
+      /// Constructor.
+      by_state (kind_type s) YY_NOEXCEPT;
+
+      /// Copy constructor.
+      by_state (const by_state& that) YY_NOEXCEPT;
+
+      /// Record that this symbol is empty.
+      void clear () YY_NOEXCEPT;
+
+      /// Steal the symbol type from \a that.
+      void move (by_state& that);
+
+      /// The (internal) type number (corresponding to \a state).
+      /// \a empty_symbol when empty.
+      symbol_number_type type_get () const YY_NOEXCEPT;
+
+      /// The state number used to denote an empty symbol.
+      enum { empty_state = -1 };
+
+      /// The state.
+      /// \a empty when empty.
+      state_type state;
+    };
+
+    /// "Internal" symbol: element of the stack.
+    struct stack_symbol_type : basic_symbol<by_state>
+    {
+      /// Superclass.
+      typedef basic_symbol<by_state> super_type;
+      /// Construct an empty symbol.
+      stack_symbol_type ();
+      /// Move or copy construction.
+      stack_symbol_type (YY_RVREF (stack_symbol_type) that);
+      /// Steal the contents from \a sym to build this.
+      stack_symbol_type (state_type s, YY_MOVE_REF (symbol_type) sym);
+#if YY_CPLUSPLUS < 201103L
+      /// Assignment, needed by push_back by some old implementations.
+      /// Moves the contents of that.
+      stack_symbol_type& operator= (stack_symbol_type& that);
+#endif
+    };
+
+    /// A stack with random access from its top.
+    template <typename T, typename S = std::vector<T> >
+    class stack
+    {
+    public:
+      // Hide our reversed order.
+      typedef typename S::reverse_iterator iterator;
+      typedef typename S::const_reverse_iterator const_iterator;
+      typedef typename S::size_type size_type;
+
+      stack (size_type n = 200)
+        : seq_ (n)
+      {}
+
+      /// Random access.
+      ///
+      /// Index 0 returns the topmost element.
+      T&
+      operator[] (size_type i)
+      {
+        return seq_[size () - 1 - i];
+      }
+
+      /// Random access.
+      ///
+      /// Index 0 returns the topmost element.
+      T&
+      operator[] (int i)
+      {
+        return operator[] (size_type (i));
+      }
+
+      /// Random access.
+      ///
+      /// Index 0 returns the topmost element.
+      const T&
+      operator[] (size_type i) const
+      {
+        return seq_[size () - 1 - i];
+      }
+
+      /// Random access.
+      ///
+      /// Index 0 returns the topmost element.
+      const T&
+      operator[] (int i) const
+      {
+        return operator[] (size_type (i));
+      }
+
+      /// Steal the contents of \a t.
+      ///
+      /// Close to move-semantics.
+      void
+      push (YY_MOVE_REF (T) t)
+      {
+        seq_.push_back (T ());
+        operator[] (0).move (t);
+      }
+
+      /// Pop elements from the stack.
+      void
+      pop (int n = 1) YY_NOEXCEPT
+      {
+        for (; 0 < n; --n)
+          seq_.pop_back ();
+      }
+
+      /// Pop all elements from the stack.
+      void
+      clear () YY_NOEXCEPT
+      {
+        seq_.clear ();
+      }
+
+      /// Number of elements on the stack.
+      size_type
+      size () const YY_NOEXCEPT
+      {
+        return seq_.size ();
+      }
+
+      /// Iterator on top of the stack (going downwards).
+      const_iterator
+      begin () const YY_NOEXCEPT
+      {
+        return seq_.rbegin ();
+      }
+
+      /// Bottom of the stack.
+      const_iterator
+      end () const YY_NOEXCEPT
+      {
+        return seq_.rend ();
+      }
+
+      /// Present a slice of the top of a stack.
+      class slice
+      {
+      public:
+        slice (const stack& stack, int range)
+          : stack_ (stack)
+          , range_ (range)
+        {}
+
+        const T&
+        operator[] (int i) const
+        {
+          return stack_[range_ - i];
+        }
+
+      private:
+        const stack& stack_;
+        int range_;
+      };
+
+    private:
+      stack (const stack&);
+      stack& operator= (const stack&);
+      /// The wrapped container.
+      S seq_;
+    };
+
+
+    /// Stack type.
+    typedef stack<stack_symbol_type> stack_type;
+
+    /// The stack.
+    stack_type yystack_;
+
+    /// Push a new state on the stack.
+    /// \param m    a debug message to display
+    ///             if null, no trace is output.
+    /// \param sym  the symbol
+    /// \warning the contents of \a s.value is stolen.
+    void yypush_ (const char* m, YY_MOVE_REF (stack_symbol_type) sym);
+
+    /// Push a new look ahead token on the state on the stack.
+    /// \param m    a debug message to display
+    ///             if null, no trace is output.
+    /// \param s    the state
+    /// \param sym  the symbol (for its value and location).
+    /// \warning the contents of \a sym.value is stolen.
+    void yypush_ (const char* m, state_type s, YY_MOVE_REF (symbol_type) sym);
+
+    /// Pop \a n symbols from the stack.
+    void yypop_ (int n = 1);
+
+    /// Constants.
+    enum
+    {
+      yyeof_ = 0,
+      yylast_ = 2703,     ///< Last index in yytable_.
+      yynnts_ = 91,  ///< Number of nonterminal symbols.
+      yyfinal_ = 13, ///< Termination state number.
+      yyterror_ = 1,
+      yyerrcode_ = 256,
+      yyntokens_ = 87  ///< Number of tokens.
+    };
+
+
+    // User arguments.
+    Logger& m_log;
+    Lexer& m_lexer;
+    Specification& m_specification;
+  };
+
+  inline
+  Parser::token_number_type
+  Parser::yytranslate_ (token_type t)
+  {
+    // YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to
+    // TOKEN-NUM as returned by yylex.
+    static
+    const token_number_type
+    translate_table[] =
+    {
+       0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
+      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
+      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
+      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
+      85,    86
+    };
+    const unsigned user_token_number_max_ = 341;
+    const token_number_type undef_token_ = 2;
+
+    if (static_cast<int> (t) <= yyeof_)
+      return yyeof_;
+    else if (static_cast<unsigned> (t) <= user_token_number_max_)
+      return translate_table[t];
+    else
+      return undef_token_;
   }
+
+  // basic_symbol.
+#if 201103L <= YY_CPLUSPLUS
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (basic_symbol&& that)
+    : Base (std::move (that))
+    , value ()
+    , location (std::move (that.location))
+  {
+    switch (this->type_get ())
+    {
+      case 3: // "CASM"
+      case 4: // "init"
+      case 5: // "derived"
+      case 6: // "enumeration"
+      case 7: // "rule"
+      case 8: // "using"
+      case 9: // "invariant"
+      case 10: // "function"
+      case 11: // "initially"
+      case 12: // "defined"
+      case 13: // "seq"
+      case 14: // "endseq"
+      case 15: // "par"
+      case 16: // "endpar"
+      case 17: // "skip"
+      case 18: // "let"
+      case 19: // "in"
+      case 20: // "forall"
+      case 21: // "choose"
+      case 22: // "iterate"
+      case 23: // "do"
+      case 24: // "if"
+      case 25: // "then"
+      case 26: // "else"
+      case 27: // "case"
+      case 28: // "of"
+      case 29: // "default"
+      case 30: // "holds"
+      case 31: // "exists"
+      case 32: // "with"
+      case 33: // "as"
+      case 34: // "while"
+      case 35: // "undef"
+      case 36: // "false"
+      case 37: // "true"
+      case 38: // "and"
+      case 39: // "or"
+      case 40: // "xor"
+      case 41: // "implies"
+      case 42: // "not"
+      case 43: // "+"
+      case 44: // "-"
+      case 45: // "="
+      case 46: // "("
+      case 47: // ")"
+      case 48: // "["
+      case 49: // "]"
+      case 50: // "{"
+      case 51: // "}"
+      case 52: // ":"
+      case 53: // "::"
+      case 54: // "_"
+      case 55: // "|"
+      case 56: // "@"
+      case 57: // ","
+      case 58: // "<"
+      case 59: // ">"
+      case 60: // "*"
+      case 61: // "/"
+      case 62: // "%"
+      case 63: // "^"
+      case 64: // "'"
+      case 65: // ".."
+      case 66: // "."
+      case 67: // "->"
+      case 68: // "=>"
+      case 69: // ":="
+      case 70: // "!="
+      case 71: // "<="
+      case 72: // ">="
+      case 73: // "{|"
+      case 74: // "|}"
+        value.move< Ast::Token::Ptr > (std::move (that.value));
+        break;
+
+      case 175: // Attribute
+        value.move< Attribute::Ptr > (std::move (that.value));
+        break;
+
+      case 174: // Attributes
+        value.move< Attributes::Ptr > (std::move (that.value));
+        break;
+
+      case 176: // BasicAttribute
+        value.move< BasicAttribute::Ptr > (std::move (that.value));
+        break;
+
+      case 151: // BasicType
+        value.move< BasicType::Ptr > (std::move (that.value));
+        break;
+
+      case 113: // BlockRule
+        value.move< BlockRule::Ptr > (std::move (that.value));
+        break;
+
+      case 122: // CallExpression
+        value.move< CallExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 116: // CallRule
+        value.move< CallRule::Ptr > (std::move (that.value));
+        break;
+
+      case 133: // CardinalityExpression
+        value.move< CardinalityExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 108: // CaseLabel
+        value.move< Case::Ptr > (std::move (that.value));
+        break;
+
+      case 106: // CaseRule
+        value.move< CaseRule::Ptr > (std::move (that.value));
+        break;
+
+      case 107: // CaseLabels
+        value.move< Cases::Ptr > (std::move (that.value));
+        break;
+
+      case 130: // ChooseExpression
+        value.move< ChooseExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 111: // ChooseRule
+        value.move< ChooseRule::Ptr > (std::move (that.value));
+        break;
+
+      case 129: // ConditionalExpression
+        value.move< ConditionalExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 105: // ConditionalRule
+        value.move< ConditionalRule::Ptr > (std::move (that.value));
+        break;
+
+      case 160: // MaybeDefined
+        value.move< Defined::Ptr > (std::move (that.value));
+        break;
+
+      case 91: // AttributedDefinition
+      case 92: // Definition
+        value.move< Definition::Ptr > (std::move (that.value));
+        break;
+
+      case 90: // Definitions
+        value.move< Definitions::Ptr > (std::move (that.value));
+        break;
+
+      case 95: // DerivedDefinition
+        value.move< DerivedDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 123: // DirectCallExpression
+        value.move< DirectCallExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 94: // EnumerationDefinition
+        value.move< EnumerationDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 98: // EnumeratorDefinition
+        value.move< EnumeratorDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 99: // Enumerators
+        value.move< Enumerators::Ptr > (std::move (that.value));
+        break;
+
+      case 132: // ExistentialQuantifierExpression
+        value.move< ExistentialQuantifierExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 119: // Term
+      case 120: // SimpleOrClaspedTerm
+      case 121: // OperatorExpression
+        value.move< Expression::Ptr > (std::move (that.value));
+        break;
+
+      case 177: // ExpressionAttribute
+        value.move< ExpressionAttribute::Ptr > (std::move (that.value));
+        break;
+
+      case 118: // Terms
+        value.move< Expressions::Ptr > (std::move (that.value));
+        break;
+
+      case 156: // FixedSizedType
+        value.move< FixedSizedType::Ptr > (std::move (that.value));
+        break;
+
+      case 110: // ForallRule
+        value.move< ForallRule::Ptr > (std::move (that.value));
+        break;
+
+      case 97: // FunctionDefinition
+        value.move< FunctionDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 89: // Header
+        value.move< HeaderDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 81: // "identifier"
+      case 164: // Identifier
+        value.move< Identifier::Ptr > (std::move (that.value));
+        break;
+
+      case 165: // IdentifierPath
+        value.move< IdentifierPath::Ptr > (std::move (that.value));
+        break;
+
+      case 126: // IndirectCallExpression
+        value.move< IndirectCallExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 93: // InitDefinition
+        value.move< InitDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 163: // Initializer
+        value.move< Initializer::Ptr > (std::move (that.value));
+        break;
+
+      case 162: // Initializers
+        value.move< Initializers::Ptr > (std::move (that.value));
+        break;
+
+      case 161: // MaybeInitially
+        value.move< Initially::Ptr > (std::move (that.value));
+        break;
+
+      case 101: // InvariantDefinition
+        value.move< InvariantDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 112: // IterateRule
+        value.move< IterateRule::Ptr > (std::move (that.value));
+        break;
+
+      case 128: // LetExpression
+        value.move< LetExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 109: // LetRule
+        value.move< LetRule::Ptr > (std::move (that.value));
+        break;
+
+      case 143: // ListLiteral
+        value.move< ListLiteral::Ptr > (std::move (that.value));
+        break;
+
+      case 134: // Literal
+        value.move< Literal::Ptr > (std::move (that.value));
+        break;
+
+      case 125: // LiteralCallExpression
+        value.move< LiteralCallExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 124: // MethodCallExpression
+        value.move< MethodCallExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 148: // Assignment
+        value.move< NamedExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 147: // Assignments
+        value.move< NamedExpressions::Ptr > (std::move (that.value));
+        break;
+
+      case 144: // RangeLiteral
+        value.move< RangeLiteral::Ptr > (std::move (that.value));
+        break;
+
+      case 146: // RecordLiteral
+        value.move< RecordLiteral::Ptr > (std::move (that.value));
+        break;
+
+      case 153: // RecordType
+        value.move< RecordType::Ptr > (std::move (that.value));
+        break;
+
+      case 142: // ReferenceLiteral
+        value.move< ReferenceLiteral::Ptr > (std::move (that.value));
+        break;
+
+      case 155: // RelationType
+        value.move< RelationType::Ptr > (std::move (that.value));
+        break;
+
+      case 103: // Rule
+        value.move< Rule::Ptr > (std::move (that.value));
+        break;
+
+      case 96: // RuleDefinition
+        value.move< RuleDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 102: // Rules
+        value.move< Rules::Ptr > (std::move (that.value));
+        break;
+
+      case 114: // SequenceRule
+        value.move< SequenceRule::Ptr > (std::move (that.value));
+        break;
+
+      case 104: // SkipRule
+        value.move< SkipRule::Ptr > (std::move (that.value));
+        break;
+
+      case 88: // Specification
+        value.move< Specification::Ptr > (std::move (that.value));
+        break;
+
+      case 154: // TemplateType
+        value.move< TemplateType::Ptr > (std::move (that.value));
+        break;
+
+      case 145: // TupleLiteral
+        value.move< TupleLiteral::Ptr > (std::move (that.value));
+        break;
+
+      case 152: // TupleType
+        value.move< TupleType::Ptr > (std::move (that.value));
+        break;
+
+      case 127: // TypeCastingExpression
+        value.move< TypeCastingExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 149: // Types
+      case 157: // FunctionParameters
+      case 158: // MaybeFunctionParameters
+        value.move< Types::Ptr > (std::move (that.value));
+        break;
+
+      case 135: // UndefinedLiteral
+        value.move< UndefLiteral::Ptr > (std::move (that.value));
+        break;
+
+      case 131: // UniversalQuantifierExpression
+        value.move< UniversalQuantifierExpression::Ptr > (std::move (that.value));
+        break;
+
+      case 115: // UpdateRule
+        value.move< UpdateRule::Ptr > (std::move (that.value));
+        break;
+
+      case 100: // UsingDefinition
+        value.move< UsingDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 75: // "binary"
+      case 76: // "hexadecimal"
+      case 77: // "integer"
+      case 78: // "rational"
+      case 79: // "decimal"
+      case 80: // "string"
+      case 136: // BooleanLiteral
+      case 137: // IntegerLiteral
+      case 138: // RationalLiteral
+      case 139: // DecimalLiteral
+      case 140: // BinaryLiteral
+      case 141: // StringLiteral
+        value.move< ValueLiteral::Ptr > (std::move (that.value));
+        break;
+
+      case 173: // VariableBinding
+        value.move< VariableBinding::Ptr > (std::move (that.value));
+        break;
+
+      case 172: // VariableBindings
+        value.move< VariableBindings::Ptr > (std::move (that.value));
+        break;
+
+      case 166: // Variable
+      case 169: // TypedVariable
+      case 170: // AttributedVariable
+      case 171: // TypedAttributedVariable
+        value.move< VariableDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 159: // Parameters
+      case 167: // AttributedVariables
+      case 168: // TypedVariables
+        value.move< VariableDefinitions::Ptr > (std::move (that.value));
+        break;
+
+      case 117: // WhileRule
+        value.move< WhileRule::Ptr > (std::move (that.value));
+        break;
+
+      case 150: // Type
+        value.move< libcasm_fe::Ast::Type::Ptr > (std::move (that.value));
+        break;
+
+      default:
+        break;
+    }
+
+  }
+#endif
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (const basic_symbol& that)
+    : Base (that)
+    , value ()
+    , location (that.location)
+  {
+    switch (this->type_get ())
+    {
+      case 3: // "CASM"
+      case 4: // "init"
+      case 5: // "derived"
+      case 6: // "enumeration"
+      case 7: // "rule"
+      case 8: // "using"
+      case 9: // "invariant"
+      case 10: // "function"
+      case 11: // "initially"
+      case 12: // "defined"
+      case 13: // "seq"
+      case 14: // "endseq"
+      case 15: // "par"
+      case 16: // "endpar"
+      case 17: // "skip"
+      case 18: // "let"
+      case 19: // "in"
+      case 20: // "forall"
+      case 21: // "choose"
+      case 22: // "iterate"
+      case 23: // "do"
+      case 24: // "if"
+      case 25: // "then"
+      case 26: // "else"
+      case 27: // "case"
+      case 28: // "of"
+      case 29: // "default"
+      case 30: // "holds"
+      case 31: // "exists"
+      case 32: // "with"
+      case 33: // "as"
+      case 34: // "while"
+      case 35: // "undef"
+      case 36: // "false"
+      case 37: // "true"
+      case 38: // "and"
+      case 39: // "or"
+      case 40: // "xor"
+      case 41: // "implies"
+      case 42: // "not"
+      case 43: // "+"
+      case 44: // "-"
+      case 45: // "="
+      case 46: // "("
+      case 47: // ")"
+      case 48: // "["
+      case 49: // "]"
+      case 50: // "{"
+      case 51: // "}"
+      case 52: // ":"
+      case 53: // "::"
+      case 54: // "_"
+      case 55: // "|"
+      case 56: // "@"
+      case 57: // ","
+      case 58: // "<"
+      case 59: // ">"
+      case 60: // "*"
+      case 61: // "/"
+      case 62: // "%"
+      case 63: // "^"
+      case 64: // "'"
+      case 65: // ".."
+      case 66: // "."
+      case 67: // "->"
+      case 68: // "=>"
+      case 69: // ":="
+      case 70: // "!="
+      case 71: // "<="
+      case 72: // ">="
+      case 73: // "{|"
+      case 74: // "|}"
+        value.copy< Ast::Token::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 175: // Attribute
+        value.copy< Attribute::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 174: // Attributes
+        value.copy< Attributes::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 176: // BasicAttribute
+        value.copy< BasicAttribute::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 151: // BasicType
+        value.copy< BasicType::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 113: // BlockRule
+        value.copy< BlockRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 122: // CallExpression
+        value.copy< CallExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 116: // CallRule
+        value.copy< CallRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 133: // CardinalityExpression
+        value.copy< CardinalityExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 108: // CaseLabel
+        value.copy< Case::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 106: // CaseRule
+        value.copy< CaseRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 107: // CaseLabels
+        value.copy< Cases::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 130: // ChooseExpression
+        value.copy< ChooseExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 111: // ChooseRule
+        value.copy< ChooseRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 129: // ConditionalExpression
+        value.copy< ConditionalExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 105: // ConditionalRule
+        value.copy< ConditionalRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 160: // MaybeDefined
+        value.copy< Defined::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 91: // AttributedDefinition
+      case 92: // Definition
+        value.copy< Definition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 90: // Definitions
+        value.copy< Definitions::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 95: // DerivedDefinition
+        value.copy< DerivedDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 123: // DirectCallExpression
+        value.copy< DirectCallExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 94: // EnumerationDefinition
+        value.copy< EnumerationDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 98: // EnumeratorDefinition
+        value.copy< EnumeratorDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 99: // Enumerators
+        value.copy< Enumerators::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 132: // ExistentialQuantifierExpression
+        value.copy< ExistentialQuantifierExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 119: // Term
+      case 120: // SimpleOrClaspedTerm
+      case 121: // OperatorExpression
+        value.copy< Expression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 177: // ExpressionAttribute
+        value.copy< ExpressionAttribute::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 118: // Terms
+        value.copy< Expressions::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 156: // FixedSizedType
+        value.copy< FixedSizedType::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 110: // ForallRule
+        value.copy< ForallRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 97: // FunctionDefinition
+        value.copy< FunctionDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 89: // Header
+        value.copy< HeaderDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 81: // "identifier"
+      case 164: // Identifier
+        value.copy< Identifier::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 165: // IdentifierPath
+        value.copy< IdentifierPath::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 126: // IndirectCallExpression
+        value.copy< IndirectCallExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 93: // InitDefinition
+        value.copy< InitDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 163: // Initializer
+        value.copy< Initializer::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 162: // Initializers
+        value.copy< Initializers::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 161: // MaybeInitially
+        value.copy< Initially::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 101: // InvariantDefinition
+        value.copy< InvariantDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 112: // IterateRule
+        value.copy< IterateRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 128: // LetExpression
+        value.copy< LetExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 109: // LetRule
+        value.copy< LetRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 143: // ListLiteral
+        value.copy< ListLiteral::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 134: // Literal
+        value.copy< Literal::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 125: // LiteralCallExpression
+        value.copy< LiteralCallExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 124: // MethodCallExpression
+        value.copy< MethodCallExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 148: // Assignment
+        value.copy< NamedExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 147: // Assignments
+        value.copy< NamedExpressions::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 144: // RangeLiteral
+        value.copy< RangeLiteral::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 146: // RecordLiteral
+        value.copy< RecordLiteral::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 153: // RecordType
+        value.copy< RecordType::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 142: // ReferenceLiteral
+        value.copy< ReferenceLiteral::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 155: // RelationType
+        value.copy< RelationType::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 103: // Rule
+        value.copy< Rule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 96: // RuleDefinition
+        value.copy< RuleDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 102: // Rules
+        value.copy< Rules::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 114: // SequenceRule
+        value.copy< SequenceRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 104: // SkipRule
+        value.copy< SkipRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 88: // Specification
+        value.copy< Specification::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 154: // TemplateType
+        value.copy< TemplateType::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 145: // TupleLiteral
+        value.copy< TupleLiteral::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 152: // TupleType
+        value.copy< TupleType::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 127: // TypeCastingExpression
+        value.copy< TypeCastingExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 149: // Types
+      case 157: // FunctionParameters
+      case 158: // MaybeFunctionParameters
+        value.copy< Types::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 135: // UndefinedLiteral
+        value.copy< UndefLiteral::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 131: // UniversalQuantifierExpression
+        value.copy< UniversalQuantifierExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 115: // UpdateRule
+        value.copy< UpdateRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 100: // UsingDefinition
+        value.copy< UsingDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 75: // "binary"
+      case 76: // "hexadecimal"
+      case 77: // "integer"
+      case 78: // "rational"
+      case 79: // "decimal"
+      case 80: // "string"
+      case 136: // BooleanLiteral
+      case 137: // IntegerLiteral
+      case 138: // RationalLiteral
+      case 139: // DecimalLiteral
+      case 140: // BinaryLiteral
+      case 141: // StringLiteral
+        value.copy< ValueLiteral::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 173: // VariableBinding
+        value.copy< VariableBinding::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 172: // VariableBindings
+        value.copy< VariableBindings::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 166: // Variable
+      case 169: // TypedVariable
+      case 170: // AttributedVariable
+      case 171: // TypedAttributedVariable
+        value.copy< VariableDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 159: // Parameters
+      case 167: // AttributedVariables
+      case 168: // TypedVariables
+        value.copy< VariableDefinitions::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 117: // WhileRule
+        value.copy< WhileRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 150: // Type
+        value.copy< libcasm_fe::Ast::Type::Ptr > (YY_MOVE (that.value));
+        break;
+
+      default:
+        break;
+    }
+
+  }
+
+
 
   template <typename Base>
   bool
-  Parser::basic_symbol<Base>::empty () const
+  Parser::basic_symbol<Base>::empty () const YY_NOEXCEPT
   {
     return Base::type_get () == empty_symbol;
   }
@@ -3541,9 +5365,18 @@ namespace libcasm_fe {
     : type (empty_symbol)
   {}
 
+#if 201103L <= YY_CPLUSPLUS
   inline
-  Parser::by_type::by_type (const by_type& other)
-    : type (other.type)
+  Parser::by_type::by_type (by_type&& that)
+    : type (that.type)
+  {
+    that.clear ();
+  }
+#endif
+
+  inline
+  Parser::by_type::by_type (const by_type& that)
+    : type (that.type)
   {}
 
   inline
@@ -3568,14 +5401,14 @@ namespace libcasm_fe {
 
   inline
   int
-  Parser::by_type::type_get () const
+  Parser::by_type::type_get () const YY_NOEXCEPT
   {
     return type;
   }
 
   inline
   Parser::token_type
-  Parser::by_type::token () const
+  Parser::by_type::token () const YY_NOEXCEPT
   {
     // YYTOKNUM[NUM] -- (External) token number corresponding to the
     // (internal) symbol number NUM (which must be that of a token).  */
@@ -3593,609 +5426,12 @@ namespace libcasm_fe {
      325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
      335,   336,   337,   338,   339,   340,   341
     };
-    return static_cast<token_type> (yytoken_number_[type]);
+    return token_type (yytoken_number_[type]);
   }
 
-  // Implementation of make_symbol for each symbol type.
-  inline
-  Parser::symbol_type
-  Parser::make_END (YY_COPY (location_type) l)
-  {
-    return symbol_type (token::END, YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_CASM (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::CASM, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_INIT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::INIT, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_DERIVED (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::DERIVED, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_ENUMERATION (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::ENUMERATION, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_RULE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::RULE, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_USING (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::USING, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_INVARIANT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::INVARIANT, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_FUNCTION (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::FUNCTION, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_INITIALLY (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::INITIALLY, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_DEFINED (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::DEFINED, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_SEQ (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::SEQ, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_ENDSEQ (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::ENDSEQ, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_PAR (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::PAR, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_ENDPAR (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::ENDPAR, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_SKIP (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::SKIP, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_LET (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::LET, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_IN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::IN, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_FORALL (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::FORALL, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_CHOOSE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::CHOOSE, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_ITERATE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::ITERATE, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_DO (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::DO, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_IF (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::IF, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_THEN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::THEN, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_ELSE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::ELSE, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_CASE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::CASE, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_OF (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::OF, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_DEFAULT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::DEFAULT, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_HOLDS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::HOLDS, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_EXISTS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::EXISTS, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_WITH (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::WITH, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_AS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::AS, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_WHILE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::WHILE, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_UNDEF (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::UNDEF, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_FALSE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::FALSE, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_TRUE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::TRUE, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_AND (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::AND, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_OR (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::OR, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_XOR (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::XOR, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_IMPLIES (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::IMPLIES, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_NOT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::NOT, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_PLUS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::PLUS, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_MINUS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::MINUS, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_EQUAL (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::EQUAL, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_LPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::LPAREN, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_RPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::RPAREN, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_LSQPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::LSQPAREN, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_RSQPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::RSQPAREN, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_LCURPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::LCURPAREN, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_RCURPAREN (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::RCURPAREN, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_COLON (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::COLON, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_DOUBLECOLON (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::DOUBLECOLON, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_UNDERLINE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::UNDERLINE, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_VERTICAL_BAR (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::VERTICAL_BAR, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_AT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::AT, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_COMMA (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::COMMA, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_LESSER (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::LESSER, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_GREATER (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::GREATER, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_ASTERIX (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::ASTERIX, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_SLASH (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::SLASH, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_PERCENT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::PERCENT, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_CARET (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::CARET, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_MARK (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::MARK, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_DOTDOT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::DOTDOT, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_DOT (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::DOT, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_MAPS (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::MAPS, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_ARROW (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::ARROW, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_UPDATE (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::UPDATE, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_NEQUAL (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::NEQUAL, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_LESSEQ (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::LESSEQ, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_GREATEREQ (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::GREATEREQ, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_SEQ_BRACKET (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::SEQ_BRACKET, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_ENDSEQ_BRACKET (YY_COPY (Ast::Token::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::ENDSEQ_BRACKET, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_BINARY (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::BINARY, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_HEXADECIMAL (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::HEXADECIMAL, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_INTEGER (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::INTEGER, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_RATIONAL (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::RATIONAL, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_DECIMAL (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::DECIMAL, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_STRING (YY_COPY (ValueLiteral::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::STRING, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_IDENTIFIER (YY_COPY (Identifier::Ptr) v, YY_COPY (location_type) l)
-  {
-    return symbol_type (token::IDENTIFIER, YY_MOVE (v), YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_BASIC_TYPE (YY_COPY (location_type) l)
-  {
-    return symbol_type (token::BASIC_TYPE, YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_CALL (YY_COPY (location_type) l)
-  {
-    return symbol_type (token::CALL, YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_UPLUS (YY_COPY (location_type) l)
-  {
-    return symbol_type (token::UPLUS, YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_UMINUS (YY_COPY (location_type) l)
-  {
-    return symbol_type (token::UMINUS, YY_MOVE (l));
-  }
-
-  inline
-  Parser::symbol_type
-  Parser::make_CALL_WITHOUT_ARGS (YY_COPY (location_type) l)
-  {
-    return symbol_type (token::CALL_WITHOUT_ARGS, YY_MOVE (l));
-  }
-
-
-#line 50 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
+#line 50 "../../obj/src/GrammarParser.y" // lalr1.cc:401
 } // libcasm_fe
-#line 4199 "GrammarParser.tab.h" // lalr1.cc:403
+#line 5435 "GrammarParser.tab.h" // lalr1.cc:401
 
 
 
