@@ -1,4 +1,5 @@
 %{
+//
 //  Copyright (C) 2014-2019 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
