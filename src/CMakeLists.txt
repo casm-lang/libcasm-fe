@@ -87,6 +87,8 @@ add_library( ${PROJECT}-cpp OBJECT
   execute/ReferenceConstant.cpp
   execute/Frame.cpp
 
+  import/LoaderError.cpp
+
   transform/AstDumpDotPass.cpp
   transform/AstDumpSourcePass.cpp
   transform/AstToCasmIRPass.cpp
@@ -197,6 +199,27 @@ install(
     ${${PROJECT}_EXECUTE_HEADERS_CPP}
   DESTINATION
     "include/${PROJECT}/execute"
+  )
+
+
+ecm_generate_headers( ${PROJECT}_IMPORT_HEADERS_CPP
+  ORIGINAL
+    CAMELCASE
+  HEADER_NAMES
+    LoaderError
+  PREFIX
+    ${PROJECT}/import
+  RELATIVE
+    import
+  REQUIRED_HEADERS
+    ${PROJECT}_IMPORT_HEADERS
+  )
+install(
+  FILES
+    ${${PROJECT}_IMPORT_HEADERS}
+    ${${PROJECT}_IMPORT_HEADERS_CPP}
+  DESTINATION
+    "include/${PROJECT}/import"
   )
 
 
