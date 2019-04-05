@@ -87,6 +87,7 @@ add_library( ${PROJECT}-cpp OBJECT
   execute/ReferenceConstant.cpp
   execute/Frame.cpp
 
+  import/SpecificationRepository.cpp
   import/LoaderError.cpp
 
   transform/AstDumpDotPass.cpp
@@ -206,6 +207,7 @@ ecm_generate_headers( ${PROJECT}_IMPORT_HEADERS_CPP
   ORIGINAL
     CAMELCASE
   HEADER_NAMES
+    SpecificationRepository
     LoaderError
   PREFIX
     ${PROJECT}/import
