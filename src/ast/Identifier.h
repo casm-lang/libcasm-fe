@@ -57,9 +57,11 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Identifier >;
 
+            explicit Identifier( void );
             explicit Identifier( const std::string& name );
 
             const std::string& name( void ) const;
+            bool empty( void ) const;
 
             void setDoubleColon( const Token::Ptr& doubleColon );
             const Token::Ptr& doubleColon( void ) const;

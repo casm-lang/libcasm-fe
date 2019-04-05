@@ -99,6 +99,10 @@ void EmptyVisitor::visit( InvariantDefinition& )
 {
 }
 
+void EmptyVisitor::visit( ImportDefinition& )
+{
+}
+
 void EmptyVisitor::visit( UndefLiteral& )
 {
 }

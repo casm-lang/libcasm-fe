@@ -60,6 +60,11 @@ static const std::string DELIMITER( "::" );
 // Identifier
 //
 
+Identifier::Identifier( void )
+: Identifier( std::string() )
+{
+}
+
 Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )
 , m_name( name )
@@ -71,6 +76,11 @@ Identifier::Identifier( const std::string& name )
 const std::string& Identifier::name( void ) const
 {
     return m_name;
+}
+
+bool Identifier::empty( void ) const
+{
+    return m_name.empty();
 }
 
 void Identifier::setDoubleColon( const Token::Ptr& doubleColon )

@@ -51,6 +51,7 @@ ENUMERATION     "enumeration"
 RULE            "rule"
 USING           "using"
 INVARIANT       "invariant"
+IMPORT          "import"
 
 FUNCTION        "function"
 INITIALLY       "initially"
