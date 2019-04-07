@@ -46,7 +46,7 @@
 #include <libstdhl/Test>
 
 #include <libcasm-fe/import/FileLoadingStrategy>
-#include <libcasm-fe/import/LoaderError>
+#include <libcasm-fe/import/ImportError>
 
 using namespace libcasm_fe;
 using namespace libstdhl;

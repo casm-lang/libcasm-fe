@@ -47,7 +47,7 @@
 #include <libstdhl/File>
 #include <libstdhl/String>
 
-#include "LoaderError.h"
+#include "ImportError.h"
 
 using namespace libcasm_fe;
 

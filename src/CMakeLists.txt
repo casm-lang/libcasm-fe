@@ -89,7 +89,7 @@ add_library( ${PROJECT}-cpp OBJECT
 
   import/FileLoadingStrategy.cpp
   import/SpecificationRepository.cpp
-  import/LoaderError.cpp
+  import/ImportError.cpp
 
   transform/AstDumpDotPass.cpp
   transform/AstDumpSourcePass.cpp
@@ -211,7 +211,7 @@ ecm_generate_headers( ${PROJECT}_IMPORT_HEADERS_CPP
     FileLoadingStrategy
     LoadingStrategy
     SpecificationRepository
-    LoaderError
+    ImportError
   PREFIX
     ${PROJECT}/import
   RELATIVE

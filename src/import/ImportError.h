@@ -42,16 +42,40 @@
 //  statement from your version.
 //
 
-#include "LoaderError.h"
+#ifndef _LIB_CASMFE_IMPORT_ERROR_H_
+#define _LIB_CASMFE_IMPORT_ERROR_H_
 
-using namespace libcasm_fe;
+#include <exception>
+#include <string>
 
-LoaderError::LoaderError( const std::string& msg )
-: m_msg( msg )
+namespace libcasm_fe
 {
+    class ImportError : public std::exception
+    {
+      public:
+        explicit ImportError( const std::string& msg );
+
+        const char* what( void ) const noexcept override;
+
+      private:
+        const std::string m_msg;
+    };
+
+    class NoSuchSpecificationError : public ImportError
+    {
+      public:
+        using ImportError::ImportError;
+    };
 }
 
-const char* LoaderError::what( void ) const noexcept
-{
-    return m_msg.c_str();
-}
+#endif  // _LIB_CASMFE_IMPORT_ERROR_H_
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//
