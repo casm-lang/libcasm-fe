@@ -53,6 +53,7 @@
 #include <libcasm-fe/ast/RecursiveVisitor>
 
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
+#include <libcasm-fe/import/LibraryLoaderPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Builtin>
@@ -459,6 +460,7 @@ void SymbolResolverPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
     pu.scheduleAfter< SymbolRegistrationPass >();
+    pu.scheduleAfter< LibraryLoaderPass >();
 }
 
 u1 SymbolResolverPass::run( libpass::PassResult& pr )
