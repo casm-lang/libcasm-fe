@@ -68,32 +68,29 @@ static libpass::PassRegistration< SourceToAstPass > PASS(
 
 void SourceToAstPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< libpass::LoadFilePass >();
 }
 
 u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< libpass::LoadFilePass >();
-    const auto filePath = data->filename();
-    auto& fileStream = data->stream();
-
-    const auto fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
-    const auto name = fileName.substr( 0, fileName.rfind( "." ) );
+    const auto data = pr.input< SourceToAstPass >();
+    const auto name = data->name();
 
     auto specification = std::make_shared< Specification >();
     specification->setName( name );
+    specification->setLoader( data->loader() );
 
-    Lexer lexer( log, fileStream, std::cout );
-    lexer.setFileName( filePath );
+    std::stringstream soureStream( data->source() );
+    Lexer lexer( log, soureStream, std::cout );
+    lexer.setFileName( name );
 
     Parser parser( log, lexer, *specification );
     parser.set_debug_level( m_debug );
 
     if( ( parser.parse() != 0 ) or not specification or ( log.errors() > 0 ) )
     {
-        log.error( "could not parse `" + filePath + "´" );
+        log.error( "could not parse `" + name + "´" );
         return false;
     }
 

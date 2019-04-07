@@ -61,7 +61,8 @@ namespace libcasm_fe
          *
          * The loader will resolve the \a identifierPath, depending on the type of the loader.
          *
-         * @throws LoaderError if specification couldn't be loaded from \a identifierPath
+         * @throws NoSuchSpecificationError if specification couldn't be found
+         * @throws SpecificationLoadingError if specification could be found but not loaded
          *
          * @returns The loaded CASM specification
          */

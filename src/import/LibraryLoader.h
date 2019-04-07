@@ -42,87 +42,31 @@
 //  statement from your version.
 //
 
-#include "Specification.h"
+#ifndef _LIB_CASMFE_LIBRARY_LOADER_H_
+#define _LIB_CASMFE_LIBRARY_LOADER_H_
 
-#include "import/SpecificationLoader.h"
+#include <libcasm-fe/import/LoadingStrategy>
+#include <libcasm-fe/import/SpecificationLoader>
+#include <libcasm-fe/import/SpecificationRepository>
 
-using namespace libcasm_fe;
-
-Specification::Specification( void )
-: m_asmType( AsmType::SYNCHRONOUS )
-, m_name()
-, m_header()
-, m_definitions()
-, m_spans( std::make_shared< Ast::Spans >() )
-, m_symboltable( std::make_shared< Namespace >() )
-, m_loader( nullptr )
+namespace libcasm_fe
 {
+    class LibraryLoader : public SpecificationLoader
+    {
+      public:
+        LibraryLoader(
+            libstdhl::Log::Stream& logStream, std::unique_ptr< LoadingStrategy > loadingStrategy );
+
+        Specification::Ptr loadSpecification( const std::string& identifierPath ) override;
+
+      private:
+        libstdhl::Log::Stream& m_logStream;
+        SpecificationRepository m_repository;
+        std::unique_ptr< LoadingStrategy > m_loadingStrategy;
+    };
 }
 
-void Specification::setAsmType( const AsmType asmType )
-{
-    m_asmType = asmType;
-}
-
-Specification::AsmType Specification::asmType( void ) const
-{
-    return m_asmType;
-}
-
-void Specification::setName( const std::string& name )
-{
-    m_name = name;
-}
-
-const std::string& Specification::name( void ) const
-{
-    return m_name;
-}
-
-void Specification::setHeader( const Ast::HeaderDefinition::Ptr& header )
-{
-    m_header = header;
-}
-
-const Ast::HeaderDefinition::Ptr& Specification::header( void ) const
-{
-    return m_header;
-}
-
-void Specification::setDefinitions( const Ast::Definitions::Ptr& definitions )
-{
-    m_definitions = definitions;
-}
-
-const Ast::Definitions::Ptr& Specification::definitions( void ) const
-{
-    return m_definitions;
-}
-
-void Specification::setSpans( const Ast::Spans::Ptr& spans )
-{
-    m_spans = spans;
-}
-
-const Ast::Spans::Ptr& Specification::spans( void ) const
-{
-    return m_spans;
-}
-
-const Namespace::Ptr& Specification::symboltable( void ) const
-{
-    return m_symboltable;
-}
-
-void Specification::setLoader( SpecificationLoader* loader )
-{
-    m_loader = loader;
-}
-
-SpecificationLoader* Specification::loader( void ) const
-{
-    return m_loader;
-}
+#endif  // _LIB_CASMFE_LIBRARY_LOADER_H_
 
 //
 //  Local variables:

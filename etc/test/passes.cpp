@@ -48,7 +48,6 @@
 
 #include <libpass/PassManager>
 #include <libpass/PassResult>
-#include <libpass/analyze/LoadFilePass>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -64,32 +63,20 @@ rule test_update_program_self_undef = program( self ) := undef
 
 )***";
 
-#define SOURCE_TEST( SCOPE, PASS, CONTENT, STATUS, DESCRIPTION, CONFIG )                       \
-    TEST( libcasm_fe, SCOPE##_##PASS##DESCRIPTION )                                            \
-    {                                                                                          \
-        const std::string filename = TEST_NAME + ".casm";                                      \
-        auto file = libstdhl::File::open( filename, std::fstream::out );                       \
-        file << CONTENT;                                                                       \
-        file.close();                                                                          \
-        EXPECT_EQ( libstdhl::File::exists( filename ), true );                                 \
-                                                                                               \
-        libpass::PassManager pm;                                                               \
-        pm.setDefaultPass< PASS >();                                                           \
-        pm.set< libcasm_fe::PASS >( [&]( libcasm_fe::PASS& pass ) { CONFIG } );                \
-                                                                                               \
-        libpass::PassResult pr;                                                                \
-        const auto input = libstdhl::Memory::make< libpass::LoadFilePass::Input >( filename ); \
-        pr.setInputData< libpass::LoadFilePass >( input );                                     \
-        pm.setDefaultResult( pr );                                                             \
-                                                                                               \
-        EXPECT_EQ( pm.run(), STATUS );                                                         \
-                                                                                               \
-        pm.result().output< libpass::LoadFilePass >()->close();                                \
-        libstdhl::File::remove( filename );                                                    \
-        EXPECT_EQ( libstdhl::File::exists( filename ), false );                                \
+#define SOURCE_TEST( SCOPE, PASS, CONTENT, STATUS, DESCRIPTION, CONFIG )        \
+    TEST( libcasm_fe, SCOPE##_##PASS##DESCRIPTION )                             \
+    {                                                                           \
+        libpass::PassManager pm;                                                \
+        pm.setDefaultPass< PASS >();                                            \
+        pm.set< libcasm_fe::PASS >( [&]( libcasm_fe::PASS& pass ) { CONFIG } ); \
+                                                                                \
+        libpass::PassResult pr;                                                 \
+        pr.setInput< SourceToAstPass >( "Test", source, nullptr );              \
+        pm.setDefaultResult( pr );                                              \
+                                                                                \
+        EXPECT_EQ( pm.run(), STATUS );                                          \
     }
 
-SOURCE_TEST( transform, SourceToAstPass, "_test_", false, _unable_to_parse, );
 SOURCE_TEST( transform, SourceToAstPass, source, true, , { pass.setDebug( false ); } );
 
 SOURCE_TEST( analyze, ConsistencyCheckPass, source, true, , );

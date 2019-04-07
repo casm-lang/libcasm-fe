@@ -66,6 +66,12 @@ namespace libcasm_fe
       public:
         using ImportError::ImportError;
     };
+
+    class SpecificationLoadingError : public ImportError
+    {
+      public:
+        using ImportError::ImportError;
+    };
 }
 
 #endif  // _LIB_CASMFE_IMPORT_ERROR_H_

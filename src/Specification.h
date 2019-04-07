@@ -55,6 +55,8 @@
 
 namespace libcasm_fe
 {
+    class SpecificationLoader;
+
     class Specification
     {
       public:
@@ -90,6 +92,9 @@ namespace libcasm_fe
 
         const Namespace::Ptr& symboltable( void ) const;
 
+        void setLoader( SpecificationLoader* loader );
+        SpecificationLoader* loader( void ) const;
+
       private:
         AsmType m_asmType;
         std::string m_name;
@@ -97,6 +102,7 @@ namespace libcasm_fe
         Ast::Definitions::Ptr m_definitions;
         Ast::Spans::Ptr m_spans;
         Namespace::Ptr m_symboltable;
+        SpecificationLoader* m_loader;
     };
 }
 

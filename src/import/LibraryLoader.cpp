@@ -42,94 +42,54 @@
 //  statement from your version.
 //
 
-#include "Specification.h"
+#include "LibraryLoader.h"
 
-#include "import/SpecificationLoader.h"
+#include "../analyze/FrameSizeDeterminationPass.h"
+#include "../transform/SourceToAstPass.h"
+
+#include <libpass/PassManager>
+
+#include "ImportError.h"
 
 using namespace libcasm_fe;
 
-Specification::Specification( void )
-: m_asmType( AsmType::SYNCHRONOUS )
-, m_name()
-, m_header()
-, m_definitions()
-, m_spans( std::make_shared< Ast::Spans >() )
-, m_symboltable( std::make_shared< Namespace >() )
-, m_loader( nullptr )
+LibraryLoader::LibraryLoader(
+    libstdhl::Log::Stream& logStream, std::unique_ptr< LoadingStrategy > loadingStrategy )
+: SpecificationLoader()
+, m_logStream( logStream )
+, m_repository()
+, m_loadingStrategy( std::move( loadingStrategy ) )
 {
 }
 
-void Specification::setAsmType( const AsmType asmType )
+Specification::Ptr LibraryLoader::loadSpecification( const std::string& identifierPath )
 {
-    m_asmType = asmType;
-}
+    libstdhl::Logger log( m_logStream );
 
-Specification::AsmType Specification::asmType( void ) const
-{
-    return m_asmType;
-}
+    log.debug( "Entering LibraryLoader::loadSpecification with '" + identifierPath + "'" );
 
-void Specification::setName( const std::string& name )
-{
-    m_name = name;
-}
+    const auto cachedSpecification = m_repository.get( identifierPath );
+    if( cachedSpecification )
+    {
+        log.debug( "Using '" + identifierPath + "' from repository" );
+        return *cachedSpecification;
+    }
 
-const std::string& Specification::name( void ) const
-{
-    return m_name;
-}
+    const auto source = m_loadingStrategy->loadSource( identifierPath );
 
-void Specification::setHeader( const Ast::HeaderDefinition::Ptr& header )
-{
-    m_header = header;
-}
+    libpass::PassResult pr;
+    pr.setInput< SourceToAstPass >( identifierPath, source, this );
 
-const Ast::HeaderDefinition::Ptr& Specification::header( void ) const
-{
-    return m_header;
-}
+    libpass::PassManager pm;
+    pm.setStream( m_logStream );
+    pm.setDefaultResult( pr );
+    pm.setDefaultPass< FrameSizeDeterminationPass >();
+    if( not pm.run() )
+    {
+        throw SpecificationLoadingError( "Couldn't load '" + identifierPath + "'" );
+    }
 
-void Specification::setDefinitions( const Ast::Definitions::Ptr& definitions )
-{
-    m_definitions = definitions;
+    const auto specification = pm.result().output< SourceToAstPass >()->specification();
+    m_repository.store( identifierPath, specification );
+    return specification;
 }
-
-const Ast::Definitions::Ptr& Specification::definitions( void ) const
-{
-    return m_definitions;
-}
-
-void Specification::setSpans( const Ast::Spans::Ptr& spans )
-{
-    m_spans = spans;
-}
-
-const Ast::Spans::Ptr& Specification::spans( void ) const
-{
-    return m_spans;
-}
-
-const Namespace::Ptr& Specification::symboltable( void ) const
-{
-    return m_symboltable;
-}
-
-void Specification::setLoader( SpecificationLoader* loader )
-{
-    m_loader = loader;
-}
-
-SpecificationLoader* Specification::loader( void ) const
-{
-    return m_loader;
-}
-
-//
-//  Local variables:
-//  mode: c++
-//  indent-tabs-mode: nil
-//  c-basic-offset: 4
-//  tab-width: 4
-//  End:
-//  vim:noexpandtab:sw=4:ts=4:
-//
