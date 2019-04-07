@@ -42,40 +42,66 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_LOADER_ERROR_H_
-#define _LIB_CASMFE_LOADER_ERROR_H_
+#include <libstdhl/File>
+#include <libstdhl/Test>
 
-#include <exception>
-#include <string>
+#include <libcasm-fe/import/FileLoadingStrategy>
+#include <libcasm-fe/import/LoaderError>
 
-namespace libcasm_fe
+using namespace libcasm_fe;
+using namespace libstdhl;
+
+TEST( FileLoadingStrategyTest, shouldThrowNoSuchSpecificationErrorIfRequestedSourceDoesNotExist )
 {
-    class LoaderError : public std::exception
-    {
-      public:
-        explicit LoaderError( const std::string& msg );
+    // GIVEN
+    FileLoadingStrategy loadingStrategy( "." );
 
-        const char* what( void ) const noexcept override;
-
-      private:
-        const std::string m_msg;
-    };
-
-    class NoSuchSpecificationError : public LoaderError
-    {
-      public:
-        using LoaderError::LoaderError;
-    };
+    // WHEN
+    EXPECT_THROW( loadingStrategy.loadSource( "NonExistingLib" ), NoSuchSpecificationError );
 }
 
-#endif  // _LIB_CASMFE_LOADER_ERROR_H_
+TEST( FileLoadingStrategyTest, shouldReturnSourceCodeOfFooFileWhenRequestingFoo )
+{
+    // GIVEN
+    const std::string filename( "Foo.casm" );
+    const std::string givenSource( "CASM init foo\nrule foo = skip" );
 
-//
-//  Local variables:
-//  mode: c++
-//  indent-tabs-mode: nil
-//  c-basic-offset: 4
-//  tab-width: 4
-//  End:
-//  vim:noexpandtab:sw=4:ts=4:
-//
+    auto file = File::open( filename, std::fstream::out );
+    file << givenSource;
+    file.close();
+
+    FileLoadingStrategy loadingStrategy( "." );
+
+    // WHEN
+    const auto loadedSource = loadingStrategy.loadSource( "Foo" );
+
+    // THEN
+    EXPECT_STREQ( givenSource.c_str(), loadedSource.c_str() );
+
+    // CLEANUP
+    File::remove( filename );
+}
+
+TEST( FileLoadingStrategyTest, shouldReturnSourceCodeOfBarFileInFooFolderWhenRequestingFooBar )
+{
+    // GIVEN
+    const std::string filename( "Foo/Bar.casm" );
+    const std::string givenSource( "CASM init bar\nrule bar = skip" );
+
+    File::Path::create( "Foo" );
+    auto file = File::open( filename, std::fstream::out );
+    file << givenSource;
+    file.close();
+
+    FileLoadingStrategy loadingStrategy( "." );
+
+    // WHEN
+    const auto loadedSource = loadingStrategy.loadSource( "Foo.Bar" );
+
+    // THEN
+    EXPECT_STREQ( givenSource.c_str(), loadedSource.c_str() );
+
+    // CLEANUP
+    File::remove( filename );
+    File::Path::remove( "Foo" );
+}

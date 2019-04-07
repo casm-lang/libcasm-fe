@@ -87,6 +87,7 @@ add_library( ${PROJECT}-cpp OBJECT
   execute/ReferenceConstant.cpp
   execute/Frame.cpp
 
+  import/FileLoadingStrategy.cpp
   import/SpecificationRepository.cpp
   import/LoaderError.cpp
 
@@ -207,6 +208,8 @@ ecm_generate_headers( ${PROJECT}_IMPORT_HEADERS_CPP
   ORIGINAL
     CAMELCASE
   HEADER_NAMES
+    FileLoadingStrategy
+    LoadingStrategy
     SpecificationRepository
     LoaderError
   PREFIX

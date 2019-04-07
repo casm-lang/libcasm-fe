@@ -42,33 +42,38 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_LOADER_ERROR_H_
-#define _LIB_CASMFE_LOADER_ERROR_H_
+#ifndef _LIB_CASMFE_FILE_LOADING_STRATEGY_H_
+#define _LIB_CASMFE_FILE_LOADING_STRATEGY_H_
 
-#include <exception>
-#include <string>
+#include <libcasm-fe/import/LoadingStrategy>
 
 namespace libcasm_fe
 {
-    class LoaderError : public std::exception
+    class FileLoadingStrategy : public LoadingStrategy
     {
       public:
-        explicit LoaderError( const std::string& msg );
+        /**
+         * Initializes the file loading strategy.
+         *
+         * @param basePath The base path from which the files are loaded from.
+         */
+        explicit FileLoadingStrategy( const std::string& basePath );
 
-        const char* what( void ) const noexcept override;
+        std::string loadSource( const std::string& identifierPath ) const override;
 
       private:
-        const std::string m_msg;
-    };
+        /**
+         * Converts the identifier path into a file-system path by replacing all dots with slashes
+         * and appending it to the base path.
+         */
+        std::string toFileSystemPath( const std::string& identifierPath ) const;
 
-    class NoSuchSpecificationError : public LoaderError
-    {
-      public:
-        using LoaderError::LoaderError;
+      private:
+        const std::string m_basePath;
     };
 }
 
-#endif  // _LIB_CASMFE_LOADER_ERROR_H_
+#endif  // _LIB_CASMFE_FILE_LOADING_STRATEGY_H_
 
 //
 //  Local variables:

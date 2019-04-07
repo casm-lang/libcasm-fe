@@ -42,40 +42,39 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_LOADER_ERROR_H_
-#define _LIB_CASMFE_LOADER_ERROR_H_
+#include "FileLoadingStrategy.h"
 
-#include <exception>
-#include <string>
+#include <libstdhl/File>
+#include <libstdhl/String>
 
-namespace libcasm_fe
+#include "LoaderError.h"
+
+using namespace libcasm_fe;
+
+FileLoadingStrategy::FileLoadingStrategy( const std::string& basePath )
+: LoadingStrategy()
+, m_basePath( basePath )
 {
-    class LoaderError : public std::exception
-    {
-      public:
-        explicit LoaderError( const std::string& msg );
-
-        const char* what( void ) const noexcept override;
-
-      private:
-        const std::string m_msg;
-    };
-
-    class NoSuchSpecificationError : public LoaderError
-    {
-      public:
-        using LoaderError::LoaderError;
-    };
 }
 
-#endif  // _LIB_CASMFE_LOADER_ERROR_H_
+std::string FileLoadingStrategy::loadSource( const std::string& identifierPath ) const
+{
+    const auto filePath = toFileSystemPath( identifierPath );
 
-//
-//  Local variables:
-//  mode: c++
-//  indent-tabs-mode: nil
-//  c-basic-offset: 4
-//  tab-width: 4
-//  End:
-//  vim:noexpandtab:sw=4:ts=4:
-//
+    std::ifstream file( filePath );
+    if( not file.is_open() )
+    {
+        throw NoSuchSpecificationError(
+            "Couldn't load '" + identifierPath + "' from '" + filePath + "'" );
+    }
+
+    std::stringstream content;
+    content << file.rdbuf();
+    return content.str();
+}
+
+std::string FileLoadingStrategy::toFileSystemPath( const std::string& identifierPath ) const
+{
+    const auto filePath = libstdhl::String::replaceAll( identifierPath, ".", "/" );
+    return m_basePath + "/" + filePath + ".casm";
+}

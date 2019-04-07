@@ -42,33 +42,31 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_LOADER_ERROR_H_
-#define _LIB_CASMFE_LOADER_ERROR_H_
+#ifndef _LIB_CASMFE_LOADING_STRATEGY_H_
+#define _LIB_CASMFE_LOADING_STRATEGY_H_
 
-#include <exception>
 #include <string>
 
 namespace libcasm_fe
 {
-    class LoaderError : public std::exception
+    class LoadingStrategy
     {
       public:
-        explicit LoaderError( const std::string& msg );
+        virtual ~LoadingStrategy() = default;
 
-        const char* what( void ) const noexcept override;
-
-      private:
-        const std::string m_msg;
-    };
-
-    class NoSuchSpecificationError : public LoaderError
-    {
-      public:
-        using LoaderError::LoaderError;
+        /**
+         * Loads a CASM specification from an \a identifierPath.
+         *
+         * @throws NoSuchSpecificationError if no CASM specification for the given \a identifierPath
+         * could be loaded.
+         *
+         * @returns The source code of the CASM specification
+         */
+        virtual std::string loadSource( const std::string& identifierPath ) const = 0;
     };
 }
 
-#endif  // _LIB_CASMFE_LOADER_ERROR_H_
+#endif  // _LIB_CASMFE_LOADING_STRATEGY_H_
 
 //
 //  Local variables:
