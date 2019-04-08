@@ -75,22 +75,18 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
     libcasm_fe::Logger log( &id, stream() );
 
     const auto data = pr.input< SourceToAstPass >();
-    const auto name = data->name();
+    const auto specification = data->specification();
 
-    auto specification = std::make_shared< Specification >();
-    specification->setName( name );
-    specification->setLoader( data->loader() );
-
-    std::stringstream soureStream( data->source() );
+    std::stringstream soureStream( specification->source() );
     Lexer lexer( log, soureStream, std::cout );
-    lexer.setFileName( name );
+    lexer.setFileName( specification->name() );
 
     Parser parser( log, lexer, *specification );
     parser.set_debug_level( m_debug );
 
     if( ( parser.parse() != 0 ) or not specification or ( log.errors() > 0 ) )
     {
-        log.error( "could not parse `" + name + "´" );
+        log.error( "could not parse `" + specification->name() + "´" );
         return false;
     }
 

@@ -46,7 +46,6 @@
 #define _LIBCASM_FE_SOURCE_TO_AST_PASS_H_
 
 #include <libcasm-fe/Specification>
-#include <libcasm-fe/import/SpecificationLoader>
 
 #include <libpass/Pass>
 #include <libpass/PassData>
@@ -74,39 +73,6 @@ namespace libcasm_fe
         u1 m_debug = false;
 
       public:
-        class Input : public libpass::PassData
-        {
-          public:
-            using Ptr = std::shared_ptr< Input >;
-
-            Input( const std::string& name, const std::string& source, SpecificationLoader* loader )
-            : m_name( name )
-            , m_source( source )
-            , m_loader( loader )
-            {
-            }
-
-            const std::string& name( void ) const
-            {
-                return m_name;
-            }
-
-            const std::string& source( void )
-            {
-                return m_source;
-            }
-
-            SpecificationLoader* loader( void )
-            {
-                return m_loader;
-            }
-
-          private:
-            const std::string m_name;
-            const std::string m_source;
-            SpecificationLoader* m_loader;
-        };
-
         class Output : public libpass::PassData
         {
           public:
@@ -125,6 +91,8 @@ namespace libcasm_fe
           private:
             Specification::Ptr m_specification;
         };
+
+        using Input = Output;
     };
 }
 

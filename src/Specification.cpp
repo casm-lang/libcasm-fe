@@ -51,6 +51,7 @@ using namespace libcasm_fe;
 Specification::Specification( void )
 : m_asmType( AsmType::SYNCHRONOUS )
 , m_name()
+, m_source()
 , m_header()
 , m_definitions()
 , m_spans( std::make_shared< Ast::Spans >() )
@@ -77,6 +78,16 @@ void Specification::setName( const std::string& name )
 const std::string& Specification::name( void ) const
 {
     return m_name;
+}
+
+void Specification::setSource( const std::string& source )
+{
+    m_source = source;
+}
+
+const std::string& Specification::source( void ) const
+{
+    return m_source;
 }
 
 void Specification::setHeader( const Ast::HeaderDefinition::Ptr& header )

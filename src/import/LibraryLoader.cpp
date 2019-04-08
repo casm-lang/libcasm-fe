@@ -77,8 +77,13 @@ Specification::Ptr LibraryLoader::loadSpecification( const std::string& identifi
 
     const auto source = m_loadingStrategy->loadSource( identifierPath );
 
+    const auto specification = std::make_shared< Specification >();
+    specification->setName( identifierPath );
+    specification->setSource( source );
+    specification->setLoader( this );
+
     libpass::PassResult pr;
-    pr.setInput< SourceToAstPass >( identifierPath, source, this );
+    pr.setInput< SourceToAstPass >( specification );
 
     libpass::PassManager pm;
     pm.setStream( m_logStream );
@@ -89,7 +94,6 @@ Specification::Ptr LibraryLoader::loadSpecification( const std::string& identifi
         throw SpecificationLoadingError( "Couldn't load '" + identifierPath + "'" );
     }
 
-    const auto specification = pm.result().output< SourceToAstPass >()->specification();
     m_repository.store( identifierPath, specification );
     return specification;
 }

@@ -78,6 +78,9 @@ namespace libcasm_fe
 
         const std::string& name( void ) const;
 
+        void setSource( const std::string& source );
+        const std::string& source( void ) const;
+
         void setHeader( const Ast::HeaderDefinition::Ptr& header );
 
         const Ast::HeaderDefinition::Ptr& header( void ) const;
@@ -98,6 +101,7 @@ namespace libcasm_fe
       private:
         AsmType m_asmType;
         std::string m_name;
+        std::string m_source;
         Ast::HeaderDefinition::Ptr m_header;
         Ast::Definitions::Ptr m_definitions;
         Ast::Spans::Ptr m_spans;
