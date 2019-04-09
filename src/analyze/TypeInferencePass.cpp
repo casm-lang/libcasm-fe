@@ -78,6 +78,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
   public:
     TypeInferenceVisitor( libcasm_fe::Logger& log, const Namespace& symboltable );
 
+    void visit( InitDefinition& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -167,6 +168,12 @@ TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log, const Names
 : m_log( log )
 , m_symboltable( symboltable )
 {
+}
+
+void TypeInferenceVisitor::visit( InitDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+    node.programFunction()->accept( *this );
 }
 
 void TypeInferenceVisitor::visit( VariableDefinition& node )
