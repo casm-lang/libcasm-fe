@@ -109,47 +109,6 @@
         return node;
     }
 
-    static BasicType::Ptr createRuleRefType( libstdhl::SourceLocation& sourceLocation )
-    {
-        const auto type = libstdhl::Memory::get< libcasm_ir::RuleReferenceType >();
-        const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
-        const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
-        const auto node = Ast::make< BasicType >( sourceLocation, path );
-        node->setType( type );
-        return node;
-    }
-
-    static BasicType::Ptr createAgentType( libstdhl::SourceLocation& sourceLocation )
-    {
-        const auto name = Ast::make< Identifier >( sourceLocation, "Agent" );
-        const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
-        const auto node = Ast::make< BasicType >( sourceLocation, path );
-        return node;
-    }
-
-    static FunctionDefinition::Ptr createProgramFunction( libstdhl::SourceLocation& sourceLocation, const Initializers::Ptr& initializers )
-    {
-        const auto agentType = createAgentType( sourceLocation );
-        const auto ruleRefType = createRuleRefType( sourceLocation );
-
-        const auto argTypes = Ast::make< Types >( sourceLocation );
-        argTypes->add( agentType );
-
-        const auto program = Ast::make< Identifier >( sourceLocation, "program" );
-        const auto defined = Ast::make< Defined >(
-            sourceLocation, Token::unresolved(), Token::unresolved(), Ast::make< UndefLiteral >( sourceLocation ), Token::unresolved() );
-
-        const auto initially = Ast::make< Initially >( sourceLocation, Token::unresolved(), Token::unresolved(), initializers, Token::unresolved() );
-
-        return Ast::make< FunctionDefinition >(
-            sourceLocation, Token::unresolved(), program, Token::unresolved(), argTypes, Token::unresolved(), ruleRefType, defined, initially );
-    }
-
-    static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
-    {
-        const auto& location = identifier->sourceLocation();
-        return Ast::make< IdentifierPath >( location, identifier );
-    }
 }
 
 
@@ -402,47 +361,10 @@ InitDefinition
 : INIT IdentifierPath
   {
       $$ = Ast::make< InitDefinition >( @$, $1, $2 );
-
-      const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
-      auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
-      const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
-      singleAgent->setTargetType( DirectCallExpression::TargetType::CONSTANT );
-
-      const auto initializers = Ast::make< Initializers >( @$ );
-      const auto programFunction = createProgramFunction( @$, initializers );
-      const auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
-      programArguments->add( singleAgent );
-
-      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, Token::unresolved(), $2 );
-      const auto initializer = Ast::make< Initializer >(
-          @$, Token::unresolved(), programArguments, Token::unresolved(), Token::unresolved(), ruleReference );
-      initializers->add( initializer );
-
-      // apply the name of the program declaration to the initializer functions
-      for( auto& initializer : *initializers )
-      {
-          initializer->updateRule()->function()->setIdentifier(
-              asIdentifierPath( programFunction->identifier() ) );
-      }
-
-      $$->setProgramFunction( programFunction );
   }
 | INIT LCURPAREN Initializers RCURPAREN
   {
       $$ = Ast::make< InitDefinition >( @$, $1, $2, $3, $4 );
-
-      const auto programFunction = createProgramFunction( @$, $3 );
-
-      // apply the name of the program declaration to the initializer functions
-      const auto initializers = programFunction->initially()->initializers();
-      for( auto& initializer : *initializers )
-      {
-          initializer->updateRule()->function()->setIdentifier(
-              asIdentifierPath( programFunction->identifier() ) );
-      }
-
-      $$->setProgramFunction( programFunction );
   }
 ;
 
@@ -519,7 +441,7 @@ FunctionDefinition
       const auto initially = $$->initially();
       for( auto& initializer : *initially->initializers() )
       {
-          initializer->updateRule()->function()->setIdentifier( asIdentifierPath( $2 ) );
+          initializer->updateRule()->function()->setIdentifier( IdentifierPath::fromIdentifier( $2 ) );
       }
   }
 ;
