@@ -238,18 +238,7 @@ void AstDumpDotVisitor::visit( InitDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "InitDefinition" );
-    node.attributes()->accept( *this );
-    node.initToken()->accept( *this );
-    if( node.isSingleAgent() )
-    {
-        node.initPath()->accept( *this );
-    }
-    else
-    {
-        node.leftBraceToken()->accept( *this );
-        node.initializers()->accept( *this );
-        node.rightBraceToken()->accept( *this );
-    }
+    RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( Initially& node )
