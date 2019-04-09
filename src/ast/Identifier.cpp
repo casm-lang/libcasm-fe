@@ -188,6 +188,12 @@ void IdentifierPath::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+IdentifierPath::Ptr IdentifierPath::fromIdentifier( const Identifier::Ptr& identifier )
+{
+    const auto& location = identifier->sourceLocation();
+    return Ast::make< IdentifierPath >( location, identifier );
+}
+
 //
 //  Local variables:
 //  mode: c++

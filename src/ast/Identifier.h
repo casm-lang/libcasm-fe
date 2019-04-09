@@ -125,6 +125,9 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+          public:
+            static IdentifierPath::Ptr fromIdentifier( const Identifier::Ptr& identifier );
+
           private:
             const Identifiers::Ptr m_identifiers;
             const Type m_type;
