@@ -67,7 +67,17 @@ void RecursiveVisitor::visit( HeaderDefinition& node )
 void RecursiveVisitor::visit( InitDefinition& node )
 {
     node.attributes()->accept( *this );
-    node.programFunction()->accept( *this );
+    node.initToken()->accept( *this );
+    if( node.isSingleAgent() )
+    {
+        node.initPath()->accept( *this );
+    }
+    else
+    {
+        node.leftBraceToken()->accept( *this );
+        node.initializers()->accept( *this );
+        node.rightBraceToken()->accept( *this );
+    }
 }
 
 void RecursiveVisitor::visit( Initially& node )
