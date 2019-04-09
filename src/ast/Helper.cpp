@@ -134,7 +134,9 @@ Initializer::Initializer(
 , m_arguments( arguments )
 , m_value( value )
 , m_updateRule( std::make_shared< UpdateRule >(
-      std::make_shared< DirectCallExpression >( nullptr, arguments ), value ) )
+      std::make_shared< DirectCallExpression >(
+          IdentifierPath::fromIdentifier( std::make_shared< Identifier >() ), arguments ),
+      value ) )
 , m_mapsToken( mapsToken )
 {
 }
