@@ -72,6 +72,7 @@ class TypeCheckVisitor final : public RecursiveVisitor
   public:
     TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
+    void visit( InitDefinition& node ) override;
     void visit( UsingDefinition& node ) override;
 
     void visit( BasicType& node ) override;
@@ -90,6 +91,12 @@ TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symbolta
 : m_log( log )
 , m_symboltable( symboltable )
 {
+}
+
+void TypeCheckVisitor::visit( InitDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+    node.programFunction()->accept( *this );
 }
 
 void TypeCheckVisitor::visit( UsingDefinition& node )
