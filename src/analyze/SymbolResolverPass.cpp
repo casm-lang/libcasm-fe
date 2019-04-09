@@ -79,6 +79,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
   public:
     SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
+    void visit( InitDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
 
@@ -122,6 +123,12 @@ SymbolResolveVisitor::SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& 
 , m_symboltable( symboltable )
 , m_variables()
 {
+}
+
+void SymbolResolveVisitor::visit( InitDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+    node.programFunction()->accept( *this );
 }
 
 void SymbolResolveVisitor::visit( DerivedDefinition& node )
@@ -288,53 +295,21 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    static const auto SELF( "self" );
-    static const auto AGENT( "Agent" );
-    static const auto SINGLE_AGENT_CONSTANT( "$" );
+    static const std::string SELF( "self" );
+    static const std::string AGENT( "Agent" );
 
     if( name == SELF )
     {
         const auto agentSymbol = m_symboltable.findSymbol( AGENT );
         if( not agentSymbol )
         {
-            m_log.error( { node.sourceLocation() }, "unable to find 'Agent' symbol" );
+            m_log.error( { node.sourceLocation() }, "unable to find '" + AGENT + "' symbol" );
             return;
         }
 
         node.setTargetType( DirectCallExpression::TargetType::SELF );
         node.setTargetDefinition( agentSymbol );
         validateArgumentsCount( "", 0 );
-    }
-    // single agent execution notation --> agent type domain ==
-    // Enumeration!
-    else if( name == SINGLE_AGENT_CONSTANT )
-    {
-        assert( node.targetType() == DirectCallExpression::TargetType::CONSTANT );
-
-        const auto agent = std::make_shared< EnumeratorDefinition >(
-            std::make_shared< Identifier >( SINGLE_AGENT_CONSTANT ) );
-        const auto agentEnumerators = std::make_shared< Enumerators >();
-        agentEnumerators->add( agent );
-        const auto agentEnum = std::make_shared< EnumerationDefinition >(
-            Token::unresolved(),
-            std::make_shared< Identifier >( AGENT ),
-            Token::unresolved(),
-            Token::unresolved(),
-            agentEnumerators,
-            Token::unresolved() );
-
-        const auto kind = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
-        kind->add( SINGLE_AGENT_CONSTANT );
-
-        const auto type = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
-        agent->setType( type );
-        agentEnum->setType( type );
-
-        m_symboltable.registerSymbol( AGENT, agentEnum );
-
-        node.setTargetDefinition( agent );
-        node.setType( type );
-        validateArgumentsCount( agent->description(), 0 );
     }
     else if( TypeInfo::instance().hasType( name ) )
     {
