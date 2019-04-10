@@ -130,13 +130,11 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
   private:
     libcasm_fe::Logger& m_log;
     u1 m_functionInitially;
-    u1 m_initDefinitionFound;
 };
 
 ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 , m_functionInitially( false )
-, m_initDefinitionFound( false )
 {
 }
 
@@ -144,14 +142,6 @@ void ConsistencyCheckVisitor::visit( Specification& node )
 {
     node.header()->accept( *this );
     node.definitions()->accept( *this );
-
-    if( not m_initDefinitionFound )
-    {
-        m_log.error(
-            { node.header()->sourceLocation() },
-            "no init definition found in this specification",
-            Code::AgentInitRuleNotDefined );
-    }
 }
 
 void ConsistencyCheckVisitor::visit( InitDefinition& node )
@@ -177,11 +167,6 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     node.returnType()->accept( *this );
     node.defined()->accept( *this );
     node.attributes()->accept( *this );
-
-    if( node.isProgram() )
-    {
-        m_initDefinitionFound = true;
-    }
 
     verifyHasTypeOfKind( node, IR::Type::Kind::RELATION );
 }
