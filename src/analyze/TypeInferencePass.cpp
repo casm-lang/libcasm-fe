@@ -173,7 +173,11 @@ TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log, const Names
 void TypeInferenceVisitor::visit( InitDefinition& node )
 {
     RecursiveVisitor::visit( node );
-    node.programFunction()->accept( *this );
+    const auto programFunction = node.programFunction();
+    if( programFunction )
+    {
+        programFunction->accept( *this );
+    }
 }
 
 void TypeInferenceVisitor::visit( VariableDefinition& node )
