@@ -75,6 +75,7 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
   public:
     SymbolRegistrationVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
+    void visit( InitDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -95,6 +96,136 @@ SymbolRegistrationVisitor::SymbolRegistrationVisitor(
 : m_log( log )
 , m_symboltable( symboltable )
 {
+}
+
+static BasicType::Ptr createRuleRefType( libstdhl::SourceLocation& sourceLocation )
+{
+    const auto type = libstdhl::Memory::get< libcasm_ir::RuleReferenceType >();
+    const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
+    const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
+    const auto node = Ast::make< BasicType >( sourceLocation, path );
+    node->setType( type );
+    return node;
+}
+
+static BasicType::Ptr createAgentType( libstdhl::SourceLocation& sourceLocation )
+{
+    const auto name = Ast::make< Identifier >( sourceLocation, "Agent" );
+    const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
+    const auto node = Ast::make< BasicType >( sourceLocation, path );
+    return node;
+}
+
+static FunctionDefinition::Ptr createProgramFunction(
+    libstdhl::SourceLocation& sourceLocation, const Initializers::Ptr& initializers )
+{
+    const auto agentType = createAgentType( sourceLocation );
+    const auto ruleRefType = createRuleRefType( sourceLocation );
+
+    const auto argTypes = Ast::make< Types >( sourceLocation );
+    argTypes->add( agentType );
+
+    const auto program = Ast::make< Identifier >( sourceLocation, "program" );
+    const auto defined = Ast::make< Defined >(
+        sourceLocation,
+        Token::unresolved(),
+        Token::unresolved(),
+        Ast::make< UndefLiteral >( sourceLocation ),
+        Token::unresolved() );
+
+    const auto initially = Ast::make< Initially >(
+        sourceLocation,
+        Token::unresolved(),
+        Token::unresolved(),
+        initializers,
+        Token::unresolved() );
+
+    return Ast::make< FunctionDefinition >(
+        sourceLocation,
+        Token::unresolved(),
+        program,
+        Token::unresolved(),
+        argTypes,
+        Token::unresolved(),
+        ruleRefType,
+        defined,
+        initially );
+}
+
+void SymbolRegistrationVisitor::visit( InitDefinition& node )
+{
+    auto location = node.sourceLocation();
+    auto initializers = node.initializers();
+
+    if( node.isSingleAgent() )
+    {
+        initializers = Ast::make< Initializers >( location );
+
+        static const auto AGENT( "Agent" );
+        static const auto SINGLE_AGENT_CONSTANT( "$" );
+
+        const auto agent = std::make_shared< EnumeratorDefinition >(
+            std::make_shared< Identifier >( SINGLE_AGENT_CONSTANT ) );
+
+        const auto agentEnumerators = std::make_shared< Enumerators >();
+        agentEnumerators->add( agent );
+
+        const auto agentEnum = std::make_shared< EnumerationDefinition >(
+            Token::unresolved(),
+            std::make_shared< Identifier >( AGENT ),
+            Token::unresolved(),
+            Token::unresolved(),
+            agentEnumerators,
+            Token::unresolved() );
+
+        const auto kind = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
+        kind->add( SINGLE_AGENT_CONSTANT );
+
+        const auto type = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
+        agent->setType( type );
+        agentEnum->setType( type );
+
+        m_symboltable.registerSymbol( SINGLE_AGENT_CONSTANT, agentEnum );
+        m_symboltable.registerSymbol( AGENT, agentEnum );
+
+        const auto singleAgentIdentifier = Ast::make< Identifier >( location, "$" );
+        auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( location );
+        const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
+            location,
+            IdentifierPath::fromIdentifier( singleAgentIdentifier ),
+            singleAgentArguments );
+        singleAgent->setTargetType( DirectCallExpression::TargetType::CONSTANT );
+
+        const auto programArguments = libcasm_fe::Ast::make< Expressions >( location );
+        programArguments->add( singleAgent );
+
+        const auto ruleReference =
+            Ast::make< ReferenceLiteral >( location, Token::unresolved(), node.initPath() );
+
+        const auto initializer = Ast::make< Initializer >(
+            location,
+            Token::unresolved(),
+            programArguments,
+            Token::unresolved(),
+            Token::unresolved(),
+            ruleReference );
+        initializers->add( initializer );
+    }
+
+    const auto programFunction = createProgramFunction( location, initializers );
+    node.setProgramFunction( programFunction );
+
+    // patch and apply the name of the program declaration to the initializer functions
+    const auto programFunctionInitializers = programFunction->initially()->initializers();
+    for( auto& programFunctionInitializer : *programFunctionInitializers )
+    {
+        programFunctionInitializer->updateRule()->function()->setIdentifier(
+            IdentifierPath::fromIdentifier( programFunction->identifier() ) );
+    }
+
+    registerSymbol( *node.programFunction() );
+
+    RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
