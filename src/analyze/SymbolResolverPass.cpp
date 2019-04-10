@@ -128,7 +128,11 @@ SymbolResolveVisitor::SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& 
 void SymbolResolveVisitor::visit( InitDefinition& node )
 {
     RecursiveVisitor::visit( node );
-    node.programFunction()->accept( *this );
+    const auto programFunction = node.programFunction();
+    if( programFunction )
+    {
+        programFunction->accept( *this );
+    }
 }
 
 void SymbolResolveVisitor::visit( DerivedDefinition& node )
