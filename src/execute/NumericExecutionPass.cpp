@@ -1665,6 +1665,7 @@ void StateInitializationVisitor::visit( Specification& node )
 
 void StateInitializationVisitor::visit( InitDefinition& node )
 {
+    assert( node.programFunction() and "checked during frame size determination pass!" );
     node.programFunction()->accept( *this );
 }
 
