@@ -96,7 +96,11 @@ TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symbolta
 void TypeCheckVisitor::visit( InitDefinition& node )
 {
     RecursiveVisitor::visit( node );
-    node.programFunction()->accept( *this );
+    const auto programFunction = node.programFunction();
+    if( programFunction )
+    {
+        programFunction->accept( *this );
+    }
 }
 
 void TypeCheckVisitor::visit( UsingDefinition& node )
