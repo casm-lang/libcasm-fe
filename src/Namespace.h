@@ -57,6 +57,9 @@ namespace libcasm_fe
       public:
         using Ptr = std::shared_ptr< Namespace >;
 
+        static const std::string& delimiter( void );
+
+      public:
         explicit Namespace( void );
 
         void registerSymbol( const std::string& name, const Ast::Definition::Ptr& definition );

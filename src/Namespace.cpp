@@ -46,8 +46,21 @@
 
 #include <libstdhl/String>
 
+#include "various/GrammarToken.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
+
+const std::string& Namespace::delimiter( void )
+{
+    static const auto delimiterString = Grammar::tokenAsString( Grammar::Token::DOUBLECOLON );
+    return delimiterString;
+}
+
+//
+//
+// Namespace
+//
 
 Namespace::Namespace( void )
 : m_symbols()
@@ -106,7 +119,7 @@ std::string Namespace::dump( const std::string& indention ) const
         const auto& name = _namespace.first;
         const auto& space = _namespace.second;
 
-        s << space->dump( name + "::" );
+        s << space->dump( name + Namespace::delimiter() );
     }
 
     return s.str();
