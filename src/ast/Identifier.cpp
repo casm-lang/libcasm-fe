@@ -44,6 +44,7 @@
 
 #include "Identifier.h"
 
+#include <libcasm-fe/Namespace>
 #include <libcasm-fe/ast/Token>
 
 #include "../various/GrammarToken.h"
@@ -52,8 +53,6 @@
 
 using namespace libcasm_fe;
 using namespace Ast;
-
-static const std::string DELIMITER( "::" );
 
 //
 //
@@ -149,10 +148,10 @@ const std::string& IdentifierPath::baseName( void ) const
 std::string IdentifierPath::baseDir( void ) const
 {
     const auto& p = path();
-    const size_t lastDotPos = p.find_last_of( DELIMITER );
+    const size_t lastDotPos = p.find_last_of( Namespace::delimiter() );
     if( lastDotPos != std::string::npos )
     {
-        return p.substr( 0, lastDotPos - DELIMITER.size() + 1 );
+        return p.substr( 0, lastDotPos - Namespace::delimiter().size() + 1 );
     }
     else
     {
@@ -166,7 +165,7 @@ std::string IdentifierPath::path( void ) const
 
     if( m_type == Type::RELATIVE )
     {
-        path += DELIMITER;
+        path += Namespace::delimiter();
     }
 
     bool isFirstElement = true;
@@ -174,7 +173,7 @@ std::string IdentifierPath::path( void ) const
     {
         if( not isFirstElement )
         {
-            path += DELIMITER;
+            path += Namespace::delimiter();
         }
         path += identifier->name();
         isFirstElement = false;
