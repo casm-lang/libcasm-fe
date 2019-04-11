@@ -48,6 +48,7 @@
 
 #include <libpass/PassManager>
 #include <libpass/PassResult>
+#include <libpass/analyze/LoadFilePass>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -63,27 +64,60 @@ rule test_update_program_self_undef = program( self ) := undef
 
 )***";
 
-#define SOURCE_TEST( SCOPE, PASS, CONTENT, STATUS, DESCRIPTION, CONFIG )        \
-    TEST( libcasm_fe, SCOPE##_##PASS##DESCRIPTION )                             \
-    {                                                                           \
-        libpass::PassManager pm;                                                \
-        pm.setDefaultPass< PASS >();                                            \
-        pm.set< libcasm_fe::PASS >( [&]( libcasm_fe::PASS& pass ) { CONFIG } ); \
-                                                                                \
-        const auto specification = std::make_shared< Specification >();         \
-        specification->setName( "Test" );                                       \
-        specification->setSource( source );                                     \
-                                                                                \
-        libpass::PassResult pr;                                                 \
-        pr.setInput< SourceToAstPass >( specification );                        \
-        pm.setDefaultResult( pr );                                              \
-                                                                                \
-        EXPECT_EQ( pm.run(), STATUS );                                          \
+#define SOURCE( PASS, CONTENT, STATUS, CONFIG )                                                   \
+    {                                                                                             \
+        libpass::PassManager pm;                                                                  \
+        pm.setDefaultPass< PASS >();                                                              \
+        pm.set< libcasm_fe::PASS >( [&]( libcasm_fe::PASS& pass ) { CONFIG } );                   \
+                                                                                                  \
+        libstdhl::Logger log( pm.stream() );                                                      \
+        log.setSource( libstdhl::Memory::make< libstdhl::Log::Source >( TEST_NAME, TEST_NAME ) ); \
+                                                                                                  \
+        auto flush = [&pm]() {                                                                    \
+            libstdhl::Log::ApplicationFormatter f( TEST_NAME );                                   \
+            libstdhl::Log::OutputStreamSink c( std::cerr, f );                                    \
+            pm.stream().flush( c );                                                               \
+        };                                                                                        \
+                                                                                                  \
+        const std::string filename = TEST_NAME + ".casm";                                         \
+        auto file = libstdhl::File::open( filename, std::fstream::out );                          \
+        file << CONTENT;                                                                          \
+        file.close();                                                                             \
+                                                                                                  \
+        libpass::PassResult pr;                                                                   \
+        pr.setInput< libpass::LoadFilePass >( filename );                                         \
+        pm.setDefaultResult( pr );                                                                \
+                                                                                                  \
+        EXPECT_EQ( pm.run( flush ), STATUS );                                                     \
+                                                                                                  \
+        pm.result().output< libpass::LoadFilePass >()->close();                                   \
+        libstdhl::File::remove( filename );                                                       \
+        EXPECT_EQ( libstdhl::File::exists( filename ), false );                                   \
     }
 
-SOURCE_TEST( transform, SourceToAstPass, source, true, , { pass.setDebug( false ); } );
+#define SOURCE_TEST( SCOPE, PASS, CONTENT, STATUS, DESCRIPTION, CONFIG ) \
+    TEST( libcasm_fe_passes, SCOPE##_##PASS##DESCRIPTION )               \
+    {                                                                    \
+        SOURCE( PASS, CONTENT, STATUS, CONFIG );                         \
+    }
+
+#define SOURCE_TEST_WITH_LIBRARY( SCOPE, PASS, CONTENT, LIBRARY, STATUS, DESCRIPTION, CONFIG ) \
+    TEST( libcasm_fe_passes, SCOPE##_##PASS##DESCRIPTION )                                     \
+    {                                                                                          \
+        const std::string filename = "lib.casm";                                               \
+        auto file = libstdhl::File::open( filename, std::fstream::out );                       \
+        file << LIBRARY;                                                                       \
+        file.close();                                                                          \
+                                                                                               \
+        SOURCE( PASS, CONTENT, STATUS, CONFIG );                                               \
+                                                                                               \
+        libstdhl::File::remove( filename );                                                    \
+        EXPECT_EQ( libstdhl::File::exists( filename ), false );                                \
+    }
 
 SOURCE_TEST( analyze, ConsistencyCheckPass, source, true, , );
+
+SOURCE_TEST( transform, SourceToAstPass, source, true, , { pass.setDebug( false ); } );
 
 SOURCE_TEST( transform, AstDumpSourcePass, source, true, , );
 SOURCE_TEST( transform, AstDumpDotPass, source, true, , );
@@ -98,6 +132,29 @@ SOURCE_TEST( transform, AstDumpDotPass, source, true, , );
 // )***";
 //
 // SOURCE_TEST( execute, NumericExecutionPass, source_with_no_init, true, _noInitDefinition, );
+
+static const auto src = R"***(
+CASM init test
+
+import lib
+
+rule test = lib::foo
+
+import lib as bar
+
+rule qux = bar::foo
+
+)***";
+
+static const auto lib = R"***(
+CASM
+
+rule foo = skip
+
+)***";
+
+SOURCE_TEST_WITH_LIBRARY( analyze, ConsistencyCheckPass, src, lib, true, _import, );
+// SOURCE_TEST_WITH_LIBRARY( execute, NumericExecutionPass, src, lib, true, _import, );
 
 //
 //  Local variables:
