@@ -2084,6 +2084,14 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
             invariantChecker.check( *specification );
         }
 
+        if( scheduler.numberOfSteps() == 0 )
+        {
+            log.warning(
+                { specification->header()->sourceLocation() },
+                "Could not perform a single step because no agent was initially available. This "
+                "may happen when no valid initial rule has been specified (see InitRule)." );
+        }
+
         log.info(
             "Finished execution after " + std::to_string( scheduler.numberOfSteps() ) + " steps" );
     }
