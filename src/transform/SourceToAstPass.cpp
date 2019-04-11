@@ -56,8 +56,7 @@
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
-#include <libpass/PassResult>
-#include <libpass/PassUsage>
+#include <libpass/analyze/LoadFilePass>
 
 using namespace libcasm_fe;
 
@@ -68,25 +67,29 @@ static libpass::PassRegistration< SourceToAstPass > PASS(
 
 void SourceToAstPass::usage( libpass::PassUsage& pu )
 {
+    pu.require< libpass::LoadFilePass >();
 }
 
 u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.input< SourceToAstPass >();
-    const auto specification = data->specification();
+    const auto fileData = pr.output< libpass::LoadFilePass >();
+    const auto fileName = fileData->filename();
+    auto& fileStream = fileData->stream();
 
-    std::stringstream soureStream( specification->source() );
-    Lexer lexer( log, soureStream, std::cout );
-    lexer.setFileName( specification->name() );
+    Lexer lexer( log, fileStream, std::cout );
+    lexer.setFileName( fileName );
+
+    const auto specification = std::make_shared< Specification >();
+    specification->setName( fileName );
 
     Parser parser( log, lexer, *specification );
     parser.set_debug_level( m_debug );
 
     if( ( parser.parse() != 0 ) or not specification or ( log.errors() > 0 ) )
     {
-        log.error( "could not parse `" + specification->name() + "´" );
+        log.error( "could not parse '" + specification->name() + "'" );
         return false;
     }
 

@@ -42,8 +42,8 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_IMPORT_ERROR_H_
-#define _LIB_CASMFE_IMPORT_ERROR_H_
+#ifndef _LIBCASM_FE_IMPORT_ERROR_H_
+#define _LIBCASM_FE_IMPORT_ERROR_H_
 
 #include <exception>
 #include <string>
@@ -74,7 +74,7 @@ namespace libcasm_fe
     };
 }
 
-#endif  // _LIB_CASMFE_IMPORT_ERROR_H_
+#endif  // _LIBCASM_FE_IMPORT_ERROR_H_
 
 //
 //  Local variables:

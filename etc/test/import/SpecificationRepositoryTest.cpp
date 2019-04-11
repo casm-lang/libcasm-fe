@@ -42,38 +42,49 @@
 //  statement from your version.
 //
 
-#include <libstdhl/Test>
-
-#include <libcasm-fe/import/SpecificationRepository>
+#include "../main.h"
 
 #include <memory>
 
 using namespace libcasm_fe;
 
-TEST( SpecificationRepositoryTest, shouldReturnEmptyOptionalForRequestedIdIfNotStored )
+TEST(
+    libcasm_fe_import_SpecificationRepositoryTest,
+    shouldReturnEmptyOptionalForRequestedIdIfNotStored )
 {
     // GIVEN
     SpecificationRepository repository;
 
     // WHEN
-    const auto storedSpec = repository.get( "some.lib" );
+    const auto storedSpec = repository.get( "some" + Namespace::delimiter() + "lib" );
 
     // THEN
     EXPECT_FALSE( storedSpec.has_value() );
 }
 
-TEST( SpecificationRepositoryTest, shouldReturnSpecificationForRequestedIdIfStored )
+TEST(
+    libcasm_fe_import_SpecificationRepositoryTest, shouldReturnSpecificationForRequestedIdIfStored )
 {
     // GIVEN
     SpecificationRepository repository;
 
-    const auto spec = std::make_shared< libcasm_fe::Specification >();
-    repository.store( "some.lib", spec );
+    const auto spec = std::make_shared< Specification >();
+    repository.store( "some" + Namespace::delimiter() + "lib", spec );
 
     // WHEN
-    const auto storedSpec = repository.get( "some.lib" );
+    const auto storedSpec = repository.get( "some" + Namespace::delimiter() + "lib" );
 
     // THEN
     EXPECT_TRUE( storedSpec.has_value() );
     EXPECT_EQ( spec, storedSpec );
 }
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

@@ -49,6 +49,8 @@
 
 #include <libpass/Pass>
 #include <libpass/PassData>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 /**
    @brief    TODO
@@ -91,8 +93,6 @@ namespace libcasm_fe
           private:
             Specification::Ptr m_specification;
         };
-
-        using Input = Output;
     };
 }
 

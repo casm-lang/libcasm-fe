@@ -45,17 +45,17 @@
 #include "LibraryLoaderPass.h"
 
 #include <libcasm-fe/Logger>
-#include <libcasm-fe/ast/RecursiveVisitor>
-
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
+#include <libcasm-fe/ast/RecursiveVisitor>
+#include <libcasm-fe/import/FileLoadingStrategy>
+#include <libcasm-fe/import/ImportError>
+#include <libcasm-fe/import/LibraryLoader>
+#include <libcasm-fe/import/SpecificationLoader>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
-
-#include "ImportError.h"
-#include "SpecificationLoader.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -173,6 +173,10 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     {
         specificationBasePath.clear();
     }
+
+    auto loaderStrategy = std::make_shared< FileLoadingStrategy >( "." );
+    const auto loader = std::make_shared< LibraryLoader >( stream(), loaderStrategy );
+    specification->setLoader( loader );
 
     assert( specification->loader() && "loader must be set" );
 

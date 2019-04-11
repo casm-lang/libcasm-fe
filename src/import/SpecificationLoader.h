@@ -42,8 +42,8 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_SPECIFICATION_LOADER_H_
-#define _LIB_CASMFE_SPECIFICATION_LOADER_H_
+#ifndef _LIBCASM_FE_SPECIFICATION_LOADER_H_
+#define _LIBCASM_FE_SPECIFICATION_LOADER_H_
 
 #include <libcasm-fe/Specification>
 
@@ -70,7 +70,7 @@ namespace libcasm_fe
     };
 }
 
-#endif  // _LIB_CASMFE_SPECIFICATION_LOADER_H_
+#endif  // _LIBCASM_FE_SPECIFICATION_LOADER_H_
 
 //
 //  Local variables:

@@ -42,8 +42,8 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_SPECIFICATION_REPOSITORY_H_
-#define _LIB_CASMFE_SPECIFICATION_REPOSITORY_H_
+#ifndef _LIBCASM_FE_SPECIFICATION_REPOSITORY_H_
+#define _LIBCASM_FE_SPECIFICATION_REPOSITORY_H_
 
 #include <libstdhl/Optional>
 
@@ -57,6 +57,7 @@ namespace libcasm_fe
         explicit SpecificationRepository( void );
 
         void store( const std::string& id, const Specification::Ptr& specification );
+
         libstdhl::Optional< Specification::Ptr > get( const std::string& id ) const;
 
       private:
@@ -64,7 +65,7 @@ namespace libcasm_fe
     };
 }
 
-#endif  // _LIB_CASMFE_SPECIFICATION_REPOSITORY_H_
+#endif  // _LIBCASM_FE_SPECIFICATION_REPOSITORY_H_
 
 //
 //  Local variables:

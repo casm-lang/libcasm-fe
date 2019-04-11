@@ -42,16 +42,15 @@
 //  statement from your version.
 //
 
-#include <libstdhl/File>
-#include <libstdhl/Test>
+#include "../main.h"
 
-#include <libcasm-fe/import/FileLoadingStrategy>
-#include <libcasm-fe/import/ImportError>
+#include <libstdhl/File>
 
 using namespace libcasm_fe;
-using namespace libstdhl;
 
-TEST( FileLoadingStrategyTest, shouldThrowNoSuchSpecificationErrorIfRequestedSourceDoesNotExist )
+TEST(
+    libcasm_fe_import_FileLoadingStrategyTest,
+    shouldThrowNoSuchSpecificationErrorIfRequestedSourceDoesNotExist )
 {
     // GIVEN
     FileLoadingStrategy loadingStrategy( "." );
@@ -60,48 +59,69 @@ TEST( FileLoadingStrategyTest, shouldThrowNoSuchSpecificationErrorIfRequestedSou
     EXPECT_THROW( loadingStrategy.loadSource( "NonExistingLib" ), NoSuchSpecificationError );
 }
 
-TEST( FileLoadingStrategyTest, shouldReturnSourceCodeOfFooFileWhenRequestingFoo )
+static const auto specification = R"***(
+CASM init test
+
+rule test = skip
+
+)***";
+
+TEST( libcasm_fe_import_FileLoadingStrategyTest, shouldReturnSourceOfIdentifier )
 {
     // GIVEN
-    const std::string filename( "Foo.casm" );
-    const std::string givenSource( "CASM init foo\nrule foo = skip" );
+    const std::string fileName( "./" + TEST_NAME + ".casm" );
+    const std::string importPath( TEST_NAME );
 
-    auto file = File::open( filename, std::fstream::out );
-    file << givenSource;
+    auto file = libstdhl::File::open( fileName, std::fstream::out );
+    file << specification;
     file.close();
 
     FileLoadingStrategy loadingStrategy( "." );
 
     // WHEN
-    const auto loadedSource = loadingStrategy.loadSource( "Foo" );
+    const auto source = loadingStrategy.loadSource( importPath );
 
     // THEN
-    EXPECT_STREQ( givenSource.c_str(), loadedSource.c_str() );
+    EXPECT_STREQ( fileName.c_str(), source->filename().c_str() );
 
     // CLEANUP
-    File::remove( filename );
+    libstdhl::File::remove( fileName );
+    EXPECT_EQ( libstdhl::File::exists( fileName ), false );
 }
 
-TEST( FileLoadingStrategyTest, shouldReturnSourceCodeOfBarFileInFooFolderWhenRequestingFooBar )
+TEST( libcasm_fe_import_FileLoadingStrategyTest, shouldReturnSourceInFolderOfIdentifierPath )
 {
     // GIVEN
-    const std::string filename( "Foo/Bar.casm" );
-    const std::string givenSource( "CASM init bar\nrule bar = skip" );
+    const std::string filePath( TEST_CASE );
+    const std::string fileName( "./" + filePath + "/" + TEST_UNIT + ".casm" );
+    const std::string importPath( filePath + Namespace::delimiter() + TEST_UNIT );
 
-    File::Path::create( "Foo" );
-    auto file = File::open( filename, std::fstream::out );
-    file << givenSource;
+    libstdhl::File::Path::create( filePath );
+    auto file = libstdhl::File::open( fileName, std::fstream::out );
+    file << specification;
     file.close();
 
     FileLoadingStrategy loadingStrategy( "." );
 
     // WHEN
-    const auto loadedSource = loadingStrategy.loadSource( "Foo.Bar" );
+    const auto source = loadingStrategy.loadSource( importPath );
 
     // THEN
-    EXPECT_STREQ( givenSource.c_str(), loadedSource.c_str() );
+    EXPECT_STREQ( fileName.c_str(), source->filename().c_str() );
 
     // CLEANUP
-    File::remove( filename );
-    File::Path::remove( "Foo" );
+    File::remove( fileName );
+    EXPECT_EQ( libstdhl::File::exists( fileName ), false );
+    File::Path::remove( filePath );
+    EXPECT_EQ( libstdhl::File::Path::exists( filePath ), false );
 }
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

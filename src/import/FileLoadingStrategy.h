@@ -42,14 +42,14 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_FILE_LOADING_STRATEGY_H_
-#define _LIB_CASMFE_FILE_LOADING_STRATEGY_H_
+#ifndef _LIBCASM_FE_FILE_LOADING_STRATEGY_H_
+#define _LIBCASM_FE_FILE_LOADING_STRATEGY_H_
 
 #include <libcasm-fe/import/LoadingStrategy>
 
 namespace libcasm_fe
 {
-    class FileLoadingStrategy : public LoadingStrategy
+    class FileLoadingStrategy final : public LoadingStrategy
     {
       public:
         /**
@@ -59,7 +59,8 @@ namespace libcasm_fe
          */
         explicit FileLoadingStrategy( const std::string& basePath );
 
-        std::string loadSource( const std::string& identifierPath ) const override;
+        libpass::LoadFilePass::Input::Ptr loadSource(
+            const std::string& identifierPath ) const override;
 
       private:
         /**
@@ -73,7 +74,7 @@ namespace libcasm_fe
     };
 }
 
-#endif  // _LIB_CASMFE_FILE_LOADING_STRATEGY_H_
+#endif  // _LIBCASM_FE_FILE_LOADING_STRATEGY_H_
 
 //
 //  Local variables:

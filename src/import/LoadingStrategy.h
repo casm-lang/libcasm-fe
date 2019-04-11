@@ -42,8 +42,10 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_LOADING_STRATEGY_H_
-#define _LIB_CASMFE_LOADING_STRATEGY_H_
+#ifndef _LIBCASM_FE_LOADING_STRATEGY_H_
+#define _LIBCASM_FE_LOADING_STRATEGY_H_
+
+#include <libpass/analyze/LoadFilePass>
 
 #include <string>
 
@@ -52,21 +54,23 @@ namespace libcasm_fe
     class LoadingStrategy
     {
       public:
-        virtual ~LoadingStrategy() = default;
+        virtual ~LoadingStrategy( void ) = default;
 
         /**
          * Loads a CASM specification from an \a identifierPath.
          *
-         * @throws NoSuchSpecificationError if no CASM specification for the given \a identifierPath
+         * @throws NoSuchSpecificationError if no CASM specification for the given \a
+         identifierPath
          * could be loaded.
          *
          * @returns The source code of the CASM specification
          */
-        virtual std::string loadSource( const std::string& identifierPath ) const = 0;
+        virtual libpass::LoadFilePass::Input::Ptr loadSource(
+            const std::string& location ) const = 0;
     };
 }
 
-#endif  // _LIB_CASMFE_LOADING_STRATEGY_H_
+#endif  // _LIBCASM_FE_LOADING_STRATEGY_H_
 
 //
 //  Local variables:

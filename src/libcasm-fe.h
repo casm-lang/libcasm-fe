@@ -45,6 +45,8 @@
 #ifndef _LIBCASM_FE_H_
 #define _LIBCASM_FE_H_
 
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
 #include <libcasm-fe/Version>
 #include <libcasm-fe/analyze/AttributionPass>
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
@@ -58,7 +60,9 @@
 #include <libcasm-fe/ast/Span>
 #include <libcasm-fe/execute/NumericExecutionPass>
 #include <libcasm-fe/execute/UpdateSet>
-//#include <libcasm-fe/execute/SymbolicExecutionPass>
+#include <libcasm-fe/import/FileLoadingStrategy>
+#include <libcasm-fe/import/ImportError>
+#include <libcasm-fe/import/SpecificationRepository>
 #include <libcasm-fe/transform/AstDumpDotPass>
 #include <libcasm-fe/transform/AstDumpSourcePass>
 #include <libcasm-fe/transform/AstToCasmIRPass>

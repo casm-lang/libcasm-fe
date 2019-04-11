@@ -75,11 +75,7 @@ namespace libcasm_fe
         AsmType asmType( void ) const;
 
         void setName( const std::string& name );
-
         const std::string& name( void ) const;
-
-        void setSource( const std::string& source );
-        const std::string& source( void ) const;
 
         void setHeader( const Ast::HeaderDefinition::Ptr& header );
 
@@ -95,18 +91,17 @@ namespace libcasm_fe
 
         const Namespace::Ptr& symboltable( void ) const;
 
-        void setLoader( SpecificationLoader* loader );
-        SpecificationLoader* loader( void ) const;
+        void setLoader( const std::shared_ptr< SpecificationLoader >& loader );
+        const std::shared_ptr< SpecificationLoader >& loader( void ) const;
 
       private:
         AsmType m_asmType;
         std::string m_name;
-        std::string m_source;
         Ast::HeaderDefinition::Ptr m_header;
         Ast::Definitions::Ptr m_definitions;
         Ast::Spans::Ptr m_spans;
         Namespace::Ptr m_symboltable;
-        SpecificationLoader* m_loader;
+        std::shared_ptr< SpecificationLoader > m_loader;
     };
 }
 

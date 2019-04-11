@@ -44,10 +44,11 @@
 
 #include "FileLoadingStrategy.h"
 
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/import/ImportError>
+
 #include <libstdhl/File>
 #include <libstdhl/String>
-
-#include "ImportError.h"
 
 using namespace libcasm_fe;
 
@@ -57,24 +58,33 @@ FileLoadingStrategy::FileLoadingStrategy( const std::string& basePath )
 {
 }
 
-std::string FileLoadingStrategy::loadSource( const std::string& identifierPath ) const
+libpass::LoadFilePass::Input::Ptr FileLoadingStrategy::loadSource(
+    const std::string& identifierPath ) const
 {
     const auto filePath = toFileSystemPath( identifierPath );
-
-    std::ifstream file( filePath );
-    if( not file.is_open() )
+    if( not libstdhl::File::exists( filePath ) )
     {
         throw NoSuchSpecificationError(
             "Couldn't load '" + identifierPath + "' from '" + filePath + "'" );
     }
 
-    std::stringstream content;
-    content << file.rdbuf();
-    return content.str();
+    return std::make_shared< libpass::LoadFilePass::Input >( filePath );
 }
 
 std::string FileLoadingStrategy::toFileSystemPath( const std::string& identifierPath ) const
 {
-    const auto filePath = libstdhl::String::replaceAll( identifierPath, ".", "/" );
+    const auto filePath =
+        libstdhl::String::replaceAll( identifierPath, Namespace::delimiter(), "/" );
+
     return m_basePath + "/" + filePath + ".casm";
 }
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

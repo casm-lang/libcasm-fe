@@ -42,8 +42,8 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_LIBRARY_LOADER_H_
-#define _LIB_CASMFE_LIBRARY_LOADER_H_
+#ifndef _LIBCASM_FE_LIBRARY_LOADER_H_
+#define _LIBCASM_FE_LIBRARY_LOADER_H_
 
 #include <libcasm-fe/import/LoadingStrategy>
 #include <libcasm-fe/import/SpecificationLoader>
@@ -55,18 +55,19 @@ namespace libcasm_fe
     {
       public:
         LibraryLoader(
-            libstdhl::Log::Stream& logStream, std::unique_ptr< LoadingStrategy > loadingStrategy );
+            libstdhl::Log::Stream& logStream,
+            const std::shared_ptr< LoadingStrategy >& loadingStrategy );
 
         Specification::Ptr loadSpecification( const std::string& identifierPath ) override;
 
       private:
         libstdhl::Log::Stream& m_logStream;
         SpecificationRepository m_repository;
-        std::unique_ptr< LoadingStrategy > m_loadingStrategy;
+        const std::shared_ptr< LoadingStrategy > m_loadingStrategy;
     };
 }
 
-#endif  // _LIB_CASMFE_LIBRARY_LOADER_H_
+#endif  // _LIBCASM_FE_LIBRARY_LOADER_H_
 
 //
 //  Local variables:

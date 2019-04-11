@@ -42,8 +42,8 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_LIBRARY_LOADER_PASS_H_
-#define _LIB_CASMFE_LIBRARY_LOADER_PASS_H_
+#ifndef _LIBCASM_FE_LIBRARY_LOADER_PASS_H_
+#define _LIBCASM_FE_LIBRARY_LOADER_PASS_H_
 
 #include <libpass/Pass>
 
@@ -63,7 +63,7 @@ namespace libcasm_fe
     };
 }
 
-#endif  // _LIB_CASMFE_LIBRARY_LOADER_PASS_H_
+#endif  // _LIBCASM_FE_LIBRARY_LOADER_PASS_H_
 
 //
 //  Local variables:

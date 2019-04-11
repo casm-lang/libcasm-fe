@@ -55,3 +55,13 @@ const char* ImportError::what( void ) const noexcept
 {
     return m_msg.c_str();
 }
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

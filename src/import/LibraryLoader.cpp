@@ -44,29 +44,32 @@
 
 #include "LibraryLoader.h"
 
-#include "../analyze/FrameSizeDeterminationPass.h"
-#include "../transform/SourceToAstPass.h"
+#include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/import/ImportError>
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassManager>
+#include <libpass/analyze/LoadFilePass>
 
-#include "ImportError.h"
+#include <libstdhl/String>
 
 using namespace libcasm_fe;
 
 LibraryLoader::LibraryLoader(
-    libstdhl::Log::Stream& logStream, std::unique_ptr< LoadingStrategy > loadingStrategy )
+    libstdhl::Log::Stream& logStream, const std::shared_ptr< LoadingStrategy >& loadingStrategy )
 : SpecificationLoader()
 , m_logStream( logStream )
 , m_repository()
-, m_loadingStrategy( std::move( loadingStrategy ) )
+, m_loadingStrategy( loadingStrategy )
 {
 }
 
 Specification::Ptr LibraryLoader::loadSpecification( const std::string& identifierPath )
 {
     libstdhl::Logger log( m_logStream );
+    log.setCategory( std::make_shared< libstdhl::Log::Category >( identifierPath, "import" ) );
 
-    log.debug( "Entering LibraryLoader::loadSpecification with '" + identifierPath + "'" );
+    log.debug( ">>> LibraryLoader::loadSpecification with '" + identifierPath + "'" );
 
     const auto cachedSpecification = m_repository.get( identifierPath );
     if( cachedSpecification )
@@ -76,24 +79,41 @@ Specification::Ptr LibraryLoader::loadSpecification( const std::string& identifi
     }
 
     const auto source = m_loadingStrategy->loadSource( identifierPath );
+    const auto fileName = source->filename();
 
-    const auto specification = std::make_shared< Specification >();
-    specification->setName( identifierPath );
-    specification->setSource( source );
-    specification->setLoader( this );
+    libpass::PassResult defaultPassResult;
+    defaultPassResult.setInput< libpass::LoadFilePass >( *source );
 
-    libpass::PassResult pr;
-    pr.setInput< SourceToAstPass >( specification );
+    libpass::PassManager passManager;
+    passManager.setStream( m_logStream );
+    passManager.setDefaultResult( defaultPassResult );
+    passManager.setDefaultPass< ConsistencyCheckPass >();
 
-    libpass::PassManager pm;
-    pm.setStream( m_logStream );
-    pm.setDefaultResult( pr );
-    pm.setDefaultPass< FrameSizeDeterminationPass >();
-    if( not pm.run() )
+    auto flush = [&passManager, &fileName]() {
+        libstdhl::Log::ApplicationFormatter formatter( fileName );
+        libstdhl::Log::OutputStreamSink sink( std::cerr, formatter );
+        passManager.stream().flush( sink );
+    };
+
+    if( not passManager.run( flush ) )
     {
         throw SpecificationLoadingError( "Couldn't load '" + identifierPath + "'" );
     }
 
+    const auto& passResult = passManager.result();
+    assert( passResult.hasOutput< SourceToAstPass >() );
+    const auto passData = passResult.output< SourceToAstPass >();
+    const auto specification = passData->specification();
     m_repository.store( identifierPath, specification );
     return specification;
 }
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//
