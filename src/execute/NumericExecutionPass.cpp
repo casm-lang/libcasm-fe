@@ -1665,6 +1665,7 @@ void StateInitializationVisitor::visit( Specification& node )
 
 void StateInitializationVisitor::visit( InitDefinition& node )
 {
+    assert( node.programFunction() and "checked during frame size determination pass!" );
     node.programFunction()->accept( *this );
 }
 
@@ -1825,6 +1826,8 @@ class AgentScheduler
     void setDispatchStrategy( std::unique_ptr< DispatchStrategy > dispatchStrategy );
     void setAgentSelectionStrategy( std::unique_ptr< SelectionStrategy > selectionStrategy );
 
+    u1 check( void );
+
     /**
      * Performs an ASM step.
      */
@@ -1905,6 +1908,33 @@ bool AgentScheduler::done( void ) const
 std::size_t AgentScheduler::numberOfSteps( void ) const
 {
     return m_stepCounter;
+}
+
+u1 AgentScheduler::check( void )
+{
+    u1 foundAtLeastOneDefinedAgent = false;
+
+    const auto& programs = m_globalState.programState();
+    const auto end = programs.end();
+    for( auto it = programs.begin(); it != end; ++it )
+    {
+        const auto& location = it.key();
+        const auto& value = it.value();
+
+        const auto& agentId = location.arguments().at( 0 );
+
+        if( value.defined() )
+        {
+            foundAtLeastOneDefinedAgent = true;
+        }
+    }
+
+    if( not foundAtLeastOneDefinedAgent )
+    {
+        m_done = true;
+    }
+
+    return foundAtLeastOneDefinedAgent;
 }
 
 std::vector< Agent > AgentScheduler::collectAgents( void ) const
@@ -2020,6 +2050,11 @@ void InvariantChecker::check( const Specification& specification )
     }
 }
 
+//
+//
+// NumericExecutionPass
+//
+
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
@@ -2078,10 +2113,25 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
         InvariantChecker invariantChecker( locationRegistry, globalState );
         invariantChecker.check( *specification );
 
+        if( not scheduler.check() )
+        {
+            log.warning(
+                { specification->header()->sourceLocation() },
+                "no init definition found in this specification" );
+        }
+
         while( not scheduler.done() )
         {
             scheduler.step();
             invariantChecker.check( *specification );
+        }
+
+        if( scheduler.numberOfSteps() == 0 )
+        {
+            log.warning(
+                { specification->header()->sourceLocation() },
+                "Could not perform a single step because no agent was initially available. This "
+                "may happen when no valid initial rule has been specified (see InitRule)." );
         }
 
         log.info(

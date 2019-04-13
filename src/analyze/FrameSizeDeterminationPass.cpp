@@ -76,6 +76,8 @@ class FrameSizeDeterminationVisitor final : public RecursiveVisitor
   public:
     explicit FrameSizeDeterminationVisitor( libcasm_fe::Logger& log );
 
+    void visit( Specification& node );
+
     void visit( InitDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -118,9 +120,16 @@ FrameSizeDeterminationVisitor::FrameSizeDeterminationVisitor( libcasm_fe::Logger
 {
 }
 
+void FrameSizeDeterminationVisitor::visit( Specification& node )
+{
+    node.header()->accept( *this );
+    node.definitions()->accept( *this );
+}
+
 void FrameSizeDeterminationVisitor::visit( InitDefinition& node )
 {
     node.programFunction()->accept( *this );
+    ;
 }
 
 void FrameSizeDeterminationVisitor::visit( FunctionDefinition& node )
@@ -304,7 +313,7 @@ u1 FrameSizeDeterminationPass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     FrameSizeDeterminationVisitor visitor( log );
-    specification->definitions()->accept( visitor );
+    visitor.visit( *specification );
 
     const auto errors = log.errors();
     if( errors > 0 )
