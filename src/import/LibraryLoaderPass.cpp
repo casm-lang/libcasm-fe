@@ -164,17 +164,17 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     // determine the base path of the current specification, which will be used
     // to resolve relative import paths
     auto specificationBasePath = specification->name();
-    const auto lastDotPos = specificationBasePath.find_last_of( '.' );
-    if( lastDotPos != std::string::npos )
+    const auto lastSlashPos = specificationBasePath.find_last_of( '/' );
+    if( lastSlashPos != std::string::npos )
     {
-        specificationBasePath.erase( lastDotPos );
+        specificationBasePath.erase( lastSlashPos );
     }
     else
     {
-        specificationBasePath.clear();
+        specificationBasePath = ".";
     }
 
-    auto loaderStrategy = std::make_shared< FileLoadingStrategy >( "." );
+    auto loaderStrategy = std::make_shared< FileLoadingStrategy >( specificationBasePath );
     const auto loader = std::make_shared< LibraryLoader >( stream(), loaderStrategy );
     specification->setLoader( loader );
 
