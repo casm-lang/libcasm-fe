@@ -145,6 +145,7 @@ END       0 "end of file"
 %type <UsingDefinition::Ptr> UsingDefinition
 %type <InvariantDefinition::Ptr> InvariantDefinition
 %type <ImportDefinition::Ptr> ImportDefinition
+%type <IdentifierPath::Ptr> ImportPath
 
 // literals
 %type <Literal::Ptr> Literal
@@ -499,13 +500,25 @@ InvariantDefinition
 
 
 ImportDefinition
-: IMPORT IdentifierPath
+: IMPORT ImportPath
   {
       $$ = Ast::make< ImportDefinition >( @$, $1, $2 );
   }
-| IMPORT IdentifierPath AS Identifier
+| IMPORT ImportPath AS Identifier
   {
       $$ = Ast::make< ImportDefinition >( @$, $1, $2, $3, $4 );
+  }
+;
+
+ImportPath
+: IdentifierPath
+  {
+      $$ = $1;
+  }
+| DOUBLECOLON Identifier
+  {
+      $2->setDoubleColon( $1 );
+      $$ = Ast::make< IdentifierPath >( @$, $2, IdentifierPath::Type::RELATIVE );
   }
 ;
 
