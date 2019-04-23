@@ -151,11 +151,21 @@ InvariantDefinition ::= "invariant" Identifier "=" Term
 ** ImportDefinition
 
 #+begin_src
-ImportDefinition ::= "import" IdentifierPath
-                   | "import" IdentifierPath "as" Identifier
+ImportDefinition ::= "import" ImportPath
+                   | "import" ImportPath "as" Identifier
 #+end_src
 
 #+html: {{page>.:grammar:ImportDefinition&noheader&nofooter}}
+
+
+** ImportPath
+
+#+begin_src
+ImportPath ::= IdentifierPath
+             | "::" Identifier
+#+end_src
+
+#+html: {{page>.:grammar:ImportPath&noheader&nofooter}}
 
 
 ** Rules
