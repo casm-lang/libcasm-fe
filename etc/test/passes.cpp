@@ -122,7 +122,8 @@ SOURCE_TEST( transform, SourceToAstPass, source, true, , { pass.setDebug( false 
 SOURCE_TEST( transform, AstDumpSourcePass, source, true, , );
 SOURCE_TEST( transform, AstDumpDotPass, source, true, , );
 
-// SOURCE_TEST( execute, NumericExecutionPass, source, true, , ); // TODO: FIXME: https://github.com/casm-lang/casm/issues/93
+// SOURCE_TEST( execute, NumericExecutionPass, source, true, , ); // TODO: FIXME:
+// https://github.com/casm-lang/casm/issues/93
 //
 // static const auto source_with_no_init = R"***(
 // CASM
