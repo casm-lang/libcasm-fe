@@ -54,6 +54,7 @@ SpecificationRepository::SpecificationRepository( void )
 void SpecificationRepository::store(
     const std::string& id, const Specification::Ptr& specification )
 {
+    assert( get( id ) == libstdhl::nullopt );
     m_specifications.emplace( id, specification );
 }
 

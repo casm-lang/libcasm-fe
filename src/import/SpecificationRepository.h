@@ -54,6 +54,8 @@ namespace libcasm_fe
     class SpecificationRepository
     {
       public:
+        using Ptr = std::shared_ptr< SpecificationRepository >;
+
         explicit SpecificationRepository( void );
 
         void store( const std::string& id, const Specification::Ptr& specification );

@@ -99,6 +99,7 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
 {
     RecursiveVisitor::visit( node );
 
+    // file-based loading
     std::string libraryPath;
     switch( node.path()->type() )
     {
@@ -176,6 +177,18 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
 
     auto loaderStrategy = std::make_shared< FileLoadingStrategy >( specificationBasePath );
     const auto loader = std::make_shared< LibraryLoader >( stream(), loaderStrategy );
+
+    if( pr.hasInput< LibraryLoaderPass >() )
+    {
+        const auto data = pr.input< LibraryLoaderPass >();
+        const auto specificationRepository = data->specificationRepository();
+        loader->setSpecificationRepository( specificationRepository );
+    }
+
+    std::string uri = "file://";
+    uri += specification->name();
+    loader->specificationRepository()->store( uri, specification );
+
     specification->setLoader( loader );
 
     assert( specification->loader() && "loader must be set" );

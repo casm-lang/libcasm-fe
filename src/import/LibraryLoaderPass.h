@@ -45,7 +45,10 @@
 #ifndef _LIBCASM_FE_LIBRARY_LOADER_PASS_H_
 #define _LIBCASM_FE_LIBRARY_LOADER_PASS_H_
 
+#include <libcasm-fe/import/SpecificationRepository>
+
 #include <libpass/Pass>
+#include <libpass/PassData>
 
 namespace libcasm_fe
 {
@@ -60,6 +63,26 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
+
+      public:
+        class Input : public libpass::PassData
+        {
+          public:
+            using Ptr = std::shared_ptr< Input >;
+
+            Input( const SpecificationRepository::Ptr& specificationRepository )
+            : m_specificationRepository( specificationRepository )
+            {
+            }
+
+            const SpecificationRepository::Ptr specificationRepository( void ) const
+            {
+                return m_specificationRepository;
+            }
+
+          private:
+            const SpecificationRepository::Ptr m_specificationRepository;
+        };
     };
 }
 

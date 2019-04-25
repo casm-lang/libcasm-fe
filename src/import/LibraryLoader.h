@@ -55,15 +55,19 @@ namespace libcasm_fe
     {
       public:
         LibraryLoader(
-            libstdhl::Log::Stream& logStream,
-            const std::shared_ptr< LoadingStrategy >& loadingStrategy );
+            libstdhl::Log::Stream& logStream, const LoadingStrategy::Ptr& loadingStrategy );
+
+        const SpecificationRepository::Ptr& specificationRepository( void ) const;
+
+        void setSpecificationRepository(
+            const SpecificationRepository::Ptr& specificationRepository );
 
         Specification::Ptr loadSpecification( const std::string& identifierPath ) override;
 
       private:
         libstdhl::Log::Stream& m_logStream;
-        SpecificationRepository m_repository;
-        const std::shared_ptr< LoadingStrategy > m_loadingStrategy;
+        const LoadingStrategy::Ptr m_loadingStrategy;
+        SpecificationRepository::Ptr m_specificationRepository;
     };
 }
 

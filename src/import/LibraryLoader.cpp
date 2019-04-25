@@ -46,6 +46,7 @@
 
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
 #include <libcasm-fe/import/ImportError>
+#include <libcasm-fe/import/LibraryLoaderPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassManager>
@@ -56,12 +57,23 @@
 using namespace libcasm_fe;
 
 LibraryLoader::LibraryLoader(
-    libstdhl::Log::Stream& logStream, const std::shared_ptr< LoadingStrategy >& loadingStrategy )
+    libstdhl::Log::Stream& logStream, const LoadingStrategy::Ptr& loadingStrategy )
 : SpecificationLoader()
 , m_logStream( logStream )
-, m_repository()
 , m_loadingStrategy( loadingStrategy )
+, m_specificationRepository( std::make_shared< SpecificationRepository >() )
 {
+}
+
+const SpecificationRepository::Ptr& LibraryLoader::specificationRepository( void ) const
+{
+    return m_specificationRepository;
+}
+
+void LibraryLoader::setSpecificationRepository(
+    const SpecificationRepository::Ptr& specificationRepository )
+{
+    m_specificationRepository = specificationRepository;
 }
 
 Specification::Ptr LibraryLoader::loadSpecification( const std::string& identifierPath )
@@ -71,7 +83,8 @@ Specification::Ptr LibraryLoader::loadSpecification( const std::string& identifi
 
     log.debug( ">>> LibraryLoader::loadSpecification with '" + identifierPath + "'" );
 
-    const auto cachedSpecification = m_repository.get( identifierPath );
+    const auto uri = m_loadingStrategy->toURI( identifierPath );
+    const auto cachedSpecification = specificationRepository()->get( uri.toString() );
     if( cachedSpecification )
     {
         log.debug( "Using '" + identifierPath + "' from repository" );
@@ -83,6 +96,7 @@ Specification::Ptr LibraryLoader::loadSpecification( const std::string& identifi
 
     libpass::PassResult defaultPassResult;
     defaultPassResult.setInput< libpass::LoadFilePass >( *source );
+    defaultPassResult.setInput< libcasm_fe::LibraryLoaderPass >( specificationRepository() );
 
     libpass::PassManager passManager;
     passManager.setStream( m_logStream );
@@ -104,7 +118,7 @@ Specification::Ptr LibraryLoader::loadSpecification( const std::string& identifi
     assert( passResult.hasOutput< SourceToAstPass >() );
     const auto passData = passResult.output< SourceToAstPass >();
     const auto specification = passData->specification();
-    m_repository.store( identifierPath, specification );
+    assert( specificationRepository()->get( uri.toString() ) == specification );
     return specification;
 }
 
