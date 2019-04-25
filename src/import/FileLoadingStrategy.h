@@ -62,6 +62,8 @@ namespace libcasm_fe
         libpass::LoadFilePass::Input::Ptr loadSource(
             const std::string& identifierPath ) const override;
 
+        libstdhl::Standard::RFC3986::URI toURI( const std::string& identifierPath ) const override;
+
       private:
         /**
          * Converts the identifier path into a file-system path by replacing all dots with slashes

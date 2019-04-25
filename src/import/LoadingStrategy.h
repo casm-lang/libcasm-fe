@@ -47,6 +47,8 @@
 
 #include <libpass/analyze/LoadFilePass>
 
+#include <libstdhl/std/rfc3986>
+
 #include <string>
 
 namespace libcasm_fe
@@ -54,6 +56,8 @@ namespace libcasm_fe
     class LoadingStrategy
     {
       public:
+        using Ptr = std::shared_ptr< LoadingStrategy >;
+
         virtual ~LoadingStrategy( void ) = default;
 
         /**
@@ -67,6 +71,9 @@ namespace libcasm_fe
          */
         virtual libpass::LoadFilePass::Input::Ptr loadSource(
             const std::string& location ) const = 0;
+
+        virtual libstdhl::Standard::RFC3986::URI toURI(
+            const std::string& identifierPath ) const = 0;
     };
 }
 

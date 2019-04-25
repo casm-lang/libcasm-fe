@@ -71,6 +71,13 @@ libpass::LoadFilePass::Input::Ptr FileLoadingStrategy::loadSource(
     return std::make_shared< libpass::LoadFilePass::Input >( filePath );
 }
 
+libstdhl::Standard::RFC3986::URI FileLoadingStrategy::toURI(
+    const std::string& identifierPath ) const
+{
+    return libstdhl::Standard::RFC3986::URI(
+        "file", "", toFileSystemPath( identifierPath ), "", "" );
+}
+
 std::string FileLoadingStrategy::toFileSystemPath( const std::string& identifierPath ) const
 {
     const auto filePath =
