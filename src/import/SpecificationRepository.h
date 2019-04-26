@@ -45,9 +45,12 @@
 #ifndef _LIBCASM_FE_SPECIFICATION_REPOSITORY_H_
 #define _LIBCASM_FE_SPECIFICATION_REPOSITORY_H_
 
+#include <libcasm-fe/Specification>
+
 #include <libstdhl/Optional>
 
-#include <libcasm-fe/Specification>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace libcasm_fe
 {
@@ -58,12 +61,29 @@ namespace libcasm_fe
 
         explicit SpecificationRepository( void );
 
+        std::string specificationBasePath( void ) const;
+
+        void setSpecificationBasePath( const std::string& specificationBasePath );
+
         void store( const std::string& id, const Specification::Ptr& specification );
 
         libstdhl::Optional< Specification::Ptr > get( const std::string& id ) const;
 
+        void addDepenency( const Specification::Ptr& from, const Specification::Ptr& to );
+
       private:
-        std::unordered_map< std::string, Specification::Ptr > m_specifications;
+        void checkCircleDependency(
+            const Specification* from,
+            std::unordered_set< const Specification* >& discovered,
+            std::unordered_set< const Specification* >& finished );
+
+      private:
+        std::string m_specificationBasePath;
+
+        std::unordered_map< std::string, const Specification::Ptr > m_specifications;
+
+        std::unordered_map< const Specification*, std::unordered_set< const Specification* > >
+            m_dependencyGraph;
     };
 }
 

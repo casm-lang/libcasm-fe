@@ -47,8 +47,20 @@
 using namespace libcasm_fe;
 
 SpecificationRepository::SpecificationRepository( void )
-: m_specifications()
+: m_specificationBasePath()
+, m_specifications()
+, m_dependencyGraph()
 {
+}
+
+void SpecificationRepository::setSpecificationBasePath( const std::string& specificationBasePath )
+{
+    m_specificationBasePath = specificationBasePath;
+}
+
+std::string SpecificationRepository::specificationBasePath( void ) const
+{
+    return m_specificationBasePath;
 }
 
 void SpecificationRepository::store(
@@ -67,6 +79,59 @@ libstdhl::Optional< Specification::Ptr > SpecificationRepository::get( const std
     }
 
     return libstdhl::nullopt;
+}
+
+void SpecificationRepository::addDepenency(
+    const Specification::Ptr& from, const Specification::Ptr& to )
+{
+    m_dependencyGraph.emplace( to.get(), std::unordered_set< const Specification* >() );
+    const auto dependencyGraphIterator =
+        m_dependencyGraph.emplace( from.get(), std::unordered_set< const Specification* >() );
+    auto& dependencyList = dependencyGraphIterator.first->second;
+    dependencyList.emplace( to.get() );
+
+    // detect cycle due to the adding of the dependency edge 'from -> to'
+    std::unordered_set< const Specification* > discovered;
+    std::unordered_set< const Specification* > finished;
+
+    for( const auto it : m_dependencyGraph )
+    {
+        const auto u = it.first;
+        const auto dependencyList = it.second;
+
+        if( discovered.find( u ) == discovered.end() and finished.find( u ) == finished.end() )
+        {
+            checkCircleDependency( u, discovered, finished );
+        }
+    }
+}
+
+void SpecificationRepository::checkCircleDependency(
+    const Specification* from,
+    std::unordered_set< const Specification* >& discovered,
+    std::unordered_set< const Specification* >& finished )
+{
+    discovered.emplace( from );
+
+    const auto it = m_dependencyGraph.find( from );
+    assert( it != m_dependencyGraph.end() );
+    const auto& fromList = it->second;
+
+    for( const auto to : fromList )
+    {
+        if( discovered.find( to ) != discovered.end() )
+        {
+            throw std::domain_error( "cycle detected" );
+        }
+
+        if( discovered.find( to ) == discovered.end() and finished.find( to ) == finished.end() )
+        {
+            checkCircleDependency( to, discovered, finished );
+        }
+    }
+
+    discovered.erase( from );
+    finished.emplace( from );
 }
 
 //
