@@ -45,6 +45,7 @@
 #ifndef _LIBCASM_FE_LIBRARY_LOADER_PASS_H_
 #define _LIBCASM_FE_LIBRARY_LOADER_PASS_H_
 
+#include <libcasm-fe/Specification>
 #include <libcasm-fe/import/SpecificationRepository>
 
 #include <libpass/Pass>
@@ -70,17 +71,26 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Input >;
 
-            Input( const SpecificationRepository::Ptr& specificationRepository )
-            : m_specificationRepository( specificationRepository )
+            Input(
+                const Specification::Ptr& parentSpecification,
+                const SpecificationRepository::Ptr& specificationRepository )
+            : m_parentSpecification( parentSpecification )
+            , m_specificationRepository( specificationRepository )
             {
             }
 
-            const SpecificationRepository::Ptr specificationRepository( void ) const
+            const Specification::Ptr& parentSpecification( void ) const
+            {
+                return m_parentSpecification;
+            }
+
+            const SpecificationRepository::Ptr& specificationRepository( void ) const
             {
                 return m_specificationRepository;
             }
 
           private:
+            const Specification::Ptr m_parentSpecification;
             const SpecificationRepository::Ptr m_specificationRepository;
         };
     };

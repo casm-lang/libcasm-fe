@@ -49,7 +49,6 @@
 #include <libcasm-fe/ast/RecursiveVisitor>
 #include <libcasm-fe/import/FileLoadingStrategy>
 #include <libcasm-fe/import/ImportError>
-#include <libcasm-fe/import/LibraryLoader>
 #include <libcasm-fe/import/SpecificationLoader>
 #include <libcasm-fe/transform/SourceToAstPass>
 
@@ -69,10 +68,7 @@ class LibraryLoaderVisitor final : public RecursiveVisitor
 {
   public:
     LibraryLoaderVisitor(
-        libcasm_fe::Logger& log,
-        Namespace& symboltable,
-        SpecificationLoader& loader,
-        const std::string& specificationBasePath );
+        libcasm_fe::Logger& log, Namespace& symboltable, SpecificationLoader& loader );
 
     void visit( ImportDefinition& node ) override;
 
@@ -80,18 +76,13 @@ class LibraryLoaderVisitor final : public RecursiveVisitor
     libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
     SpecificationLoader& m_loader;
-    std::string m_specificationBasePath;
 };
 
 LibraryLoaderVisitor::LibraryLoaderVisitor(
-    libcasm_fe::Logger& log,
-    Namespace& symboltable,
-    SpecificationLoader& loader,
-    const std::string& specificationBasePath )
+    libcasm_fe::Logger& log, Namespace& symboltable, SpecificationLoader& loader )
 : m_log( log )
 , m_symboltable( symboltable )
 , m_loader( loader )
-, m_specificationBasePath( specificationBasePath )
 {
 }
 
@@ -99,39 +90,14 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
 {
     RecursiveVisitor::visit( node );
 
-    // file-based loading
-    std::string libraryPath;
-    switch( node.path()->type() )
-    {
-        case IdentifierPath::Type::ABSOLUTE:
-        {
-            libraryPath = node.path()->path();
-            break;
-        }
-        case IdentifierPath::Type::RELATIVE:
-        {
-            // import library relative to the current specification
-            libraryPath = m_specificationBasePath + node.path()->path();
-            break;
-        }
-        default:
-        {
-            assert( !"path type cannot be handled" );
-        }
-    }
-
     Specification::Ptr specification;
     try
     {
-        specification = m_loader.loadSpecification( libraryPath );
+        specification = m_loader.loadSpecification( node.path() );
     }
     catch( const ImportError& e )
     {
-        m_log.error(
-            { node.path()->sourceLocation() },
-            "Couldn't import library '" + libraryPath + "'",
-            Code::ImportError );
-        m_log.warning( { node.path()->sourceLocation() }, e.what() );
+        m_log.error( { node.path()->sourceLocation() }, e.what(), Code::ImportError );
         return;
     }
     assert( specification );
@@ -175,14 +141,39 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
         specificationBasePath = ".";
     }
 
-    auto loaderStrategy = std::make_shared< FileLoadingStrategy >( specificationBasePath );
-    const auto loader = std::make_shared< LibraryLoader >( stream(), loaderStrategy );
+    LoadingStrategy::Ptr loadingStrategy = nullptr;
+    Specification::Ptr parentSpecification = nullptr;
+    SpecificationRepository::Ptr parentSpecificationRepository = nullptr;
 
     if( pr.hasInput< LibraryLoaderPass >() )
     {
         const auto data = pr.input< LibraryLoaderPass >();
-        const auto specificationRepository = data->specificationRepository();
-        loader->setSpecificationRepository( specificationRepository );
+        parentSpecificationRepository = data->specificationRepository();
+        parentSpecification = data->parentSpecification();
+        const auto parentSpecificationBasePath =
+            parentSpecificationRepository->specificationBasePath();
+        loadingStrategy = std::make_shared< FileLoadingStrategy >(
+            specificationBasePath, parentSpecificationBasePath );
+    }
+    else
+    {
+        loadingStrategy = std::make_shared< FileLoadingStrategy >( specificationBasePath );
+    }
+    assert( loadingStrategy != nullptr );
+
+    const auto loader =
+        std::make_shared< SpecificationLoader >( stream(), specification, loadingStrategy );
+
+    if( pr.hasInput< LibraryLoaderPass >() )
+    {
+        assert( parentSpecification != nullptr );
+        assert( parentSpecificationRepository != nullptr );
+        loader->setSpecificationRepository( parentSpecificationRepository );
+        loader->specificationRepository()->addDepenency( parentSpecification, specification );
+    }
+    else
+    {
+        loader->specificationRepository()->setSpecificationBasePath( specificationBasePath );
     }
 
     std::string uri = "file://";
@@ -190,11 +181,7 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     loader->specificationRepository()->store( uri, specification );
 
     specification->setLoader( loader );
-
-    assert( specification->loader() && "loader must be set" );
-
-    LibraryLoaderVisitor visitor(
-        log, *symboltable, *specification->loader(), specificationBasePath );
+    LibraryLoaderVisitor visitor( log, *symboltable, *specification->loader() );
     specification->definitions()->accept( visitor );
 
     const auto errors = log.errors();
