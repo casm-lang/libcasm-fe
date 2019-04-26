@@ -88,9 +88,9 @@ add_library( ${PROJECT}-cpp OBJECT
   execute/Frame.cpp
 
   import/FileLoadingStrategy.cpp
+  import/SpecificationLoader.cpp
   import/SpecificationRepository.cpp
   import/ImportError.cpp
-  import/LibraryLoader.cpp
   import/LibraryLoaderPass.cpp
 
   transform/AstDumpDotPass.cpp
@@ -215,7 +215,6 @@ ecm_generate_headers( ${PROJECT}_IMPORT_HEADERS_CPP
     SpecificationRepository
     ImportError
     SpecificationLoader
-    LibraryLoader
     LibraryLoaderPass
   PREFIX
     ${PROJECT}/import

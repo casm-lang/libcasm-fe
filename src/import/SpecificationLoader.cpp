@@ -42,13 +42,14 @@
 //  statement from your version.
 //
 
-#include "LibraryLoader.h"
+#include "SpecificationLoader.h"
 
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
 #include <libcasm-fe/import/ImportError>
 #include <libcasm-fe/import/LibraryLoaderPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
+#include <libpass/PassLogger>
 #include <libpass/PassManager>
 #include <libpass/analyze/LoadFilePass>
 
@@ -56,62 +57,80 @@
 
 using namespace libcasm_fe;
 
-LibraryLoader::LibraryLoader(
-    libstdhl::Log::Stream& logStream, const LoadingStrategy::Ptr& loadingStrategy )
-: SpecificationLoader()
-, m_logStream( logStream )
+SpecificationLoader::SpecificationLoader(
+    libstdhl::Log::Stream& logStream,
+    const Specification::Ptr& specification,
+    const LoadingStrategy::Ptr& loadingStrategy )
+: m_logStream( logStream )
+, m_specification( specification )
 , m_loadingStrategy( loadingStrategy )
 , m_specificationRepository( std::make_shared< SpecificationRepository >() )
 {
 }
 
-const SpecificationRepository::Ptr& LibraryLoader::specificationRepository( void ) const
+const SpecificationRepository::Ptr& SpecificationLoader::specificationRepository( void ) const
 {
     return m_specificationRepository;
 }
 
-void LibraryLoader::setSpecificationRepository(
+void SpecificationLoader::setSpecificationRepository(
     const SpecificationRepository::Ptr& specificationRepository )
 {
     m_specificationRepository = specificationRepository;
 }
 
-Specification::Ptr LibraryLoader::loadSpecification( const std::string& identifierPath )
+Specification::Ptr SpecificationLoader::loadSpecification(
+    const Ast::IdentifierPath::Ptr& identifierPath )
 {
-    libstdhl::Logger log( m_logStream );
-    log.setCategory( std::make_shared< libstdhl::Log::Category >( identifierPath, "import" ) );
+    libpass::PassLogger log( &LibraryLoaderPass::id, m_logStream );
 
-    log.debug( ">>> LibraryLoader::loadSpecification with '" + identifierPath + "'" );
+    const auto identifierPathName = identifierPath->path();
+    log.debug( "loadSpecification of '" + identifierPathName + "'" );
 
     const auto uri = m_loadingStrategy->toURI( identifierPath );
     const auto cachedSpecification = specificationRepository()->get( uri.toString() );
     if( cachedSpecification )
     {
-        log.debug( "Using '" + identifierPath + "' from repository" );
+        log.debug( "using '" + identifierPathName + "' from repository" );
+
+        try
+        {
+            specificationRepository()->addDepenency( m_specification, *cachedSpecification );
+        }
+        catch( const std::domain_error& e )
+        {
+            throw SpecificationLoadingError(
+                "Unable to import '" + identifierPathName + "', cycle detected!" );
+        }
+
         return *cachedSpecification;
     }
 
-    const auto source = m_loadingStrategy->loadSource( identifierPath );
-    const auto fileName = source->filename();
+    libpass::LoadFilePass::Input::Ptr source = nullptr;
+    try
+    {
+        source = m_loadingStrategy->loadSource( uri );
+    }
+    catch( const NoSuchSpecificationError& e )
+    {
+        throw NoSuchSpecificationError(
+            "Unable to import '" + identifierPathName + "', " + e.what() );
+    }
+    assert( source != nullptr );
 
     libpass::PassResult defaultPassResult;
     defaultPassResult.setInput< libpass::LoadFilePass >( *source );
-    defaultPassResult.setInput< libcasm_fe::LibraryLoaderPass >( specificationRepository() );
+    defaultPassResult.setInput< libcasm_fe::LibraryLoaderPass >(
+        m_specification, specificationRepository() );
 
     libpass::PassManager passManager;
     passManager.setStream( m_logStream );
     passManager.setDefaultResult( defaultPassResult );
     passManager.setDefaultPass< ConsistencyCheckPass >();
 
-    auto flush = [&passManager, &fileName]() {
-        libstdhl::Log::ApplicationFormatter formatter( fileName );
-        libstdhl::Log::OutputStreamSink sink( std::cerr, formatter );
-        passManager.stream().flush( sink );
-    };
-
-    if( not passManager.run( flush ) )
+    if( not passManager.run() )
     {
-        throw SpecificationLoadingError( "Couldn't load '" + identifierPath + "'" );
+        throw SpecificationLoadingError( "Unable to import '" + identifierPathName + "'" );
     }
 
     const auto& passResult = passManager.result();

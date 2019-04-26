@@ -46,27 +46,47 @@
 #define _LIBCASM_FE_SPECIFICATION_LOADER_H_
 
 #include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/Identifier>
+#include <libcasm-fe/import/LoadingStrategy>
+#include <libcasm-fe/import/SpecificationRepository>
 
 namespace libcasm_fe
 {
-    class SpecificationLoader
+    class SpecificationLoader final
     {
       public:
         using Ptr = std::shared_ptr< SpecificationLoader >;
 
+        explicit SpecificationLoader(
+            libstdhl::Log::Stream& logStream,
+            const Specification::Ptr& specification,
+            const LoadingStrategy::Ptr& loadingStrategy );
+
         virtual ~SpecificationLoader( void ) = default;
 
+        const SpecificationRepository::Ptr& specificationRepository( void ) const;
+
+        void setSpecificationRepository(
+            const SpecificationRepository::Ptr& specificationRepository );
+
         /**
-         * Loads a CASM specification from an \a identifierPath.
-         *
-         * The loader will resolve the \a identifierPath, depending on the type of the loader.
-         *
-         * @throws NoSuchSpecificationError if specification couldn't be found
-         * @throws SpecificationLoadingError if specification could be found but not loaded
-         *
-         * @returns The loaded CASM specification
-         */
-        virtual Specification::Ptr loadSpecification( const std::string& identifierPath ) = 0;
+           Loads a CASM specification from an \a identifierPath.
+
+           The loader will resolve the \a identifierPath, depending on the type of the loader.
+
+           @throws NoSuchSpecificationError if specification couldn't be found
+           @throws SpecificationLoadingError if specification could be found but not loaded
+
+           @returns The loaded CASM specification
+        */
+
+        Specification::Ptr loadSpecification( const Ast::IdentifierPath::Ptr& identifierPath );
+
+      private:
+        libstdhl::Log::Stream& m_logStream;
+        const Specification::Ptr m_specification;
+        const LoadingStrategy::Ptr m_loadingStrategy;
+        SpecificationRepository::Ptr m_specificationRepository;
     };
 }
 
