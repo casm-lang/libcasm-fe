@@ -45,6 +45,8 @@
 #ifndef _LIBCASM_FE_LOADING_STRATEGY_H_
 #define _LIBCASM_FE_LOADING_STRATEGY_H_
 
+#include <libcasm-fe/ast/Identifier>
+
 #include <libpass/analyze/LoadFilePass>
 
 #include <libstdhl/std/rfc3986>
@@ -60,20 +62,16 @@ namespace libcasm_fe
 
         virtual ~LoadingStrategy( void ) = default;
 
+        virtual libstdhl::Standard::RFC3986::URI toURI(
+            const Ast::IdentifierPath::Ptr& identifierPath ) const = 0;
+
         /**
-         * Loads a CASM specification from an \a identifierPath.
-         *
-         * @throws NoSuchSpecificationError if no CASM specification for the given \a
-         identifierPath
-         * could be loaded.
-         *
-         * @returns The source code of the CASM specification
+         Loads a CASM specification from a given \a URI location.
+
+         @returns The source code of the CASM specification
          */
         virtual libpass::LoadFilePass::Input::Ptr loadSource(
-            const std::string& location ) const = 0;
-
-        virtual libstdhl::Standard::RFC3986::URI toURI(
-            const std::string& identifierPath ) const = 0;
+            const libstdhl::Standard::RFC3986::URI& location ) const = 0;
     };
 }
 

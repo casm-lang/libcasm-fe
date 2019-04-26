@@ -57,22 +57,31 @@ namespace libcasm_fe
          *
          * @param basePath The base path from which the files are loaded from.
          */
-        explicit FileLoadingStrategy( const std::string& basePath );
+        explicit FileLoadingStrategy(
+            const std::string& absolutePath, const std::string& relativePath );
+
+        explicit FileLoadingStrategy( const std::string& absolutePath );
+
+        std::string absolutePath( void ) const;
+
+        std::string relativePath( void ) const;
+
+        libstdhl::Standard::RFC3986::URI toURI(
+            const Ast::IdentifierPath::Ptr& identifierPath ) const override;
 
         libpass::LoadFilePass::Input::Ptr loadSource(
-            const std::string& identifierPath ) const override;
-
-        libstdhl::Standard::RFC3986::URI toURI( const std::string& identifierPath ) const override;
+            const libstdhl::Standard::RFC3986::URI& location ) const override;
 
       private:
         /**
          * Converts the identifier path into a file-system path by replacing all dots with slashes
          * and appending it to the base path.
          */
-        std::string toFileSystemPath( const std::string& identifierPath ) const;
+        std::string toFileSystemPath( const Ast::IdentifierPath::Ptr& identifierPath ) const;
 
       private:
-        const std::string m_basePath;
+        const std::string m_absolutePath;
+        const std::string m_relativePath;
     };
 }
 

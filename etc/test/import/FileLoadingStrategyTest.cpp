@@ -45,6 +45,7 @@
 #include "../main.h"
 
 #include <libstdhl/File>
+#include <libstdhl/Standard>
 
 using namespace libcasm_fe;
 
@@ -55,8 +56,12 @@ TEST(
     // GIVEN
     FileLoadingStrategy loadingStrategy( "." );
 
+    const auto importPath = Ast::IdentifierPath::fromIdentifier(
+        std::make_shared< Ast::Identifier >( "NonExistingLib" ) );
+    const auto importPathURI = loadingStrategy.toURI( importPath );
+
     // WHEN
-    EXPECT_THROW( loadingStrategy.loadSource( "NonExistingLib" ), NoSuchSpecificationError );
+    EXPECT_THROW( loadingStrategy.loadSource( importPathURI ), NoSuchSpecificationError );
 }
 
 static const auto specification = R"***(
@@ -69,17 +74,19 @@ rule test = skip
 TEST( libcasm_fe_import_FileLoadingStrategyTest, shouldReturnSourceOfIdentifier )
 {
     // GIVEN
+    FileLoadingStrategy loadingStrategy( "." );
+
     const std::string fileName( "./" + TEST_NAME + ".casm" );
-    const std::string importPath( TEST_NAME );
+    const auto importPath =
+        Ast::IdentifierPath::fromIdentifier( std::make_shared< Ast::Identifier >( TEST_NAME ) );
+    const auto importPathURI = loadingStrategy.toURI( importPath );
 
     auto file = libstdhl::File::open( fileName, std::fstream::out );
     file << specification;
     file.close();
 
-    FileLoadingStrategy loadingStrategy( "." );
-
     // WHEN
-    const auto source = loadingStrategy.loadSource( importPath );
+    const auto source = loadingStrategy.loadSource( importPathURI );
 
     // THEN
     EXPECT_STREQ( fileName.c_str(), source->filename().c_str() );
@@ -92,19 +99,23 @@ TEST( libcasm_fe_import_FileLoadingStrategyTest, shouldReturnSourceOfIdentifier 
 TEST( libcasm_fe_import_FileLoadingStrategyTest, shouldReturnSourceInFolderOfIdentifierPath )
 {
     // GIVEN
+    FileLoadingStrategy loadingStrategy( "." );
+
     const std::string filePath( TEST_CASE );
     const std::string fileName( "./" + filePath + "/" + TEST_UNIT + ".casm" );
-    const std::string importPath( filePath + Namespace::delimiter() + TEST_UNIT );
+    const auto identifiers = std::make_shared< Ast::Identifiers >();
+    identifiers->add( std::make_shared< Ast::Identifier >( filePath ) );
+    identifiers->add( std::make_shared< Ast::Identifier >( TEST_UNIT ) );
+    const auto importPath = std::make_shared< Ast::IdentifierPath >( identifiers );
+    const auto importPathURI = loadingStrategy.toURI( importPath );
 
     libstdhl::File::Path::create( filePath );
     auto file = libstdhl::File::open( fileName, std::fstream::out );
     file << specification;
     file.close();
 
-    FileLoadingStrategy loadingStrategy( "." );
-
     // WHEN
-    const auto source = loadingStrategy.loadSource( importPath );
+    const auto source = loadingStrategy.loadSource( importPathURI );
 
     // THEN
     EXPECT_STREQ( fileName.c_str(), source->filename().c_str() );

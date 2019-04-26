@@ -52,38 +52,69 @@
 
 using namespace libcasm_fe;
 
-FileLoadingStrategy::FileLoadingStrategy( const std::string& basePath )
+FileLoadingStrategy::FileLoadingStrategy(
+    const std::string& absolutePath, const std::string& relativePath )
 : LoadingStrategy()
-, m_basePath( basePath )
+, m_absolutePath( absolutePath )
+, m_relativePath( relativePath )
 {
 }
 
-libpass::LoadFilePass::Input::Ptr FileLoadingStrategy::loadSource(
-    const std::string& identifierPath ) const
+FileLoadingStrategy::FileLoadingStrategy( const std::string& absolutePath )
+: FileLoadingStrategy( absolutePath, absolutePath )
 {
-    const auto filePath = toFileSystemPath( identifierPath );
-    if( not libstdhl::File::exists( filePath ) )
-    {
-        throw NoSuchSpecificationError(
-            "Couldn't load '" + identifierPath + "' from '" + filePath + "'" );
-    }
+}
 
-    return std::make_shared< libpass::LoadFilePass::Input >( filePath );
+std::string FileLoadingStrategy::absolutePath( void ) const
+{
+    return m_absolutePath;
+}
+
+std::string FileLoadingStrategy::relativePath( void ) const
+{
+    return m_relativePath;
 }
 
 libstdhl::Standard::RFC3986::URI FileLoadingStrategy::toURI(
-    const std::string& identifierPath ) const
+    const Ast::IdentifierPath::Ptr& identifierPath ) const
 {
     return libstdhl::Standard::RFC3986::URI(
         "file", "", toFileSystemPath( identifierPath ), "", "" );
 }
 
-std::string FileLoadingStrategy::toFileSystemPath( const std::string& identifierPath ) const
+libpass::LoadFilePass::Input::Ptr FileLoadingStrategy::loadSource(
+    const libstdhl::Standard::RFC3986::URI& location ) const
 {
-    const auto filePath =
-        libstdhl::String::replaceAll( identifierPath, Namespace::delimiter(), "/" );
+    assert( location.scheme() == "file" );
+    const auto filePath = location.path();
+    if( not libstdhl::File::exists( filePath ) )
+    {
+        throw NoSuchSpecificationError( "file path '" + filePath + "' does not exist" );
+    }
 
-    return m_basePath + "/" + filePath + ".casm";
+    return std::make_shared< libpass::LoadFilePass::Input >( filePath );
+}
+
+std::string FileLoadingStrategy::toFileSystemPath(
+    const Ast::IdentifierPath::Ptr& identifierPath ) const
+{
+    const auto identifierPathName = identifierPath->path();
+    const auto filePath =
+        libstdhl::String::replaceAll( identifierPathName, Namespace::delimiter(), "/" );
+
+    std::string fileSystemPath = "";
+
+    if( identifierPath->type() == Ast::IdentifierPath::Type::ABSOLUTE )
+    {
+        fileSystemPath += m_absolutePath + "/";
+    }
+    else
+    {
+        assert( identifierPath->type() == Ast::IdentifierPath::Type::RELATIVE );
+        fileSystemPath += m_relativePath;
+    }
+
+    return fileSystemPath + filePath + ".casm";
 }
 
 //
