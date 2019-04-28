@@ -50,7 +50,7 @@
 #include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/ast/RecursiveVisitor>
 
-#include <libcasm-fe/analyze/TypeCheckPass>
+#include <libcasm-fe/import/SpecificationMergerPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Builtin>
@@ -1663,13 +1663,27 @@ bool TypeInferenceVisitor::tryResolveCallInTypeNamespace( DirectCallExpression& 
         return false;
     }
 
-    const auto symbol = typeNamespace->findSymbol( *node.identifier() );
+    const auto maybeSymbol = typeNamespace->findSymbol( *node.identifier() );
+    const auto symbol = maybeSymbol.first;
+    const auto accessible = maybeSymbol.second;
+
     if( not symbol )
     {
         m_log.error(
             { node.identifier()->sourceLocation() },
             "'" + name + "' has not been defined in namespace '" + typeName + "'",
             Code::SymbolIsUnknown );
+        return false;
+    }
+    else if( not accessible )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "'" + name + "' is not accessible in namespace '" + typeName + "'",
+            Code::SymbolIsInaccessible );
+        m_log.warning(
+            { symbol->sourceLocation() },
+            "'" + symbol->identifier()->name() + "' has not been exported" );
         return false;
     }
 
@@ -2162,7 +2176,7 @@ void CallTargetCheckVisitor::visit( MethodCallExpression& node )
 void TypeInferencePass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
-    pu.scheduleAfter< TypeCheckPass >();
+    pu.scheduleAfter< SpecificationMergerPass >();
 }
 
 u1 TypeInferencePass::run( libpass::PassResult& pr )
@@ -2177,6 +2191,10 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
 
     CallTargetCheckVisitor callTargetCheckVisitor( log );
     specification->definitions()->accept( callTargetCheckVisitor );
+
+#ifndef NDEBUG
+    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
+#endif
 
     const auto errors = log.errors();
     if( errors > 0 )
