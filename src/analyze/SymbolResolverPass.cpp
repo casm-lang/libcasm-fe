@@ -112,6 +112,8 @@ class SymbolResolveVisitor final : public RecursiveVisitor
      */
     Definition::Ptr resolveIfAlias( const Definition::Ptr& definition ) const;
 
+    Definition::Ptr tryResolveSymbol( const IdentifierPath& identifierPath ) const;
+
   private:
     libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
@@ -159,43 +161,44 @@ void SymbolResolveVisitor::visit( ReferenceLiteral& node )
         return;
     }
 
-    const auto symbol = m_symboltable.findSymbol( *node.identifier() );
-    if( symbol )
+    const auto symbol = tryResolveSymbol( *node.identifier() );
+
+    if( not symbol )
     {
-        switch( symbol->id() )
-        {
-            case Node::ID::FUNCTION_DEFINITION:
-            {
-                node.setReferenceType( ReferenceLiteral::ReferenceType::FUNCTION );
-                node.setReference( symbol );
-                break;
-            }
-            case Node::ID::DERIVED_DEFINITION:
-            {
-                node.setReferenceType( ReferenceLiteral::ReferenceType::DERIVED );
-                node.setReference( symbol );
-                break;
-            }
-            case Node::ID::RULE_DEFINITION:
-            {
-                node.setReferenceType( ReferenceLiteral::ReferenceType::RULE );
-                node.setReference( symbol );
-                break;
-            }
-            default:
-            {
-                m_log.error(
-                    { node.identifier()->sourceLocation() },
-                    "cannot reference '" + symbol->description() + "'" );
-            }
-        }
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "'" + name + "' has not been defined",
+            Code::SymbolIsUnknown );
         return;
     }
 
-    m_log.error(
-        { node.identifier()->sourceLocation() },
-        "'" + name + "' has not been defined",
-        Code::SymbolIsUnknown );
+    switch( symbol->id() )
+    {
+        case Node::ID::FUNCTION_DEFINITION:
+        {
+            node.setReferenceType( ReferenceLiteral::ReferenceType::FUNCTION );
+            node.setReference( symbol );
+            break;
+        }
+        case Node::ID::DERIVED_DEFINITION:
+        {
+            node.setReferenceType( ReferenceLiteral::ReferenceType::DERIVED );
+            node.setReference( symbol );
+            break;
+        }
+        case Node::ID::RULE_DEFINITION:
+        {
+            node.setReferenceType( ReferenceLiteral::ReferenceType::RULE );
+            node.setReference( symbol );
+            break;
+        }
+        default:
+        {
+            m_log.error(
+                { node.identifier()->sourceLocation() },
+                "cannot reference '" + symbol->description() + "'" );
+        }
+    }
 }
 
 void SymbolResolveVisitor::visit( DirectCallExpression& node )
@@ -235,7 +238,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    auto symbol = m_symboltable.findSymbol( *node.identifier() );
+    auto symbol = tryResolveSymbol( *node.identifier() );
     if( symbol )
     {
         symbol = resolveIfAlias( symbol );
@@ -445,7 +448,8 @@ Definition::Ptr SymbolResolveVisitor::resolveIfAlias( const Definition::Ptr& def
     }
 
     const auto usingDefinition = std::static_pointer_cast< UsingDefinition >( definition );
-    const auto symbol = m_symboltable.findSymbol( *usingDefinition->type()->name() );
+    const auto symbol = tryResolveSymbol( *usingDefinition->type()->name() );
+
     if( symbol )
     {
         return resolveIfAlias( symbol );  // resolve again, the symbol may be another alias
@@ -454,6 +458,27 @@ Definition::Ptr SymbolResolveVisitor::resolveIfAlias( const Definition::Ptr& def
     {
         return definition;
     }
+}
+
+Definition::Ptr SymbolResolveVisitor::tryResolveSymbol( const IdentifierPath& identifierPath ) const
+{
+    const auto name = identifierPath.path();
+    const auto maybeSymbol = m_symboltable.findSymbol( identifierPath );
+    const auto symbol = maybeSymbol.first;
+    const auto accessible = maybeSymbol.second;
+
+    if( symbol and not accessible )
+    {
+        m_log.error(
+            { identifierPath.sourceLocation() },
+            "'" + name + "' is not accessible",
+            Code::SymbolIsInaccessible );
+        m_log.warning(
+            { symbol->sourceLocation() },
+            "'" + symbol->identifier()->name() + "' has not been exported" );
+    }
+
+    return symbol;
 }
 
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
