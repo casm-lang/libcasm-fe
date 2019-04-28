@@ -44,7 +44,7 @@
 
 #include "SpecificationLoader.h"
 
-#include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/analyze/TypeCheckPass>
 #include <libcasm-fe/import/ImportError>
 #include <libcasm-fe/import/LibraryLoaderPass>
 #include <libcasm-fe/transform/SourceToAstPass>
@@ -92,17 +92,6 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     if( cachedSpecification )
     {
         log.debug( "using '" + identifierPathName + "' from repository" );
-
-        try
-        {
-            specificationRepository()->addDepenency( m_specification, *cachedSpecification );
-        }
-        catch( const std::domain_error& e )
-        {
-            throw SpecificationLoadingError(
-                "Unable to import '" + identifierPathName + "', cycle detected!" );
-        }
-
         return *cachedSpecification;
     }
 
@@ -126,7 +115,7 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     libpass::PassManager passManager;
     passManager.setStream( m_logStream );
     passManager.setDefaultResult( defaultPassResult );
-    passManager.setDefaultPass< ConsistencyCheckPass >();
+    passManager.setDefaultPass< TypeCheckPass >();
 
     if( not passManager.run() )
     {
