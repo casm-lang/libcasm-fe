@@ -69,23 +69,12 @@ namespace libcasm_fe
 
         libstdhl::Optional< Specification::Ptr > get( const std::string& id ) const;
 
-        void addDepenency( const Specification::Ptr& from, const Specification::Ptr& to );
-
         std::vector< Specification::Ptr > specifications( void ) const;
-
-      private:
-        void checkCircleDependency(
-            const Specification* from,
-            std::unordered_set< const Specification* >& discovered,
-            std::unordered_set< const Specification* >& finished );
 
       private:
         std::string m_specificationBasePath;
 
         std::unordered_map< std::string, const Specification::Ptr > m_specifications;
-
-        std::unordered_map< const Specification*, std::unordered_set< const Specification* > >
-            m_dependencyGraph;
     };
 }
 
