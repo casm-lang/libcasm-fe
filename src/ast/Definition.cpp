@@ -67,6 +67,7 @@ Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 , m_attributes( std::make_shared< Attributes >() )
 , m_delimiterToken( unresolvedToken )
 , m_maxNumberOfLocals( 0 )
+, m_exported( false )
 {
 }
 
@@ -104,6 +105,16 @@ void Definition::setMaximumNumberOfLocals( std::size_t maxNumberOfLocals )
 std::size_t Definition::maximumNumberOfLocals( void ) const
 {
     return m_maxNumberOfLocals;
+}
+
+void Definition::setExported( const u1 exported )
+{
+    m_exported = exported;
+}
+
+u1 Definition::exported( void ) const
+{
+    return m_exported;
 }
 
 //
