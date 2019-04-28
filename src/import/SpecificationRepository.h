@@ -71,6 +71,8 @@ namespace libcasm_fe
 
         void addDepenency( const Specification::Ptr& from, const Specification::Ptr& to );
 
+        std::vector< Specification::Ptr > specifications( void ) const;
+
       private:
         void checkCircleDependency(
             const Specification* from,

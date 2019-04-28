@@ -134,6 +134,19 @@ void SpecificationRepository::checkCircleDependency(
     finished.emplace( from );
 }
 
+std::vector< Specification::Ptr > SpecificationRepository::specifications( void ) const
+{
+    std::vector< Specification::Ptr > values;
+    values.reserve( m_specifications.size() );
+
+    for( const auto& keyValue : m_specifications )
+    {
+        values.emplace_back( keyValue.second );
+    }
+
+    return values;
+}
+
 //
 //  Local variables:
 //  mode: c++
