@@ -52,27 +52,15 @@
 
 using namespace libcasm_fe;
 
-FileLoadingStrategy::FileLoadingStrategy(
-    const std::string& absolutePath, const std::string& relativePath )
+FileLoadingStrategy::FileLoadingStrategy( const std::string& basePath )
 : LoadingStrategy()
-, m_absolutePath( absolutePath )
-, m_relativePath( relativePath )
+, m_basePath( basePath )
 {
 }
 
-FileLoadingStrategy::FileLoadingStrategy( const std::string& absolutePath )
-: FileLoadingStrategy( absolutePath, absolutePath )
+std::string FileLoadingStrategy::basePath( void ) const
 {
-}
-
-std::string FileLoadingStrategy::absolutePath( void ) const
-{
-    return m_absolutePath;
-}
-
-std::string FileLoadingStrategy::relativePath( void ) const
-{
-    return m_relativePath;
+    return m_basePath;
 }
 
 libstdhl::Standard::RFC3986::URI FileLoadingStrategy::toURI(
@@ -98,23 +86,11 @@ libpass::LoadFilePass::Input::Ptr FileLoadingStrategy::loadSource(
 std::string FileLoadingStrategy::toFileSystemPath(
     const Ast::IdentifierPath::Ptr& identifierPath ) const
 {
+    assert( identifierPath->type() == Ast::IdentifierPath::Type::ABSOLUTE );
     const auto identifierPathName = identifierPath->path();
     const auto filePath =
         libstdhl::String::replaceAll( identifierPathName, Namespace::delimiter(), "/" );
-
-    std::string fileSystemPath = "";
-
-    if( identifierPath->type() == Ast::IdentifierPath::Type::ABSOLUTE )
-    {
-        fileSystemPath += m_absolutePath + "/";
-    }
-    else
-    {
-        assert( identifierPath->type() == Ast::IdentifierPath::Type::RELATIVE );
-        fileSystemPath += m_relativePath;
-    }
-
-    return fileSystemPath + filePath + ".casm";
+    return m_basePath + "/" + filePath + ".casm";
 }
 
 //
