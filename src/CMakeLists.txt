@@ -92,6 +92,7 @@ add_library( ${PROJECT}-cpp OBJECT
   import/SpecificationRepository.cpp
   import/ImportError.cpp
   import/LibraryLoaderPass.cpp
+  import/SpecificationMergerPass.cpp
 
   transform/AstDumpDotPass.cpp
   transform/AstDumpSourcePass.cpp
@@ -216,6 +217,7 @@ ecm_generate_headers( ${PROJECT}_IMPORT_HEADERS_CPP
     ImportError
     SpecificationLoader
     LibraryLoaderPass
+    SpecificationMergerPass
   PREFIX
     ${PROJECT}/import
   RELATIVE
