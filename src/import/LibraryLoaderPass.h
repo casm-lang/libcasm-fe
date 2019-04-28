@@ -93,6 +93,8 @@ namespace libcasm_fe
             const Specification::Ptr m_parentSpecification;
             const SpecificationRepository::Ptr m_specificationRepository;
         };
+
+        using Output = Input;
     };
 }
 

@@ -106,7 +106,8 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
         node.identifier()->empty() ? node.path()->identifiers()->back() : node.identifier();
     try
     {
-        m_symboltable.registerNamespace( identifier->name(), specification->symboltable() );
+        m_symboltable.registerNamespace(
+            identifier->name(), specification->symboltable(), Namespace::Visibility::External );
     }
     catch( const std::domain_error& e )
     {
@@ -152,8 +153,7 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
         parentSpecification = data->parentSpecification();
         const auto parentSpecificationBasePath =
             parentSpecificationRepository->specificationBasePath();
-        loadingStrategy = std::make_shared< FileLoadingStrategy >(
-            specificationBasePath, parentSpecificationBasePath );
+        loadingStrategy = std::make_shared< FileLoadingStrategy >( parentSpecificationBasePath );
     }
     else
     {
@@ -164,12 +164,9 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     const auto loader =
         std::make_shared< SpecificationLoader >( stream(), specification, loadingStrategy );
 
-    if( pr.hasInput< LibraryLoaderPass >() )
+    if( parentSpecificationRepository )
     {
-        assert( parentSpecification != nullptr );
-        assert( parentSpecificationRepository != nullptr );
         loader->setSpecificationRepository( parentSpecificationRepository );
-        loader->specificationRepository()->addDepenency( parentSpecification, specification );
     }
     else
     {
@@ -191,6 +188,7 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
         return false;
     }
 
+    pr.setOutput< LibraryLoaderPass >( specification, loader->specificationRepository() );
     return true;
 }
 
