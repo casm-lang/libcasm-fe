@@ -119,6 +119,14 @@ Specification::Ptr SpecificationLoader::loadSpecification(
 
     if( not passManager.run() )
     {
+#ifndef NDEBUG
+        auto flush = [&passManager, &uri]() {
+            libstdhl::Log::ApplicationFormatter formatter( uri.toString() );
+            libstdhl::Log::OutputStreamSink sink( std::cerr, formatter );
+            passManager.stream().flush( sink );
+        };
+        flush();
+#endif
         throw SpecificationLoadingError( "Unable to import '" + identifierPathName + "'" );
     }
 
