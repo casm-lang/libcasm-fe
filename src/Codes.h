@@ -79,7 +79,8 @@ namespace libcasm_fe
         IdentifierIsAlreadyUsed = 0x0506,
 
         MethodIsUnknown = 0x0507,
-        ImportError = 0x0508
+        ImportError = 0x0508,
+        SymbolIsInaccessible = 0x0509
 
         // --------------------------------------------------------- f*** ...
         // function errors
