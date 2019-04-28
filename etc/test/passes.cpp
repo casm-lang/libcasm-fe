@@ -139,18 +139,20 @@ CASM init test
 
 import lib
 
-rule test = lib::foo
-
 import lib as bar
 
-rule qux = bar::foo
+rule test =
+{
+    lib::foo
+    bar::foo
+}
 
 )***";
 
 static const auto lib = R"***(
 CASM
 
-rule foo = skip
+[ export ] rule foo = skip
 
 )***";
 
