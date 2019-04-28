@@ -47,6 +47,8 @@
 
 #include <libcasm-fe/ast/Definition>
 
+#include <unordered_set>
+
 namespace libcasm_fe
 {
     /**
@@ -59,19 +61,33 @@ namespace libcasm_fe
 
         static const std::string& delimiter( void );
 
+        enum class Visibility
+        {
+            Internal,
+            External,
+        };
+
+        using Linkage = std::pair< Namespace::Ptr, Visibility >;
+
+        using Symbol = std::pair< Ast::Definition::Ptr, u1 >;
+
       public:
         explicit Namespace( void );
 
         void registerSymbol( const std::string& name, const Ast::Definition::Ptr& definition );
 
-        void registerNamespace( const std::string& name, const Namespace::Ptr& _namespace );
+        void registerNamespace(
+            const std::string& name,
+            const Namespace::Ptr& _namespace,
+            const Visibility visibility = Visibility::Internal );
 
         /**
          * Searches for a symbol with identifier @p path.
          *
-         * @return The symbol or nullptr if absent.
+         * @return The symbol consisting of definition pointer (nullptr if absent) and accessible
+         * flag.
          */
-        Ast::Definition::Ptr findSymbol( const Ast::IdentifierPath& path ) const;
+        Symbol findSymbol( const Ast::IdentifierPath& path ) const;
 
         /**
          * Searches for a symbol named @p name in the current namespace.
@@ -90,9 +106,13 @@ namespace libcasm_fe
         std::string dump( const std::string& indention = "" ) const;
 
       private:
+        std::string dump(
+            const std::string& indention, std::unordered_set< const Namespace* >& stack ) const;
+
+      private:
         std::unordered_map< std::string, Ast::Definition::Ptr > m_symbols;
 
-        std::unordered_map< std::string, Namespace::Ptr > m_namespaces;
+        std::unordered_map< std::string, Linkage > m_namespaces;
     };
 }
 
