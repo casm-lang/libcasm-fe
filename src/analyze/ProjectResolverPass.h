@@ -42,67 +42,50 @@
 //  statement from your version.
 //
 
-#include "SourceToAstPass.h"
+#ifndef _LIBCASM_FE_PROJECT_RESOLVER_PASS_H_
+#define _LIBCASM_FE_PROJECT_RESOLVER_PASS_H_
 
-#include "../Lexer.h"
-#include "../various/GrammarParser.tab.h"
+#include <libcasm-fe/Project>
 
-#include <libcasm-fe/Logger>
-#include <libcasm-fe/Namespace>
-#include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
+#include <libpass/Pass>
+#include <libpass/PassData>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
-#include <libcasm-fe/analyze/ConsistencyCheckPass>
-#include <libcasm-fe/analyze/ProjectResolverPass>
-#include <libcasm-fe/transform/SourceToAstPass>
-
-#include <libpass/PassRegistry>
-
-using namespace libcasm_fe;
-
-char SourceToAstPass::id = 0;
-
-static libpass::PassRegistration< SourceToAstPass > PASS(
-    "SourceToAstPass", "parse the source code and generate an AST", "ast-parse", 0 );
-
-void SourceToAstPass::usage( libpass::PassUsage& pu )
+namespace libcasm_fe
 {
-    pu.require< ProjectResolverPass >();
-}
-
-u1 SourceToAstPass::run( libpass::PassResult& pr )
-{
-    libcasm_fe::Logger log( &id, stream() );
-
-    const auto data = pr.output< ProjectResolverPass >();
-    const auto project = data->project();
-    const auto specificationFile = project->specification();
-    const auto specificationFileName = specificationFile->filename();
-    auto& specificationFileStream = specificationFile->stream();
-
-    Lexer lexer( log, specificationFileStream, std::cout );
-    lexer.setFileName( specificationFileName );
-
-    const auto specification = std::make_shared< Specification >();
-    specification->setName( specificationFileName );
-
-    Parser parser( log, lexer, *specification );
-    parser.set_debug_level( m_debug );
-
-    if( ( parser.parse() != 0 ) or not specification or ( log.errors() > 0 ) )
+    class ProjectResolverPass final : public libpass::Pass
     {
-        log.error( "could not parse '" + specification->name() + "'" );
-        return false;
-    }
+      public:
+        static char id;
 
-    pr.setOutput< SourceToAstPass >( specification );
-    return true;
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
+
+      public:
+        class Output : public libpass::PassData
+        {
+          public:
+            using Ptr = std::shared_ptr< Output >;
+
+            Output( const Project::Ptr& project )
+            : m_project( project )
+            {
+            }
+
+            const Project::Ptr& project( void ) const
+            {
+                return m_project;
+            }
+
+          private:
+            const Project::Ptr m_project;
+        };
+    };
 }
 
-void SourceToAstPass::setDebug( u1 enable )
-{
-    m_debug = enable;
-}
+#endif  // _LIBCASM_FE_PROJECT_RESOLVER_PASS_H_
 
 //
 //  Local variables:
