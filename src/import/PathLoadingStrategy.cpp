@@ -1,0 +1,112 @@
+//
+//  Copyright (C) 2014-2019 CASM Organization <https://casm-lang.org>
+//  All rights reserved.
+//
+//  Developed by: Philipp Paulweber
+//                Emmanuel Pescosta
+//                Florian Hahn
+//                Ioan Molnar
+//                <https://github.com/casm-lang/libcasm-fe>
+//
+//  This file is part of libcasm-fe.
+//
+//  libcasm-fe is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  libcasm-fe is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
+//
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
+
+#include "PathLoadingStrategy.h"
+
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/import/ImportError>
+
+#include <libstdhl/File>
+#include <libstdhl/String>
+
+using namespace libcasm_fe;
+
+PathLoadingStrategy::PathLoadingStrategy( const std::string& basePath )
+: LoadingStrategy()
+, m_basePath( basePath )
+{
+}
+
+std::string PathLoadingStrategy::basePath( void ) const
+{
+    return m_basePath;
+}
+
+libstdhl::Standard::RFC3986::URI PathLoadingStrategy::toURI(
+    const Ast::IdentifierPath::Ptr& identifierPath ) const
+{
+    return libstdhl::Standard::RFC3986::URI(
+        "file", "", toFileSystemPath( identifierPath ), "", "" );
+}
+
+libpass::LoadFilePass::Input::Ptr PathLoadingStrategy::loadSource(
+    const libstdhl::Standard::RFC3986::URI& location ) const
+{
+    assert( location.scheme() == "file" );
+    const auto filePath = location.path();
+    if( not libstdhl::File::exists( filePath ) )
+    {
+        throw NoSuchSpecificationError( "file path '" + filePath + "' does not exist" );
+    }
+
+    return std::make_shared< libpass::LoadFilePass::Input >( filePath );
+}
+
+std::string PathLoadingStrategy::toFileSystemPath(
+    const Ast::IdentifierPath::Ptr& identifierPath ) const
+{
+    assert( identifierPath->type() == Ast::IdentifierPath::Type::ABSOLUTE );
+    const auto delimiter = Namespace::delimiter();
+    const auto identifierPathName = identifierPath->path();
+    const auto modulePath = identifierPath->identifiers()->front()->name();
+    const auto moduleName =
+        libstdhl::String::replaceAll( identifierPathName, modulePath, m_basePath );
+
+    auto filePath = libstdhl::String::replaceAll( moduleName, Namespace::delimiter(), "/" );
+    if( libstdhl::String::startsWith( filePath, "/" ) )
+    {
+        filePath = filePath.substr( 1 );
+    }
+    return filePath + ".casm";
+}
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//
