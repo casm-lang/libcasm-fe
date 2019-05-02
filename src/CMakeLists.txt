@@ -51,10 +51,12 @@ include_directories(
 )
 
 add_library( ${PROJECT}-cpp OBJECT
+  Configuration.cpp
   Exception.cpp
   Lexer.cpp
   Logger.cpp
   Namespace.cpp
+  Project.cpp
   Specification.cpp
   TypeInfo.cpp
 
@@ -79,6 +81,7 @@ add_library( ${PROJECT}-cpp OBJECT
   analyze/SymbolRegistrationPass.cpp
   analyze/SymbolResolverPass.cpp
   analyze/FrameSizeDeterminationPass.cpp
+  analyze/ProjectResolverPass.cpp
   analyze/PropertyResolverPass.cpp
   analyze/PropertyRevisePass.cpp
 
@@ -88,6 +91,7 @@ add_library( ${PROJECT}-cpp OBJECT
   execute/Frame.cpp
 
   import/FileLoadingStrategy.cpp
+  import/PathLoadingStrategy.cpp
   import/SpecificationLoader.cpp
   import/SpecificationRepository.cpp
   import/ImportError.cpp
@@ -128,9 +132,11 @@ ecm_generate_headers( ${PROJECT}_HEADERS_CPP
     libcasm-fe
     CasmFE
     Codes
+    Configuration
     Exception
     Logger
     Namespace
+    Project
     Specification
     TypeInfo
   PREFIX
@@ -158,6 +164,7 @@ ecm_generate_headers( ${PROJECT}_ANALYZE_HEADERS_CPP
     TypeCheckPass
     TypeInferencePass
     FrameSizeDeterminationPass
+    ProjectResolverPass
     PropertyResolverPass
     PropertyRevisePass
   PREFIX
@@ -212,6 +219,7 @@ ecm_generate_headers( ${PROJECT}_IMPORT_HEADERS_CPP
     CAMELCASE
   HEADER_NAMES
     FileLoadingStrategy
+    PathLoadingStrategy
     LoadingStrategy
     SpecificationRepository
     ImportError
