@@ -152,51 +152,52 @@ u1 ProjectResolverPass::run( libpass::PassResult& pr )
                 project = std::make_shared< Project >( specification, configuration );
             }
 
-            if( not yaml[ "CASM" ].has( "imports" ) )
+            // search for optional 'imports'
+            if( yaml[ "CASM" ].has( "imports" ) )
             {
-                throw libstdhl::Yaml::Exception(
-                    configurationFileName + ": project configuration has no 'imports' key" );
-            }
-            else if( yaml[ "CASM" ][ "imports" ].type() != libstdhl::Yaml::Type::SEQUENCE )
-            {
-                throw libstdhl::Yaml::Exception(
-                    configurationFileName +
-                    ": project configuration value of 'imports' key is not a sequence" );
-            }
-            else
-            {
-                const auto& imports = yaml[ "CASM" ][ "imports" ];
-                for( auto dependencyIndex = 0; dependencyIndex < imports.size(); dependencyIndex++ )
+                if( yaml[ "CASM" ][ "imports" ].type() != libstdhl::Yaml::Type::SEQUENCE )
                 {
-                    const auto dependency = imports[ dependencyIndex ];
-
-                    if( dependency.type() != libstdhl::Yaml::Type::MAP )
+                    throw libstdhl::Yaml::Exception(
+                        configurationFileName +
+                        ": project configuration value of 'imports' key is not a sequence" );
+                }
+                else
+                {
+                    const auto& imports = yaml[ "CASM" ][ "imports" ];
+                    for( auto dependencyIndex = 0; dependencyIndex < imports.size();
+                         dependencyIndex++ )
                     {
-                        throw libstdhl::Yaml::Exception(
-                            configurationFileName + ": project configuration dependency '" +
-                            std::to_string( dependencyIndex + 1 ) + "' of 'imports' is not a map" );
-                    }
+                        const auto dependency = imports[ dependencyIndex ];
 
-                    dependency.foreach( [&]( const std::string& dependencyName,
-                                             const libstdhl::Yaml::Content& dependencyLocation,
-                                             u1& ) {
-                        if( dependencyLocation.type() != libstdhl::Yaml::Type::STRING )
+                        if( dependency.type() != libstdhl::Yaml::Type::MAP )
                         {
                             throw libstdhl::Yaml::Exception(
-                                configurationFileName +
-                                ": project configuration 'imports' dependency '" + dependencyName +
-                                "' is not a string" );
+                                configurationFileName + ": project configuration dependency '" +
+                                std::to_string( dependencyIndex + 1 ) +
+                                "' of 'imports' is not a map" );
                         }
 
-                        const auto dependencyLocationString =
-                            dependencyLocation.as< std::string >();
-                        const auto dependencyLocationURI =
-                            libstdhl::Standard::RFC3986::URI::fromString(
-                                dependencyLocationString );
+                        dependency.foreach( [&]( const std::string& dependencyName,
+                                                 const libstdhl::Yaml::Content& dependencyLocation,
+                                                 u1& ) {
+                            if( dependencyLocation.type() != libstdhl::Yaml::Type::STRING )
+                            {
+                                throw libstdhl::Yaml::Exception(
+                                    configurationFileName +
+                                    ": project configuration 'imports' dependency '" +
+                                    dependencyName + "' is not a string" );
+                            }
 
-                        log.info( dependencyName + " : " + dependencyLocationURI.toString() );
-                        configuration->setImport( dependencyName, dependencyLocationURI );
-                    } );
+                            const auto dependencyLocationString =
+                                dependencyLocation.as< std::string >();
+                            const auto dependencyLocationURI =
+                                libstdhl::Standard::RFC3986::URI::fromString(
+                                    dependencyLocationString );
+
+                            log.info( dependencyName + " : " + dependencyLocationURI.toString() );
+                            configuration->setImport( dependencyName, dependencyLocationURI );
+                        } );
+                    }
                 }
             }
         }
