@@ -46,65 +46,60 @@
 
 using namespace libcasm_fe;
 
-Exception::Exception( const std::string& msg, Code errorCode )
-: Exception( libstdhl::SourceLocation(), msg, errorCode )
+ErrorCodeException::ErrorCodeException( const std::string& message, Code errorCode )
+: ErrorCodeException( libstdhl::SourceLocation(), message, errorCode )
 {
 }
 
-Exception::Exception(
-    const libstdhl::SourceLocation& location, const std::string& msg, Code errorCode )
-: Exception( location, msg, {}, errorCode )
+ErrorCodeException::ErrorCodeException(
+    const libstdhl::SourceLocation& location, const std::string& message, Code errorCode )
+: ErrorCodeException( location, message, {}, errorCode )
 {
 }
 
-Exception::Exception(
+ErrorCodeException::ErrorCodeException(
     const libstdhl::SourceLocation& location,
-    const std::string& msg,
+    const std::string& message,
     const std::vector< std::string >& backtrace,
     Code errorCode )
-: m_msg( msg )
+: Exception( message )
 , m_locations( { location } )
 , m_backtrace( backtrace )
 , m_errorCode( errorCode )
 {
 }
 
-Exception::Exception(
+ErrorCodeException::ErrorCodeException(
     const std::vector< libstdhl::SourceLocation >& locations,
-    const std::string& msg,
+    const std::string& message,
     Code errorCode )
-: Exception( locations, msg, {}, errorCode )
+: ErrorCodeException( locations, message, {}, errorCode )
 {
 }
 
-Exception::Exception(
+ErrorCodeException::ErrorCodeException(
     const std::vector< libstdhl::SourceLocation >& locations,
-    const std::string& msg,
+    const std::string& message,
     const std::vector< std::string >& backtrace,
     Code errorCode )
-: m_msg( msg )
+: Exception( message )
 , m_locations( locations )
 , m_backtrace( backtrace )
 , m_errorCode( errorCode )
 {
 }
 
-const char* Exception::what( void ) const noexcept
-{
-    return m_msg.c_str();
-}
-
-const std::vector< libstdhl::SourceLocation >& Exception::locations( void ) const noexcept
+const std::vector< libstdhl::SourceLocation >& ErrorCodeException::locations( void ) const noexcept
 {
     return m_locations;
 }
 
-const std::vector< std::string >& Exception::backtrace( void ) const noexcept
+const std::vector< std::string >& ErrorCodeException::backtrace( void ) const noexcept
 {
     return m_backtrace;
 }
 
-Code Exception::errorCode( void ) const noexcept
+Code ErrorCodeException::errorCode( void ) const noexcept
 {
     return m_errorCode;
 }
