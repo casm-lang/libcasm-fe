@@ -45,6 +45,7 @@
 #ifndef _LIBCASM_FE_SPECIFICATION_REPOSITORY_H_
 #define _LIBCASM_FE_SPECIFICATION_REPOSITORY_H_
 
+#include <libcasm-fe/Project>
 #include <libcasm-fe/Specification>
 
 #include <libstdhl/Optional>
@@ -61,20 +62,26 @@ namespace libcasm_fe
 
         explicit SpecificationRepository( void );
 
-        std::string specificationBasePath( void ) const;
-
-        void setSpecificationBasePath( const std::string& specificationBasePath );
-
         void store( const std::string& id, const Specification::Ptr& specification );
 
         libstdhl::Optional< Specification::Ptr > get( const std::string& id ) const;
 
         std::vector< Specification::Ptr > specifications( void ) const;
 
-      private:
-        std::string m_specificationBasePath;
+        const Project::Ptr& project( void ) const;
 
+        void setProject( const Project::Ptr& project );
+
+        std::string specificationBasePath( void ) const;
+
+        void setSpecificationBasePath( const std::string& specificationBasePath );
+
+      private:
         std::unordered_map< std::string, const Specification::Ptr > m_specifications;
+
+        Project::Ptr m_project;
+
+        std::string m_specificationBasePath;
     };
 }
 

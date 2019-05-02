@@ -58,9 +58,7 @@ namespace libcasm_fe
         using Ptr = std::shared_ptr< SpecificationLoader >;
 
         explicit SpecificationLoader(
-            libstdhl::Log::Stream& logStream,
-            const Specification::Ptr& specification,
-            const LoadingStrategy::Ptr& loadingStrategy );
+            libstdhl::Log::Stream& logStream, const LoadingStrategy::Ptr& loadingStrategy );
 
         virtual ~SpecificationLoader( void ) = default;
 
@@ -84,7 +82,6 @@ namespace libcasm_fe
 
       private:
         libstdhl::Log::Stream& m_logStream;
-        const Specification::Ptr m_specification;
         const LoadingStrategy::Ptr m_loadingStrategy;
         SpecificationRepository::Ptr m_specificationRepository;
     };

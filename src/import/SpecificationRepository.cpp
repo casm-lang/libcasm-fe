@@ -47,19 +47,10 @@
 using namespace libcasm_fe;
 
 SpecificationRepository::SpecificationRepository( void )
-: m_specificationBasePath()
-, m_specifications()
+: m_specifications()
+, m_project( nullptr )
+, m_specificationBasePath()
 {
-}
-
-void SpecificationRepository::setSpecificationBasePath( const std::string& specificationBasePath )
-{
-    m_specificationBasePath = specificationBasePath;
-}
-
-std::string SpecificationRepository::specificationBasePath( void ) const
-{
-    return m_specificationBasePath;
 }
 
 void SpecificationRepository::store(
@@ -91,6 +82,26 @@ std::vector< Specification::Ptr > SpecificationRepository::specifications( void 
     }
 
     return values;
+}
+
+const Project::Ptr& SpecificationRepository::project( void ) const
+{
+    return m_project;
+}
+
+void SpecificationRepository::setProject( const Project::Ptr& project )
+{
+    m_project = project;
+}
+
+void SpecificationRepository::setSpecificationBasePath( const std::string& specificationBasePath )
+{
+    m_specificationBasePath = specificationBasePath;
+}
+
+std::string SpecificationRepository::specificationBasePath( void ) const
+{
+    return m_specificationBasePath;
 }
 
 //

@@ -47,6 +47,7 @@
 #include <libcasm-fe/analyze/TypeCheckPass>
 #include <libcasm-fe/import/ImportError>
 #include <libcasm-fe/import/LibraryLoaderPass>
+#include <libcasm-fe/import/PathLoadingStrategy>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassLogger>
@@ -58,11 +59,8 @@
 using namespace libcasm_fe;
 
 SpecificationLoader::SpecificationLoader(
-    libstdhl::Log::Stream& logStream,
-    const Specification::Ptr& specification,
-    const LoadingStrategy::Ptr& loadingStrategy )
+    libstdhl::Log::Stream& logStream, const LoadingStrategy::Ptr& loadingStrategy )
 : m_logStream( logStream )
-, m_specification( specification )
 , m_loadingStrategy( loadingStrategy )
 , m_specificationRepository( std::make_shared< SpecificationRepository >() )
 {
@@ -85,9 +83,32 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     libpass::PassLogger log( &LibraryLoaderPass::id, m_logStream );
 
     const auto identifierPathName = identifierPath->path();
-    log.debug( "loadSpecification of '" + identifierPathName + "'" );
+    log.debug( "loadSpecification: import '" + identifierPathName + "'" );
 
-    const auto uri = m_loadingStrategy->toURI( identifierPath );
+    LoadingStrategy::Ptr loadingStrategy = m_loadingStrategy;
+
+    const auto moduleName = identifierPath->identifiers()->front()->name();
+    if( specificationRepository()->project()->configuration() )
+    {
+        const auto configuration = specificationRepository()->project()->configuration();
+        log.info( ">>> WE HAVE A PROJECT CONFIG =D @ '" + configuration->fileName() + "' <<<" );
+
+        const auto dependencyLocation = configuration->import( moduleName );
+        if( dependencyLocation )
+        {
+            log.info(
+                ">>> found module '" + moduleName + "' @ '" + dependencyLocation->path() +
+                "' <<<" );
+            assert( dependencyLocation->scheme() == "file" );
+            loadingStrategy = std::make_shared< PathLoadingStrategy >( dependencyLocation->path() );
+        }
+    }
+
+    log.debug( "loadSpecification: module '" + moduleName + "'" );
+
+    // const auto specificationRepository()
+
+    const auto uri = loadingStrategy->toURI( identifierPath );
     const auto cachedSpecification = specificationRepository()->get( uri.toString() );
     if( cachedSpecification )
     {
@@ -98,7 +119,7 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     libpass::LoadFilePass::Input::Ptr source = nullptr;
     try
     {
-        source = m_loadingStrategy->loadSource( uri );
+        source = loadingStrategy->loadSource( uri );
     }
     catch( const NoSuchSpecificationError& e )
     {
@@ -109,8 +130,7 @@ Specification::Ptr SpecificationLoader::loadSpecification(
 
     libpass::PassResult defaultPassResult;
     defaultPassResult.setInput< libpass::LoadFilePass >( *source );
-    defaultPassResult.setInput< libcasm_fe::LibraryLoaderPass >(
-        m_specification, specificationRepository() );
+    defaultPassResult.setInput< libcasm_fe::LibraryLoaderPass >( specificationRepository() );
 
     libpass::PassManager passManager;
     passManager.setStream( m_logStream );

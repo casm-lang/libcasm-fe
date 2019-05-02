@@ -71,17 +71,9 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Input >;
 
-            Input(
-                const Specification::Ptr& parentSpecification,
-                const SpecificationRepository::Ptr& specificationRepository )
-            : m_parentSpecification( parentSpecification )
-            , m_specificationRepository( specificationRepository )
+            Input( const SpecificationRepository::Ptr& specificationRepository )
+            : m_specificationRepository( specificationRepository )
             {
-            }
-
-            const Specification::Ptr& parentSpecification( void ) const
-            {
-                return m_parentSpecification;
             }
 
             const SpecificationRepository::Ptr& specificationRepository( void ) const
@@ -90,11 +82,30 @@ namespace libcasm_fe
             }
 
           private:
-            const Specification::Ptr m_parentSpecification;
             const SpecificationRepository::Ptr m_specificationRepository;
         };
 
-        using Output = Input;
+        class Output : public Input
+        {
+          public:
+            using Ptr = std::shared_ptr< Output >;
+
+            Output(
+                const Specification::Ptr& specification,
+                const SpecificationRepository::Ptr& specificationRepository )
+            : Input( specificationRepository )
+            , m_specification( specification )
+            {
+            }
+
+            const Specification::Ptr& specification( void ) const
+            {
+                return m_specification;
+            }
+
+          private:
+            const Specification::Ptr m_specification;
+        };
     };
 }
 

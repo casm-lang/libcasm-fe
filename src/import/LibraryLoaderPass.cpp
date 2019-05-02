@@ -45,6 +45,7 @@
 #include "LibraryLoaderPass.h"
 
 #include <libcasm-fe/Logger>
+#include <libcasm-fe/analyze/ProjectResolverPass>
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
 #include <libcasm-fe/ast/RecursiveVisitor>
 #include <libcasm-fe/import/FileLoadingStrategy>
@@ -118,6 +119,7 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
 void LibraryLoaderPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
+    pu.require< ProjectResolverPass >();
     pu.scheduleAfter< SymbolRegistrationPass >();
 }
 
@@ -128,10 +130,13 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
     const auto symboltable = specification->symboltable();
+    const auto specificationFileName = specification->name();
 
-    // determine the base path of the current specification, which will be used
-    // to resolve relative import paths
-    auto specificationBasePath = specification->name();
+    const auto projectResolverData = pr.output< ProjectResolverPass >();
+    const auto project = projectResolverData->project();
+    const auto configuration = project->configuration();
+
+    auto specificationBasePath = specificationFileName;
     const auto lastSlashPos = specificationBasePath.find_last_of( '/' );
     if( lastSlashPos != std::string::npos )
     {
@@ -142,43 +147,39 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
         specificationBasePath = ".";
     }
 
-    LoadingStrategy::Ptr loadingStrategy = nullptr;
-    Specification::Ptr parentSpecification = nullptr;
     SpecificationRepository::Ptr parentSpecificationRepository = nullptr;
 
     if( pr.hasInput< LibraryLoaderPass >() )
     {
         const auto data = pr.input< LibraryLoaderPass >();
         parentSpecificationRepository = data->specificationRepository();
-        parentSpecification = data->parentSpecification();
+
         const auto parentSpecificationBasePath =
             parentSpecificationRepository->specificationBasePath();
-        loadingStrategy = std::make_shared< FileLoadingStrategy >( parentSpecificationBasePath );
+        specificationBasePath = parentSpecificationBasePath;
     }
-    else
-    {
-        loadingStrategy = std::make_shared< FileLoadingStrategy >( specificationBasePath );
-    }
-    assert( loadingStrategy != nullptr );
 
-    const auto loader =
-        std::make_shared< SpecificationLoader >( stream(), specification, loadingStrategy );
+    const auto loadingStrategy = std::make_shared< FileLoadingStrategy >( specificationBasePath );
+
+    SpecificationLoader loader( stream(), loadingStrategy );
 
     if( parentSpecificationRepository )
     {
-        loader->setSpecificationRepository( parentSpecificationRepository );
+        loader.setSpecificationRepository( parentSpecificationRepository );
     }
     else
     {
-        loader->specificationRepository()->setSpecificationBasePath( specificationBasePath );
+        loader.specificationRepository()->setSpecificationBasePath( specificationBasePath );
+        loader.specificationRepository()->setProject( project );
     }
 
-    std::string uri = "file://";
-    uri += specification->name();
-    loader->specificationRepository()->store( uri, specification );
+    assert( loader.specificationRepository() != nullptr );
+    assert( loader.specificationRepository()->project() != nullptr );
 
-    specification->setLoader( loader );
-    LibraryLoaderVisitor visitor( log, *symboltable, *specification->loader() );
+    std::string uri = "file://" + specificationFileName;
+    loader.specificationRepository()->store( uri, specification );
+
+    LibraryLoaderVisitor visitor( log, *symboltable, loader );
     specification->definitions()->accept( visitor );
 
     const auto errors = log.errors();
@@ -188,7 +189,7 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setOutput< LibraryLoaderPass >( specification, loader->specificationRepository() );
+    pr.setOutput< LibraryLoaderPass >( specification, loader.specificationRepository() );
     return true;
 }
 
