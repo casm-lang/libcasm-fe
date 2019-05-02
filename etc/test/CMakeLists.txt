@@ -54,6 +54,7 @@ include_directories(
 add_library( ${PROJECT}-test OBJECT
   main.cpp
   passes.cpp
+  project.cpp
   ast/NodeTest.cpp
   ast/literal.cpp
   ast/span.cpp
