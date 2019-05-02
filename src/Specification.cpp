@@ -44,9 +44,18 @@
 
 #include "Specification.h"
 
-#include "import/SpecificationLoader.h"
-
 using namespace libcasm_fe;
+
+//
+//
+// Specification
+//
+
+const std::string& Specification::fileExtension( void )
+{
+    static const std::string fileExtensionString = ".casm";
+    return fileExtensionString;
+}
 
 Specification::Specification( void )
 : m_asmType( AsmType::SYNCHRONOUS )
@@ -55,7 +64,6 @@ Specification::Specification( void )
 , m_definitions()
 , m_spans( std::make_shared< Ast::Spans >() )
 , m_symboltable( std::make_shared< Namespace >() )
-, m_loader( nullptr )
 {
 }
 
@@ -112,16 +120,6 @@ const Ast::Spans::Ptr& Specification::spans( void ) const
 const Namespace::Ptr& Specification::symboltable( void ) const
 {
     return m_symboltable;
-}
-
-void Specification::setLoader( const SpecificationLoader::Ptr& loader )
-{
-    m_loader = loader;
-}
-
-const SpecificationLoader::Ptr& Specification::loader( void ) const
-{
-    return m_loader;
 }
 
 //

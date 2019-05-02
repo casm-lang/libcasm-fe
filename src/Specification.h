@@ -55,11 +55,11 @@
 
 namespace libcasm_fe
 {
-    class SpecificationLoader;
-
     class Specification
     {
       public:
+        static const std::string& fileExtension( void );
+
         enum class AsmType
         {
             SYNCHRONOUS,  // lock-step
@@ -91,9 +91,6 @@ namespace libcasm_fe
 
         const Namespace::Ptr& symboltable( void ) const;
 
-        void setLoader( const std::shared_ptr< SpecificationLoader >& loader );
-        const std::shared_ptr< SpecificationLoader >& loader( void ) const;
-
       private:
         AsmType m_asmType;
         std::string m_name;
@@ -101,7 +98,6 @@ namespace libcasm_fe
         Ast::Definitions::Ptr m_definitions;
         Ast::Spans::Ptr m_spans;
         Namespace::Ptr m_symboltable;
-        std::shared_ptr< SpecificationLoader > m_loader;
     };
 }
 
