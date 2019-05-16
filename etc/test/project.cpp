@@ -88,16 +88,16 @@ import src::Bar
 
 )***";
 
-static const auto specificationSrcBar = R"***(
+static const auto specificationBar = R"***(
 CASM
 
 import src::Qux
 
-//import external::Baz
+import external::Baz
 
 )***";
 
-static const auto specificationSrcQux = R"***(
+static const auto specificationQux = R"***(
 CASM
 
 import Foo
@@ -106,53 +106,68 @@ import external::Baz
 
 )***";
 
-static const auto specificationLibBaz = R"***(
+static const auto configurationProject = R"***(
+CASM:
+  execute: Foo.casm
+  imports:
+    - external: file:///../library
+)***";
+
+static const auto specificationBaz = R"***(
 CASM
 
 rule asdf = skip
 
 )***";
 
-static const auto projectConfiguration = R"***(
+static const auto configurationLibrary = R"***(
 CASM:
-  execute: libcasm_fe_project.import_from_configuration/Foo.casm
-  imports:
-    - external: file:///./libcasm_fe_project.import_from_configuration/lib
-
+  execute: Baz.casm
 )***";
 
 TEST( libcasm_fe_project, import_from_configuration )
 {
     // GIVEN
-    const auto projectConfig = TEST_NAME + ".yml";
-    const auto projectPath = TEST_NAME + "/";
-    const auto projectPathLib = projectPath + "lib/";
+    const auto projectPath = TEST_NAME + "/project/";
     const auto projectPathSrc = projectPath + "src/";
+    const auto projectConfig = projectPath + ".casm.yml";
     const auto projectFileFoo = projectPath + "Foo.casm";
     const auto projectFileBar = projectPathSrc + "Bar.casm";
     const auto projectFileQux = projectPathSrc + "Qux.casm";
-    const auto projectFileBaz = projectPathLib + "Baz.casm";
+
+    const auto libraryPath = TEST_NAME + "/library/";
+    const auto libraryConfig = libraryPath + ".casm.yml";
+    const auto libraryFileBaz = libraryPath + "Baz.casm";
+
+    TEST_PATH_CREATE( TEST_NAME );
+
     TEST_PATH_CREATE( projectPath );
     TEST_PATH_CREATE( projectPathSrc );
-    TEST_PATH_CREATE( projectPathLib );
+    TEST_FILE_CREATE( projectConfig, configurationProject );
     TEST_FILE_CREATE( projectFileFoo, specificationFoo );
-    TEST_FILE_CREATE( projectFileBar, specificationSrcBar );
-    TEST_FILE_CREATE( projectFileQux, specificationSrcQux );
-    TEST_FILE_CREATE( projectFileBaz, specificationLibBaz );
-    TEST_FILE_CREATE( projectConfig, projectConfiguration );
+    TEST_FILE_CREATE( projectFileBar, specificationBar );
+    TEST_FILE_CREATE( projectFileQux, specificationQux );
+
+    TEST_PATH_CREATE( libraryPath );
+    TEST_FILE_CREATE( libraryConfig, configurationLibrary );
+    TEST_FILE_CREATE( libraryFileBaz, specificationBaz );
 
     // WHEN & THEN
-    TEST_PASS( ConsistencyCheckPass, projectConfig, true, );
+    TEST_PASS( ConsistencyCheckPass, projectPath, true, );
 
     // CLEANUP
-    TEST_FILE_REMOVE( projectConfig );
-    TEST_FILE_REMOVE( projectFileBaz );
+    TEST_FILE_REMOVE( libraryFileBaz );
+    TEST_FILE_REMOVE( libraryConfig );
+    TEST_PATH_REMOVE( libraryPath );
+
     TEST_FILE_REMOVE( projectFileQux );
     TEST_FILE_REMOVE( projectFileBar );
     TEST_FILE_REMOVE( projectFileFoo );
-    TEST_PATH_REMOVE( projectPathLib );
+    TEST_FILE_REMOVE( projectConfig );
     TEST_PATH_REMOVE( projectPathSrc );
     TEST_PATH_REMOVE( projectPath );
+
+    TEST_PATH_REMOVE( TEST_NAME );
 }
 
 //
