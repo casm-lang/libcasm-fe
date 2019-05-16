@@ -140,7 +140,7 @@ Configuration Configuration::fromString( const std::string& fileName )
 
                 if( dependency.type() != libstdhl::Yaml::Type::MAP )
                 {
-                    throw libstdhl::Yaml::Exception(
+                    throw ConfigurationException(
                         fileName + ": project configuration dependency '" +
                         std::to_string( dependencyIndex + 1 ) + "' of 'imports' is not a map" );
                 }
@@ -150,7 +150,7 @@ Configuration Configuration::fromString( const std::string& fileName )
                                          u1& ) {
                     if( dependencyLocation.type() != libstdhl::Yaml::Type::STRING )
                     {
-                        throw libstdhl::Yaml::Exception(
+                        throw ConfigurationException(
                             fileName + ": project configuration 'imports' dependency '" +
                             dependencyName + "' is not a string" );
                     }
