@@ -61,11 +61,18 @@ namespace libcasm_fe
 
         static const std::string& fileExtension( void );
 
-        explicit Configuration( const std::string& fileName );
+        static Configuration fromString( const std::string& fileName );
 
+      private:
+        explicit Configuration(
+            const std::string& fileName, const std::string& filePath, const std::string& execute );
+
+      public:
         const std::string& fileName( void ) const;
 
         const std::string& filePath( void ) const;
+
+        const std::string& execute( void ) const;
 
         void setImport(
             const std::string& dependencyName,
@@ -76,7 +83,8 @@ namespace libcasm_fe
 
       private:
         const std::string m_fileName;
-        std::string m_filePath;
+        const std::string m_filePath;
+        const std::string m_execute;
 
         std::unordered_map< std::string, libstdhl::Standard::RFC3986::URI > m_imports;
     };

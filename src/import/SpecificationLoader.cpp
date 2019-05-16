@@ -100,7 +100,8 @@ Specification::Ptr SpecificationLoader::loadSpecification(
                 ">>> found module '" + moduleName + "' @ '" + dependencyLocation->path() +
                 "' <<<" );
             assert( dependencyLocation->scheme() == "file" );
-            loadingStrategy = std::make_shared< PathLoadingStrategy >( dependencyLocation->path() );
+            loadingStrategy = std::make_shared< PathLoadingStrategy >(
+                specificationRepository()->specificationBasePath() + dependencyLocation->path() );
         }
     }
 

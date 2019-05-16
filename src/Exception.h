@@ -111,7 +111,7 @@ namespace libcasm_fe
         using ErrorCodeException::ErrorCodeException;
     };
 
-    class ConfigurationImportException : public Exception
+    class ConfigurationException : public Exception
     {
       public:
         using Exception::Exception;

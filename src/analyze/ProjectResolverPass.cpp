@@ -56,7 +56,6 @@
 #include <libpass/PassUsage>
 
 #include <libstdhl/String>
-#include <libstdhl/Yaml>
 #include <libstdhl/std/rfc3986>
 
 using namespace libcasm_fe;
@@ -98,118 +97,24 @@ u1 ProjectResolverPass::run( libpass::PassResult& pr )
     if( libstdhl::String::endsWith( specificationFileName, ".yml" ) or
         libstdhl::String::endsWith( specificationFileName, ".yaml" ) )
     {
-        const auto configuration = std::make_shared< Configuration >( specificationFileName );
-        const auto configurationFileName = configuration->fileName();
-        const auto configurationFilePath = configuration->filePath();
-        log.debug(
-            "CASM project configuration provided as input YAML file '" + configurationFileName +
-            "'" );
+        const auto configurationFileName = specificationFileName;
+        log.debug( "CASM project configuration input YAML file '" + configurationFileName + "'" );
 
         try
         {
-            auto file = libstdhl::File::open( configurationFileName );
+            const auto configuration = std::make_shared< Configuration >(
+                Configuration::fromString( configurationFileName ) );
 
-            const auto yaml = libstdhl::Yaml::Content::fromStream( file );
+            const auto specification = std::make_shared< libpass::LoadFilePass::Output >(
+                configuration->filePath() + configuration->execute() );
 
-            log.debug( "project configuration:\n" + yaml.dump() );
-
-            if( yaml.type() != libstdhl::Yaml::Type::MAP )
-            {
-                throw libstdhl::Yaml::Exception(
-                    configurationFileName + ": project configuration is not a map" );
-            }
-
-            if( not yaml.has( "CASM" ) )
-            {
-                throw libstdhl::Yaml::Exception(
-                    configurationFileName + ": project configuration has no 'CASM' key" );
-            }
-            else if( yaml[ "CASM" ].type() != libstdhl::Yaml::Type::MAP )
-            {
-                throw libstdhl::Yaml::Exception(
-                    configurationFileName +
-                    ": project configuration value of 'CASM' key is not a map" );
-            }
-
-            if( not yaml[ "CASM" ].has( "execute" ) )
-            {
-                throw libstdhl::Yaml::Exception(
-                    configurationFileName + ": project configuration has no 'execute' key" );
-            }
-            else if( yaml[ "CASM" ][ "execute" ].type() != libstdhl::Yaml::Type::STRING )
-            {
-                throw libstdhl::Yaml::Exception(
-                    configurationFileName +
-                    ": project configuration value of 'execute' key is not a string" );
-            }
-            else
-            {
-                const auto executeFileName = yaml[ "CASM" ][ "execute" ].as< std::string >();
-
-                specificationFileName = configurationFilePath + executeFileName;
-                const auto specification =
-                    std::make_shared< libpass::LoadFilePass::Output >( specificationFileName );
-                project = std::make_shared< Project >( specification, configuration );
-            }
-
-            // search for optional 'imports'
-            if( yaml[ "CASM" ].has( "imports" ) )
-            {
-                if( yaml[ "CASM" ][ "imports" ].type() != libstdhl::Yaml::Type::SEQUENCE )
-                {
-                    throw libstdhl::Yaml::Exception(
-                        configurationFileName +
-                        ": project configuration value of 'imports' key is not a sequence" );
-                }
-                else
-                {
-                    const auto& imports = yaml[ "CASM" ][ "imports" ];
-                    for( auto dependencyIndex = 0; dependencyIndex < imports.size();
-                         dependencyIndex++ )
-                    {
-                        const auto dependency = imports[ dependencyIndex ];
-
-                        if( dependency.type() != libstdhl::Yaml::Type::MAP )
-                        {
-                            throw libstdhl::Yaml::Exception(
-                                configurationFileName + ": project configuration dependency '" +
-                                std::to_string( dependencyIndex + 1 ) +
-                                "' of 'imports' is not a map" );
-                        }
-
-                        dependency.foreach( [&]( const std::string& dependencyName,
-                                                 const libstdhl::Yaml::Content& dependencyLocation,
-                                                 u1& ) {
-                            if( dependencyLocation.type() != libstdhl::Yaml::Type::STRING )
-                            {
-                                throw libstdhl::Yaml::Exception(
-                                    configurationFileName +
-                                    ": project configuration 'imports' dependency '" +
-                                    dependencyName + "' is not a string" );
-                            }
-
-                            const auto dependencyLocationString =
-                                dependencyLocation.as< std::string >();
-                            const auto dependencyLocationURI =
-                                libstdhl::Standard::RFC3986::URI::fromString(
-                                    dependencyLocationString );
-
-                            log.info( dependencyName + " : " + dependencyLocationURI.toString() );
-                            configuration->setImport( dependencyName, dependencyLocationURI );
-                        } );
-                    }
-                }
-            }
+            project = std::make_shared< Project >( specification, configuration );
         }
-        catch( const libstdhl::Yaml::Exception& e )
+        catch( const ConfigurationException& e )
         {
             log.error( e.what() );
         }
         catch( const std::invalid_argument& e )
-        {
-            log.error( e.what() );
-        }
-        catch( const ConfigurationImportException& e )
         {
             log.error( e.what() );
         }

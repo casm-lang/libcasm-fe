@@ -47,7 +47,9 @@
 #include <libcasm-fe/Exception>
 #include <libcasm-fe/Specification>
 
+#include <libstdhl/File>
 #include <libstdhl/String>
+#include <libstdhl/Yaml>
 
 using namespace libcasm_fe;
 
@@ -56,27 +58,129 @@ using namespace libcasm_fe;
 // Configuration
 //
 
+Configuration Configuration::fromString( const std::string& fileName )
+{
+    auto filePath = fileName;
+    const auto lastSlashPos = filePath.find_last_of( '/' );
+    if( lastSlashPos != std::string::npos )
+    {
+        filePath.erase( lastSlashPos );
+        filePath += "/";
+    }
+    else
+    {
+        filePath = "";
+    }
+
+    std::fstream file;
+    try
+    {
+        file = libstdhl::File::open( fileName );
+    }
+    catch( const std::invalid_argument& e )
+    {
+        throw ConfigurationException( fileName + ": " + e.what() );
+    }
+
+    libstdhl::Yaml::Content yamlFile;
+    try
+    {
+        yamlFile = libstdhl::Yaml::Content::fromStream( file );
+    }
+    catch( const libstdhl::Yaml::Exception& e )
+    {
+        throw ConfigurationException( fileName + ": " + e.what() );
+    }
+
+    const auto& yaml = yamlFile;
+    // log.debug( "project configuration:\n" + yaml.dump() );
+
+    if( yaml.type() != libstdhl::Yaml::Type::MAP )
+    {
+        throw ConfigurationException( fileName + ": project configuration is not a map" );
+    }
+
+    if( not yaml.has( "CASM" ) )
+    {
+        throw ConfigurationException( fileName + ": project configuration has no 'CASM' key" );
+    }
+    else if( yaml[ "CASM" ].type() != libstdhl::Yaml::Type::MAP )
+    {
+        throw ConfigurationException(
+            fileName + ": project configuration value of 'CASM' key is not a map" );
+    }
+
+    if( not yaml[ "CASM" ].has( "execute" ) )
+    {
+        throw ConfigurationException( fileName + ": project configuration has no 'execute' key" );
+    }
+    else if( yaml[ "CASM" ][ "execute" ].type() != libstdhl::Yaml::Type::STRING )
+    {
+        throw ConfigurationException(
+            fileName + ": project configuration value of 'execute' key is not a string" );
+    }
+
+    const auto execute = yaml[ "CASM" ][ "execute" ].as< std::string >();
+    Configuration configuration( fileName, filePath, execute );
+
+    // search for optional 'imports'
+    if( yaml[ "CASM" ].has( "imports" ) )
+    {
+        if( yaml[ "CASM" ][ "imports" ].type() != libstdhl::Yaml::Type::SEQUENCE )
+        {
+            throw ConfigurationException(
+                fileName + ": project configuration value of 'imports' key is not a sequence" );
+        }
+        else
+        {
+            const auto& imports = yaml[ "CASM" ][ "imports" ];
+            for( auto dependencyIndex = 0; dependencyIndex < imports.size(); dependencyIndex++ )
+            {
+                const auto dependency = imports[ dependencyIndex ];
+
+                if( dependency.type() != libstdhl::Yaml::Type::MAP )
+                {
+                    throw libstdhl::Yaml::Exception(
+                        fileName + ": project configuration dependency '" +
+                        std::to_string( dependencyIndex + 1 ) + "' of 'imports' is not a map" );
+                }
+
+                dependency.foreach( [&]( const std::string& dependencyName,
+                                         const libstdhl::Yaml::Content& dependencyLocation,
+                                         u1& ) {
+                    if( dependencyLocation.type() != libstdhl::Yaml::Type::STRING )
+                    {
+                        throw libstdhl::Yaml::Exception(
+                            fileName + ": project configuration 'imports' dependency '" +
+                            dependencyName + "' is not a string" );
+                    }
+
+                    const auto dependencyLocationString = dependencyLocation.as< std::string >();
+                    const auto dependencyLocationURI =
+                        libstdhl::Standard::RFC3986::URI::fromString( dependencyLocationString );
+
+                    configuration.setImport( dependencyName, dependencyLocationURI );
+                } );
+            }
+        }
+    }
+
+    return configuration;
+}
+
 const std::string& Configuration::fileExtension( void )
 {
     static const std::string fileExtensionString = Specification::fileExtension() + ".yml";
     return fileExtensionString;
 }
 
-Configuration::Configuration( const std::string& fileName )
+Configuration::Configuration(
+    const std::string& fileName, const std::string& filePath, const std::string& execute )
 : m_fileName( fileName )
-, m_filePath( fileName )
+, m_filePath( filePath )
+, m_execute( execute )
 , m_imports()
 {
-    const auto lastSlashPos = m_filePath.find_last_of( '/' );
-    if( lastSlashPos != std::string::npos )
-    {
-        m_filePath.erase( lastSlashPos );
-        m_filePath += "/";
-    }
-    else
-    {
-        m_filePath = "";
-    }
 }
 
 const std::string& Configuration::fileName( void ) const
@@ -89,6 +193,11 @@ const std::string& Configuration::filePath( void ) const
     return m_filePath;
 }
 
+const std::string& Configuration::execute( void ) const
+{
+    return m_execute;
+}
+
 void Configuration::setImport(
     const std::string& dependencyName, const libstdhl::Standard::RFC3986::URI& dependencyLocation )
 {
@@ -97,7 +206,7 @@ void Configuration::setImport(
 
     if( not result.second )
     {
-        throw ConfigurationImportException(
+        throw ConfigurationException(
             "import dependency '" + dependencyName + "' already defined with location " +
             uri.toString() + "'" );
     }
@@ -105,14 +214,14 @@ void Configuration::setImport(
     const auto uriScheme = uri.scheme();
     if( uriScheme != "file" )
     {
-        throw ConfigurationImportException(
+        throw ConfigurationException(
             "import dependency '" + dependencyName + "' has unsupported URI scheme '" + uriScheme +
             "' in location " + uri.toString() + "'" );
     }
     const auto uriPath = uri.path();
     if( not libstdhl::String::startsWith( uriPath, "/" ) )
     {
-        throw ConfigurationImportException(
+        throw ConfigurationException(
             "import dependency '" + dependencyName +
             "' must be a local one starting with '/', you provided '" + uri.toString() + "'" );
     }
