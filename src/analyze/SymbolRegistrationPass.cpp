@@ -116,6 +116,8 @@ static BasicType::Ptr createAgentType( libstdhl::SourceLocation& sourceLocation 
     return node;
 }
 
+static const std::string PROGRAM = "program";
+
 static FunctionDefinition::Ptr createProgramFunction(
     libstdhl::SourceLocation& sourceLocation, const Initializers::Ptr& initializers )
 {
@@ -125,7 +127,7 @@ static FunctionDefinition::Ptr createProgramFunction(
     const auto argTypes = Ast::make< Types >( sourceLocation );
     argTypes->add( agentType );
 
-    const auto program = Ast::make< Identifier >( sourceLocation, "program" );
+    const auto program = Ast::make< Identifier >( sourceLocation, PROGRAM );
     const auto defined = Ast::make< Defined >(
         sourceLocation,
         Token::unresolved(),
@@ -157,6 +159,17 @@ void SymbolRegistrationVisitor::visit( InitDefinition& node )
     auto location = node.sourceLocation();
     auto initializers = node.initializers();
 
+    const auto& symbol = m_symboltable.findSymbol( PROGRAM );
+    if( symbol )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "multiple definition of 'init' rule",
+            Code::AgentInitRuleMultipleDefinitions );
+        m_log.info( { symbol->sourceLocation() }, "first definition found here" );
+        return;
+    }
+
     if( node.isSingleAgent() )
     {
         initializers = Ast::make< Initializers >( location );
@@ -185,8 +198,16 @@ void SymbolRegistrationVisitor::visit( InitDefinition& node )
         agent->setType( type );
         agentEnum->setType( type );
 
-        m_symboltable.registerSymbol( SINGLE_AGENT_CONSTANT, agentEnum );
-        m_symboltable.registerSymbol( AGENT, agentEnum );
+        try
+        {
+            m_symboltable.registerSymbol( SINGLE_AGENT_CONSTANT, agentEnum );
+            m_symboltable.registerSymbol( AGENT, agentEnum );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.debug( { node.sourceLocation() }, e.what() );
+            return;
+        }
 
         const auto singleAgentIdentifier = Ast::make< Identifier >( location, "$" );
         auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( location );

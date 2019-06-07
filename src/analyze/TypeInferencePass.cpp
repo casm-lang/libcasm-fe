@@ -464,7 +464,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         inference( "direct call", nullptr, node );
         if( not tryResolveCallInTypeNamespace( node ) )
         {
-            // unable to resolve the call -> not enough information to continue
             return;
         }
     }
@@ -1656,6 +1655,11 @@ bool TypeInferenceVisitor::tryResolveCallInTypeNamespace( DirectCallExpression& 
     const auto typeNamespace = m_symboltable.findNamespace( typeName );
     if( not typeNamespace )
     {
+        m_log.error(
+            { node.sourceLocation() },
+            "'" + node.identifier()->path() + "' is unknown",
+            Code::SymbolIsUnknown );
+
         return false;
     }
 
