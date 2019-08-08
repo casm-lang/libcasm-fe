@@ -49,6 +49,7 @@ include_directories(
   ${LIBPASS_INCLUDE_DIR}
   ${LIBCASM_IR_INCLUDE_DIR}
   ${LIBCASM_RT_INCLUDE_DIR}
+  ${LIBTPTP_INCLUDE_DIR}
   )
 
 add_library( ${PROJECT}-test OBJECT
