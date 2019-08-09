@@ -351,8 +351,6 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( VariableBinding& node ) override;
 
   private:
-    u1 hasEmptyUpdateSet( void ) const;
-
     std::unique_ptr< Frame > makeFrame(
         CallExpression* call, Node* callee, std::size_t numberOfLocals );
 
@@ -1254,27 +1252,19 @@ void ExecutionVisitor::visit( ChooseRule& node )
 
 void ExecutionVisitor::visit( IterateRule& node )
 {
-    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100 );
+    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
+    const auto* updateSet = m_updateSetManager.currentUpdateSet();
 
-    while( true )
+    std::size_t previousEpoch;
+    do
     {
-        // uses a new parallel update set on each iteration only to check if the
-        // current iteration actually produced any updates
-        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100 );
+        previousEpoch = updateSet->epoch();
         node.rule()->accept( *this );
-        if( hasEmptyUpdateSet() )
-        {
-            // the current iteration hasn't produced any updates -> done
-            break;
-        }
-        parTrans.merge();  // should not throw a merge conflict because of the
-                           // surrounding sequential block, thus no conflict
-                           // handling required
-    }
+    } while( previousEpoch != updateSet->epoch() );
 
     try
     {
-        seqTrans.merge();
+        transaction.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -1378,9 +1368,11 @@ void ExecutionVisitor::visit( CallRule& node )
 
 void ExecutionVisitor::visit( WhileRule& node )
 {
-    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100 );
+    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
+    const auto* updateSet = m_updateSetManager.currentUpdateSet();
 
-    while( true )
+    std::size_t previousEpoch;
+    do
     {
         node.condition()->accept( *this );
         const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
@@ -1398,23 +1390,13 @@ void ExecutionVisitor::visit( WhileRule& node )
             break;
         }
 
-        // uses a new parallel update set on each iteration only to check if the
-        // current iteration actually produced any updates
-        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100 );
+        previousEpoch = updateSet->epoch();
         node.rule()->accept( *this );
-        if( hasEmptyUpdateSet() )
-        {
-            // the current iteration hasn't produced any updates -> done
-            break;
-        }
-        parTrans.merge();  // should not throw a merge conflict because of the
-                           // surrounding sequential block, thus no conflict
-                           // handling required
-    }
+    } while( previousEpoch != updateSet->epoch() );
 
     try
     {
-        seqTrans.merge();
+        transaction.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -1445,11 +1427,6 @@ void ExecutionVisitor::visit( VariableBinding& node )
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.variable()->localIndex();
     frame->setLocal( variableIndex, value );
-}
-
-u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
-{
-    return m_updateSetManager.currentUpdateSet()->empty();
 }
 
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
