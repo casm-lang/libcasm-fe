@@ -301,6 +301,8 @@ class UpdateSet
     /**
      * Merges all updates of the current update-set into the update-set \a other
      *
+     * @post The current update-set is cleared.
+     *
      * @param other The update-set which should receive the updates (must not
      *        be nullptr)
      *
@@ -324,6 +326,8 @@ class UpdateSet
             {
                 other->add( it.key(), it.value() );
             }
+
+            this->clear();
         }
     }
 

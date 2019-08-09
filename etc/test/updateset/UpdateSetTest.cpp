@@ -130,6 +130,21 @@ TEST( UpdateSetTest, mergeUpdateSetsIntoEmptyUpdateSetsShouldSwapValues )
     EXPECT_EQ( 3, seqUpdateSet->size() );
 }
 
+TEST( UpdateSetTest, updateSetShouldBeEmptyAfterMergingItsUpdatesIntoAnotherUpdateSet )
+{
+    const auto updateSet1 =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    updateSet1->add( 1UL, "1000" );
+
+    const auto updateSet2 = std::unique_ptr< TestUpdateSet >(
+        updateSet1->fork( TestUpdateSet::Semantics::Sequential, 10UL ) );
+    updateSet2->add( 1UL, "2000" );
+
+    updateSet2->merge();
+
+    EXPECT_TRUE( updateSet2->empty() );
+}
+
 TEST(
     UpdateSetTest,
     mergeSequentialUpdateSetsIntoParallelShouldNotThrowWhenOverwritingSameLocationWithSameValue )
