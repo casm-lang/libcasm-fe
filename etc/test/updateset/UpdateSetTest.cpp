@@ -254,3 +254,65 @@ TEST(
 
     EXPECT_EQ( "update 2", updateSet->lookup( location ).value() );
 }
+
+TEST( UpdateSetTest, addSequentialShouldIncreaseEpoch )
+{
+    const auto updateSet =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+
+    const auto epochBeforeUpdate = updateSet->epoch();
+    updateSet->add( 1UL, "1000" );
+    EXPECT_NE( epochBeforeUpdate, updateSet->epoch() );
+}
+
+TEST( UpdateSetTest, addParallelShouldIncreaseEpoch )
+{
+    const auto updateSet =
+        std::unique_ptr< TestUpdateSet >( new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
+
+    const auto epochBeforeUpdate = updateSet->epoch();
+    updateSet->add( 1UL, "1000" );
+    EXPECT_NE( epochBeforeUpdate, updateSet->epoch() );
+}
+
+TEST( UpdateSetTest, mergeShouldNotIncreaseEpochOfTargetUpdateSetIfSourceUpdatSetIsEmpty )
+{
+    const auto target =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+
+    const auto source =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+
+    const auto epochBeforeMerge = target->epoch();
+    source->mergeInto( target.get() );
+    EXPECT_EQ( epochBeforeMerge, target->epoch() );
+}
+
+TEST( UpdateSetTest, mergeShouldIncreaseEpochOfTargetUpdateSetIfSourceUpateSetIsNotEmpty )
+{
+    const auto target =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    target->add( 1UL, "1000" );
+
+    const auto source =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    source->add( 1UL, "2000" );
+
+    const auto epochBeforeMerge = target->epoch();
+    source->mergeInto( target.get() );
+    EXPECT_NE( epochBeforeMerge, target->epoch() );
+}
+
+TEST( UpdateSetTest, mergeShouldIncreaseEpochOfTargetUpdateSetIfSourceUpateSetIsNotEmptySwapCase )
+{
+    const auto target =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+
+    const auto source =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    source->add( 1UL, "2000" );
+
+    const auto epochBeforeMerge = target->epoch();
+    source->mergeInto( target.get() );  // uses swap because target is empty
+    EXPECT_NE( epochBeforeMerge, target->epoch() );
+}

@@ -160,6 +160,7 @@ class UpdateSet
     explicit UpdateSet( std::size_t initialSize = 1UL, UpdateSet* parent = nullptr )
     : m_set( initialSize )
     , m_parent( parent )
+    , m_epoch( 0UL )
     {
     }
 
@@ -314,9 +315,16 @@ class UpdateSet
     {
         assert( other != nullptr );
 
+        if( empty() )
+        {
+            return;
+        }
+
         if( other->m_set.empty() )
         {
             std::swap( other->m_set, m_set );
+
+            other->increaseEpoch();
         }
         else
         {
@@ -378,11 +386,28 @@ class UpdateSet
         return {};
     }
 
+    /**
+     * A change of the epoch indicates that updates have been added.
+     *
+     * @return The current epoch of the update-set
+     */
+    std::size_t epoch() const
+    {
+        return m_epoch;
+    }
+
+  protected:
+    void increaseEpoch()
+    {
+        ++m_epoch;
+    }
+
   protected:
     UpdateHashMap m_set;
 
   private:
     UpdateSet* const m_parent;
+    std::size_t m_epoch;
 };
 
 /**
@@ -421,6 +446,8 @@ class SequentialUpdateSet final : public UpdateSet< Details >
     void add( const Location& location, const Value& value ) override
     {
         Super::m_set.insertOrAssign( location, value );
+
+        Super::increaseEpoch();
     }
 
     /**
@@ -494,6 +521,8 @@ class ParallelUpdateSet final : public UpdateSet< Details >
                 throw Conflict( { location, value }, { location, existingValue } );
             }
         }
+
+        Super::increaseEpoch();
     }
 };
 
