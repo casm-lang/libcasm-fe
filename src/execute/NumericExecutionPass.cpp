@@ -60,7 +60,7 @@
 #include <libcasm-fe/execute/UpdateSet>
 
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/import/SpecificationMergerPass>
 
 #include <libcasm-rt/Value>
 
@@ -2034,7 +2034,7 @@ void InvariantChecker::check( const Specification& specification )
 
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
+    pu.require< SpecificationMergerPass >();
     pu.scheduleAfter< FrameSizeDeterminationPass >();
 }
 
@@ -2042,7 +2042,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
+    const auto data = pr.output< SpecificationMergerPass >();
     const auto specification = data->specification();
 
     static u1 constantHandlerFlag = false;
