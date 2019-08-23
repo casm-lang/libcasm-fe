@@ -51,7 +51,6 @@
 #include <libcasm-fe/ast/RecursiveVisitor>
 
 #include <libcasm-fe/import/SpecificationMergerPass>
-#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Builtin>
 #include <libcasm-ir/Exception>
@@ -2175,15 +2174,14 @@ void CallTargetCheckVisitor::visit( MethodCallExpression& node )
 
 void TypeInferencePass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
-    pu.scheduleAfter< SpecificationMergerPass >();
+    pu.require< SpecificationMergerPass >();
 }
 
 u1 TypeInferencePass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
+    const auto data = pr.output< SpecificationMergerPass >();
     const auto specification = data->specification();
 
     TypeInferenceVisitor typeInferenceVisitor( log, *specification->symboltable() );
