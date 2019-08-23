@@ -89,6 +89,8 @@ namespace libcasm_fe
 
         const Ast::Spans::Ptr& spans( void ) const;
 
+        void setSymboltable( const Namespace::Ptr& symboltable );
+
         const Namespace::Ptr& symboltable( void ) const;
 
       private:

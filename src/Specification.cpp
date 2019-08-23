@@ -117,6 +117,11 @@ const Ast::Spans::Ptr& Specification::spans( void ) const
     return m_spans;
 }
 
+void Specification::setSymboltable( const Namespace::Ptr& symboltable )
+{
+    m_symboltable = symboltable;
+}
+
 const Namespace::Ptr& Specification::symboltable( void ) const
 {
     return m_symboltable;
