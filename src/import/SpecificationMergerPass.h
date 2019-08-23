@@ -45,7 +45,12 @@
 #ifndef _LIBCASM_FE_SPECIFICATION_MERGER_PASS_H_
 #define _LIBCASM_FE_SPECIFICATION_MERGER_PASS_H_
 
+#include <libcasm-fe/Specification>
+
 #include <libpass/Pass>
+#include <libpass/PassData>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 namespace libcasm_fe
 {
@@ -57,6 +62,26 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
+
+      public:
+        class Output : public libpass::PassData
+        {
+          public:
+            using Ptr = std::shared_ptr< Output >;
+
+            Output( const Specification::Ptr& specification )
+            : m_specification( specification )
+            {
+            }
+
+            Specification::Ptr specification( void ) const
+            {
+                return m_specification;
+            }
+
+          private:
+            Specification::Ptr m_specification;
+        };
     };
 }
 

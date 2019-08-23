@@ -90,11 +90,18 @@ u1 SpecificationMergerPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    const auto s = pr.output< SourceToAstPass >()->specification();
-    s->setDefinitions(
-        definitions );  // TODO: FIXME: @ppaulweber: maybe we introduce here a new intermediate
-                        // specification on which the other passes can depend on
+    const auto parsedSpecification = pr.output< SourceToAstPass >()->specification();
+    const auto mergedSpecification = std::make_shared< Specification >();
 
+    mergedSpecification->setAsmType( parsedSpecification->asmType() );
+    mergedSpecification->setName( parsedSpecification->name() );
+    mergedSpecification->setHeader( parsedSpecification->header() );
+    mergedSpecification->setSpans( parsedSpecification->spans() );
+    mergedSpecification->setSymboltable( parsedSpecification->symboltable() );
+
+    mergedSpecification->setDefinitions( definitions );
+
+    pr.setOutput< SpecificationMergerPass >( mergedSpecification );
     return true;
 }
 
