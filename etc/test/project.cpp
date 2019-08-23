@@ -102,7 +102,7 @@ CASM
 
 import Foo
 
-import external::Baz
+import other::Baz
 
 )***";
 
@@ -111,6 +111,7 @@ CASM:
   execute: Foo.casm
   imports:
     - external: file:///../library
+    - other: ../library
 )***";
 
 static const auto specificationBaz = R"***(

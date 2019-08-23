@@ -156,10 +156,21 @@ Configuration Configuration::fromString( const std::string& fileName )
                     }
 
                     const auto dependencyLocationString = dependencyLocation.as< std::string >();
-                    const auto dependencyLocationURI =
-                        libstdhl::Standard::RFC3986::URI::fromString( dependencyLocationString );
 
-                    configuration.setImport( dependencyName, dependencyLocationURI );
+                    try
+                    {
+                        const auto dependencyLocationURI =
+                            libstdhl::Standard::RFC3986::URI::fromString(
+                                dependencyLocationString );
+                        configuration.setImport( dependencyName, dependencyLocationURI );
+                    }
+                    catch( const std::invalid_argument& e )
+                    {
+                        const auto dependencyLocationURI =
+                            libstdhl::Standard::RFC3986::URI::fromString(
+                                "file:///" + dependencyLocationString );
+                        configuration.setImport( dependencyName, dependencyLocationURI );
+                    }
                 } );
             }
         }
