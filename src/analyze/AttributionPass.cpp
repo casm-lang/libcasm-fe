@@ -83,13 +83,14 @@ static const std::string DUMPS_ATTRIBUTE = "dumps";
 static const std::string PURE_ATTRIBUTE = "pure";
 static const std::string SYNCHRONOUS_ATTRIBUTE = "synchronous";
 static const std::string ASYNCHRONOUS_ATTRIBUTE = "asynchronous";
+static const std::string EXPORT_ATTRIBUTE = "export";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
-    DEPRECATED_ATTRIBUTE,  IN_ATTRIBUTE,       MONITORED_ATTRIBUTE, EXTERNAL_ATTRIBUTE,
-    CONTROLLED_ATTRIBUTE,  INTERNAL_ATTRIBUTE, SHARED_ATTRIBUTE,    OUT_ATTRIBUTE,
-    STATIC_ATTRIBUTE,      SYMBOLIC_ATTRIBUTE, PURE_ATTRIBUTE,      SYNCHRONOUS_ATTRIBUTE,
-    ASYNCHRONOUS_ATTRIBUTE
+    DEPRECATED_ATTRIBUTE,   IN_ATTRIBUTE,       MONITORED_ATTRIBUTE, EXTERNAL_ATTRIBUTE,
+    CONTROLLED_ATTRIBUTE,   INTERNAL_ATTRIBUTE, SHARED_ATTRIBUTE,    OUT_ATTRIBUTE,
+    STATIC_ATTRIBUTE,       SYMBOLIC_ATTRIBUTE, PURE_ATTRIBUTE,      SYNCHRONOUS_ATTRIBUTE,
+    ASYNCHRONOUS_ATTRIBUTE, EXPORT_ATTRIBUTE,
 };
 
 // list of allowed expression attribute names
@@ -225,15 +226,19 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
 
     DefinitionAttributionVisitor visitor{ m_log, node };
     node.attributes()->accept( visitor );
-    const auto& attributeNames = visitor.attributeNames();
 
     using Classification = FunctionDefinition::Classification;
 
+    const auto& attributeNames = visitor.attributeNames();
     for( const auto& name : attributeNames )
     {
         Classification classification = Classification::UNKNOWN;
 
-        if( name == SYMBOLIC_ATTRIBUTE )
+        if( name == EXPORT_ATTRIBUTE )
+        {
+            node.setExported( true );
+        }
+        else if( name == SYMBOLIC_ATTRIBUTE )
         {
             node.setSymbolic( true );
         }
@@ -296,11 +301,15 @@ void DefinitionVisitor::visit( DerivedDefinition& node )
 
     DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
-    const auto& attributeNames = visitor.attributeNames();
 
+    const auto& attributeNames = visitor.attributeNames();
     for( const auto& name : attributeNames )
     {
-        if( name == PURE_ATTRIBUTE )
+        if( name == EXPORT_ATTRIBUTE )
+        {
+            node.setExported( true );
+        }
+        else if( name == PURE_ATTRIBUTE )
         {
             node.setProperty( libcasm_ir::Property::PURE );
         }
@@ -313,6 +322,15 @@ void DefinitionVisitor::visit( RuleDefinition& node )
 
     DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+    for( const auto& name : attributeNames )
+    {
+        if( name == EXPORT_ATTRIBUTE )
+        {
+            node.setExported( true );
+        }
+    }
 }
 
 void DefinitionVisitor::visit( EnumeratorDefinition& node )
@@ -329,6 +347,21 @@ void DefinitionVisitor::visit( EnumerationDefinition& node )
 
     DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+    for( const auto& name : attributeNames )
+    {
+        if( name == EXPORT_ATTRIBUTE )
+        {
+            node.setExported( true );
+
+            // pass exported flag to enumerators
+            for( const auto& enumerator : *node.enumerators() )
+            {
+                enumerator->setExported( true );
+            }
+        }
+    }
 }
 
 void DefinitionVisitor::visit( UsingDefinition& node )
@@ -337,6 +370,15 @@ void DefinitionVisitor::visit( UsingDefinition& node )
 
     DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+    for( const auto& name : attributeNames )
+    {
+        if( name == EXPORT_ATTRIBUTE )
+        {
+            node.setExported( true );
+        }
+    }
 }
 
 void DefinitionVisitor::visit( ImportDefinition& node )
@@ -345,6 +387,15 @@ void DefinitionVisitor::visit( ImportDefinition& node )
 
     DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+    for( const auto& name : attributeNames )
+    {
+        if( name == EXPORT_ATTRIBUTE )
+        {
+            node.setExported( true );
+        }
+    }
 }
 
 class HeaderVisitor final : public RecursiveVisitor

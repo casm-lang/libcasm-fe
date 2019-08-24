@@ -42,53 +42,67 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#include "SpecificationRepository.h"
 
-#include <libcasm-fe/Codes>
+using namespace libcasm_fe;
 
-#include <libpass/PassLogger>
-
-#include <libstdhl/SourceLocation>
-
-#include <string>
-#include <vector>
-
-namespace libcasm_fe
+SpecificationRepository::SpecificationRepository( void )
+: m_specifications()
+, m_project( nullptr )
+, m_specificationBasePath()
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
-    {
-      public:
-        using libpass::PassLogger::PassLogger;
-
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
-
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-    };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+void SpecificationRepository::store(
+    const std::string& id, const Specification::Ptr& specification )
+{
+    assert( get( id ) == libstdhl::nullopt );
+    m_specifications.emplace( id, specification );
+}
+
+libstdhl::Optional< Specification::Ptr > SpecificationRepository::get( const std::string& id ) const
+{
+    const auto it = m_specifications.find( id );
+    if( it != m_specifications.cend() )
+    {
+        return it->second;
+    }
+
+    return libstdhl::nullopt;
+}
+
+std::vector< Specification::Ptr > SpecificationRepository::specifications( void ) const
+{
+    std::vector< Specification::Ptr > values;
+    values.reserve( m_specifications.size() );
+
+    for( const auto& keyValue : m_specifications )
+    {
+        values.emplace_back( keyValue.second );
+    }
+
+    return values;
+}
+
+const Project::Ptr& SpecificationRepository::project( void ) const
+{
+    return m_project;
+}
+
+void SpecificationRepository::setProject( const Project::Ptr& project )
+{
+    m_project = project;
+}
+
+void SpecificationRepository::setSpecificationBasePath( const std::string& specificationBasePath )
+{
+    m_specificationBasePath = specificationBasePath;
+}
+
+std::string SpecificationRepository::specificationBasePath( void ) const
+{
+    return m_specificationBasePath;
+}
 
 //
 //  Local variables:

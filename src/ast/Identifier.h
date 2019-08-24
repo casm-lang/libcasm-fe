@@ -83,14 +83,14 @@ namespace libcasm_fe
          * @brief An identifier path is an identifier + namespaces.
          *
          * The identifier path can either be absolute or relative. The string of
-         * a relative identifier path starts with a dot. All relative identifier
+         * a relative identifier path starts with a double colon. All relative identifier
          * paths will later be resolved and converted into absolute paths.
          *
-         * An absolute path "Color.Red" will be splitted into the namespaces
+         * An absolute path "Color::Red" will be splitted into the namespaces
          * ["Color"] and identifier "Red". Furthermore the node will be marked
          * as NamespaceType.ABSOLUTE.
          *
-         * A relative path ".Red" will be splitted into the namespaces [] and
+         * A relative path "::Red" will be splitted into the namespaces [] and
          * identifier "Red". Furthermore the node will be marked as
          * NamespaceType.RELATIVE.
          */

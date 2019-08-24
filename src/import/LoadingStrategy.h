@@ -42,53 +42,40 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#ifndef _LIBCASM_FE_LOADING_STRATEGY_H_
+#define _LIBCASM_FE_LOADING_STRATEGY_H_
 
-#include <libcasm-fe/Codes>
+#include <libcasm-fe/ast/Identifier>
 
-#include <libpass/PassLogger>
+#include <libpass/analyze/LoadFilePass>
 
-#include <libstdhl/SourceLocation>
+#include <libstdhl/std/rfc3986>
 
 #include <string>
-#include <vector>
 
 namespace libcasm_fe
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
+    class LoadingStrategy
     {
       public:
-        using libpass::PassLogger::PassLogger;
+        using Ptr = std::shared_ptr< LoadingStrategy >;
 
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
+        virtual ~LoadingStrategy( void ) = default;
 
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        virtual libstdhl::Standard::RFC3986::URI toURI(
+            const Ast::IdentifierPath::Ptr& identifierPath ) const = 0;
 
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        /**
+         Loads a CASM specification from a given \a URI location.
 
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+         @returns The source code of the CASM specification
+         */
+        virtual libpass::LoadFilePass::Input::Ptr loadSource(
+            const libstdhl::Standard::RFC3986::URI& location ) const = 0;
     };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+#endif  // _LIBCASM_FE_LOADING_STRATEGY_H_
 
 //
 //  Local variables:

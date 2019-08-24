@@ -50,7 +50,7 @@
 #include <libcasm-fe/ast/RecursiveVisitor>
 
 #include <libcasm-fe/analyze/PropertyRevisePass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/import/SpecificationMergerPass>
 
 #include <libcasm-ir/Builtin>
 
@@ -505,7 +505,7 @@ void ConsistencyCheckVisitor::verifyHasTypeOfKind(
 
 void ConsistencyCheckPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
+    pu.require< SpecificationMergerPass >();
     pu.scheduleAfter< PropertyRevisePass >();
 }
 
@@ -513,7 +513,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
+    const auto data = pr.output< SpecificationMergerPass >();
     const auto specification = data->specification();
 
     ConsistencyCheckVisitor visitor( log );

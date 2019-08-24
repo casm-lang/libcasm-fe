@@ -51,10 +51,12 @@ include_directories(
 )
 
 add_library( ${PROJECT}-cpp OBJECT
+  Configuration.cpp
   Exception.cpp
   Lexer.cpp
   Logger.cpp
   Namespace.cpp
+  Project.cpp
   Specification.cpp
   TypeInfo.cpp
 
@@ -79,6 +81,7 @@ add_library( ${PROJECT}-cpp OBJECT
   analyze/SymbolRegistrationPass.cpp
   analyze/SymbolResolverPass.cpp
   analyze/FrameSizeDeterminationPass.cpp
+  analyze/ProjectResolverPass.cpp
   analyze/PropertyResolverPass.cpp
   analyze/PropertyRevisePass.cpp
 
@@ -86,6 +89,14 @@ add_library( ${PROJECT}-cpp OBJECT
   execute/HashMapBase.cpp
   execute/ReferenceConstant.cpp
   execute/Frame.cpp
+
+  import/FileLoadingStrategy.cpp
+  import/PathLoadingStrategy.cpp
+  import/SpecificationLoader.cpp
+  import/SpecificationRepository.cpp
+  import/ImportError.cpp
+  import/LibraryLoaderPass.cpp
+  import/SpecificationMergerPass.cpp
 
   transform/AstDumpDotPass.cpp
   transform/AstDumpSourcePass.cpp
@@ -121,9 +132,11 @@ ecm_generate_headers( ${PROJECT}_HEADERS_CPP
     libcasm-fe
     CasmFE
     Codes
+    Configuration
     Exception
     Logger
     Namespace
+    Project
     Specification
     TypeInfo
   PREFIX
@@ -151,6 +164,7 @@ ecm_generate_headers( ${PROJECT}_ANALYZE_HEADERS_CPP
     TypeCheckPass
     TypeInferencePass
     FrameSizeDeterminationPass
+    ProjectResolverPass
     PropertyResolverPass
     PropertyRevisePass
   PREFIX
@@ -197,6 +211,34 @@ install(
     ${${PROJECT}_EXECUTE_HEADERS_CPP}
   DESTINATION
     "include/${PROJECT}/execute"
+  )
+
+
+ecm_generate_headers( ${PROJECT}_IMPORT_HEADERS_CPP
+  ORIGINAL
+    CAMELCASE
+  HEADER_NAMES
+    FileLoadingStrategy
+    PathLoadingStrategy
+    LoadingStrategy
+    SpecificationRepository
+    ImportError
+    SpecificationLoader
+    LibraryLoaderPass
+    SpecificationMergerPass
+  PREFIX
+    ${PROJECT}/import
+  RELATIVE
+    import
+  REQUIRED_HEADERS
+    ${PROJECT}_IMPORT_HEADERS
+  )
+install(
+  FILES
+    ${${PROJECT}_IMPORT_HEADERS}
+    ${${PROJECT}_IMPORT_HEADERS_CPP}
+  DESTINATION
+    "include/${PROJECT}/import"
   )
 
 

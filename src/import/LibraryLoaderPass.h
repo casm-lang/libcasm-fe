@@ -42,53 +42,74 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#ifndef _LIBCASM_FE_LIBRARY_LOADER_PASS_H_
+#define _LIBCASM_FE_LIBRARY_LOADER_PASS_H_
 
-#include <libcasm-fe/Codes>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/import/SpecificationRepository>
 
-#include <libpass/PassLogger>
-
-#include <libstdhl/SourceLocation>
-
-#include <string>
-#include <vector>
+#include <libpass/Pass>
+#include <libpass/PassData>
 
 namespace libcasm_fe
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
+    /**
+     * @brief Imports CASM libraries into the namespace
+     */
+    class LibraryLoaderPass final : public libpass::Pass
     {
       public:
-        using libpass::PassLogger::PassLogger;
+        static char id;
 
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
+        void usage( libpass::PassUsage& pu ) override;
 
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        bool run( libpass::PassResult& pr ) override;
 
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+      public:
+        class Input : public libpass::PassData
+        {
+          public:
+            using Ptr = std::shared_ptr< Input >;
 
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+            Input( const SpecificationRepository::Ptr& specificationRepository )
+            : m_specificationRepository( specificationRepository )
+            {
+            }
 
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+            const SpecificationRepository::Ptr& specificationRepository( void ) const
+            {
+                return m_specificationRepository;
+            }
+
+          private:
+            const SpecificationRepository::Ptr m_specificationRepository;
+        };
+
+        class Output : public Input
+        {
+          public:
+            using Ptr = std::shared_ptr< Output >;
+
+            Output(
+                const Specification::Ptr& specification,
+                const SpecificationRepository::Ptr& specificationRepository )
+            : Input( specificationRepository )
+            , m_specification( specification )
+            {
+            }
+
+            const Specification::Ptr& specification( void ) const
+            {
+                return m_specification;
+            }
+
+          private:
+            const Specification::Ptr m_specification;
+        };
     };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+#endif  // _LIBCASM_FE_LIBRARY_LOADER_PASS_H_
 
 //
 //  Local variables:

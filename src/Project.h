@@ -42,53 +42,35 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#ifndef _LIBCASM_FE_PROJECT_H_
+#define _LIBCASM_FE_PROJECT_H_
 
-#include <libcasm-fe/Codes>
+#include <libcasm-fe/Configuration>
 
-#include <libpass/PassLogger>
-
-#include <libstdhl/SourceLocation>
-
-#include <string>
-#include <vector>
+#include <libpass/analyze/LoadFilePass>
 
 namespace libcasm_fe
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
+    class Project
     {
       public:
-        using libpass::PassLogger::PassLogger;
+        using Ptr = std::shared_ptr< Project >;
 
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
+        explicit Project(
+            const libpass::LoadFilePass::Output::Ptr& specification,
+            const Configuration::Ptr& configuration = nullptr );
 
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        const libpass::LoadFilePass::Output::Ptr& specification( void ) const;
 
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        const Configuration::Ptr& configuration( void ) const;
 
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+      private:
+        const libpass::LoadFilePass::Output::Ptr m_specification;
+        const Configuration::Ptr m_configuration;
     };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+#endif  // _LIBCASM_FE_PROJECT_H_
 
 //
 //  Local variables:

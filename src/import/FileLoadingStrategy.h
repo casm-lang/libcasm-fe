@@ -42,53 +42,44 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#ifndef _LIBCASM_FE_FILE_LOADING_STRATEGY_H_
+#define _LIBCASM_FE_FILE_LOADING_STRATEGY_H_
 
-#include <libcasm-fe/Codes>
-
-#include <libpass/PassLogger>
-
-#include <libstdhl/SourceLocation>
-
-#include <string>
-#include <vector>
+#include <libcasm-fe/import/LoadingStrategy>
 
 namespace libcasm_fe
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
+    class FileLoadingStrategy final : public LoadingStrategy
     {
       public:
-        using libpass::PassLogger::PassLogger;
+        /**
+         * Initializes the file loading strategy.
+         *
+         * @param basePath The base path from which the files are loaded from.
+         */
+        explicit FileLoadingStrategy( const std::string& basePath );
 
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
+        std::string basePath( void ) const;
 
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        libstdhl::Standard::RFC3986::URI toURI(
+            const Ast::IdentifierPath::Ptr& identifierPath ) const override;
 
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        libpass::LoadFilePass::Input::Ptr loadSource(
+            const libstdhl::Standard::RFC3986::URI& location ) const override;
 
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+      private:
+        /**
+         * Converts the identifier path into a file-system path by replacing all dots with slashes
+         * and appending it to the base path.
+         */
+        std::string toFileSystemPath( const Ast::IdentifierPath::Ptr& identifierPath ) const;
 
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+      private:
+        const std::string m_basePath;
     };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+#endif  // _LIBCASM_FE_FILE_LOADING_STRATEGY_H_
 
 //
 //  Local variables:

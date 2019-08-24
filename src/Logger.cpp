@@ -44,7 +44,7 @@
 
 #include "Logger.h"
 
-#include "Exception.h"
+#include <libcasm-fe/Exception>
 
 #include <libstdhl/String>
 
@@ -112,7 +112,7 @@ void libcasm_fe::Logger::error(
     }
 }
 
-void libcasm_fe::Logger::error( const Exception& exception )
+void libcasm_fe::Logger::error( const ErrorCodeException& exception )
 {
     error( exception.locations(), exception.what(), exception.errorCode() );
     info( "Backtrace:\n" + libstdhl::String::join( exception.backtrace(), "\n" ) );

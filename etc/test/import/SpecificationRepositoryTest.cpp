@@ -42,53 +42,42 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#include "../main.h"
 
-#include <libcasm-fe/Codes>
+#include <memory>
 
-#include <libpass/PassLogger>
+using namespace libcasm_fe;
 
-#include <libstdhl/SourceLocation>
-
-#include <string>
-#include <vector>
-
-namespace libcasm_fe
+TEST(
+    libcasm_fe_import_SpecificationRepositoryTest,
+    shouldReturnEmptyOptionalForRequestedIdIfNotStored )
 {
-    class ErrorCodeException;
+    // GIVEN
+    SpecificationRepository repository;
 
-    class Logger : public libpass::PassLogger
-    {
-      public:
-        using libpass::PassLogger::PassLogger;
+    // WHEN
+    const auto storedSpec = repository.get( "some" + Namespace::delimiter() + "lib" );
 
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
-
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-    };
+    // THEN
+    EXPECT_FALSE( storedSpec.has_value() );
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+TEST(
+    libcasm_fe_import_SpecificationRepositoryTest, shouldReturnSpecificationForRequestedIdIfStored )
+{
+    // GIVEN
+    SpecificationRepository repository;
+
+    const auto spec = std::make_shared< Specification >();
+    repository.store( "some" + Namespace::delimiter() + "lib", spec );
+
+    // WHEN
+    const auto storedSpec = repository.get( "some" + Namespace::delimiter() + "lib" );
+
+    // THEN
+    EXPECT_TRUE( storedSpec.has_value() );
+    EXPECT_EQ( spec, storedSpec );
+}
 
 //
 //  Local variables:

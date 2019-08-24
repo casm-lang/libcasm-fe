@@ -50,7 +50,7 @@
 #include <libcasm-fe/ast/RecursiveVisitor>
 
 #include <libcasm-fe/analyze/PropertyResolverPass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/import/SpecificationMergerPass>
 
 #include <libcasm-ir/Annotation>
 
@@ -295,7 +295,7 @@ void PropertyReviseVisitor::checkIfPropertiesHold(
 
 void PropertyRevisePass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
+    pu.require< SpecificationMergerPass >();
     pu.scheduleAfter< PropertyResolverPass >();
 }
 
@@ -303,7 +303,7 @@ u1 PropertyRevisePass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
+    const auto data = pr.output< SpecificationMergerPass >();
     const auto specification = data->specification();
 
     PropertyReviseVisitor visitor( log );

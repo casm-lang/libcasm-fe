@@ -42,53 +42,52 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#ifndef _LIBCASM_FE_SPECIFICATION_LOADER_H_
+#define _LIBCASM_FE_SPECIFICATION_LOADER_H_
 
-#include <libcasm-fe/Codes>
-
-#include <libpass/PassLogger>
-
-#include <libstdhl/SourceLocation>
-
-#include <string>
-#include <vector>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/Identifier>
+#include <libcasm-fe/import/LoadingStrategy>
+#include <libcasm-fe/import/SpecificationRepository>
 
 namespace libcasm_fe
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
+    class SpecificationLoader final
     {
       public:
-        using libpass::PassLogger::PassLogger;
+        using Ptr = std::shared_ptr< SpecificationLoader >;
 
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
+        explicit SpecificationLoader(
+            libstdhl::Log::Stream& logStream, const LoadingStrategy::Ptr& loadingStrategy );
 
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        virtual ~SpecificationLoader( void ) = default;
 
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        const SpecificationRepository::Ptr& specificationRepository( void ) const;
 
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        void setSpecificationRepository(
+            const SpecificationRepository::Ptr& specificationRepository );
 
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        /**
+           Loads a CASM specification from an \a identifierPath.
+
+           The loader will resolve the \a identifierPath, depending on the type of the loader.
+
+           @throws NoSuchSpecificationError if specification couldn't be found
+           @throws SpecificationLoadingError if specification could be found but not loaded
+
+           @returns The loaded CASM specification
+        */
+
+        Specification::Ptr loadSpecification( const Ast::IdentifierPath::Ptr& identifierPath );
+
+      private:
+        libstdhl::Log::Stream& m_logStream;
+        const LoadingStrategy::Ptr m_loadingStrategy;
+        SpecificationRepository::Ptr m_specificationRepository;
     };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+#endif  // _LIBCASM_FE_SPECIFICATION_LOADER_H_
 
 //
 //  Local variables:

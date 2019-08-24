@@ -42,53 +42,32 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#include "Project.h"
 
-#include <libcasm-fe/Codes>
+using namespace libcasm_fe;
 
-#include <libpass/PassLogger>
+//
+//
+// Project
+//
 
-#include <libstdhl/SourceLocation>
-
-#include <string>
-#include <vector>
-
-namespace libcasm_fe
+Project::Project(
+    const libpass::LoadFilePass::Output::Ptr& specification,
+    const Configuration::Ptr& configuration )
+: m_specification( specification )
+, m_configuration( configuration )
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
-    {
-      public:
-        using libpass::PassLogger::PassLogger;
-
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
-
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-    };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+const libpass::LoadFilePass::Output::Ptr& Project::specification( void ) const
+{
+    return m_specification;
+}
+
+const Configuration::Ptr& Project::configuration( void ) const
+{
+    return m_configuration;
+}
 
 //
 //  Local variables:

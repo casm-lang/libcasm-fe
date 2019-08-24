@@ -50,7 +50,7 @@
 #include <libcasm-fe/ast/RecursiveVisitor>
 
 #include <libcasm-fe/analyze/TypeInferencePass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/import/SpecificationMergerPass>
 
 #include <libcasm-ir/Annotation>
 
@@ -365,7 +365,7 @@ void PropertyResolverVisitor::visit( CardinalityExpression& node )
 
 void PropertyResolverPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
+    pu.require< SpecificationMergerPass >();
     pu.scheduleAfter< TypeInferencePass >();
 }
 
@@ -373,7 +373,7 @@ u1 PropertyResolverPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
+    const auto data = pr.output< SpecificationMergerPass >();
     const auto specification = data->specification();
 
     PropertyResolverVisitor visitor( log );

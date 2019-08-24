@@ -123,9 +123,24 @@ void TypeCheckVisitor::visit( BasicType& node )
         return;
     }
 
-    const auto symbol = m_symboltable.findSymbol( *node.name() );
+    const auto maybeSymbol = m_symboltable.findSymbol( *node.name() );
+    const auto symbol = maybeSymbol.first;
+    const auto accessible = maybeSymbol.second;
+
     if( symbol )
     {
+        if( not accessible )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                symbol->description() + " '" + name + "' is not accessible",
+                Code::SymbolIsInaccessible );
+            m_log.warning(
+                { symbol->sourceLocation() },
+                "'" + symbol->identifier()->name() + "' has not been exported" );
+            return;
+        }
+
         switch( symbol->id() )
         {
             case Node::ID::USING_DEFINITION:  // [[fallthrough]]

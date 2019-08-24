@@ -42,53 +42,64 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#include "PathLoadingStrategy.h"
 
-#include <libcasm-fe/Codes>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/import/ImportError>
 
-#include <libpass/PassLogger>
+#include <libstdhl/File>
+#include <libstdhl/String>
 
-#include <libstdhl/SourceLocation>
+using namespace libcasm_fe;
 
-#include <string>
-#include <vector>
-
-namespace libcasm_fe
+PathLoadingStrategy::PathLoadingStrategy( const std::string& basePath )
+: LoadingStrategy()
+, m_basePath( basePath )
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
-    {
-      public:
-        using libpass::PassLogger::PassLogger;
-
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
-
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-    };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+std::string PathLoadingStrategy::basePath( void ) const
+{
+    return m_basePath;
+}
+
+libstdhl::Standard::RFC3986::URI PathLoadingStrategy::toURI(
+    const Ast::IdentifierPath::Ptr& identifierPath ) const
+{
+    return libstdhl::Standard::RFC3986::URI(
+        "file", "", toFileSystemPath( identifierPath ), "", "" );
+}
+
+libpass::LoadFilePass::Input::Ptr PathLoadingStrategy::loadSource(
+    const libstdhl::Standard::RFC3986::URI& location ) const
+{
+    assert( location.scheme() == "file" );
+    const auto filePath = location.path();
+    if( not libstdhl::File::exists( filePath ) )
+    {
+        throw NoSuchSpecificationError( "file path '" + filePath + "' does not exist" );
+    }
+
+    return std::make_shared< libpass::LoadFilePass::Input >( filePath );
+}
+
+std::string PathLoadingStrategy::toFileSystemPath(
+    const Ast::IdentifierPath::Ptr& identifierPath ) const
+{
+    assert( identifierPath->type() == Ast::IdentifierPath::Type::ABSOLUTE );
+    const auto delimiter = Namespace::delimiter();
+    const auto identifierPathName = identifierPath->path();
+    const auto modulePath = identifierPath->identifiers()->front()->name();
+    const auto moduleName =
+        libstdhl::String::replaceAll( identifierPathName, modulePath, m_basePath );
+
+    auto filePath = libstdhl::String::replaceAll( moduleName, Namespace::delimiter(), "/" );
+    if( libstdhl::String::startsWith( filePath, "/" ) )
+    {
+        filePath = filePath.substr( 1 );
+    }
+    return filePath + ".casm";
+}
 
 //
 //  Local variables:

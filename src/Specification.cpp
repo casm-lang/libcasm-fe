@@ -46,6 +46,17 @@
 
 using namespace libcasm_fe;
 
+//
+//
+// Specification
+//
+
+const std::string& Specification::fileExtension( void )
+{
+    static const std::string fileExtensionString = ".casm";
+    return fileExtensionString;
+}
+
 Specification::Specification( void )
 : m_asmType( AsmType::SYNCHRONOUS )
 , m_name()
@@ -104,6 +115,11 @@ void Specification::setSpans( const Ast::Spans::Ptr& spans )
 const Ast::Spans::Ptr& Specification::spans( void ) const
 {
     return m_spans;
+}
+
+void Specification::setSymboltable( const Namespace::Ptr& symboltable )
+{
+    m_symboltable = symboltable;
 }
 
 const Namespace::Ptr& Specification::symboltable( void ) const

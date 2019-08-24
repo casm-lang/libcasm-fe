@@ -42,53 +42,68 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#include "SpecificationMergerPass.h"
 
-#include <libcasm-fe/Codes>
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/analyze/TypeCheckPass>
+#include <libcasm-fe/import/LibraryLoaderPass>
+#include <libcasm-fe/transform/SourceToAstPass>
 
-#include <libpass/PassLogger>
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
-#include <libstdhl/SourceLocation>
+using namespace libcasm_fe;
+using namespace Ast;
 
-#include <string>
-#include <vector>
+char SpecificationMergerPass::id = 0;
 
-namespace libcasm_fe
+static libpass::PassRegistration< SpecificationMergerPass > PASS(
+    "ASTSpecificationMergerPass", "merges the imported CASM specifications", "ast-spec-merge", 0 );
+
+void SpecificationMergerPass::usage( libpass::PassUsage& pu )
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
-    {
-      public:
-        using libpass::PassLogger::PassLogger;
-
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
-
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-    };
+    pu.require< LibraryLoaderPass >();
+    pu.scheduleAfter< TypeCheckPass >();
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+u1 SpecificationMergerPass::run( libpass::PassResult& pr )
+{
+    libcasm_fe::Logger log( &id, stream() );
+
+    const auto data = pr.output< LibraryLoaderPass >();
+    const auto specificationRepository = data->specificationRepository();
+
+    const auto definitions = std::make_shared< Definitions >();
+    for( const auto& specification : specificationRepository->specifications() )
+    {
+        for( const auto& definition : *specification->definitions() )
+        {
+            definitions->add( definition );
+        }
+    }
+
+    const auto errors = log.errors();
+    if( errors > 0 )
+    {
+        log.debug( "found %lu error(s) during library loading", errors );
+        return false;
+    }
+
+    const auto parsedSpecification = pr.output< SourceToAstPass >()->specification();
+    const auto mergedSpecification = std::make_shared< Specification >();
+
+    mergedSpecification->setAsmType( parsedSpecification->asmType() );
+    mergedSpecification->setName( parsedSpecification->name() );
+    mergedSpecification->setHeader( parsedSpecification->header() );
+    mergedSpecification->setSpans( parsedSpecification->spans() );
+    mergedSpecification->setSymboltable( parsedSpecification->symboltable() );
+
+    mergedSpecification->setDefinitions( definitions );
+
+    pr.setOutput< SpecificationMergerPass >( mergedSpecification );
+    return true;
+}
 
 //
 //  Local variables:

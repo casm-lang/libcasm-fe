@@ -42,53 +42,50 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#ifndef _LIBCASM_FE_PROJECT_RESOLVER_PASS_H_
+#define _LIBCASM_FE_PROJECT_RESOLVER_PASS_H_
 
-#include <libcasm-fe/Codes>
+#include <libcasm-fe/Project>
 
-#include <libpass/PassLogger>
-
-#include <libstdhl/SourceLocation>
-
-#include <string>
-#include <vector>
+#include <libpass/Pass>
+#include <libpass/PassData>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 namespace libcasm_fe
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
+    class ProjectResolverPass final : public libpass::Pass
     {
       public:
-        using libpass::PassLogger::PassLogger;
+        static char id;
 
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
+        void usage( libpass::PassUsage& pu ) override;
 
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        bool run( libpass::PassResult& pr ) override;
 
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+      public:
+        class Output : public libpass::PassData
+        {
+          public:
+            using Ptr = std::shared_ptr< Output >;
 
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+            Output( const Project::Ptr& project )
+            : m_project( project )
+            {
+            }
 
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+            const Project::Ptr& project( void ) const
+            {
+                return m_project;
+            }
+
+          private:
+            const Project::Ptr m_project;
+        };
     };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+#endif  // _LIBCASM_FE_PROJECT_RESOLVER_PASS_H_
 
 //
 //  Local variables:

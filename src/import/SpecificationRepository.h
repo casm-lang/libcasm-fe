@@ -42,53 +42,50 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#ifndef _LIBCASM_FE_SPECIFICATION_REPOSITORY_H_
+#define _LIBCASM_FE_SPECIFICATION_REPOSITORY_H_
 
-#include <libcasm-fe/Codes>
+#include <libcasm-fe/Project>
+#include <libcasm-fe/Specification>
 
-#include <libpass/PassLogger>
+#include <libstdhl/Optional>
 
-#include <libstdhl/SourceLocation>
-
-#include <string>
-#include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace libcasm_fe
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
+    class SpecificationRepository
     {
       public:
-        using libpass::PassLogger::PassLogger;
+        using Ptr = std::shared_ptr< SpecificationRepository >;
 
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
+        explicit SpecificationRepository( void );
 
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        void store( const std::string& id, const Specification::Ptr& specification );
 
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        libstdhl::Optional< Specification::Ptr > get( const std::string& id ) const;
 
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        std::vector< Specification::Ptr > specifications( void ) const;
 
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        const Project::Ptr& project( void ) const;
+
+        void setProject( const Project::Ptr& project );
+
+        std::string specificationBasePath( void ) const;
+
+        void setSpecificationBasePath( const std::string& specificationBasePath );
+
+      private:
+        std::unordered_map< std::string, const Specification::Ptr > m_specifications;
+
+        Project::Ptr m_project;
+
+        std::string m_specificationBasePath;
     };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+#endif  // _LIBCASM_FE_SPECIFICATION_REPOSITORY_H_
 
 //
 //  Local variables:

@@ -82,11 +82,15 @@ namespace libcasm_fe
             void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
             std::size_t maximumNumberOfLocals( void ) const;
 
+            void setExported( const u1 exported );
+            u1 exported( void ) const;
+
           private:
             const Identifier::Ptr m_identifier;
             Attributes::Ptr m_attributes;
             Token::Ptr m_delimiterToken;
             std::size_t m_maxNumberOfLocals;
+            u1 m_exported;
         };
 
         using Definitions = NodeList< Definition >;

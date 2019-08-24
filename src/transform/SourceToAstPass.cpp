@@ -53,11 +53,10 @@
 #include <libcasm-fe/ast/RecursiveVisitor>
 
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/analyze/ProjectResolverPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
-#include <libpass/PassResult>
-#include <libpass/PassUsage>
 
 using namespace libcasm_fe;
 
@@ -68,32 +67,31 @@ static libpass::PassRegistration< SourceToAstPass > PASS(
 
 void SourceToAstPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< libpass::LoadFilePass >();
+    pu.require< ProjectResolverPass >();
 }
 
 u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< libpass::LoadFilePass >();
-    const auto filePath = data->filename();
-    auto& fileStream = data->stream();
+    const auto data = pr.output< ProjectResolverPass >();
+    const auto project = data->project();
+    const auto specificationFile = project->specification();
+    const auto specificationFileName = specificationFile->filename();
+    auto& specificationFileStream = specificationFile->stream();
 
-    const auto fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
-    const auto name = fileName.substr( 0, fileName.rfind( "." ) );
+    Lexer lexer( log, specificationFileStream, std::cout );
+    lexer.setFileName( specificationFileName );
 
-    auto specification = std::make_shared< Specification >();
-    specification->setName( name );
-
-    Lexer lexer( log, fileStream, std::cout );
-    lexer.setFileName( filePath );
+    const auto specification = std::make_shared< Specification >();
+    specification->setName( specificationFileName );
 
     Parser parser( log, lexer, *specification );
     parser.set_debug_level( m_debug );
 
     if( ( parser.parse() != 0 ) or not specification or ( log.errors() > 0 ) )
     {
-        log.error( "could not parse `" + filePath + "´" );
+        log.error( "could not parse '" + specification->name() + "'" );
         return false;
     }
 

@@ -53,18 +53,7 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-static const auto source = R"***(
-CASM
-
-init test_skip
-
-rule test_skip = skip
-
-rule test_update_program_self_undef = program( self ) := undef
-
-)***";
-
-#define SOURCE( PASS, CONTENT, STATUS, CONFIG )                                                   \
+#define TEST_PASS( PASS, FILENAME, STATUS, CONFIG )                                               \
     {                                                                                             \
         libpass::PassManager pm;                                                                  \
         pm.setDefaultPass< PASS >();                                                              \
@@ -79,85 +68,108 @@ rule test_update_program_self_undef = program( self ) := undef
             pm.stream().flush( c );                                                               \
         };                                                                                        \
                                                                                                   \
-        const std::string filename = TEST_NAME + ".casm";                                         \
-        auto file = libstdhl::File::open( filename, std::fstream::out );                          \
-        file << CONTENT;                                                                          \
-        file.close();                                                                             \
-                                                                                                  \
         libpass::PassResult pr;                                                                   \
-        pr.setInput< libpass::LoadFilePass >( filename );                                         \
+        pr.setInput< libpass::LoadFilePass >( FILENAME );                                         \
         pm.setDefaultResult( pr );                                                                \
                                                                                                   \
         EXPECT_EQ( pm.run( flush ), STATUS );                                                     \
                                                                                                   \
         pm.result().output< libpass::LoadFilePass >()->close();                                   \
-        libstdhl::File::remove( filename );                                                       \
-        EXPECT_EQ( libstdhl::File::exists( filename ), false );                                   \
     }
 
-#define SOURCE_TEST( SCOPE, PASS, CONTENT, STATUS, DESCRIPTION, CONFIG ) \
-    TEST( libcasm_fe_passes, SCOPE##_##PASS##DESCRIPTION )               \
-    {                                                                    \
-        SOURCE( PASS, CONTENT, STATUS, CONFIG );                         \
-    }
-
-#define SOURCE_TEST_WITH_LIBRARY( SCOPE, PASS, CONTENT, LIBRARY, STATUS, DESCRIPTION, CONFIG ) \
-    TEST( libcasm_fe_passes, SCOPE##_##PASS##DESCRIPTION )                                     \
-    {                                                                                          \
-        const std::string filename = "lib.casm";                                               \
-        auto file = libstdhl::File::open( filename, std::fstream::out );                       \
-        file << LIBRARY;                                                                       \
-        file.close();                                                                          \
-                                                                                               \
-        SOURCE( PASS, CONTENT, STATUS, CONFIG );                                               \
-                                                                                               \
-        libstdhl::File::remove( filename );                                                    \
-        EXPECT_EQ( libstdhl::File::exists( filename ), false );                                \
-    }
-
-SOURCE_TEST( analyze, ConsistencyCheckPass, source, true, , );
-
-SOURCE_TEST( transform, SourceToAstPass, source, true, , { pass.setDebug( false ); } );
-
-SOURCE_TEST( transform, AstDumpSourcePass, source, true, , );
-SOURCE_TEST( transform, AstDumpDotPass, source, true, , );
-
-// SOURCE_TEST( execute, NumericExecutionPass, source, true, , ); // TODO: FIXME:
-// https://github.com/casm-lang/casm/issues/93
-//
-// static const auto source_with_no_init = R"***(
-// CASM
-//
-// rule test = skip
-//
-// )***";
-//
-// SOURCE_TEST( execute, NumericExecutionPass, source_with_no_init, true, _noInitDefinition, );
-
-static const auto src = R"***(
-CASM init test
-
-import lib
-
-import lib as bar
-
-rule test =
-{
-    lib::foo
-    bar::foo
-}
-
-)***";
-
-static const auto lib = R"***(
+static const auto specificationFoo = R"***(
 CASM
 
-[ export ] rule foo = skip
+init test
+
+rule test = program( self ) := undef
+
+import src::Bar
 
 )***";
 
-SOURCE_TEST_WITH_LIBRARY( analyze, ConsistencyCheckPass, src, lib, true, _import, );
-// SOURCE_TEST_WITH_LIBRARY( execute, NumericExecutionPass, src, lib, true, _import, );
+static const auto specificationBar = R"***(
+CASM
+
+import src::Qux
+
+import external::Baz
+
+)***";
+
+static const auto specificationQux = R"***(
+CASM
+
+import Foo
+
+import other::Baz
+
+)***";
+
+static const auto configurationProject = R"***(
+CASM:
+  execute: Foo.casm
+  imports:
+    - external: file:///../library
+    - other: ../library
+)***";
+
+static const auto specificationBaz = R"***(
+CASM
+
+rule asdf = skip
+
+)***";
+
+static const auto configurationLibrary = R"***(
+CASM:
+  execute: Baz.casm
+)***";
+
+TEST( libcasm_fe_project, import_from_configuration )
+{
+    // GIVEN
+    const auto projectPath = TEST_NAME + "/project/";
+    const auto projectPathSrc = projectPath + "src/";
+    const auto projectConfig = projectPath + ".casm.yml";
+    const auto projectFileFoo = projectPath + "Foo.casm";
+    const auto projectFileBar = projectPathSrc + "Bar.casm";
+    const auto projectFileQux = projectPathSrc + "Qux.casm";
+
+    const auto libraryPath = TEST_NAME + "/library/";
+    const auto libraryConfig = libraryPath + ".casm.yml";
+    const auto libraryFileBaz = libraryPath + "Baz.casm";
+
+    TEST_PATH_CREATE( TEST_NAME );
+
+    TEST_PATH_CREATE( projectPath );
+    TEST_PATH_CREATE( projectPathSrc );
+    TEST_FILE_CREATE( projectConfig, configurationProject );
+    TEST_FILE_CREATE( projectFileFoo, specificationFoo );
+    TEST_FILE_CREATE( projectFileBar, specificationBar );
+    TEST_FILE_CREATE( projectFileQux, specificationQux );
+
+    TEST_PATH_CREATE( libraryPath );
+    TEST_FILE_CREATE( libraryConfig, configurationLibrary );
+    TEST_FILE_CREATE( libraryFileBaz, specificationBaz );
+
+    // WHEN & THEN
+    TEST_PASS( ConsistencyCheckPass, projectPath, true, );
+
+    // CLEANUP
+    TEST_FILE_REMOVE( libraryFileBaz );
+    TEST_FILE_REMOVE( libraryConfig );
+    TEST_PATH_REMOVE( libraryPath );
+
+    TEST_FILE_REMOVE( projectFileQux );
+    TEST_FILE_REMOVE( projectFileBar );
+    TEST_FILE_REMOVE( projectFileFoo );
+    TEST_FILE_REMOVE( projectConfig );
+    TEST_PATH_REMOVE( projectPathSrc );
+    TEST_PATH_REMOVE( projectPath );
+
+    TEST_PATH_REMOVE( TEST_NAME );
+}
 
 //
 //  Local variables:

@@ -42,53 +42,55 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#ifndef _LIBCASM_FE_CONFIGURATION_H_
+#define _LIBCASM_FE_CONFIGURATION_H_
 
-#include <libcasm-fe/Codes>
+#include <libstdhl/Optional>
+#include <libstdhl/std/rfc3986>
 
-#include <libpass/PassLogger>
-
-#include <libstdhl/SourceLocation>
-
+#include <memory>
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 namespace libcasm_fe
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
+    class Configuration
     {
       public:
-        using libpass::PassLogger::PassLogger;
+        using Ptr = std::shared_ptr< Configuration >;
 
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
+        static const std::string& fileExtension( void );
 
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        static Configuration fromString( const std::string& fileName );
 
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+      private:
+        explicit Configuration(
+            const std::string& fileName, const std::string& filePath, const std::string& execute );
 
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+      public:
+        const std::string& fileName( void ) const;
 
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+        const std::string& filePath( void ) const;
+
+        const std::string& execute( void ) const;
+
+        void setImport(
+            const std::string& dependencyName,
+            const libstdhl::Standard::RFC3986::URI& dependencyLocation );
+
+        libstdhl::Optional< libstdhl::Standard::RFC3986::URI > import(
+            const std::string& dependencyName ) const;
+
+      private:
+        const std::string m_fileName;
+        const std::string m_filePath;
+        const std::string m_execute;
+
+        std::unordered_map< std::string, libstdhl::Standard::RFC3986::URI > m_imports;
     };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+#endif  // _LIBCASM_FE_CONFIGURATION_H_
 
 //
 //  Local variables:

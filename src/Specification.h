@@ -58,6 +58,8 @@ namespace libcasm_fe
     class Specification
     {
       public:
+        static const std::string& fileExtension( void );
+
         enum class AsmType
         {
             SYNCHRONOUS,  // lock-step
@@ -73,7 +75,6 @@ namespace libcasm_fe
         AsmType asmType( void ) const;
 
         void setName( const std::string& name );
-
         const std::string& name( void ) const;
 
         void setHeader( const Ast::HeaderDefinition::Ptr& header );
@@ -87,6 +88,8 @@ namespace libcasm_fe
         void setSpans( const Ast::Spans::Ptr& spans );
 
         const Ast::Spans::Ptr& spans( void ) const;
+
+        void setSymboltable( const Namespace::Ptr& symboltable );
 
         const Namespace::Ptr& symboltable( void ) const;
 

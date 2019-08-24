@@ -42,53 +42,39 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LOGGER_H_
-#define _LIBCASM_FE_LOGGER_H_
+#ifndef _LIBCASM_FE_IMPORT_ERROR_H_
+#define _LIBCASM_FE_IMPORT_ERROR_H_
 
-#include <libcasm-fe/Codes>
-
-#include <libpass/PassLogger>
-
-#include <libstdhl/SourceLocation>
-
+#include <exception>
 #include <string>
-#include <vector>
 
 namespace libcasm_fe
 {
-    class ErrorCodeException;
-
-    class Logger : public libpass::PassLogger
+    class ImportError : public std::exception
     {
       public:
-        using libpass::PassLogger::PassLogger;
+        explicit ImportError( const std::string& msg );
 
-        using libpass::PassLogger::error;
-        void error(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
-            Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
+        const char* what( void ) const noexcept override;
 
-        using libpass::PassLogger::warning;
-        void warning(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+      private:
+        const std::string m_msg;
+    };
 
-        using libpass::PassLogger::info;
-        void info(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+    class NoSuchSpecificationError : public ImportError
+    {
+      public:
+        using ImportError::ImportError;
+    };
 
-        using libpass::PassLogger::hint;
-        void hint(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
-
-        using libpass::PassLogger::debug;
-        void debug(
-            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
+    class SpecificationLoadingError : public ImportError
+    {
+      public:
+        using ImportError::ImportError;
     };
 }
 
-#endif  // _LIBCASM_FE_LOGGER_H_
+#endif  // _LIBCASM_FE_IMPORT_ERROR_H_
 
 //
 //  Local variables:

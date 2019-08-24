@@ -48,7 +48,9 @@
 #include <libcasm-fe/Specification>
 
 #include <libpass/Pass>
-#include <libpass/analyze/LoadFilePass>
+#include <libpass/PassData>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 /**
    @brief    TODO
@@ -73,8 +75,6 @@ namespace libcasm_fe
         u1 m_debug = false;
 
       public:
-        using Input = libpass::LoadFilePass::Output;
-
         class Output : public libpass::PassData
         {
           public:

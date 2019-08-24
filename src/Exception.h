@@ -46,39 +46,48 @@
 #define _LIBCASM_FE_EXCEPTION_H_
 
 #include <libcasm-fe/CasmFE>
-
 #include <libcasm-fe/Codes>
 
+#include <libstdhl/Exception>
 #include <libstdhl/SourceLocation>
 
-#include <exception>
 #include <string>
 #include <vector>
 
 namespace libcasm_fe
 {
-    class Exception : public std::exception
+    class Exception : public libstdhl::Exception
     {
       public:
-        Exception( const std::string& msg, Code errorCode );
-        Exception(
+        using libstdhl::Exception::Exception;
+    };
+
+    class ErrorCodeException : public Exception
+    {
+      public:
+        using Exception::Exception;
+
+        ErrorCodeException( const std::string& message, Code errorCode );
+
+        ErrorCodeException(
             const libstdhl::SourceLocation& location,
-            const std::string& msg,
-            const std::vector< std::string >& backtrace,
-            Code errorCode );
-        Exception(
-            const libstdhl::SourceLocation& location, const std::string& msg, Code errorCode );
-        Exception(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& msg,
-            Code errorCode );
-        Exception(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& msg,
+            const std::string& message,
             const std::vector< std::string >& backtrace,
             Code errorCode );
 
-        const char* what( void ) const noexcept override;
+        ErrorCodeException(
+            const libstdhl::SourceLocation& location, const std::string& message, Code errorCode );
+
+        ErrorCodeException(
+            const std::vector< libstdhl::SourceLocation >& locations,
+            const std::string& message,
+            Code errorCode );
+
+        ErrorCodeException(
+            const std::vector< libstdhl::SourceLocation >& locations,
+            const std::string& message,
+            const std::vector< std::string >& backtrace,
+            Code errorCode );
 
         const std::vector< libstdhl::SourceLocation >& locations( void ) const noexcept;
 
@@ -87,19 +96,24 @@ namespace libcasm_fe
         Code errorCode( void ) const noexcept;
 
       private:
-        const std::string m_msg;
         const std::vector< libstdhl::SourceLocation > m_locations;
         const std::vector< std::string > m_backtrace;
         const Code m_errorCode;
     };
 
-    class RuntimeException : public Exception
+    class RuntimeException : public ErrorCodeException
     {
-        using Exception::Exception;
+        using ErrorCodeException::ErrorCodeException;
     };
 
-    class CompiletimeException : public Exception
+    class CompiletimeException : public ErrorCodeException
     {
+        using ErrorCodeException::ErrorCodeException;
+    };
+
+    class ConfigurationException : public Exception
+    {
+      public:
         using Exception::Exception;
     };
 }
