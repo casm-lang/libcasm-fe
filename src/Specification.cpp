@@ -60,6 +60,7 @@ const std::string& Specification::fileExtension( void )
 Specification::Specification( void )
 : m_asmType( AsmType::SYNCHRONOUS )
 , m_name()
+, m_location( "", "", "", "", "" )
 , m_header()
 , m_definitions()
 , m_spans( std::make_shared< Ast::Spans >() )
@@ -85,6 +86,16 @@ void Specification::setName( const std::string& name )
 const std::string& Specification::name( void ) const
 {
     return m_name;
+}
+
+void Specification::setLocation( const libstdhl::Standard::RFC3986::URI& location )
+{
+    m_location = location;
+}
+
+const libstdhl::Standard::RFC3986::URI& Specification::location( void ) const
+{
+    return m_location;
 }
 
 void Specification::setHeader( const Ast::HeaderDefinition::Ptr& header )

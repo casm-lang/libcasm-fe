@@ -53,6 +53,8 @@
 #include <libcasm-fe/ast/Rule>
 #include <libcasm-fe/ast/Span>
 
+#include <libstdhl/std/rfc3986>
+
 namespace libcasm_fe
 {
     class Specification
@@ -77,6 +79,9 @@ namespace libcasm_fe
         void setName( const std::string& name );
         const std::string& name( void ) const;
 
+        void setLocation( const libstdhl::Standard::RFC3986::URI& location );
+        const libstdhl::Standard::RFC3986::URI& location( void ) const;
+
         void setHeader( const Ast::HeaderDefinition::Ptr& header );
 
         const Ast::HeaderDefinition::Ptr& header( void ) const;
@@ -96,6 +101,7 @@ namespace libcasm_fe
       private:
         AsmType m_asmType;
         std::string m_name;
+        libstdhl::Standard::RFC3986::URI m_location;
         Ast::HeaderDefinition::Ptr m_header;
         Ast::Definitions::Ptr m_definitions;
         Ast::Spans::Ptr m_spans;
