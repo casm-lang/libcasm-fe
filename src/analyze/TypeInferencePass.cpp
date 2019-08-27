@@ -2187,9 +2187,6 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     TypeInferenceVisitor typeInferenceVisitor( log, *specification->symboltable() );
     specification->definitions()->accept( typeInferenceVisitor );
 
-    CallTargetCheckVisitor callTargetCheckVisitor( log );
-    specification->definitions()->accept( callTargetCheckVisitor );
-
 #ifndef NDEBUG
     log.debug( "symbol table = \n" + specification->symboltable()->dump() );
 #endif
@@ -2198,6 +2195,16 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     if( errors > 0 )
     {
         log.debug( "found %lu error(s) during type inference", errors );
+        return false;
+    }
+
+    CallTargetCheckVisitor callTargetCheckVisitor( log );
+    specification->definitions()->accept( callTargetCheckVisitor );
+
+    const auto checkErrors = log.errors();
+    if( checkErrors > 0 )
+    {
+        log.debug( "found %lu error(s) during type inference", checkErrors );
         return false;
     }
 
