@@ -1312,7 +1312,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
     const auto updateValue = m_evaluationStack.pop();
     try
     {
-        validateValue( updateValue, function->type()->result() );
+        validateValue( updateValue, *function->type() );
     }
     catch( const IR::ValidationException& e )
     {
