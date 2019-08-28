@@ -115,10 +115,3 @@ src/various/Grammar.org: src/various/GrammarParser.xml src/GrammarLexer.l
 	@sed -i "s/\"decimal\"/\"`grep '// DECIMAL' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
 	@sed -i "s/\"identifier\"/\"`grep '// IDENTIFIER' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
 	@sed -i "s/\"string\"/'\"'.*'\"'/g" $@
-
-ci-fetch: ci-git-access
-
-ci-git-access:
-	@echo "-- Git Access Configuration"
-	@git config --global \
-	url."https://$(GITHUB_TOKEN)@github.com/".insteadOf "https://github.com/"
