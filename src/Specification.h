@@ -76,11 +76,11 @@ namespace libcasm_fe
         void setAsmType( const AsmType asmType );
         AsmType asmType( void ) const;
 
-        void setName( const std::string& name );
-        const std::string& name( void ) const;
-
         void setLocation( const libstdhl::Standard::RFC3986::URI::Ptr& location );
+
         const libstdhl::Standard::RFC3986::URI::Ptr& location( void ) const;
+
+        const std::string& name( void ) const;
 
         void setHeader( const Ast::HeaderDefinition::Ptr& header );
 
