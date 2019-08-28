@@ -99,8 +99,8 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
 
     const auto specification = std::make_shared< Specification >();
     specification->setName( specificationName );
-    specification->setLocation(
-        libstdhl::Standard::RFC3986::URI( "file", "", specificationFileName, "", "" ) );
+    specification->setLocation( std::make_shared< libstdhl::Standard::RFC3986::URI >(
+        "file", "", specificationFileName, "", "" ) );
 
     Parser parser( log, lexer, *specification );
     parser.set_debug_level( m_debug );
