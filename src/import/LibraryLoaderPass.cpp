@@ -176,8 +176,7 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     assert( loader.specificationRepository() != nullptr );
     assert( loader.specificationRepository()->project() != nullptr );
 
-    std::string uri = "file://" + specificationFileName;
-    loader.specificationRepository()->store( uri, specification );
+    loader.specificationRepository()->store( specification->location()->toString(), specification );
 
     LibraryLoaderVisitor visitor( log, *symboltable, loader );
     specification->definitions()->accept( visitor );
