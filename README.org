@@ -49,8 +49,8 @@
 * libcasm-fe: CASM Language, AST, and Front-End Library
 
 [[https://gitter.im/casm-lang/libcasm-fe][https://badges.gitter.im/casm-lang/libcasm-fe.png]]
+[[https://github.com/casm-lang/libcasm-fe/actions][https://github.com/casm-lang/libcasm-fe/workflows/build/badge.svg]]
 [[https://ci.casm-lang.org/teams/main/pipelines/development/jobs/libcasm-fe-master][ @@html:<img src="https://ci.casm-lang.org/api/v1/teams/main/pipelines/development/jobs/libcasm-fe-master/badge">@@ ]]
-[[https://cirrus-ci.com/github/casm-lang/libcasm-fe][https://api.cirrus-ci.com/github/casm-lang/libcasm-fe.svg]]
 [[https://codecov.io/gh/casm-lang/libcasm-fe][https://codecov.io/gh/casm-lang/libcasm-fe/badge.svg]]
 [[https://github.com/casm-lang/libcasm-fe/tags][https://img.shields.io/github/tag/casm-lang/libcasm-fe.svg]]
 [[https://github.com/casm-lang/libcasm-fe/blob/master/LICENSE.txt][https://img.shields.io/badge/license-GPLv3%2BLE-blue.svg]]
