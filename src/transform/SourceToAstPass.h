@@ -52,6 +52,8 @@
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
+#include <libstdhl/std/rfc3986>
+
 /**
    @brief    TODO
 

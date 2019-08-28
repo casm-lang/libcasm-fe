@@ -83,31 +83,16 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
     Lexer lexer( log, specificationFileStream, std::cout );
     lexer.setFileName( specificationFileName );
 
-    auto specificationName = specificationFileName;
-    const auto lastSlashPos = specificationName.find_last_of( '/' );
-    const auto lastPointPos = specificationName.rfind( "." );
-
-    if( lastSlashPos != std::string::npos )
-    {
-        specificationName =
-            specificationName.substr( lastSlashPos + 1, lastPointPos - lastSlashPos - 1 );
-    }
-    else
-    {
-        specificationName = specificationName.substr( 0, lastPointPos );
-    }
-
     const auto specification = std::make_shared< Specification >();
-    specification->setName( specificationName );
     specification->setLocation( std::make_shared< libstdhl::Standard::RFC3986::URI >(
-        "file", "", specificationFileName, "", "" ) );
+        "file", "/", specificationFileName, "", "" ) );
 
     Parser parser( log, lexer, *specification );
     parser.set_debug_level( m_debug );
 
     if( ( parser.parse() != 0 ) or not specification or ( log.errors() > 0 ) )
     {
-        log.error( "could not parse '" + specification->name() + "'" );
+        log.error( "could not parse '" + specification->location()->toString() + "'" );
         return false;
     }
 
