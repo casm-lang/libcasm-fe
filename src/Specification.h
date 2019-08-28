@@ -79,8 +79,8 @@ namespace libcasm_fe
         void setName( const std::string& name );
         const std::string& name( void ) const;
 
-        void setLocation( const libstdhl::Standard::RFC3986::URI& location );
-        const libstdhl::Standard::RFC3986::URI& location( void ) const;
+        void setLocation( const libstdhl::Standard::RFC3986::URI::Ptr& location );
+        const libstdhl::Standard::RFC3986::URI::Ptr& location( void ) const;
 
         void setHeader( const Ast::HeaderDefinition::Ptr& header );
 
@@ -101,7 +101,7 @@ namespace libcasm_fe
       private:
         AsmType m_asmType;
         std::string m_name;
-        libstdhl::Standard::RFC3986::URI m_location;
+        libstdhl::Standard::RFC3986::URI::Ptr m_location;
         Ast::HeaderDefinition::Ptr m_header;
         Ast::Definitions::Ptr m_definitions;
         Ast::Spans::Ptr m_spans;
