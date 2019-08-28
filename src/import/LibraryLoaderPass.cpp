@@ -130,7 +130,7 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
     const auto symboltable = specification->symboltable();
-    const auto specificationFileName = specification->location().path();
+    const auto specificationFileName = specification->location()->path();
 
     const auto projectResolverData = pr.output< ProjectResolverPass >();
     const auto project = projectResolverData->project();
