@@ -94,7 +94,7 @@ u1 SpecificationMergerPass::run( libpass::PassResult& pr )
     const auto mergedSpecification = std::make_shared< Specification >();
 
     mergedSpecification->setAsmType( parsedSpecification->asmType() );
-    mergedSpecification->setName( parsedSpecification->name() );
+    mergedSpecification->setLocation( parsedSpecification->location() );
     mergedSpecification->setHeader( parsedSpecification->header() );
     mergedSpecification->setSpans( parsedSpecification->spans() );
     mergedSpecification->setSymboltable( parsedSpecification->symboltable() );

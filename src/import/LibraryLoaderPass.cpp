@@ -130,7 +130,7 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
     const auto symboltable = specification->symboltable();
-    const auto specificationFileName = specification->name();
+    const auto specificationFileName = specification->location()->path();
 
     const auto projectResolverData = pr.output< ProjectResolverPass >();
     const auto project = projectResolverData->project();
@@ -176,8 +176,7 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     assert( loader.specificationRepository() != nullptr );
     assert( loader.specificationRepository()->project() != nullptr );
 
-    std::string uri = "file://" + specificationFileName;
-    loader.specificationRepository()->store( uri, specification );
+    loader.specificationRepository()->store( specification->location()->toString(), specification );
 
     LibraryLoaderVisitor visitor( log, *symboltable, loader );
     specification->definitions()->accept( visitor );

@@ -67,7 +67,7 @@ libstdhl::Standard::RFC3986::URI PathLoadingStrategy::toURI(
     const Ast::IdentifierPath::Ptr& identifierPath ) const
 {
     return libstdhl::Standard::RFC3986::URI(
-        "file", "", toFileSystemPath( identifierPath ), "", "" );
+        "file", "/", toFileSystemPath( identifierPath ), "", "" );
 }
 
 libpass::LoadFilePass::Input::Ptr PathLoadingStrategy::loadSource(

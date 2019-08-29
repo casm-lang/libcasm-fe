@@ -60,6 +60,7 @@ const std::string& Specification::fileExtension( void )
 Specification::Specification( void )
 : m_asmType( AsmType::SYNCHRONOUS )
 , m_name()
+, m_location()
 , m_header()
 , m_definitions()
 , m_spans( std::make_shared< Ast::Spans >() )
@@ -77,9 +78,37 @@ Specification::AsmType Specification::asmType( void ) const
     return m_asmType;
 }
 
-void Specification::setName( const std::string& name )
+void Specification::setLocation( const libstdhl::Standard::RFC3986::URI::Ptr& location )
 {
-    m_name = name;
+    m_location = location;
+
+    if( m_location->scheme() != "file" )
+    {
+        throw std::invalid_argument(
+            "unsupported scheme '" + m_location->scheme() + "' scheme found" );
+    }
+
+    //
+    // <spec-path> ::= [ <file-path> / ] <file-name> [ .<file-extension> ]
+    //
+
+    const auto fileName = m_location->path();
+    auto lastSlashPos = fileName.find_last_of( '/' );
+    auto lastPointPos = fileName.rfind( "." );
+
+    // if <file-path> has no slash set to start position, otherwise increment by one
+    lastSlashPos = ( lastSlashPos == std::string::npos ) ? 0 : lastSlashPos + 1;
+
+    // if <spec-path> has no point set to end position, otherwise decrement by one
+    lastPointPos = ( lastPointPos == std::string::npos ) ? fileName.size() - 1 : lastPointPos - 1;
+
+    // extract sub-string with start position and length (delta) characters and set member
+    m_name = fileName.substr( lastSlashPos, lastPointPos - lastSlashPos );
+}
+
+const libstdhl::Standard::RFC3986::URI::Ptr& Specification::location( void ) const
+{
+    return m_location;
 }
 
 const std::string& Specification::name( void ) const
