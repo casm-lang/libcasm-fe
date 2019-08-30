@@ -80,8 +80,8 @@ using namespace libcasm_fe;
 %option yyclass="Lexer"
 %option c++
 
-%x LCOMMENT
-%x COMMENT
+%x YY_INLINE_COMMENT
+%x YY_BLOCK_COMMENT
 %x STRING
 
 %%
@@ -209,12 +209,12 @@ using namespace libcasm_fe;
 "//" { // single-line comments
     m_strbuf.clear();
     m_strbuf.append( yytext );
-    BEGIN( LCOMMENT );
+    BEGIN( YY_INLINE_COMMENT );
 }
-<LCOMMENT>. {
+<YY_INLINE_COMMENT>. {
     m_strbuf.append( yytext );
 }
-<LCOMMENT>\n {
+<YY_INLINE_COMMENT>\n {
     m_loc.lines( yyleng );
     m_strbuf.append( yytext );
     const auto firstCharacter = yyinput();
@@ -249,7 +249,7 @@ using namespace libcasm_fe;
         }
     }
 }
-<LCOMMENT><<EOF>> {
+<YY_INLINE_COMMENT><<EOF>> {
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
     m_spans->add(span);
     BEGIN( INITIAL );
@@ -258,23 +258,23 @@ using namespace libcasm_fe;
 "/*" { // multi-line comments
     m_strbuf.clear();
     m_strbuf.append( yytext );
-    BEGIN( COMMENT );
+    BEGIN( YY_BLOCK_COMMENT );
 }
-<COMMENT>"*/" {
+<YY_BLOCK_COMMENT>"*/" {
     m_strbuf.append( yytext );
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::BLOCK_COMMENT, m_strbuf.length() );
     m_spans->add(span);
     m_loc.step();
     BEGIN( INITIAL );
 }
-<COMMENT>\n {
+<YY_BLOCK_COMMENT>\n {
     m_strbuf.append( yytext );
     m_loc.lines( 1 );
 }
-<COMMENT>([^*\n]|\r)+|. {
+<YY_BLOCK_COMMENT>([^*\n]|\r)+|. {
     m_strbuf.append( yytext );
 }
-<COMMENT><<EOF>> {
+<YY_BLOCK_COMMENT><<EOF>> {
     m_log.error( {m_loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
     BEGIN( INITIAL );
     yyterminate();
