@@ -54,13 +54,13 @@ include_directories(
 add_library( ${PROJECT}-test OBJECT
   main.cpp
   passes.cpp
+  utf8.cpp
   project.cpp
   ast/NodeTest.cpp
   ast/literal.cpp
   ast/span.cpp
   import/FileLoadingStrategyTest.cpp
   import/SpecificationRepositoryTest.cpp
-  main.cpp
 #  numeric/expression_evaluation.cpp  # TODO: FIXME: PPA: EPE we should enable this test ASAP
 #  symbolic/expression_evaluation.cpp # TODO: FIXME: PPA: EPE we should enable this test ASAP
   updateset/UpdateSetManagerTest.cpp
