@@ -60,7 +60,7 @@ UPDATE_ROOT = ../stdhl
 include .cmake/config.mk
 
 
-LX  = flex
+LX  = flex -8
 YC  = bison
 YF  = -Wall -v -g -x
 
