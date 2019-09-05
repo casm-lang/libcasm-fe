@@ -55,7 +55,13 @@ TEST( libcasm_fe_utf8, identifier_with_emoticons )
     static const auto spec = R"***(
 CASM
 
-rule 😆 = skip
+// rule test = 😆 
+
+// rule 😆 = 😆😆
+
+// rule 😆😆 = skip
+
+/* asdf 😆😆 */ rule 😆 = skip
 
 enumeration 😆😆😆 = { 😢, 😢😢, 😢😢😢, 😢suffix, prefix😢, 😢infix😢 }
 
