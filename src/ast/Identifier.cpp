@@ -44,10 +44,10 @@
 
 #include "Identifier.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/ast/Token>
-
-#include "../various/GrammarToken.h"
 
 #include <cassert>
 
@@ -107,6 +107,11 @@ void Identifier::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// IdentifierPath
+//
 
 IdentifierPath::IdentifierPath( const Identifier::Ptr& identifier, Type type )
 : Node( Node::ID::IDENTIFIER_PATH )
