@@ -67,6 +67,9 @@ enumeration 😆😆😆 = { 😢, 😢😢, 😢😢😢, 😢suffix, prefix�
 
 function really😆function : 😆😆😆 -> Integer
 
+rule test =
+    println( "test string with UTF-8 😆 emoticon" ) // contains 😆 in the string
+
 )***";
 
     // WHEN
