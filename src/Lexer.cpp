@@ -46,6 +46,8 @@
 
 #include <libcasm-fe/Logger>
 
+#include <libstdhl/Unicode>
+
 using namespace libcasm_fe;
 
 Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
@@ -67,6 +69,27 @@ Spans::Ptr Lexer::fetchSpansAndReset( void )
     const auto currentSpans = m_spans;
     m_spans = std::make_shared< Spans >();
     return currentSpans;
+}
+
+void Lexer::checkUTF8( const std::string& byteSequence ) const
+{
+    static const auto blocks = {
+        libstdhl::Unicode::Block::MISCELLANEOUS_SYMBOLS,
+        libstdhl::Unicode::Block::EMOTICONS,
+        libstdhl::Unicode::Block::ORNAMENTAL_DINGBATS,
+        libstdhl::Unicode::Block::TRANSPORT_AND_MAP_SYMBOLS,
+    };
+
+    const auto utf8 = libstdhl::Unicode::UTF8::fromString( byteSequence );
+
+    if( libstdhl::Unicode::inside( utf8, blocks ) )
+    {
+        return;
+    }
+
+    throw std::domain_error(
+        "identifier contains invalid UTF-8 character '" + utf8.unicode() + "' (0x" +
+        utf8.description() + ")" );
 }
 
 void Lexer::LexerError( const char* msg )

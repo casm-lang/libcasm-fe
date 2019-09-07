@@ -65,9 +65,11 @@ namespace libcasm_fe
 
         void setFileName( const std::string& fileName );
 
-        Parser::symbol_type nextToken();
+        Parser::symbol_type nextToken( void );
 
         Spans::Ptr fetchSpansAndReset( void );
+
+        void checkUTF8( const std::string& byteSequence ) const;
 
       protected:
         void LexerError( const char* msg ) override;
