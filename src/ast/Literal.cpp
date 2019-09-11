@@ -153,10 +153,7 @@ libstdhl::Type::Radix ValueLiteral::radix( void ) const
 
 std::string ValueLiteral::toString( void ) const
 {
-    const auto& begin = sourceLocation().begin;
-    const auto& end = sourceLocation().end;
-    const auto line = libstdhl::File::readLine( *begin.fileName, begin.line );
-    return line.substr( begin.column - 1, end.column - begin.column );
+    return sourceLocation().read();
 }
 
 void ValueLiteral::accept( Visitor& visitor )

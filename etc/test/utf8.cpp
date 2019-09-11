@@ -42,59 +42,44 @@
 //  statement from your version.
 //
 
-#include "Lexer.h"
-
-#include <libcasm-fe/Logger>
-
-#include <libstdhl/Unicode>
+#include "main.h"
+#include "pass.h"
 
 using namespace libcasm_fe;
+using namespace Ast;
 
-Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
-: yyFlexLexer( in, out )
-, m_log( log )
-, m_loc()
-, m_strbuf()
-, m_spans( std::make_shared< Spans >() )
+TEST( libcasm_fe_utf8, identifier_with_emoticons )
 {
-}
+    // GIVEN
+    static const auto file = TEST_NAME + ".casm";
+    static const auto spec = R"***(
+CASM
 
-void Lexer::setFileName( const std::string& fileName )
-{
-    m_loc.begin.fileName = m_loc.end.fileName = std::make_shared< std::string >( fileName );
-}
+// rule test = 😆 
 
-Spans::Ptr Lexer::fetchSpansAndReset( void )
-{
-    const auto currentSpans = m_spans;
-    m_spans = std::make_shared< Spans >();
-    return currentSpans;
-}
+// rule 😆 = 😆😆
 
-void Lexer::checkUTF8( const std::string& byteSequence ) const
-{
-    static const auto blocks = {
-        libstdhl::Unicode::Block::MISCELLANEOUS_SYMBOLS,
-        libstdhl::Unicode::Block::EMOTICONS,
-        libstdhl::Unicode::Block::ORNAMENTAL_DINGBATS,
-        libstdhl::Unicode::Block::TRANSPORT_AND_MAP_SYMBOLS,
-    };
+// rule 😆😆 = skip
 
-    const auto utf8 = libstdhl::Unicode::UTF8::fromString( byteSequence );
+/* asdf 😆😆 */ rule 😆 = skip
 
-    if( libstdhl::Unicode::inside( utf8, blocks ) )
-    {
-        return;
-    }
+enumeration 😆😆😆 = { 😢, 😢😢, 😢😢😢, 😢suffix, prefix😢, 😢infix😢 }
 
-    throw std::domain_error(
-        "identifier contains invalid UTF-8 character '" + utf8.unicode() + "' (0x" +
-        utf8.description() + ")" );
-}
+function really😆function : 😆😆😆 -> Integer
 
-void Lexer::LexerError( const char* msg )
-{
-    m_log.error( { m_loc }, msg, Code::SyntaxError );
+rule test =
+    println( "test string with UTF-8 😆 emoticon" ) // contains 😆 in the string
+
+)***";
+
+    // WHEN
+    TEST_FILE_CREATE( file, spec );
+
+    // THEN
+    TEST_PASS( AstDumpSourcePass, file, true, );
+
+    // CLEANUP
+    TEST_FILE_REMOVE( file );
 }
 
 //

@@ -60,7 +60,7 @@ UPDATE_ROOT = ../stdhl
 include .cmake/config.mk
 
 
-LX  = flex
+LX  = flex -8
 YC  = bison
 YF  = -Wall -v -g -x
 
@@ -113,5 +113,5 @@ src/various/Grammar.org: src/various/GrammarParser.xml src/GrammarLexer.l
 	@sed -i "s/\"integer\"/\"`grep '// INTEGER' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
 	@sed -i "s/\"rational\"/\"`grep '// RATIONAL' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
 	@sed -i "s/\"decimal\"/\"`grep '// DECIMAL' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
-	@sed -i "s/\"identifier\"/\"`grep '// IDENTIFIER' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
+	@sed -i "s/\"identifier\"/\"([a-ZA-Z_]|UTF8){([a-zA-Z_0-9]|UTF8)}*\"/g" $@
 	@sed -i "s/\"string\"/'\"'.*'\"'/g" $@

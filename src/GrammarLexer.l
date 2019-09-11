@@ -52,6 +52,7 @@
 #include "various/GrammarToken.h"
 
 #include <libstdhl/SourceLocation>
+#include <libstdhl/Unicode>
 
 using namespace libcasm_fe;
 
@@ -80,9 +81,10 @@ using namespace libcasm_fe;
 %option yyclass="Lexer"
 %option c++
 
-%x LCOMMENT
-%x COMMENT
-%x STRING
+%x YY_IDENTIFIER
+%x YY_INLINE_COMMENT
+%x YY_BLOCK_COMMENT
+%x YY_STRING
 
 %%
 %{
@@ -176,13 +178,6 @@ using namespace libcasm_fe;
 
 {{grammartoken}}
 
-[a-zA-Z_][a-zA-Z0-9\_]* {
-    // IDENTIFIER
-    const auto identifier = Ast::make< Identifier >( m_loc, yytext );
-    identifier->setSpans( fetchSpansAndReset() );
-    return Parser::make_IDENTIFIER( identifier, m_loc );
-}
-
 [\x20]+ { // space
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::SPACE, yyleng);
     m_spans->add(span);
@@ -206,15 +201,94 @@ using namespace libcasm_fe;
     m_loc.step();
 }
 
+[a-zA-Z_][a-zA-Z0-9_]* {
+    // ASCII identifier characters START
+    m_strbuf.clear();
+    m_strbuf.append( yytext );
+
+    const auto nextCharacter = yyinput();
+    if( nextCharacter )
+    {
+        unput( nextCharacter );
+    }
+
+    if( libstdhl::Unicode::UTF8::byteSequenceLengthIndication( nextCharacter ) > 1 )
+    {
+        BEGIN( YY_IDENTIFIER );
+    }
+    else
+    {
+        const auto identifier = Ast::make< Identifier >( m_loc, m_strbuf );
+        identifier->setSpans( fetchSpansAndReset() );
+        return Parser::make_IDENTIFIER( identifier, m_loc );
+    }
+}
+
+[\xc0-\xdf]|[\xe0-\xef]|[\xf0-\xf7] {
+    // UTF-8 identifier character START
+    m_strbuf.clear();
+    m_loc.columns( -yyleng );
+    unput( yytext[ 0 ] );
+    BEGIN( YY_IDENTIFIER );
+}
+
+<YY_IDENTIFIER>[\xc0-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf][\x80-\xbf]|[\xf0-\xf7][\x80-\xbf][\x80-\xbf][\x80-\xbf] {
+    // UTF-8 (byte length 2, 3, and 4) character
+    m_loc.columns( -yyleng+1 );
+    try
+    {
+        checkUTF8( yytext );
+    }
+    catch( const std::domain_error& e )
+    {
+        BEGIN( INITIAL );
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    m_strbuf.append( yytext );
+}
+
+<YY_IDENTIFIER>[a-zA-Z0-9_] {
+    // ASCII characters
+    m_strbuf.append( yytext );
+}
+
+<YY_IDENTIFIER>\n {
+    const auto identifier = Ast::make< Identifier >( m_loc, m_strbuf );
+    identifier->setSpans( fetchSpansAndReset() );
+    const auto token = Parser::make_IDENTIFIER( identifier, m_loc );
+    unput( yytext[0] );
+    BEGIN( INITIAL );
+    return token;
+}
+
+<YY_IDENTIFIER>. {
+    // invalid identifier character detected, unput and return identifier token
+    m_loc.columns( -yyleng );
+    unput( yytext[0] );
+    BEGIN( INITIAL );
+    const auto identifier = Ast::make< Identifier >( m_loc, m_strbuf );
+    identifier->setSpans( fetchSpansAndReset() );
+    return Parser::make_IDENTIFIER( identifier, m_loc );
+}
+
 "//" { // single-line comments
     m_strbuf.clear();
     m_strbuf.append( yytext );
-    BEGIN( LCOMMENT );
+    BEGIN( YY_INLINE_COMMENT );
 }
-<LCOMMENT>. {
+
+<YY_INLINE_COMMENT>(\t|\r|[\x20-\xbf]) {
+    // restricted extended ASCII or UTF-8 (byte length 1) character
     m_strbuf.append( yytext );
 }
-<LCOMMENT>\n {
+
+<YY_INLINE_COMMENT>[\xc0-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf][\x80-\xbf]|[\xf0-\xf7][\x80-\xbf][\x80-\xbf][\x80-\xbf] {
+    // UTF-8 (byte length 2, 3, and 4) character
+    m_loc.columns( -yyleng+1 );
+    m_strbuf.append( yytext );
+}
+
+<YY_INLINE_COMMENT>\n {
     m_loc.lines( yyleng );
     m_strbuf.append( yytext );
     const auto firstCharacter = yyinput();
@@ -249,32 +323,44 @@ using namespace libcasm_fe;
         }
     }
 }
-<LCOMMENT><<EOF>> {
+
+<YY_INLINE_COMMENT><<EOF>> {
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
     m_spans->add(span);
     BEGIN( INITIAL );
 }
 
-"/*" { // multi-line comments
+"/*" { // block comments
     m_strbuf.clear();
     m_strbuf.append( yytext );
-    BEGIN( COMMENT );
+    BEGIN( YY_BLOCK_COMMENT );
 }
-<COMMENT>"*/" {
+
+<YY_BLOCK_COMMENT>"*/" {
     m_strbuf.append( yytext );
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::BLOCK_COMMENT, m_strbuf.length() );
     m_spans->add(span);
     m_loc.step();
     BEGIN( INITIAL );
 }
-<COMMENT>\n {
+
+<YY_BLOCK_COMMENT>\n {
     m_strbuf.append( yytext );
-    m_loc.lines( 1 );
+    m_loc.lines( yyleng );
 }
-<COMMENT>([^*\n]|\r)+|. {
+
+<YY_BLOCK_COMMENT>(\t|\r|[\x20-\xbf]) {
+    // restricted extended ASCII or UTF-8 (byte length 1) character
     m_strbuf.append( yytext );
 }
-<COMMENT><<EOF>> {
+
+<YY_BLOCK_COMMENT>[\xc0-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf][\x80-\xbf]|[\xf0-\xf7][\x80-\xbf][\x80-\xbf][\x80-\xbf] {
+    // UTF-8 (byte length 2, 3, and 4) character
+    m_loc.columns( -yyleng+1 );
+    m_strbuf.append( yytext );
+}
+
+<YY_BLOCK_COMMENT><<EOF>> {
     m_log.error( {m_loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
     BEGIN( INITIAL );
     yyterminate();
@@ -282,32 +368,10 @@ using namespace libcasm_fe;
 
 \" { // strings
     m_strbuf.clear();
-    BEGIN( STRING );
+    BEGIN( YY_STRING );
 }
-<STRING>[^\\"\n]* { /* eat all tokens */
-    m_strbuf.append( yytext );
-}
-<STRING>\n {
-    m_loc.lines( 1 );
-}
-<STRING>\\n {
-    m_strbuf.append( "\n" );
-}
-<STRING>\\t {
-    m_strbuf.append( "\t" );
-}
-<STRING>\\["\\] {
-    m_strbuf.append( yytext + 1 );
-}
-<STRING>\\. {
-    m_log.error( {m_loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
-}
-<STRING><<EOF>> {
-    m_log.error( {m_loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
-    BEGIN( INITIAL );
-    yyterminate();
-}
-<STRING>\" {
+
+<YY_STRING>\" {
     BEGIN( INITIAL );
     ValueLiteral::Ptr valueLiteral = nullptr;
     try
@@ -323,8 +387,45 @@ using namespace libcasm_fe;
     return Parser::make_STRING( valueLiteral, m_loc );
 }
 
+<YY_STRING>[\x20-\x21]|[\x23-\xbf] {
+    // restricted extended ASCII or UTF-8 (byte length 1) character without '"' (0x22)
+    m_strbuf.append( yytext );
+}
+
+<YY_STRING>[\xc0-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf][\x80-\xbf]|[\xf0-\xf7][\x80-\xbf][\x80-\xbf][\x80-\xbf] {
+    // UTF-8 (byte length 2, 3, and 4) character
+    m_loc.columns( -yyleng+1 );
+    m_strbuf.append( yytext );
+}
+
+<YY_STRING>\n {
+    m_loc.lines( yyleng );
+}
+
+<YY_STRING>\\n {
+    m_strbuf.append( "\n" );
+}
+
+<YY_STRING>\\t {
+    m_strbuf.append( "\t" );
+}
+
+<YY_STRING>\\["\\] {
+    m_strbuf.append( yytext + 1 );
+}
+
+<YY_STRING>\\. {
+    m_log.error( {m_loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
+}
+
+<YY_STRING><<EOF>> {
+    m_log.error( {m_loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
+    BEGIN( INITIAL );
+    yyterminate();
+}
+
 . {
-    m_log.error( {m_loc}, "unrecognized character `" + std::string( yytext ) + "`",
+    m_log.error( {m_loc}, "unrecognized character '" + std::string( yytext ) + "'",
         Code::SyntaxErrorUnrecognizedCharacter );
     m_loc.step();
 }

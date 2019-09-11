@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.3.2.
+// A Bison parser, made by GNU Bison 3.4.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
@@ -44,7 +44,7 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 64 "../../obj/src/GrammarParser.y" // lalr1.cc:401
+#line 64 "../../obj/src/GrammarParser.y"
 
     namespace libcasm_fe
     {
@@ -65,7 +65,7 @@
 
     #define YY_NULLPTR nullptr
 
-#line 69 "GrammarParser.tab.h" // lalr1.cc:401
+#line 69 "GrammarParser.tab.h"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -179,9 +179,10 @@
 # define YYDEBUG 1
 #endif
 
-#line 50 "../../obj/src/GrammarParser.y" // lalr1.cc:401
+#line 50 "../../obj/src/GrammarParser.y"
 namespace libcasm_fe {
-#line 185 "GrammarParser.tab.h" // lalr1.cc:401
+#line 185 "GrammarParser.tab.h"
+
 
 
 
@@ -3777,7 +3778,7 @@ switch (yytype)
 
 
   private:
-    /// This class is not copyable.
+    /// This class is not copiable.
     Parser (const Parser&);
     Parser& operator= (const Parser&);
 
@@ -5482,9 +5483,10 @@ switch (yytype)
     return token_type (yytoken_number_[type]);
   }
 
-#line 50 "../../obj/src/GrammarParser.y" // lalr1.cc:401
+#line 50 "../../obj/src/GrammarParser.y"
 } // libcasm_fe
-#line 5488 "GrammarParser.tab.h" // lalr1.cc:401
+#line 5489 "GrammarParser.tab.h"
+
 
 
 
