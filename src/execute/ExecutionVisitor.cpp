@@ -51,10 +51,9 @@
 #include <libcasm-fe/ast/RecursiveVisitor>
 #include <libcasm-fe/ast/Rule>
 #include <libcasm-fe/transform/SourceToAstPass>
+
 #include <libcasm-ir/Exception>
-#include <libcasm-ir/Instruction>
-#include <libcasm-ir/Value>
-#include <libcasm-rt/Value>
+#include <libcasm-ir/Operation>
 
 #include <mutex>
 #include <stdexcept>
@@ -64,7 +63,6 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 namespace IR = libcasm_ir;
-namespace RT = libcasm_rt;
 
 static std::string updateAsString( const ExecutionUpdateSet::Update& update )
 {
@@ -620,7 +618,7 @@ void ExecutionVisitor::visit( UnaryExpression& node )
 
     try
     {
-        RT::Value::execute( node.op(), node.type(), value, value );
+        IR::Operation::execute( node.op(), node.type(), value, value );
     }
     catch( const std::exception& e )
     {
@@ -642,7 +640,7 @@ void ExecutionVisitor::visit( BinaryExpression& node )
 
     try
     {
-        RT::Value::execute( node.op(), node.type(), rhs, lhs, rhs );
+        IR::Operation::execute( node.op(), node.type(), rhs, lhs, rhs );
     }
     catch( const IR::Exception& e )
     {
@@ -1199,7 +1197,7 @@ void ExecutionVisitor::invokeBuiltin(
         const auto& arguments = m_frameStack.top()->locals();
         IR::Constant returnValue;
 
-        RT::Value::execute( id, type, returnValue, arguments.data(), arguments.size() );
+        IR::Operation::execute( id, type, returnValue, arguments.data(), arguments.size() );
 
         const auto& returnType = type->result();
         if( not returnType.isVoid() )
