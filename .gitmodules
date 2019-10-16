@@ -62,6 +62,10 @@
 	url = https://github.com/casm-lang/libpass
 	branch = master
 
+[submodule "lib/tptp"]
+	path = lib/tptp
+	url = https://github.com/casm-lang/libtptp
+
 [submodule "lib/casm-ir"]
 	path = lib/casm-ir
 	url = https://github.com/casm-lang/libcasm-ir
