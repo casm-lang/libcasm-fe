@@ -419,6 +419,8 @@ namespace libcasm_fe
         void setDispatchStrategy( std::unique_ptr< DispatchStrategy > dispatchStrategy );
         void setAgentSelectionStrategy( std::unique_ptr< SelectionStrategy > selectionStrategy );
 
+        u1 check( void );
+
         /**
          * Performs an ASM step.
          */

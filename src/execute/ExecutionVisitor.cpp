@@ -46,18 +46,15 @@
 
 #include <libcasm-fe/Exception>
 #include <libcasm-fe/Logger>
+#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/RecursiveVisitor>
 #include <libcasm-fe/ast/Rule>
-
-#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
 #include <libcasm-fe/transform/SourceToAstPass>
-
-#include <libcasm-rt/Value>
-
 #include <libcasm-ir/Exception>
 #include <libcasm-ir/Instruction>
 #include <libcasm-ir/Value>
+#include <libcasm-rt/Value>
 
 #include <mutex>
 #include <stdexcept>
@@ -968,27 +965,19 @@ void ExecutionVisitor::visit( ChooseRule& node )
 
 void ExecutionVisitor::visit( IterateRule& node )
 {
-    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100 );
+    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
+    const auto* updateSet = m_updateSetManager.currentUpdateSet();
 
-    while( true )
+    std::size_t previousEpoch;
+    do
     {
-        // uses a new parallel update set on each iteration only to check if the
-        // current iteration actually produced any updates
-        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100 );
+        previousEpoch = updateSet->epoch();
         node.rule()->accept( *this );
-        if( hasEmptyUpdateSet() )
-        {
-            // the current iteration hasn't produced any updates -> done
-            break;
-        }
-        parTrans.merge();  // should not throw a merge conflict because of the
-                           // surrounding sequential block, thus no conflict
-                           // handling required
-    }
+    } while( previousEpoch != updateSet->epoch() );
 
     try
     {
-        seqTrans.merge();
+        transaction.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -1036,7 +1025,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
     const auto updateValue = m_evaluationStack.pop();
     try
     {
-        validateValue( updateValue, function->type()->result() );
+        validateValue( updateValue, *function->type() );
     }
     catch( const IR::ValidationException& e )
     {
@@ -1092,9 +1081,11 @@ void ExecutionVisitor::visit( CallRule& node )
 
 void ExecutionVisitor::visit( WhileRule& node )
 {
-    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100 );
+    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
+    const auto* updateSet = m_updateSetManager.currentUpdateSet();
 
-    while( true )
+    std::size_t previousEpoch;
+    do
     {
         node.condition()->accept( *this );
         const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
@@ -1112,23 +1103,13 @@ void ExecutionVisitor::visit( WhileRule& node )
             break;
         }
 
-        // uses a new parallel update set on each iteration only to check if the
-        // current iteration actually produced any updates
-        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100 );
+        previousEpoch = updateSet->epoch();
         node.rule()->accept( *this );
-        if( hasEmptyUpdateSet() )
-        {
-            // the current iteration hasn't produced any updates -> done
-            break;
-        }
-        parTrans.merge();  // should not throw a merge conflict because of the
-                           // surrounding sequential block, thus no conflict
-                           // handling required
-    }
+    } while( previousEpoch != updateSet->epoch() );
 
     try
     {
-        seqTrans.merge();
+        transaction.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -1159,11 +1140,6 @@ void ExecutionVisitor::visit( VariableBinding& node )
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.variable()->localIndex();
     frame->setLocal( variableIndex, value );
-}
-
-u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
-{
-    return m_updateSetManager.currentUpdateSet()->empty();
 }
 
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
@@ -1364,6 +1340,7 @@ void StateInitializationVisitor::visit( Specification& node )
 
 void StateInitializationVisitor::visit( InitDefinition& node )
 {
+    assert( node.programFunction() and "checked during frame size determination pass!" );
     node.programFunction()->accept( *this );
 }
 
@@ -1499,6 +1476,33 @@ bool AgentScheduler::done( void ) const
 std::size_t AgentScheduler::numberOfSteps( void ) const
 {
     return m_stepCounter;
+}
+
+u1 AgentScheduler::check( void )
+{
+    u1 foundAtLeastOneDefinedAgent = false;
+
+    const auto& programs = m_globalState.programState();
+    const auto end = programs.end();
+    for( auto it = programs.begin(); it != end; ++it )
+    {
+        const auto& location = it.key();
+        const auto& value = it.value();
+
+        const auto& agentId = location.arguments().at( 0 );
+
+        if( value.defined() )
+        {
+            foundAtLeastOneDefinedAgent = true;
+        }
+    }
+
+    if( not foundAtLeastOneDefinedAgent )
+    {
+        m_done = true;
+    }
+
+    return foundAtLeastOneDefinedAgent;
 }
 
 std::vector< Agent > AgentScheduler::collectAgents( void ) const
