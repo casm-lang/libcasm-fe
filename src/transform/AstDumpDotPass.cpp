@@ -49,9 +49,8 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
-
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/ast/RecursiveVisitor>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
@@ -424,14 +423,14 @@ void AstDumpDotVisitor::visit( TypeCastingExpression& node )
 void AstDumpDotVisitor::visit( UnaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "UnaryExpression\n" + libcasm_ir::Value::token( node.op() ) );
+    dumpNode( node, "UnaryExpression\n" + node.operationToken()->tokenString() );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BinaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "BinaryExpression\n" + libcasm_ir::Value::token( node.op() ) );
+    dumpNode( node, "BinaryExpression\n" + node.operationToken()->tokenString() );
     RecursiveVisitor::visit( node );
 }
 
