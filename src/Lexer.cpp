@@ -73,7 +73,7 @@ Spans::Ptr Lexer::fetchSpansAndReset( void )
 
 void Lexer::checkUTF8( const std::string& byteSequence ) const
 {
-    static const std::vector<libstdhl::Unicode::Block> blocks = {
+    static const std::vector< libstdhl::Unicode::Block > blocks = {
         libstdhl::Unicode::Block::MISCELLANEOUS_SYMBOLS,
         libstdhl::Unicode::Block::EMOTICONS,
         libstdhl::Unicode::Block::ORNAMENTAL_DINGBATS,
