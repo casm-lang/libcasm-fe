@@ -57,14 +57,15 @@ include( LibPackage )
 package_git( ${PROJECT} )
 package_git_submodule( libstdhl   master REQUIRED obj   ../stdhl   lib/stdhl   )
 package_git_submodule( libpass    master REQUIRED obj   ../pass    lib/pass    )
+package_git_submodule( libtptp    master REQUIRED obj   ../tptp    lib/tptp    )
+package_git_submodule( libz3      master REQUIRED obj   ../z3      lib/z3      )
 package_git_submodule( libcasm-ir master REQUIRED obj   ../casm-ir lib/casm-ir )
-package_git_submodule( libcasm-rt master REQUIRED obj   ../casm-rt lib/casm-rt )
 package_git_submodule( libgtest   master REQUIRED build ../gtest   lib/gtest   )
 package_git_submodule( libhayai   master REQUIRED build ../hayai   lib/hayai   )
 package_git_deps(
   libstdhl>libpass
-  libpass>libcasm-ir
-  libcasm-ir>libcasm-rt
+  libpass>libtptp
+  libtptp>libcasm-ir
   )
 
 find_package( Threads REQUIRED )
@@ -134,10 +135,10 @@ add_library( ${PROJECT} STATIC
   $<TARGET_OBJECTS:${PROJECT}-cpp>
   )
 
-if( ${LIBCASM_RT_FOUND} )
+if( ${LIBCASM_IR_FOUND} )
   target_link_libraries( ${PROJECT}
-    ${LIBCASM_RT_LIBRARY}
     ${LIBCASM_IR_LIBRARY}
+    ${LIBTPTP_LIBRARY}
     ${LIBPASS_LIBRARY}
     ${LIBSTDHL_LIBRARY}
     )

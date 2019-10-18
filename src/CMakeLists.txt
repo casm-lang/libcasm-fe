@@ -46,8 +46,8 @@ include_directories(
   ${PROJECT_BINARY_DIR}/src
   ${LIBSTDHL_INCLUDE_DIR}
   ${LIBPASS_INCLUDE_DIR}
+  ${LIBTPTP_INCLUDE_DIR}
   ${LIBCASM_IR_INCLUDE_DIR}
-  ${LIBCASM_RT_INCLUDE_DIR}
 )
 
 add_library( ${PROJECT}-cpp OBJECT
@@ -85,6 +85,7 @@ add_library( ${PROJECT}-cpp OBJECT
   analyze/PropertyResolverPass.cpp
   analyze/PropertyRevisePass.cpp
 
+  execute/ExecutionVisitor.cpp
   execute/NumericExecutionPass.cpp
   execute/HashMapBase.cpp
   execute/ReferenceConstant.cpp
@@ -188,6 +189,7 @@ ecm_generate_headers( ${PROJECT}_EXECUTE_HEADERS_CPP
     CAMELCASE
   HEADER_NAMES
     ChainedHashMap
+    ExecutionVisitor
     Frame
     FunctionState
     HashMapBase

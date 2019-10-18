@@ -49,16 +49,12 @@
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/ast/RecursiveVisitor>
-
 #include <libcasm-fe/import/SpecificationMergerPass>
-
 #include <libcasm-ir/Builtin>
 #include <libcasm-ir/Exception>
-
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
-
 #include <libstdhl/String>
 
 using namespace libcasm_fe;
@@ -953,7 +949,7 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
 
     RecursiveVisitor::visit( node );
 
-    const auto description = "unary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
+    const auto description = "unary operator '" + node.operationToken()->tokenString() + "'";
 
     inference( description, annotation, node, { node.expression() } );
 
@@ -981,7 +977,7 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
 
     RecursiveVisitor::visit( node );
 
-    const auto description = "binary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
+    const auto description = "binary operator '" + node.operationToken()->tokenString() + "'";
     inference( description, annotation, node, { node.left(), node.right() } );
 
     RecursiveVisitor::visit( node );
