@@ -773,8 +773,6 @@ ifdef ACCESS_TOKEN
 	@echo "-- Git Access Configuration"
 	@git config --global \
 	url."https://$(ACCESS_TOKEN)@github.com/".insteadOf "https://github.com/"
-	@git config --global \
-	url."https://$(ACCESS_TOKEN)@github.com/".insteadOf "git@github.com:"
 endif
 	@echo ""
 	@echo "-- Submodules"
