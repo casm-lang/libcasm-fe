@@ -769,6 +769,7 @@ info-ci: info
 
 info-fetch: info-ci
 ifdef ACCESS_TOKEN
+	@echo ""
 	@echo "-- Git Access Configuration"
 	@git config --global \
 	url."https://$(ACCESS_TOKEN)@github.com/".insteadOf "https://github.com/"
