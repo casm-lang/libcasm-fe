@@ -121,6 +121,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Setup
       run:  |
+        sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
         brew --version
         brew install z3
     - name: Fetching
@@ -150,6 +151,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Setup
       run:  |
+        sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
         brew --version
         brew install z3
         brew install gcc@9
