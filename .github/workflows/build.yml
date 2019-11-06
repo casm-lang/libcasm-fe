@@ -123,7 +123,9 @@ jobs:
     - uses: actions/checkout@v1
     - name: Setup
       run: |
-        sudo xcode-select -s /Applications/Xcode_10.3.app
+        make info
+        sudo xcode-select --reset
+        sudo xcode-select --switch /Applications/Xcode_10.3.app
         brew install z3
         make C=clang info-tools
     - name: Fetching
