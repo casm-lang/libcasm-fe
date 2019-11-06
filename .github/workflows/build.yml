@@ -124,8 +124,7 @@ jobs:
     - name: Setup
       run: |
         make info
-        sudo xcode-select --reset
-        sudo xcode-select --switch /Applications/Xcode_10.3.app
+        sudo xcode-select -s /Applications/Xcode_10.3.app/Contents/Developer
         brew install z3
         make C=clang info-tools
     - name: Fetching
