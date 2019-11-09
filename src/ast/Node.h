@@ -93,7 +93,6 @@ namespace libcasm_fe
                 RANGE_LITERAL,
                 TUPLE_LITERAL,
                 RECORD_LITERAL,
-                STRUCTURE_LITERAL,
 
                 // expressions
                 EMBRACED_EXPRESSION,

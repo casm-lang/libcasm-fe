@@ -72,6 +72,7 @@ namespace libcasm_fe
             void visit( StructureDefinition& node ) override;
             void visit( FeatureDefinition& node ) override;
             void visit( ImplementDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
             void visit( Declaration& node ) override;
 
             void visit( UndefLiteral& node ) override;
@@ -81,7 +82,6 @@ namespace libcasm_fe
             void visit( RangeLiteral& node ) override;
             void visit( TupleLiteral& node ) override;
             void visit( RecordLiteral& node ) override;
-            void visit( StructureLiteral& node ) override;
 
             void visit( EmbracedExpression& node ) override;
             void visit( NamedExpression& node ) override;

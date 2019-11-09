@@ -327,27 +327,6 @@ void RecordLiteral::accept( Visitor& visitor )
 }
 
 //
-//
-// StructureLiteral
-//
-
-StructureLiteral::StructureLiteral( const Type::Ptr& type )
-: Literal( Node::ID::STRUCTURE_LITERAL )
-, m_type( type )
-{
-}
-
-const Type::Ptr& StructureLiteral::type( void ) const
-{
-    return m_type;
-}
-
-void StructureLiteral::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil

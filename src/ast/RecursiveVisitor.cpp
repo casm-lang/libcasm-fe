@@ -45,9 +45,9 @@
 
 #include "RecursiveVisitor.h"
 
-#include "../various/GrammarToken.h"
-
 #include <libcasm-fe/Specification>
+
+#include "../various/GrammarToken.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -240,6 +240,12 @@ void RecursiveVisitor::visit( ImplementDefinition& node )
     node.rightBraceToken()->accept( *this );
 }
 
+void RecursiveVisitor::visit( BuiltinDefinition& node )
+{
+    node.attributes()->accept( *this );
+    node.identifier()->accept( *this );
+}
+
 void RecursiveVisitor::visit( Declaration& node )
 {
     node.attributes()->accept( *this );
@@ -306,13 +312,6 @@ void RecursiveVisitor::visit( RecordLiteral& node )
     node.delimiterToken()->accept( *this );
     node.leftBracket()->accept( *this );
     node.namedExpressions()->accept( *this );
-    node.rightBracket()->accept( *this );
-}
-
-void RecursiveVisitor::visit( StructureLiteral& node )
-{
-    node.type()->accept( *this );
-    node.leftBracket()->accept( *this );
     node.rightBracket()->accept( *this );
 }
 

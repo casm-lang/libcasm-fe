@@ -120,6 +120,10 @@ void EmptyVisitor::visit( ImplementDefinition& )
 {
 }
 
+void EmptyVisitor::visit( BuiltinDefinition& )
+{
+}
+
 void EmptyVisitor::visit( Declaration& )
 {
 }
@@ -153,10 +157,6 @@ void EmptyVisitor::visit( RecordLiteral& )
 }
 
 void EmptyVisitor::visit( EmbracedExpression& )
-{
-}
-
-void EmptyVisitor::visit( StructureLiteral& )
 {
 }
 
