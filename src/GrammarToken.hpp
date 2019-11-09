@@ -57,6 +57,7 @@ STRUCTURE       "structure"
 FEATURE         "feature"
 IMPLEMENT       "implement"
 FOR             "for"
+SELF            "self"
 THIS            "this"
 
 FUNCTION        "function"

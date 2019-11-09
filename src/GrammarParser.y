@@ -163,7 +163,6 @@ END       0 "end of file"
 %type <RangeLiteral::Ptr> RangeLiteral
 %type <TupleLiteral::Ptr> TupleLiteral
 %type <RecordLiteral::Ptr> RecordLiteral
-%type <StructureLiteral::Ptr> StructureLiteral
 
 // expressions
 %type <Expression::Ptr> Term SimpleOrClaspedTerm OperatorExpression
@@ -227,6 +226,7 @@ END       0 "end of file"
 %type <Defined::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <VariableDefinitions::Ptr> Parameters AttributedVariables
+%type <VariableDefinitions::Ptr> MethodParameters
 %type <VariableBinding::Ptr> VariableBinding
 %type <VariableBindings::Ptr> VariableBindings
 %type <FunctionDefinition::Ptr> LocalFunctionDefinition AttributedLocalFunctionDefinition
@@ -409,8 +409,9 @@ InitDefinition
       // apply the name of the program declaration to the initializer functions
       for( auto& initializer : *initializers )
       {
-          initializer->updateRule()->function()->setIdentifier(
-              asIdentifierPath( programFunction->identifier() ) );
+          patchUpdateFunctionIdentifier(
+              initializer->updateRule()->function(),
+              programFunction->identifier() );
       }
 
       programFunction->setInitializers( initializers );
@@ -426,8 +427,9 @@ InitDefinition
       auto initializers = $3;
       for( auto& initializer : *initializers )
       {
-          initializer->updateRule()->function()->setIdentifier(
-              asIdentifierPath( programFunction->identifier() ) );
+          patchUpdateFunctionIdentifier(
+              initializer->updateRule()->function(),
+              programFunction->identifier() );
       }
 
       programFunction->setInitializers( initializers );
@@ -451,6 +453,12 @@ DerivedDefinition
       $$ = Ast::make< DerivedDefinition >( @$, $1, $2, params, $3, $4, $5, $6 );
   }
 | DERIVED Identifier LPAREN Parameters RPAREN MAPS Type EQUAL Term
+  {
+      $$ = Ast::make< DerivedDefinition >( @$, $1, $2, $4, $6, $7, $8, $9 );
+      $$->setLeftBracketToken( $3 );
+      $$->setRightBracketToken( $5 );
+  }
+| DERIVED Identifier LPAREN MethodParameters RPAREN MAPS Type EQUAL Term
   {
       $$ = Ast::make< DerivedDefinition >( @$, $1, $2, $4, $6, $7, $8, $9 );
       $$->setLeftBracketToken( $3 );
@@ -488,6 +496,19 @@ RuleDefinition
       $$->setLeftBracketToken( $3 );
       $$->setRightBracketToken( $5 );
   }
+| RULE Identifier LPAREN MethodParameters RPAREN EQUAL Rule
+  {
+      const auto vType = createVoidType( @$ );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, uToken, vType, $6, $7 );
+      $$->setLeftBracketToken( $3 );
+      $$->setRightBracketToken( $5 );
+  }
+| RULE Identifier LPAREN MethodParameters RPAREN MAPS Type EQUAL Rule
+  {
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, $6, $7, $8, $9 );
+      $$->setLeftBracketToken( $3 );
+      $$->setRightBracketToken( $5 );
+  }
 | RULE Identifier LPAREN error RPAREN EQUAL Rule // error recovery
   {
       $$ = nullptr;
@@ -508,7 +529,9 @@ FunctionDefinition
       const auto initially = $$->initially();
       for( auto& initializer : *initially->initializers() )
       {
-          initializer->updateRule()->function()->setIdentifier( asIdentifierPath( $2 ) );
+          patchUpdateFunctionIdentifier(
+              initializer->updateRule()->function(),
+              $2 );
       }
   }
 ;
@@ -998,10 +1021,7 @@ UpdateRule
   }
 | MethodCallExpression UPDATE Term
   {
-      // TODO: FIXME: @ppaulweber: change UpdateRule to support MethodCallExpression as well
-      // const auto function = $1;
-      // function->setMethodType( MethodCallExpression::MethodType::FUNCTION );
-      // $$ = Ast::make< UpdateRule >( @$, function, $3 );
+      $$ = Ast::make< UpdateRule >( @$, $1, $2, $3 );
   }
 ;
 
@@ -1212,7 +1232,21 @@ CallExpression
 
 
 DirectCallExpression
-: IdentifierPath %prec CALL_WITHOUT_ARGS
+: SELF %prec CALL_WITHOUT_ARGS
+  {
+      const auto identifier = Ast::make< Identifier >( @1, $1->tokenString() );
+      const auto identifierPath = asIdentifierPath( identifier );
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< DirectCallExpression >( @$, identifierPath, arguments );
+  }
+| THIS %prec CALL_WITHOUT_ARGS
+  {
+      const auto identifier = Ast::make< Identifier >( @1, $1->tokenString() );
+      const auto identifierPath = asIdentifierPath( identifier );
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< DirectCallExpression >( @$, identifierPath, arguments );
+  }
+| IdentifierPath %prec CALL_WITHOUT_ARGS
   {
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
@@ -1401,10 +1435,6 @@ Literal
   {
       $$ = $1;
   }
-| StructureLiteral
-  {
-      $$ = $1;
-  }
 ;
 
 
@@ -1529,24 +1559,10 @@ TupleLiteral
 
 
 RecordLiteral
-: LPAREN Assignments RPAREN
+: LCURPAREN Assignments RCURPAREN
   {
       $$ = Ast::make< RecordLiteral >( @$, $2 );
       $$->setLeftBracket( $1 );
-      $$->setRightBracket( $3 );
-  }
-;
-
-//
-//
-// Structure Literal
-//
-
-StructureLiteral
-: BasicType LPAREN RPAREN
-  {
-      $$ = Ast::make< StructureLiteral >( @$, $1 );
-      $$->setLeftBracket( $2 );
       $$->setRightBracket( $3 );
   }
 ;
@@ -1715,6 +1731,26 @@ MaybeFunctionParameters
 ;
 
 
+MethodParameters
+: MethodParameters COMMA TypedAttributedVariable
+  {
+      auto parameters = $1;
+      $3->setDelimiterToken( $2 );
+      parameters->add( $3 );
+      $$ = parameters;
+  }
+| THIS
+  {
+      auto parameters = Ast::make< NodeList< VariableDefinition > >( @$ );
+      const auto identifier = Ast::make< Identifier >( @1, $1->tokenString() );
+      const auto unresolvedType = Ast::make< UnresolvedType >( @$ );
+      auto variable = Ast::make< VariableDefinition >( @$, identifier, uToken, unresolvedType );
+      parameters->add( variable );
+      $$ = parameters;
+  }
+;
+
+
 Parameters
 : Parameters COMMA TypedAttributedVariable
   {
@@ -1809,9 +1845,9 @@ Identifier
   {
       $$ = $1;
   }
-| IN // allow in keyword as identifier
+| IN // allow 'in' keyword as identifier
   {
-      $$ = Ast::make< Identifier >( @$, "in" );
+      $$ = Ast::make< Identifier >( @$, $1->tokenString() );
       $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
 ;
