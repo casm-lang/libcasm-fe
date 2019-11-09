@@ -74,6 +74,11 @@ static const std::unordered_set< std::string > TYPE_NAMES_FOR_REFERENCE_TYPES = 
     TypeInfo::TYPE_NAME_RULEREF, TypeInfo::TYPE_NAME_FUNCREF
 };
 
+// reference types
+static const std::unordered_set< std::string > TYPE_NAMES_FOR_STRUCUTRE_TYPES = {
+    TypeInfo::TYPE_NAME_OBJECT
+};
+
 //
 //
 // TypeInfo
@@ -137,6 +142,12 @@ u1 TypeInfo::isReferenceType( const std::string& name ) const
 {
     const auto it = TYPE_NAMES_FOR_REFERENCE_TYPES.find( name );
     return it != TYPE_NAMES_FOR_REFERENCE_TYPES.cend();
+}
+
+u1 TypeInfo::isStructureType( const std::string& name ) const
+{
+    const auto it = TYPE_NAMES_FOR_STRUCUTRE_TYPES.find( name );
+    return it != TYPE_NAMES_FOR_STRUCUTRE_TYPES.cend();
 }
 
 //

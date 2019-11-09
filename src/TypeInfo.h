@@ -71,6 +71,8 @@ namespace libcasm_fe
 
         u1 isReferenceType( const std::string& name ) const;
 
+        u1 isStructureType( const std::string& name ) const;
+
       protected:
         TypeInfo( void );
 
@@ -102,6 +104,9 @@ namespace libcasm_fe
         // reference types
         static constexpr const char* TYPE_NAME_RULEREF = "RuleRef";
         static constexpr const char* TYPE_NAME_FUNCREF = "FuncRef";
+
+        // structure/object types
+        static constexpr const char* TYPE_NAME_OBJECT = "Object";
 
         static TypeInfo& instance( void )
         {
