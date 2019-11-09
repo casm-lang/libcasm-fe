@@ -605,7 +605,7 @@ void SequenceRule::accept( Visitor& visitor )
 //
 
 UpdateRule::UpdateRule(
-    const DirectCallExpression::Ptr& function,
+    const CallExpression::Ptr& function,
     const Token::Ptr& updateToken,
     const Expression::Ptr& expression )
 : Rule( Node::ID::UPDATE_RULE )
@@ -615,13 +615,7 @@ UpdateRule::UpdateRule(
 {
 }
 
-UpdateRule::UpdateRule(
-    const DirectCallExpression::Ptr& function, const Expression::Ptr& expression )
-: UpdateRule( function, Token::unresolved(), expression )
-{
-}
-
-const DirectCallExpression::Ptr& UpdateRule::function( void ) const
+const CallExpression::Ptr& UpdateRule::function( void ) const
 {
     return m_function;
 }
