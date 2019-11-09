@@ -141,6 +141,10 @@ std::string Node::description( void ) const
         {
             return "implement";
         }
+        case ID::BUILTIN_DEFINITION:
+        {
+            return "builtin";
+        }
         case ID::DECLARATION:
         {
             const auto& declaration = static_cast< const Declaration& >( *this );

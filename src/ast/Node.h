@@ -48,10 +48,8 @@
 
 #include <libcasm-fe/CasmFE>
 #include <libcasm-fe/ast/Visitor>
-
 #include <libcasm-ir/Property>
 #include <libcasm-ir/Type>
-
 #include <libstdhl/List>
 #include <libstdhl/SourceLocation>
 
@@ -84,6 +82,7 @@ namespace libcasm_fe
                 STRUCTURE_DEFINITION,
                 FEATURE_DEFINITION,
                 IMPLEMENT_DEFINITION,
+                BUILTIN_DEFINITION,
                 DECLARATION,
 
                 // literals
