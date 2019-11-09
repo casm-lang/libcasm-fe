@@ -115,10 +115,11 @@ namespace libcasm_fe
 
             const Expression::Ptr& value( void ) const;
 
-            const std::shared_ptr< FunctionDefinition >& function( void ) const;
-            void setFunction( const std::shared_ptr< FunctionDefinition >& function );
-
             const Token::Ptr& mapsToken( void ) const;
+
+            const UpdateRule::Ptr& updateRule( void ) const;
+
+            void setObjectType( const libcasm_ir::Type::Ptr& objectType );
 
             void accept( Visitor& visitor ) override final;
 
@@ -126,7 +127,7 @@ namespace libcasm_fe
             const Expressions::Ptr m_arguments;
             const Expression::Ptr m_value;
             const Token::Ptr m_mapsToken;
-            std::shared_ptr< FunctionDefinition > m_function;
+            UpdateRule::Ptr m_updateRule;
         };
 
         using Initializers = NodeList< Initializer >;

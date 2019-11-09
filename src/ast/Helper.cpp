@@ -136,8 +136,12 @@ Initializer::Initializer(
 : Helper( Node::ID::INITIALIZER, leftBraceToken, rightBraceToken )
 , m_arguments( arguments )
 , m_value( value )
+, m_updateRule( std::make_shared< UpdateRule >(
+      std::make_shared< DirectCallExpression >(
+          IdentifierPath::fromIdentifier( std::make_shared< Identifier >() ), arguments ),
+      unresolvedToken,
+      value ) )
 , m_mapsToken( mapsToken )
-, m_function( nullptr )
 {
 }
 
@@ -151,19 +155,38 @@ const Expression::Ptr& Initializer::value( void ) const
     return m_value;
 }
 
-const FunctionDefinition::Ptr& Initializer::function( void ) const
-{
-    return m_function;
-}
-
-void Initializer::setFunction( const FunctionDefinition::Ptr& function )
-{
-    m_function = function;
-}
-
 const Token::Ptr& Initializer::mapsToken( void ) const
 {
     return m_mapsToken;
+}
+
+const UpdateRule::Ptr& Initializer::updateRule( void ) const
+{
+    return m_updateRule;
+}
+
+void Initializer::setObjectType( const libcasm_ir::Type::Ptr& objectType )
+{
+    const auto& function = updateRule()->function();
+    assert( function and function->id() == Ast::Node::ID::DIRECT_CALL_EXPRESSION );
+    const auto& functionCall = std::static_pointer_cast< DirectCallExpression >( function );
+
+    const auto identifier = Ast::make< Identifier >( sourceLocation(), "this" );
+    const auto identifierPath = Ast::make< IdentifierPath >( sourceLocation(), identifier );
+    const auto arguments = Ast::make< Expressions >( sourceLocation() );
+    const auto objectCall =
+        Ast::make< DirectCallExpression >( sourceLocation(), identifierPath, arguments );
+    objectCall->setType( objectType );
+    objectCall->setTargetType( DirectCallExpression::TargetType::THIS );
+
+    const auto methodName =
+        Ast::make< Identifier >( sourceLocation(), functionCall->identifier()->path() );
+
+    const auto methodCall = Ast::make< MethodCallExpression >(
+        sourceLocation(), objectCall, unresolvedToken, methodName, functionCall->arguments() );
+
+    m_updateRule = Ast::make< UpdateRule >(
+        sourceLocation(), methodCall, unresolvedToken, updateRule()->expression() );
 }
 
 void Initializer::accept( Visitor& visitor )
