@@ -158,6 +158,7 @@ VariableDefinition::VariableDefinition(
 , m_variableType( variableType )
 , m_colonToken( colonToken )
 , m_localIndex( 0 )
+, m_objectDefinition()
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
     setProperty( libcasm_ir::Property::PURE );
@@ -181,6 +182,16 @@ void VariableDefinition::setLocalIndex( std::size_t localIndex )
 std::size_t VariableDefinition::localIndex( void ) const
 {
     return m_localIndex;
+}
+
+void VariableDefinition::setObjectDefinition( const Definition::Ptr& objectDefinition )
+{
+    m_objectDefinition = objectDefinition;
+}
+
+const Definition::Ptr& VariableDefinition::objectDefinition( void ) const
+{
+    return m_objectDefinition;
 }
 
 void VariableDefinition::accept( Visitor& visitor )
@@ -700,12 +711,12 @@ void InvariantDefinition::accept( Visitor& visitor )
 //
 
 StructureDefinition::StructureDefinition(
-    const Token::Ptr structureToken,
+    const Token::Ptr& structureToken,
     const Identifier::Ptr& identifier,
-    const Token::Ptr assignmentToken,
-    const Token::Ptr leftBraceToken,
+    const Token::Ptr& assignmentToken,
+    const Token::Ptr& leftBraceToken,
     const FunctionDefinitions::Ptr& functions,
-    const Token::Ptr rightBraceToken )
+    const Token::Ptr& rightBraceToken )
 : Definition( Node::ID::STRUCTURE_DEFINITION, identifier )
 , m_functions( functions )
 , m_structureToken( structureToken )
@@ -720,22 +731,22 @@ const FunctionDefinitions::Ptr& StructureDefinition::functions( void ) const
     return m_functions;
 }
 
-const Token::Ptr StructureDefinition::structureToken( void ) const
+const Token::Ptr& StructureDefinition::structureToken( void ) const
 {
     return m_structureToken;
 }
 
-const Token::Ptr StructureDefinition::assignmentToken( void ) const
+const Token::Ptr& StructureDefinition::assignmentToken( void ) const
 {
     return m_assignmentToken;
 }
 
-const Token::Ptr StructureDefinition::leftBraceToken( void ) const
+const Token::Ptr& StructureDefinition::leftBraceToken( void ) const
 {
     return m_leftBraceToken;
 }
 
-const Token::Ptr StructureDefinition::rightBraceToken( void ) const
+const Token::Ptr& StructureDefinition::rightBraceToken( void ) const
 {
     return m_rightBraceToken;
 }
@@ -751,12 +762,12 @@ void StructureDefinition::accept( Visitor& visitor )
 //
 
 FeatureDefinition::FeatureDefinition(
-    const Token::Ptr featureToken,
+    const Token::Ptr& featureToken,
     const Identifier::Ptr& identifier,
-    const Token::Ptr assignmentToken,
-    const Token::Ptr leftBraceToken,
+    const Token::Ptr& assignmentToken,
+    const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
-    const Token::Ptr rightBraceToken )
+    const Token::Ptr& rightBraceToken )
 : Definition( Node::ID::FEATURE_DEFINITION, identifier )
 , m_definitions( definitions )
 , m_featureToken( featureToken )
@@ -771,22 +782,22 @@ const Definitions::Ptr& FeatureDefinition::definitions( void ) const
     return m_definitions;
 }
 
-const Token::Ptr FeatureDefinition::featureToken( void ) const
+const Token::Ptr& FeatureDefinition::featureToken( void ) const
 {
     return m_featureToken;
 }
 
-const Token::Ptr FeatureDefinition::assignmentToken( void ) const
+const Token::Ptr& FeatureDefinition::assignmentToken( void ) const
 {
     return m_assignmentToken;
 }
 
-const Token::Ptr FeatureDefinition::leftBraceToken( void ) const
+const Token::Ptr& FeatureDefinition::leftBraceToken( void ) const
 {
     return m_leftBraceToken;
 }
 
-const Token::Ptr FeatureDefinition::rightBraceToken( void ) const
+const Token::Ptr& FeatureDefinition::rightBraceToken( void ) const
 {
     return m_rightBraceToken;
 }
@@ -802,14 +813,14 @@ void FeatureDefinition::accept( Visitor& visitor )
 //
 
 ImplementDefinition::ImplementDefinition(
-    const Token::Ptr implementToken,
+    const Token::Ptr& implementToken,
     const IdentifierPath::Ptr& feature,
-    const Token::Ptr forToken,
+    const Token::Ptr& forToken,
     const Identifier::Ptr& identifier,
-    const Token::Ptr assignmentToken,
-    const Token::Ptr leftBraceToken,
+    const Token::Ptr& assignmentToken,
+    const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
-    const Token::Ptr rightBraceToken )
+    const Token::Ptr& rightBraceToken )
 : Definition( Node::ID::IMPLEMENT_DEFINITION, identifier )
 , m_feature( feature )
 , m_definitions( definitions )
@@ -822,12 +833,12 @@ ImplementDefinition::ImplementDefinition(
 }
 
 ImplementDefinition::ImplementDefinition(
-    const Token::Ptr implementToken,
+    const Token::Ptr& implementToken,
     const Identifier::Ptr& identifier,
-    const Token::Ptr assignmentToken,
-    const Token::Ptr leftBraceToken,
+    const Token::Ptr& assignmentToken,
+    const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
-    const Token::Ptr rightBraceToken )
+    const Token::Ptr& rightBraceToken )
 : ImplementDefinition(
       implementToken,
       unresolvedIdentifierPath,
@@ -850,32 +861,68 @@ const Definitions::Ptr& ImplementDefinition::definitions( void ) const
     return m_definitions;
 }
 
-const Token::Ptr ImplementDefinition::implementToken( void ) const
+const Token::Ptr& ImplementDefinition::implementToken( void ) const
 {
     return m_implementToken;
 }
 
-const Token::Ptr ImplementDefinition::forToken( void ) const
+const Token::Ptr& ImplementDefinition::forToken( void ) const
 {
     return m_forToken;
 }
 
-const Token::Ptr ImplementDefinition::assignmentToken( void ) const
+const Token::Ptr& ImplementDefinition::assignmentToken( void ) const
 {
     return m_assignmentToken;
 }
 
-const Token::Ptr ImplementDefinition::leftBraceToken( void ) const
+const Token::Ptr& ImplementDefinition::leftBraceToken( void ) const
 {
     return m_leftBraceToken;
 }
 
-const Token::Ptr ImplementDefinition::rightBraceToken( void ) const
+const Token::Ptr& ImplementDefinition::rightBraceToken( void ) const
 {
     return m_rightBraceToken;
 }
 
+u1 ImplementDefinition::hasFeature( void ) const
+{
+    return forToken()->token() != Grammar::Token::UNRESOLVED;
+}
+
 void ImplementDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
+// BuiltinDefinition
+//
+
+BuiltinDefinition::BuiltinDefinition(
+    const Identifier::Ptr& name,
+    const libcasm_ir::Value::ID builtinId,
+    const libcasm_ir::RelationType::Ptr& builtinType )
+: Definition( Node::ID::BUILTIN_DEFINITION, name )
+, m_builtinId( builtinId )
+, m_builtinType( builtinType )
+{
+    setType( targetBuiltinType() );
+}
+
+libcasm_ir::Value::ID BuiltinDefinition::targetBuiltinId( void ) const
+{
+    return m_builtinId;
+}
+
+const libcasm_ir::RelationType::Ptr& BuiltinDefinition::targetBuiltinType( void ) const
+{
+    return m_builtinType;
+}
+
+void BuiltinDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

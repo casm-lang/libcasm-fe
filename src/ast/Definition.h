@@ -133,12 +133,17 @@ namespace libcasm_fe
             void setLocalIndex( std::size_t localIndex );
             std::size_t localIndex( void ) const;
 
+            // used in SymbolResolver to point to the correct Feature/Implement Definition
+            void setObjectDefinition( const Definition::Ptr& objectDefinition );
+            const Definition::Ptr& objectDefinition( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             const Type::Ptr m_variableType;
             const Token::Ptr m_colonToken;
             std::size_t m_localIndex;
+            Definition::Ptr m_objectDefinition;
         };
 
         using VariableDefinitions = NodeList< VariableDefinition >;
@@ -434,22 +439,22 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< StructureDefinition >;
 
             StructureDefinition(
-                const Token::Ptr structureToken,
+                const Token::Ptr& structureToken,
                 const Identifier::Ptr& identifier,
-                const Token::Ptr assignmentToken,
-                const Token::Ptr leftBraceToken,
+                const Token::Ptr& assignmentToken,
+                const Token::Ptr& leftBraceToken,
                 const FunctionDefinitions::Ptr& functions,
-                const Token::Ptr rightBraceToken );
+                const Token::Ptr& rightBraceToken );
 
             const FunctionDefinitions::Ptr& functions( void ) const;
 
-            const Token::Ptr structureToken( void ) const;
+            const Token::Ptr& structureToken( void ) const;
 
-            const Token::Ptr assignmentToken( void ) const;
+            const Token::Ptr& assignmentToken( void ) const;
 
-            const Token::Ptr leftBraceToken( void ) const;
+            const Token::Ptr& leftBraceToken( void ) const;
 
-            const Token::Ptr rightBraceToken( void ) const;
+            const Token::Ptr& rightBraceToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -467,22 +472,22 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< FeatureDefinition >;
 
             FeatureDefinition(
-                const Token::Ptr featureToken,
+                const Token::Ptr& featureToken,
                 const Identifier::Ptr& identifier,
-                const Token::Ptr assignmentToken,
-                const Token::Ptr leftBraceToken,
+                const Token::Ptr& assignmentToken,
+                const Token::Ptr& leftBraceToken,
                 const Definitions::Ptr& definitions,
-                const Token::Ptr rightBraceToken );
+                const Token::Ptr& rightBraceToken );
 
             const Definitions::Ptr& definitions( void ) const;
 
-            const Token::Ptr featureToken( void ) const;
+            const Token::Ptr& featureToken( void ) const;
 
-            const Token::Ptr assignmentToken( void ) const;
+            const Token::Ptr& assignmentToken( void ) const;
 
-            const Token::Ptr leftBraceToken( void ) const;
+            const Token::Ptr& leftBraceToken( void ) const;
 
-            const Token::Ptr rightBraceToken( void ) const;
+            const Token::Ptr& rightBraceToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -500,36 +505,38 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< ImplementDefinition >;
 
             ImplementDefinition(
-                const Token::Ptr implementToken,
+                const Token::Ptr& implementToken,
                 const IdentifierPath::Ptr& feature,
-                const Token::Ptr forToken,
+                const Token::Ptr& forToken,
                 const Identifier::Ptr& identifier,
-                const Token::Ptr assignmentToken,
-                const Token::Ptr leftBraceToken,
+                const Token::Ptr& assignmentToken,
+                const Token::Ptr& leftBraceToken,
                 const Definitions::Ptr& definitions,
-                const Token::Ptr rightBraceToken );
+                const Token::Ptr& rightBraceToken );
 
             ImplementDefinition(
-                const Token::Ptr implementToken,
+                const Token::Ptr& implementToken,
                 const Identifier::Ptr& identifier,
-                const Token::Ptr assignmentToken,
-                const Token::Ptr leftBraceToken,
+                const Token::Ptr& assignmentToken,
+                const Token::Ptr& leftBraceToken,
                 const Definitions::Ptr& definitions,
-                const Token::Ptr rightBraceToken );
+                const Token::Ptr& rightBraceToken );
 
             const IdentifierPath::Ptr& feature( void ) const;
 
             const Definitions::Ptr& definitions( void ) const;
 
-            const Token::Ptr implementToken( void ) const;
+            const Token::Ptr& implementToken( void ) const;
 
-            const Token::Ptr forToken( void ) const;
+            const Token::Ptr& forToken( void ) const;
 
-            const Token::Ptr assignmentToken( void ) const;
+            const Token::Ptr& assignmentToken( void ) const;
 
-            const Token::Ptr leftBraceToken( void ) const;
+            const Token::Ptr& leftBraceToken( void ) const;
 
-            const Token::Ptr rightBraceToken( void ) const;
+            const Token::Ptr& rightBraceToken( void ) const;
+
+            u1 hasFeature( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -541,6 +548,27 @@ namespace libcasm_fe
             const Token::Ptr m_assignmentToken;
             const Token::Ptr m_leftBraceToken;
             const Token::Ptr m_rightBraceToken;
+        };
+
+        class BuiltinDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< BuiltinDefinition >;
+
+            BuiltinDefinition(
+                const Identifier::Ptr& name,
+                const libcasm_ir::Value::ID builtinId,
+                const libcasm_ir::RelationType::Ptr& builtinType );
+
+            libcasm_ir::Value::ID targetBuiltinId( void ) const;
+
+            const libcasm_ir::RelationType::Ptr& targetBuiltinType( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const libcasm_ir::Value::ID m_builtinId;
+            const libcasm_ir::RelationType::Ptr m_builtinType;
         };
 
         class InitDefinition final : public Definition
