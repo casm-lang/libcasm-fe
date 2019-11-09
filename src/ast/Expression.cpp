@@ -45,12 +45,12 @@
 
 #include "Expression.h"
 
-#include "../various/GrammarToken.h"
-
 #include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Literal>
 #include <libcasm-fe/ast/Token>
 #include <libcasm-fe/ast/Type>
+
+#include "../various/GrammarToken.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -154,7 +154,7 @@ void NamedExpression::accept( Visitor& visitor )
 // CallExpression
 //
 
-CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
+CallExpression::CallExpression( const Node::ID id, const Expressions::Ptr& arguments )
 : Expression( id )
 , m_arguments( arguments )
 , m_leftBracketToken( Token::unresolved() )
@@ -199,8 +199,6 @@ DirectCallExpression::DirectCallExpression(
 : CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
 , m_identifier( identifier )
 , m_targetType( TargetType::UNKNOWN )
-, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
-, m_targetBuiltinType()
 , m_targetDefinition()
 {
 }
@@ -266,6 +264,10 @@ std::string DirectCallExpression::targetTypeString( const TargetType targetType 
         {
             return "self";
         }
+        case TargetType::THIS:
+        {
+            return "this";
+        }
         case TargetType::UNKNOWN:
         {
             return "unknown";
@@ -276,28 +278,6 @@ std::string DirectCallExpression::targetTypeString( const TargetType targetType 
     return std::string();
 }
 
-void DirectCallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
-{
-    m_targetBuiltinId = builtinId;
-}
-
-libcasm_ir::Value::ID DirectCallExpression::targetBuiltinId( void ) const
-{
-    assert( targetType() == TargetType::BUILTIN );
-    return m_targetBuiltinId;
-}
-
-void DirectCallExpression::setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType )
-{
-    m_targetBuiltinType = builtinType;
-}
-
-const libcasm_ir::RelationType::Ptr& DirectCallExpression::targetBuiltinType( void ) const
-{
-    assert( targetType() == TargetType::BUILTIN );
-    return m_targetBuiltinType;
-}
-
 void DirectCallExpression::setTargetDefinition( const Definition::Ptr& definition )
 {
     m_targetDefinition = definition;
@@ -305,7 +285,7 @@ void DirectCallExpression::setTargetDefinition( const Definition::Ptr& definitio
 
 const Definition::Ptr& DirectCallExpression::targetDefinition( void ) const
 {
-    assert( ( targetType() != TargetType::BUILTIN ) and ( targetType() != TargetType::UNKNOWN ) );
+    assert( targetType() != TargetType::UNKNOWN );
     return m_targetDefinition;
 }
 
@@ -329,8 +309,6 @@ MethodCallExpression::MethodCallExpression(
 , m_methodName( methodName )
 , m_dotToken( dotToken )
 , m_methodType( MethodType::UNKNOWN )
-, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
-, m_targetBuiltinType( nullptr )
 {
 }
 
@@ -371,10 +349,6 @@ std::string MethodCallExpression::methodTypeName( void ) const
         {
             return "derived";
         }
-        case MethodType::BUILTIN:
-        {
-            return "built-in";
-        }
         case MethodType::RULE:
         {
             return "rule";
@@ -389,29 +363,6 @@ std::string MethodCallExpression::methodTypeName( void ) const
     return std::string();
 }
 
-void MethodCallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
-{
-    m_targetBuiltinId = builtinId;
-}
-
-libcasm_ir::Value::ID MethodCallExpression::targetBuiltinId( void ) const
-{
-    assert( m_methodType == MethodType::BUILTIN );
-
-    return m_targetBuiltinId;
-}
-
-void MethodCallExpression::setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType )
-{
-    m_targetBuiltinType = builtinType;
-}
-
-const libcasm_ir::RelationType::Ptr& MethodCallExpression::targetBuiltinType( void ) const
-{
-    assert( m_methodType == MethodType::BUILTIN );
-    return m_targetBuiltinType;
-}
-
 void MethodCallExpression::setTargetDefinition( const Definition::Ptr& definition )
 {
     m_targetDefinition = definition;
@@ -419,7 +370,7 @@ void MethodCallExpression::setTargetDefinition( const Definition::Ptr& definitio
 
 const Definition::Ptr& MethodCallExpression::targetDefinition( void ) const
 {
-    assert( ( m_methodType != MethodType::BUILTIN ) and ( m_methodType != MethodType::UNKNOWN ) );
+    assert( m_methodType != MethodType::UNKNOWN );
 
     return m_targetDefinition;
 }
@@ -509,8 +460,6 @@ TypeCastingExpression::TypeCastingExpression(
 , m_asType( asType )
 , m_asToken( asToken )
 , m_castingType( CastingType::UNKNOWN )
-, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
-, m_targetBuiltinType( nullptr )
 {
 }
 
@@ -557,28 +506,6 @@ std::string TypeCastingExpression::castingTypeName( void ) const
     return std::string();
 }
 
-void TypeCastingExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
-{
-    m_targetBuiltinId = builtinId;
-}
-
-libcasm_ir::Value::ID TypeCastingExpression::targetBuiltinId( void ) const
-{
-    assert( m_castingType == CastingType::BUILTIN );
-    return m_targetBuiltinId;
-}
-
-void TypeCastingExpression::setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType )
-{
-    m_targetBuiltinType = builtinType;
-}
-
-const libcasm_ir::RelationType::Ptr& TypeCastingExpression::targetBuiltinType( void ) const
-{
-    assert( m_castingType == CastingType::BUILTIN );
-    return m_targetBuiltinType;
-}
-
 void TypeCastingExpression::setTargetDefinition( const Definition::Ptr& definition )
 {
     m_targetDefinition = definition;
@@ -586,8 +513,7 @@ void TypeCastingExpression::setTargetDefinition( const Definition::Ptr& definiti
 
 const Definition::Ptr& TypeCastingExpression::targetDefinition( void ) const
 {
-    assert(
-        ( m_castingType != CastingType::BUILTIN ) and ( m_castingType != CastingType::UNKNOWN ) );
+    assert( m_castingType != CastingType::UNKNOWN );
     return m_targetDefinition;
 }
 
@@ -1045,26 +971,6 @@ std::string CardinalityExpression::cardinalityTypeName( void ) const
 
     assert( !" internal error! " );
     return std::string();
-}
-
-void CardinalityExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
-{
-    m_targetBuiltinId = builtinId;
-}
-
-libcasm_ir::Value::ID CardinalityExpression::targetBuiltinId( void ) const
-{
-    return m_targetBuiltinId;
-}
-
-void CardinalityExpression::setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType )
-{
-    m_targetBuiltinType = builtinType;
-}
-
-const libcasm_ir::RelationType::Ptr& CardinalityExpression::targetBuiltinType( void ) const
-{
-    return m_targetBuiltinType;
 }
 
 void CardinalityExpression::accept( Visitor& visitor )
