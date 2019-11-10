@@ -54,8 +54,6 @@
 #include <libcasm-fe/analyze/AttributionPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
-#include <libcasm-ir/Builtin>
-
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
@@ -66,12 +64,17 @@ using namespace Ast;
 char SymbolRegistrationPass::id = 0;
 
 static libpass::PassRegistration< SymbolRegistrationPass > PASS(
-    "ASTSymbolRegistrationPass",
-    "registers declared symbols in the symbol table",
+    "Symbol Registration Pass",
+    "registers defined and declared symbols in the namespace symbol table",
     "ast-sym-reg",
     0 );
 
-class SymbolRegistrationVisitor final : public EmptyVisitor
+//
+//
+// SymbolRegistrationVisitor
+//
+
+class SymbolRegistrationVisitor final : public RecursiveVisitor
 {
   public:
     SymbolRegistrationVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
@@ -85,9 +88,12 @@ class SymbolRegistrationVisitor final : public EmptyVisitor
     void visit( UsingDefinition& node ) override;
     void visit( StructureDefinition& node ) override;
     void visit( FeatureDefinition& node ) override;
+    void visit( ImplementDefinition& node ) override;
+    void visit( BuiltinDefinition& node ) override;
+    void visit( Declaration& node ) override;
 
   private:
-    void registerSymbol( Definition& node );
+    void registerSymbol( Definition& node, const u1 isCheck = false );
 
   private:
     libcasm_fe::Logger& m_log;
@@ -316,18 +322,9 @@ void SymbolRegistrationVisitor::visit( UsingDefinition& node )
     registerSymbol( node );
 }
 
-void SymbolRegistrationVisitor::registerSymbol( Definition& node )
+void SymbolRegistrationVisitor::registerSymbol( Definition& node, const u1 isCheck )
 {
     const auto& name = node.identifier()->name();
-
-    if( libcasm_ir::Builtin::available( name ) )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
-            Code::IdentifierIsBuiltinName );
-        return;
-    }
 
     if( TypeInfo::instance().hasType( name ) )
     {
@@ -335,6 +332,11 @@ void SymbolRegistrationVisitor::registerSymbol( Definition& node )
             { node.identifier()->sourceLocation() },
             "cannot use type name '" + name + "' as " + node.description() + " symbol",
             Code::IdentifierIsTypeName );
+        return;
+    }
+
+    if( isCheck )
+    {
         return;
     }
 
@@ -354,25 +356,7 @@ void SymbolRegistrationVisitor::visit( StructureDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
-    if( libcasm_ir::Builtin::available( name ) )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
-            Code::StructureDefinitionIdentifierIsBuiltinName );
-    }
-
-    try
-    {
-        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.findSymbol( name );
-
-        m_log.error( { node.sourceLocation() }, e.what(), Code::StructureDefinitionAlreadyUsed );
-        m_log.info( { symbol->sourceLocation() }, e.what() );
-    }
+    registerSymbol( node );
 
     // register structure definitions in a sub-namespace
     const auto structureNamespace = std::make_shared< Namespace >();
@@ -393,25 +377,7 @@ void SymbolRegistrationVisitor::visit( FeatureDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
-    if( libcasm_ir::Builtin::available( name ) )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
-            Code::FeatureDefinitionIdentifierIsBuiltinName );
-    }
-
-    try
-    {
-        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.findSymbol( name );
-
-        m_log.error( { node.sourceLocation() }, e.what(), Code::FeatureDefinitionAlreadyUsed );
-        m_log.info( { symbol->sourceLocation() }, e.what() );
-    }
+    registerSymbol( node );
 
     // register feature definitions in a sub-namespace
     const auto featureNamespace = std::make_shared< Namespace >();
@@ -427,6 +393,76 @@ void SymbolRegistrationVisitor::visit( FeatureDefinition& node )
         m_log.debug( { node.sourceLocation() }, e.what() );
     }
 }
+
+void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
+{
+    auto name = node.identifier()->name();
+
+    registerSymbol( node, true );
+
+    // find the structure namespace to implement the definitions
+    const auto structureNamespace = m_symboltable.findNamespace( name );
+    if( not structureNamespace )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "cannot implement undefined structure '" + name + "'",
+            Code::ImplementDefinitionOfUndefinedStructure );
+        return;
+    }
+
+    if( node.hasFeature() )
+    {
+        // find the feature symbol
+        const auto featureSymbol = m_symboltable.findSymbol( *node.feature() );
+        if( not featureSymbol )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "cannot implement undefined feature '" + name + "'",
+                Code::ImplementDefinitionOfUndefinedStructure );
+            return;
+        }
+
+        name = featureSymbol->identifier()->name();
+    }
+
+    try
+    {
+        // create implementation namespace inside the structure namespace
+        structureNamespace->registerSymbol( name, node.ptr< Definition >() );
+    }
+    catch( const std::domain_error& e )
+    {
+        const auto& symbol = structureNamespace->findSymbol( name );
+
+        m_log.error( { node.sourceLocation() }, e.what(), Code::ImplementDefinitionAlreadyUsed );
+        m_log.info( { symbol->sourceLocation() }, e.what() );
+    }
+
+    // register implement definitions in the structure namespace
+    SymbolRegistrationVisitor structureVisitor( m_log, *structureNamespace );
+    node.definitions()->accept( structureVisitor );
+}
+
+void SymbolRegistrationVisitor::visit( BuiltinDefinition& node )
+{
+    registerSymbol( node );
+
+    RecursiveVisitor::visit( node );
+}
+
+void SymbolRegistrationVisitor::visit( Declaration& node )
+{
+    registerSymbol( node );
+
+    RecursiveVisitor::visit( node );
+}
+
+//
+//
+// SymbolRegistrationPass
+//
 
 void SymbolRegistrationPass::usage( libpass::PassUsage& pu )
 {
