@@ -179,12 +179,7 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
     libcasm_ir::Properties callProperties;
     switch( node.targetType() )
     {
-        case DirectCallExpression::TargetType::BUILTIN:
-        {
-            const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-            callProperties = annotation.properties();
-            break;
-        }
+        case DirectCallExpression::TargetType::BUILTIN:   // [[fallthrough]]
         case DirectCallExpression::TargetType::VARIABLE:  // [[fallthrough]]
         case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
         case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
@@ -202,7 +197,8 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
             callProperties.set( libcasm_ir::Property::PURE );
             break;
         }
-        case DirectCallExpression::TargetType::SELF:
+        case DirectCallExpression::TargetType::SELF:  // [[fallthrough]]
+        case DirectCallExpression::TargetType::THIS:
         {
             callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
             break;
@@ -230,23 +226,24 @@ void PropertyResolverVisitor::visit( MethodCallExpression& node )
     RecursiveVisitor::visit( node );
 
     libcasm_ir::Properties callProperties;
-    if( node.methodType() == MethodCallExpression::MethodType::BUILTIN )
+    switch( node.methodType() )
     {
-        const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-        callProperties = annotation.properties();
-    }
-    else if( node.methodType() == MethodCallExpression::MethodType::FUNCTION )
-    {
-        const auto& definition = node.targetDefinition();
-        assert( definition.get() != nullptr );
-        node.setProperties( definition->properties() );
-    }
-    else
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "method type '" + node.methodTypeName() + "' is not implemented!" );
-        return;
+        case MethodCallExpression::MethodType::FUNCTION:  // [[fallthrough]]
+        case MethodCallExpression::MethodType::DERIVED:   // [[fallthrough]]
+        case MethodCallExpression::MethodType::RULE:
+        {
+            const auto& definition = node.targetDefinition();
+            assert( definition.get() != nullptr );
+            callProperties = definition->properties();
+            break;
+        }
+        default:
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "method type '" + node.methodTypeName() + "' is not implemented!" );
+            return;
+        }
     }
 
     if( node.arguments()->size() > 0 )
@@ -360,9 +357,6 @@ void PropertyResolverVisitor::visit( ExistentialQuantifierExpression& node )
 void PropertyResolverVisitor::visit( CardinalityExpression& node )
 {
     RecursiveVisitor::visit( node );
-
-    const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-    node.setProperties( annotation.properties() * node.expression()->properties() );
 }
 
 //
