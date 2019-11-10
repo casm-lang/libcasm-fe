@@ -415,6 +415,40 @@ void ExecutionVisitor::visit( InvariantDefinition& node )
     }
 }
 
+void ExecutionVisitor::visit( StructureDefinition& node )
+{
+    // TODO: FIXME: @ppaulweber: continue, related to #35
+}
+
+void ExecutionVisitor::visit( BuiltinDefinition& node )
+{
+    const auto& type = node.type();
+    validateArguments( node, type->arguments(), {}, Code::BuiltinArgumentValueInvalid );
+
+    try
+    {
+        const auto& arguments = m_frameStack.top()->locals();
+        IR::Constant returnValue;
+
+        RT::Value::execute(
+            node.targetBuiltinId(), type, returnValue, arguments.data(), arguments.size() );
+
+        const auto& returnType = type->result();
+        if( not returnType.isVoid() )
+        {
+            m_evaluationStack.push( returnValue );
+        }
+    }
+    catch( const std::exception& e )
+    {
+        throw RuntimeException(
+            node.sourceLocation(),
+            "builtin has thrown an exception: " + std::string( e.what() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::RuntimeException );
+    }
+}
+
 void ExecutionVisitor::visit( UndefLiteral& node )
 {
     m_evaluationStack.push( IR::Constant::undef( node.type() ) );

@@ -200,6 +200,8 @@ namespace libcasm_fe
         void visit( Ast::RuleDefinition& node ) override;
         void visit( Ast::EnumeratorDefinition& node ) override;
         void visit( Ast::InvariantDefinition& node ) override;
+        void visit( Ast::StructureDefinition& node ) override;
+        void visit( Ast::BuiltinDefinition& node ) override;
 
         void visit( Ast::UndefLiteral& node ) override;
         void visit( Ast::ValueLiteral& node ) override;
