@@ -119,41 +119,7 @@ Frame* FrameStack::top( void ) const
     return m_frames.back().get();
 }
 
-static std::string generateBuiltinTraceLine( Frame* frame )
-{
-    const auto call = frame->call();
-    assert( call != nullptr );
-
-    std::string args;
-    const auto numberOfArguments = call->arguments()->size();
-    for( std::size_t i = 0; i < numberOfArguments; i++ )
-    {
-        if( i > 0 )
-        {
-            args += ", ";
-        }
-        args += frame->local( i ).name();
-    }
-
-    std::string name;
-    if( call->id() == Node::ID::DIRECT_CALL_EXPRESSION )
-    {
-        name = call->ptr< DirectCallExpression >()->identifier()->path();
-    }
-    else if( call->id() == Node::ID::TYPE_CASTING_EXPRESSION )
-    {
-        name = "operator::as" + call->ptr< TypeCastingExpression >()->type()->description();
-    }
-    else
-    {
-        name = "UNKNOWN";
-    }
-
-    return libstdhl::String::format( "Builtin %s(%s)", name.c_str(), args.c_str() );
-}
-
-static std::string generateCalleeTraceLine(
-    Frame* frame, const libstdhl::SourceLocation& problemLocation )
+static std::string generateCalleeTraceLine( Frame* frame, const SourceLocation& problemLocation )
 {
     const auto callee = frame->callee();
     assert( callee != nullptr );
@@ -226,6 +192,13 @@ static std::string generateCalleeTraceLine(
             name = invariant->identifier()->name();
             break;
         }
+        case Node::ID::BUILTIN_DEFINITION:
+        {
+            const auto builtin = callee->ptr< BuiltinDefinition >();
+            type = "Builtin";
+            name = builtin->identifier()->name();
+            break;
+        }
         default:
         {
             type = callee->description();
@@ -259,11 +232,7 @@ std::vector< std::string > FrameStack::generateBacktrace(
 
         const auto call = frame->call();
         const auto callee = frame->callee();
-
-        // callee can only be nullptr when calling builtins
-        const auto traceLine = ( callee == nullptr )
-                                   ? generateBuiltinTraceLine( frame.get() )
-                                   : generateCalleeTraceLine( frame.get(), problemLocation );
+        const auto traceLine = generateCalleeTraceLine( frame.get(), problemLocation );
         backtrace.emplace_back( "#" + std::to_string( frameCounter ) + " in " + traceLine );
 
         ++frameCounter;
