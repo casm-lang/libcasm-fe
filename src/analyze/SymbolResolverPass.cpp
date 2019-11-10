@@ -224,6 +224,8 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( InitDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( FeatureDefinition& node ) override;
+    void visit( ImplementDefinition& node ) override;
 
     void visit( ReferenceLiteral& node ) override;
 
@@ -277,12 +279,14 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     Namespace& m_symboltable;
 
     std::unordered_map< std::string, Definition::Ptr > m_scopeSymbols;
+    Definition::Ptr m_objectDefinition;
 };
 
 SymbolResolveVisitor::SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 , m_scopeSymbols()
+, m_objectDefinition()
 {
 }
 
@@ -304,6 +308,30 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
     pushSymbols< VariableDefinition >( node.arguments() );
     node.rule()->accept( *this );
     popSymbols< VariableDefinition >( node.arguments() );
+}
+
+void SymbolResolveVisitor::visit( FeatureDefinition& node )
+{
+    auto name = node.identifier()->name();
+    const auto& featureSymbol = m_symboltable.findSymbol( name );
+    assert( featureSymbol and " inconsistent state, checked during symbol registration " );
+    m_objectDefinition = featureSymbol;
+
+    RecursiveVisitor::visit( node );
+
+    m_objectDefinition = nullptr;
+}
+
+void SymbolResolveVisitor::visit( ImplementDefinition& node )
+{
+    auto name = node.identifier()->name();
+    const auto& structureSymbol = m_symboltable.findSymbol( name );
+    assert( structureSymbol and " inconsistent state, checked during symbol registration " );
+    m_objectDefinition = structureSymbol;
+
+    RecursiveVisitor::visit( node );
+
+    m_objectDefinition = nullptr;
 }
 
 void SymbolResolveVisitor::visit( ReferenceLiteral& node )
@@ -377,17 +405,16 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         }
     };
 
-    if( libcasm_ir::Builtin::available( name ) )
+    const auto variableIt = m_scopeSymbols.find( name );
+    if( variableIt != m_scopeSymbols.cend() )
     {
-        const auto& annotation = libcasm_ir::Annotation::find( name );
-
-        node.setTargetType( DirectCallExpression::TargetType::BUILTIN );
-        node.setTargetBuiltinId( annotation.valueID() );
-        validateArgumentsCount( "builtin", annotation.relations().front().argument.size() );
+        node.setTargetType( DirectCallExpression::TargetType::VARIABLE );
+        node.setTargetDefinition( variableIt->second );
+        validateArgumentsCount( "variable", 0 );
         return;
     }
 
-    auto symbol = tryResolveSymbol( *node.identifier() );
+    auto symbol = m_symboltable.findSymbol( *node.identifier() );
     if( symbol )
     {
         symbol = resolveIfAlias( symbol );
@@ -396,10 +423,11 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         switch( symbol->id() )
         {
-            case Node::ID::VARIABLE_DEFINITION:
+            case Node::ID::BUILTIN_DEFINITION:
             {
-                node.setTargetType( DirectCallExpression::TargetType::VARIABLE );
-                expectedNumberOfArguments = 0;
+                node.setTargetType( DirectCallExpression::TargetType::BUILTIN );
+                const auto builtin = std::static_pointer_cast< BuiltinDefinition >( symbol );
+                expectedNumberOfArguments = builtin->targetBuiltinType()->arguments().size();
                 break;
             }
             case Node::ID::FUNCTION_DEFINITION:
@@ -556,6 +584,20 @@ void SymbolResolveVisitor::visit( ChooseRule& node )
 void SymbolResolveVisitor::pushSymbol( const Definition::Ptr& symbol )
 {
     const auto& name = symbol->identifier()->name();
+
+    static const auto THIS( "this" );
+    if( name == THIS )
+    {
+        if( not m_objectDefinition )
+        {
+            m_log.error(
+                { variable->sourceLocation() },
+                "'this' can only be used inside a feature and implement definition" );
+            return;
+        }
+
+        variable->setObjectDefinition( m_objectDefinition );
+    }
 
     const auto result = m_scopeSymbols.emplace( name, symbol );
     if( not result.second )
