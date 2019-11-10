@@ -74,9 +74,11 @@ class TypeCheckVisitor final : public RecursiveVisitor
     TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
     void visit( InitDefinition& node ) override;
+    void visit( Initializer& node ) override;
     void visit( UsingDefinition& node ) override;
     void visit( StructureDefinition& node ) override;
     void visit( FeatureDefinition& node ) override;
+    void visit( ImplementDefinition& node ) override;
 
     void visit( BasicType& node ) override;
     void visit( TupleType& node ) override;
@@ -88,11 +90,13 @@ class TypeCheckVisitor final : public RecursiveVisitor
   private:
     libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
+    libcasm_ir::Type::Ptr m_objectType;
 };
 
 TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
+, m_objectType()
 {
 }
 
@@ -100,6 +104,16 @@ void TypeCheckVisitor::visit( InitDefinition& node )
 {
     RecursiveVisitor::visit( node );
     node.programFunction()->accept( *this );
+}
+
+void TypeCheckVisitor::visit( Initializer& node )
+{
+    if( m_objectType )
+    {
+        node.setObjectType( m_objectType );
+    }
+
+    node.updateRule()->accept( *this );
 }
 
 void TypeCheckVisitor::visit( UsingDefinition& node )
@@ -110,36 +124,44 @@ void TypeCheckVisitor::visit( UsingDefinition& node )
 
 void TypeCheckVisitor::visit( StructureDefinition& node )
 {
-    RecursiveVisitor::visit( node );
-
     const auto& name = node.identifier()->name();
-
-    if( node.type() )
-    {
-        return;
-    }
-
     m_log.debug( "creating IR structure type '" + name + "'" );
     const auto structure = std::make_shared< libcasm_ir::Structure >( name );
     const auto type = std::make_shared< libcasm_ir::StructureType >( structure );
     node.setType( type );
+    m_objectType = node.type();
+
+    RecursiveVisitor::visit( node );
+
+    m_objectType = nullptr;
 }
 
 void TypeCheckVisitor::visit( FeatureDefinition& node )
 {
-    RecursiveVisitor::visit( node );
-
     const auto& name = node.identifier()->name();
-
-    if( node.type() )
-    {
-        return;
-    }
-
     m_log.debug( "creating IR feature type '" + name + "'" );
     const auto feature = std::make_shared< libcasm_ir::Feature >( name );
     const auto type = std::make_shared< libcasm_ir::FeatureType >( feature );
     node.setType( type );
+    m_objectType = node.type();
+
+    RecursiveVisitor::visit( node );
+
+    m_objectType = nullptr;
+}
+
+void TypeCheckVisitor::visit( ImplementDefinition& node )
+{
+    const auto& name = node.identifier()->name();
+    const auto structureSymbol = m_symboltable.findSymbol( name );
+    assert( structureSymbol and " inconsistent state, checked during symbol registration " );
+    assert( structureSymbol->id() == Node::ID::STRUCTURE_DEFINITION );
+    node.setType( structureSymbol->type() );
+    m_objectType = node.type();
+
+    RecursiveVisitor::visit( node );
+
+    m_objectType = nullptr;
 }
 
 void TypeCheckVisitor::visit( BasicType& node )
@@ -218,6 +240,17 @@ void TypeCheckVisitor::visit( BasicType& node )
             "reference type '" + name + "' defined without a relation, use '" + name +
                 "< /* relation type */  >'",
             Code::TypeAnnotationRelationTypeHasNoSubType );
+    }
+    else if( TypeInfo::instance().isStructureType( name ) )
+    {
+        if( not m_objectType )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "type '" + name + "' can only be used inside feature and implement definitions" );
+            return;
+        }
+        node.setType( m_objectType );
     }
     else
     {
