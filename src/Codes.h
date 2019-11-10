@@ -136,6 +136,13 @@ namespace libcasm_fe
         FeatureDefinitionAlreadyUsed = 0x5600,
         FeatureDefinitionIdentifierIsBuiltinName = 0x5610,
 
+        // ---------------------------------------------------------
+        // implement errors
+
+        ImplementDefinitionAlreadyUsed = 0x5700,
+        ImplementDefinitionIdentifierIsBuiltinName = 0x5710,
+        ImplementDefinitionOfUndefinedStructure = 0x5720,
+
         // --------------------------------------------------------- 5*** ...
         // rule errors
 
