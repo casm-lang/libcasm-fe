@@ -88,6 +88,7 @@ EnumerationDefinition ::= "enumeration" Identifier "=" "{" Enumerators "}"
 #+begin_src
 DerivedDefinition ::= "derived" Identifier "->" Type "=" Term
                     | "derived" Identifier "(" Parameters ")" "->" Type "=" Term
+                    | "derived" Identifier "(" MethodParameters ")" "->" Type "=" Term
 #+end_src
 
 #+html: {{page>.:grammar:DerivedDefinition&noheader&nofooter}}
@@ -100,6 +101,8 @@ RuleDefinition ::= "rule" Identifier "=" Rule
                  | "rule" Identifier "->" Type "=" Rule
                  | "rule" Identifier "(" Parameters ")" "=" Rule
                  | "rule" Identifier "(" Parameters ")" "->" Type "=" Rule
+                 | "rule" Identifier "(" MethodParameters ")" "=" Rule
+                 | "rule" Identifier "(" MethodParameters ")" "->" Type "=" Rule
 #+end_src
 
 #+html: {{page>.:grammar:RuleDefinition&noheader&nofooter}}
@@ -531,7 +534,9 @@ CallExpression ::= DirectCallExpression
 ** DirectCallExpression
 
 #+begin_src
-DirectCallExpression ::= IdentifierPath
+DirectCallExpression ::= "self"
+                       | "this"
+                       | IdentifierPath
                        | IdentifierPath "(" ")"
                        | IdentifierPath "(" Terms ")"
 #+end_src
@@ -647,7 +652,6 @@ Literal ::= UndefinedLiteral
           | RangeLiteral
           | TupleLiteral
           | RecordLiteral
-          | StructureLiteral
 #+end_src
 
 #+html: {{page>.:grammar:Literal&noheader&nofooter}}
@@ -758,19 +762,10 @@ TupleLiteral ::= "(" Terms "," Term ")"
 ** RecordLiteral
 
 #+begin_src
-RecordLiteral ::= "(" Assignments ")"
+RecordLiteral ::= "{" Assignments "}"
 #+end_src
 
 #+html: {{page>.:grammar:RecordLiteral&noheader&nofooter}}
-
-
-** StructureLiteral
-
-#+begin_src
-StructureLiteral ::= BasicType "(" ")"
-#+end_src
-
-#+html: {{page>.:grammar:StructureLiteral&noheader&nofooter}}
 
 
 ** Assignments
@@ -888,6 +883,16 @@ MaybeFunctionParameters ::= FunctionParameters
 #+end_src
 
 #+html: {{page>.:grammar:MaybeFunctionParameters&noheader&nofooter}}
+
+
+** MethodParameters
+
+#+begin_src
+MethodParameters ::= MethodParameters "," TypedAttributedVariable
+                   | "this"
+#+end_src
+
+#+html: {{page>.:grammar:MethodParameters&noheader&nofooter}}
 
 
 ** Parameters
