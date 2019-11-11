@@ -428,10 +428,7 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
         }
         case DirectCallExpression::TargetType::BUILTIN:
         {
-            const auto id = node.targetBuiltinId();
-            const auto builtin = libcasm_ir::Builtin::create( id, type );
-            m_statement->add< libcasm_ir::CallInstruction >( builtin, args );
-            m_specification->add( builtin );
+            assert( not" unimplemented direct expr call " );
             break;
         }
         case DirectCallExpression::TargetType::RULE:
@@ -475,6 +472,11 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
 
             m_specification->add( constant );
             m_ast2ir.emplace( &node, constant );
+            break;
+        }
+        case DirectCallExpression::TargetType::THIS:
+        {
+            assert( not" unimplemented this call " );
             break;
         }
         case DirectCallExpression::TargetType::UNKNOWN:
