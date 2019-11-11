@@ -430,7 +430,7 @@ void ExecutionVisitor::visit( BuiltinDefinition& node )
         const auto& arguments = m_frameStack.top()->locals();
         IR::Constant returnValue;
 
-        RT::Value::execute(
+        IR::Operation::execute(
             node.targetBuiltinId(), type, returnValue, arguments.data(), arguments.size() );
 
         const auto& returnType = type->result();
@@ -551,6 +551,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 {
     switch( node.targetType() )
     {
+        case DirectCallExpression::TargetType::BUILTIN:   // [[fallthrough]]
         case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
         case DirectCallExpression::TargetType::DERIVED:
         {
@@ -579,13 +580,6 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             }
             break;
         }
-        case DirectCallExpression::TargetType::BUILTIN:
-        {
-            m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
-            invokeBuiltin( node, node.targetBuiltinId(), node.targetBuiltinType() );
-            m_frameStack.pop();
-            break;
-        }
         case DirectCallExpression::TargetType::TYPE_DOMAIN:
         {
             m_evaluationStack.push( IR::DomainConstant( node.type() ) );
@@ -600,6 +594,11 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::SELF:
         {
             m_evaluationStack.push( m_agentId );
+            break;
+        }
+        case DirectCallExpression::TargetType::THIS:
+        {
+            assert( !"unimplemented THIS" );
             break;
         }
         case DirectCallExpression::TargetType::UNKNOWN:
@@ -663,14 +662,6 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
             }
             break;
         }
-        case MethodCallExpression::MethodType::BUILTIN:
-        {
-            m_frameStack.push(
-                makeObjectFrame( object, &node, nullptr, node.arguments()->size() ) );
-            invokeBuiltin( node, node.targetBuiltinId(), node.targetBuiltinType() );
-            m_frameStack.pop();
-            break;
-        }
         case MethodCallExpression::MethodType::UNKNOWN:
         {
             assert( !"cannot call an unknown method" );
@@ -720,6 +711,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     const auto& literal = value.value();
     switch( literal->referenceType() )
     {
+        case ReferenceLiteral::ReferenceType::BUILTIN:   // [[fallthrough]]
         case ReferenceLiteral::ReferenceType::FUNCTION:  // [[fallthrough]]
         case ReferenceLiteral::ReferenceType::DERIVED:
         {
@@ -748,13 +740,6 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             }
             break;
         }
-        case ReferenceLiteral::ReferenceType::BUILTIN:
-        {
-            m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
-            invokeBuiltin( node, literal->builtinId(), literal->type() );
-            m_frameStack.pop();
-            break;
-        }
         case ReferenceLiteral::ReferenceType::UNKNOWN:
         {
             assert( !"cannot call an unknown target" );
@@ -768,22 +753,11 @@ void ExecutionVisitor::visit( TypeCastingExpression& node )
     node.fromExpression()->accept( *this );
     const auto object = m_evaluationStack.pop();
 
-    switch( node.castingType() )
-    {
-        case TypeCastingExpression::CastingType::BUILTIN:
-        {
-            m_frameStack.push(
-                makeObjectFrame( object, &node, nullptr, node.arguments()->size() ) );
-            invokeBuiltin( node, node.targetBuiltinId(), node.targetBuiltinType() );
-            m_frameStack.pop();
-            break;
-        }
-        case TypeCastingExpression::CastingType::UNKNOWN:
-        {
-            assert( !"cannot call an unknown method" );
-            break;
-        }
-    }
+    throw RuntimeException(
+        node.sourceLocation(),
+        "unimplemented",
+        m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+        Code::Unspecified );
 }
 
 void ExecutionVisitor::visit( UnaryExpression& node )
@@ -992,11 +966,11 @@ void ExecutionVisitor::visit( CardinalityExpression& node )
     node.expression()->accept( *this );
     const auto object = m_evaluationStack.pop();
 
-    assert( node.cardinalityType() == CardinalityExpression::CardinalityType::BUILTIN );
-
-    m_frameStack.push( makeObjectFrame( object, &node, nullptr, node.arguments()->size() ) );
-    invokeBuiltin( node, node.targetBuiltinId(), node.targetBuiltinType() );
-    m_frameStack.pop();
+    throw RuntimeException(
+        node.sourceLocation(),
+        "unimplemented",
+        m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+        Code::Unspecified );
 }
 
 void ExecutionVisitor::visit( ConditionalRule& node )
@@ -1417,34 +1391,6 @@ std::unique_ptr< Frame > ExecutionVisitor::makeObjectFrame(
     }
 
     return frame;
-}
-
-void ExecutionVisitor::invokeBuiltin(
-    const Node& node, IR::Value::ID id, const IR::Type::Ptr& type )
-{
-    validateArguments( node, type->arguments(), {}, Code::BuiltinArgumentValueInvalid );
-
-    try
-    {
-        const auto& arguments = m_frameStack.top()->locals();
-        IR::Constant returnValue;
-
-        IR::Operation::execute( id, type, returnValue, arguments.data(), arguments.size() );
-
-        const auto& returnType = type->result();
-        if( not returnType.isVoid() )
-        {
-            m_evaluationStack.push( returnValue );
-        }
-    }
-    catch( const std::exception& e )
-    {
-        throw RuntimeException(
-            { node.sourceLocation() },
-            "builtin has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::RuntimeException );
-    }
 }
 
 void ExecutionVisitor::validateValue(

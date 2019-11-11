@@ -259,20 +259,6 @@ namespace libcasm_fe
             Ast::Node* callee,
             std::size_t numberOfLocals );
 
-        /**
-         * Calls the builtin with id \a id.
-         *
-         * It uses the locals of the current frame as argument values.
-         *
-         * @param node The AST node in whose context the invocation is performed
-         *             (used for the error location and stack trace generation)
-         * @param id ID of the builtin
-         * @param type Relation type of the builtin
-         *
-         * @throws RuntimeException in case of an error
-         */
-        void invokeBuiltin( const Ast::Node& node, IR::Value::ID id, const IR::Type::Ptr& type );
-
         enum class ValidationFlag
         {
             ValueMustBeDefined,
