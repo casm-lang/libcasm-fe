@@ -249,7 +249,12 @@ void SymbolRegistrationVisitor::visit( InitDefinition& node )
     const auto programFunctionInitializers = programFunction->initially()->initializers();
     for( auto& programFunctionInitializer : *programFunctionInitializers )
     {
-        programFunctionInitializer->setFunction( programFunction );
+        const auto updateRuleFunction = programFunctionInitializer->updateRule()->function();
+        assert( updateRuleFunction->id() == Node::ID::DIRECT_CALL_EXPRESSION );
+        const auto directCallExpression =
+            std::static_pointer_cast< DirectCallExpression >( updateRuleFunction );
+        directCallExpression->setIdentifier(
+            IdentifierPath::fromIdentifier( programFunction->identifier() ) );
     }
 
     registerSymbol( *node.programFunction() );
@@ -258,6 +263,19 @@ void SymbolRegistrationVisitor::visit( InitDefinition& node )
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 {
     registerSymbol( node );
+
+    // apply the name of the function declaration to the initializer functions
+    const auto initially = node.initially();
+    for( auto& initializer : *initially->initializers() )
+    {
+        const auto updateRuleFunction = initializer->updateRule()->function();
+        assert( updateRuleFunction->id() == Node::ID::DIRECT_CALL_EXPRESSION );
+        const auto directCallExpression =
+            std::static_pointer_cast< DirectCallExpression >( updateRuleFunction );
+        directCallExpression->setIdentifier( IdentifierPath::fromIdentifier( node.identifier() ) );
+    }
+
+    RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
@@ -415,7 +433,7 @@ void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
     {
         // find the feature symbol
         const auto featureSymbol = m_symboltable.findSymbol( *node.feature() );
-        if( not featureSymbol )
+        if( not featureSymbol.second )
         {
             m_log.error(
                 { node.sourceLocation() },
@@ -424,7 +442,7 @@ void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
             return;
         }
 
-        name = featureSymbol->identifier()->name();
+        name = featureSymbol.first->identifier()->name();
     }
 
     try
