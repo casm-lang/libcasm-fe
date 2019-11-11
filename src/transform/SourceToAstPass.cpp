@@ -45,19 +45,15 @@
 
 #include "SourceToAstPass.h"
 
-#include "../Lexer.h"
-#include "../various/GrammarParser.tab.h"
-
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
-
-#include <libcasm-fe/analyze/ConsistencyCheckPass>
 #include <libcasm-fe/analyze/ProjectResolverPass>
 #include <libcasm-fe/transform/SourceToAstPass>
-
 #include <libpass/PassRegistry>
+
+#include "../Lexer.h"
+#include "../various/GrammarParser.tab.h"
 
 using namespace libcasm_fe;
 
@@ -96,6 +92,21 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
         log.error( "could not parse '" + specification->location()->toString() + "'" );
         return false;
     }
+
+    const auto println = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "println" ),
+        libcasm_ir::PrintLnBuiltin::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            std::make_shared< libcasm_ir::VoidType >(),
+            std::vector< libcasm_ir::Type::Ptr >{
+                std::make_shared< libcasm_ir::StringType >() } ) );
+
+    const auto printlnProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                     libcasm_ir::Property::PURE };
+
+    println->setProperties( printlnProperties );
+
+    specification->definitions()->add( println );
 
     pr.setOutput< SourceToAstPass >( specification );
     return true;
