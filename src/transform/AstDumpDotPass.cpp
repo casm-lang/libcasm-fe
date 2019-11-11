@@ -45,15 +45,12 @@
 
 #include "AstDumpDotPass.h"
 
-#include "../various/GrammarToken.h"
-
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
 #include <libcasm-fe/ast/RecursiveVisitor>
 #include <libcasm-fe/transform/SourceToAstPass>
-
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
@@ -63,6 +60,8 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
+
+#include "../various/GrammarToken.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -128,6 +127,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( StructureDefinition& node ) override;
     void visit( FeatureDefinition& node ) override;
     void visit( ImplementDefinition& node ) override;
+    void visit( BuiltinDefinition& node ) override;
     void visit( Declaration& node ) override;
 
     void visit( ValueLiteral& node ) override;
@@ -137,7 +137,6 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( RangeLiteral& node ) override;
     void visit( TupleLiteral& node ) override;
     void visit( RecordLiteral& node ) override;
-    void visit( StructureLiteral& node ) override;
 
     void visit( EmbracedExpression& node ) override;
     void visit( NamedExpression& node ) override;
@@ -353,6 +352,14 @@ void AstDumpDotVisitor::visit( ImplementDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpDotVisitor::visit( BuiltinDefinition& node )
+{
+    // TODO: add command-line switch
+    DotLink link( this, &node );
+    dumpNode( node, "BuiltinDefinition" );
+    RecursiveVisitor::visit( node );
+}
+
 void AstDumpDotVisitor::visit( Declaration& node )
 {
     DotLink link( this, &node );
@@ -406,13 +413,6 @@ void AstDumpDotVisitor::visit( RecordLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RecordLiteral" );
-    RecursiveVisitor::visit( node );
-}
-
-void AstDumpDotVisitor::visit( StructureLiteral& node )
-{
-    DotLink link( this, &node );
-    dumpNode( node, "StructureLiteral" );
     RecursiveVisitor::visit( node );
 }
 
