@@ -389,51 +389,10 @@ InitDefinition
 : INIT IdentifierPath
   {
       $$ = Ast::make< InitDefinition >( @$, $1, $2 );
-
-      const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
-      auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
-      const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
-      singleAgent->setTargetType( DirectCallExpression::TargetType::CONSTANT );
-
-      auto programFunction = createProgramFunction( @$ );
-      auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
-      programArguments->add( singleAgent );
-
-      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, uToken, $2 );
-      const auto initializers = Ast::make< Initializers >( @$ );
-      const auto initializer = Ast::make< Initializer >(
-          @$, uToken, programArguments, uToken, uToken, ruleReference );
-      initializers->add( initializer );
-
-      // apply the name of the program declaration to the initializer functions
-      for( auto& initializer : *initializers )
-      {
-          patchUpdateFunctionIdentifier(
-              initializer->updateRule()->function(),
-              programFunction->identifier() );
-      }
-
-      programFunction->setInitializers( initializers );
-      $$->setProgramFunction( programFunction );
   }
 | INIT LCURPAREN Initializers RCURPAREN
   {
       $$ = Ast::make< InitDefinition >( @$, $1, $2, $3, $4 );
-
-      auto programFunction = createProgramFunction( @$ );
-
-      // apply the name of the program declaration to the initializer functions
-      auto initializers = $3;
-      for( auto& initializer : *initializers )
-      {
-          patchUpdateFunctionIdentifier(
-              initializer->updateRule()->function(),
-              programFunction->identifier() );
-      }
-
-      programFunction->setInitializers( initializers );
-      $$->setProgramFunction( programFunction );
   }
 ;
 
@@ -499,7 +458,7 @@ RuleDefinition
 | RULE Identifier LPAREN MethodParameters RPAREN EQUAL Rule
   {
       const auto vType = createVoidType( @$ );
-      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, uToken, vType, $6, $7 );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, Token::unresolved(), vType, $6, $7 );
       $$->setLeftBracketToken( $3 );
       $$->setRightBracketToken( $5 );
   }
@@ -524,15 +483,6 @@ FunctionDefinition
 : FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
       $$ = Ast::make< FunctionDefinition >( @$, $1, $2, $3, $4, $5, $6, $7, $8 );
-
-      // apply the name of the function declaration to the initializer functions
-      const auto initially = $$->initially();
-      for( auto& initializer : *initially->initializers() )
-      {
-          patchUpdateFunctionIdentifier(
-              initializer->updateRule()->function(),
-              $2 );
-      }
   }
 ;
 
@@ -1235,14 +1185,14 @@ DirectCallExpression
 : SELF %prec CALL_WITHOUT_ARGS
   {
       const auto identifier = Ast::make< Identifier >( @1, $1->tokenString() );
-      const auto identifierPath = asIdentifierPath( identifier );
+      const auto identifierPath = IdentifierPath::fromIdentifier( identifier );
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< DirectCallExpression >( @$, identifierPath, arguments );
   }
 | THIS %prec CALL_WITHOUT_ARGS
   {
       const auto identifier = Ast::make< Identifier >( @1, $1->tokenString() );
-      const auto identifierPath = asIdentifierPath( identifier );
+      const auto identifierPath = IdentifierPath::fromIdentifier( identifier );
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< DirectCallExpression >( @$, identifierPath, arguments );
   }
@@ -1744,7 +1694,7 @@ MethodParameters
       auto parameters = Ast::make< NodeList< VariableDefinition > >( @$ );
       const auto identifier = Ast::make< Identifier >( @1, $1->tokenString() );
       const auto unresolvedType = Ast::make< UnresolvedType >( @$ );
-      auto variable = Ast::make< VariableDefinition >( @$, identifier, uToken, unresolvedType );
+      auto variable = Ast::make< VariableDefinition >( @$, identifier, Token::unresolved(), unresolvedType );
       parameters->add( variable );
       $$ = parameters;
   }
