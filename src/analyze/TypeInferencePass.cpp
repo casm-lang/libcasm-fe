@@ -969,7 +969,7 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
     RecursiveVisitor::visit( node );
 
     const auto description = "binary operator '" + node.operationToken()->tokenString() + "'";
-    inference( description, annotation, node, { node.left(), node.right() } );
+    inference( description, node, { node.left(), node.right() } );
 
     RecursiveVisitor::visit( node );
 }
