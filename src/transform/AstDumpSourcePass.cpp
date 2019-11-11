@@ -45,21 +45,18 @@
 
 #include "AstDumpSourcePass.h"
 
-#include "../various/GrammarToken.h"
-
+#include <iostream>
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
-
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/ast/RecursiveVisitor>
 #include <libcasm-fe/transform/SourceToAstPass>
-
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
-#include <iostream>
+#include "../various/GrammarToken.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -79,6 +76,10 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
   public:
     explicit AstDumpSourceVisitor( std::ostream& stream );
 
+    void visit( BuiltinDefinition& node ) override;
+
+    void visit( InitDefinition& node ) override;
+    void visit( Initializer& node ) override;
     void visit( RuleDefinition& node ) override;
     void visit( EmbracedExpression& node ) override;
 
@@ -98,6 +99,37 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
 AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 : m_stream( stream )
 {
+}
+
+void AstDumpSourceVisitor::visit( BuiltinDefinition& node )
+{
+    // omit builtin information
+}
+
+void AstDumpSourceVisitor::visit( InitDefinition& node )
+{
+    node.attributes()->accept( *this );
+    node.initToken()->accept( *this );
+    if( node.isSingleAgent() )
+    {
+        node.initPath()->accept( *this );
+    }
+    else
+    {
+        node.leftBraceToken()->accept( *this );
+        node.initializers()->accept( *this );
+        node.rightBraceToken()->accept( *this );
+    }
+}
+
+void AstDumpSourceVisitor::visit( Initializer& node )
+{
+    node.delimiterToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.arguments()->accept( *this );
+    node.rightBraceToken()->accept( *this );
+    node.mapsToken()->accept( *this );
+    node.value()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( RuleDefinition& node )
