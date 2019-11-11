@@ -119,7 +119,8 @@ Frame* FrameStack::top( void ) const
     return m_frames.back().get();
 }
 
-static std::string generateCalleeTraceLine( Frame* frame, const SourceLocation& problemLocation )
+static std::string generateCalleeTraceLine(
+    Frame* frame, const libstdhl::SourceLocation& problemLocation )
 {
     const auto callee = frame->callee();
     assert( callee != nullptr );
