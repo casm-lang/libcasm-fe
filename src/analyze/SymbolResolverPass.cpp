@@ -414,7 +414,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    auto symbol = m_symboltable.findSymbol( *node.identifier() );
+    auto symbol = tryResolveSymbol( *node.identifier() );
     if( symbol )
     {
         symbol = resolveIfAlias( symbol );
