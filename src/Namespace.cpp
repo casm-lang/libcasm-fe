@@ -103,11 +103,7 @@ Definition::Ptr Namespace::findSymbol( const std::string& name ) const
     return it->second;
 }
 
-< < < < < < HEAD Namespace::Symbol Namespace::findSymbol( const IdentifierPath& path ) const
-=======
-
-    Ast::Definition::Ptr Namespace::findSymbol( const IdentifierPath& path ) const
->>>>>>> Namespace: improved debug output
+Namespace::Symbol Namespace::findSymbol( const IdentifierPath& path ) const
 {
     const auto& pathSegments = *path.identifiers();
 
