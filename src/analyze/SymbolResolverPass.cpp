@@ -75,6 +75,110 @@ static libpass::PassRegistration< SymbolResolverPass > PASS(
     "ast-sym-resolve",
     0 );
 
+//
+//
+// NamespaceResolveVisitor
+//
+
+class NamespaceResolveVisitor final : public RecursiveVisitor
+{
+  public:
+    NamespaceResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
+
+    void visit( UsingPathDefinition& node ) override;
+
+  private:
+    libcasm_fe::Logger& m_log;
+    Namespace& m_symboltable;
+};
+
+NamespaceResolveVisitor::NamespaceResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
+: m_log( log )
+, m_symboltable( symboltable )
+{
+}
+
+void NamespaceResolveVisitor::visit( UsingPathDefinition& node )
+{
+    const auto& path = *node.path();
+    const auto& name = path.baseName();
+    const auto& pathName = path.path();
+
+    if( node.explicitSymbol() )
+    {
+        const auto symbol = m_symboltable.findSymbol( path );
+        const auto definition = symbol.first;
+        const auto accessible = symbol.second;
+        if( not definition )
+        {
+            m_log.error( { node.sourceLocation() }, "unable to resolve symbol '" + pathName + "'" );
+            return;
+        }
+
+        if( not accessible )
+        {
+            m_log.error(
+                { path.sourceLocation() },
+                "'" + pathName + "' is not accessible",
+                Code::SymbolIsInaccessible );
+            m_log.warning(
+                { definition->sourceLocation() },
+                "'" + definition->identifier()->name() + "' has not been exported" );
+        }
+
+        try
+        {
+            m_symboltable.registerSymbol( name, definition );
+        }
+        catch( const std::domain_error& e )
+        {
+            const auto& symbol = m_symboltable.findSymbol( name );
+            m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
+            m_log.info( { definition->sourceLocation() }, e.what() );
+        }
+    }
+    else
+    {
+        const auto usingNamespace = m_symboltable.findNamespace( path );
+        if( not usingNamespace )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "unable to resolve namespace '" + pathName + "'",
+                Code::SymbolIsUnknown );
+
+            return;
+        }
+
+        for( const auto& namespaceSymbol : usingNamespace->symbols() )
+        {
+            const auto& name = namespaceSymbol.first;
+            const auto& definition = namespaceSymbol.second;
+
+            if( definition->exported() )
+            {
+                try
+                {
+                    m_symboltable.registerSymbol( name, definition );
+                }
+                catch( const std::domain_error& e )
+                {
+                    const auto& symbol = m_symboltable.findSymbol( name );
+                    m_log.error(
+                        { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
+                    m_log.info( { definition->sourceLocation() }, e.what() );
+                    m_log.info( { symbol->sourceLocation() }, e.what() );
+                }
+            }
+        }
+    }
+}
+
+//
+//
+// SymbolResolveVisitor
+//
+
 class SymbolResolveVisitor final : public RecursiveVisitor
 {
   public:
@@ -481,6 +585,11 @@ Definition::Ptr SymbolResolveVisitor::tryResolveSymbol( const IdentifierPath& id
     return symbol;
 }
 
+//
+//
+// SymbolResolverPass
+//
+
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
@@ -494,6 +603,13 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
 
     const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
+
+    NamespaceResolveVisitor namespaceResolveVisitor( log, *specification->symboltable() );
+    specification->definitions()->accept( namespaceResolveVisitor );
+
+#ifndef NDEBUG
+    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
+#endif
 
     SymbolResolveVisitor visitor( log, *specification->symboltable() );
     specification->definitions()->accept( visitor );
