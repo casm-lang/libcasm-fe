@@ -114,6 +114,10 @@ std::string Node::description( void ) const
         {
             return "using";
         }
+        case ID::USING_PATH_DEFINITION:
+        {
+            return "using path";
+        }
         case ID::INVARIANT_DEFINITION:
         {
             return "invariant";

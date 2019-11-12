@@ -170,6 +170,15 @@ void RecursiveVisitor::visit( UsingDefinition& node )
     node.type()->accept( *this );
 }
 
+void RecursiveVisitor::visit( UsingPathDefinition& node )
+{
+    node.attributes()->accept( *this );
+    node.usingToken()->accept( *this );
+    node.path()->accept( *this );
+    node.doubleColonToken()->accept( *this );
+    node.asterixToken()->accept( *this );
+}
+
 void RecursiveVisitor::visit( InvariantDefinition& node )
 {
     node.attributes()->accept( *this );

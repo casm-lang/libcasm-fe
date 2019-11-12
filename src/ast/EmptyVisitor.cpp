@@ -95,6 +95,10 @@ void EmptyVisitor::visit( UsingDefinition& )
 {
 }
 
+void EmptyVisitor::visit( UsingPathDefinition& )
+{
+}
+
 void EmptyVisitor::visit( InvariantDefinition& )
 {
 }

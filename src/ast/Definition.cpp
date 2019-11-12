@@ -586,6 +586,61 @@ void UsingDefinition::accept( Visitor& visitor )
 
 //
 //
+// UsingPathDefinition
+//
+
+UsingPathDefinition::UsingPathDefinition(
+    const Token::Ptr& usingToken,
+    const IdentifierPath::Ptr& path,
+    const Token::Ptr& doubleColonToken,
+    const Token::Ptr& asterixToken )
+: Definition( Node::ID::USING_PATH_DEFINITION, std::make_shared< Identifier >() )
+, m_path( path )
+, m_usingToken( usingToken )
+, m_doubleColonToken( doubleColonToken )
+, m_asterixToken( asterixToken )
+{
+}
+
+UsingPathDefinition::UsingPathDefinition(
+    const Token::Ptr& usingToken, const IdentifierPath::Ptr& path )
+: UsingPathDefinition( usingToken, path, Token::unresolved(), Token::unresolved() )
+{
+}
+
+const IdentifierPath::Ptr& UsingPathDefinition::path( void ) const
+{
+    return m_path;
+}
+
+u1 UsingPathDefinition::explicitSymbol( void ) const
+{
+    return m_doubleColonToken->token() == Grammar::Token::UNRESOLVED and
+           m_asterixToken->token() == Grammar::Token::UNRESOLVED;
+}
+
+const Token::Ptr& UsingPathDefinition::usingToken( void ) const
+{
+    return m_usingToken;
+}
+
+const Token::Ptr& UsingPathDefinition::doubleColonToken( void ) const
+{
+    return m_doubleColonToken;
+}
+
+const Token::Ptr& UsingPathDefinition::asterixToken( void ) const
+{
+    return m_asterixToken;
+}
+
+void UsingPathDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
 // InvariantDefinition
 //
 

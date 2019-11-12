@@ -77,6 +77,7 @@ namespace libcasm_fe
                 ENUMERATOR_DEFINITION,
                 ENUMERATION_DEFINITION,
                 USING_DEFINITION,
+                USING_PATH_DEFINITION,
                 INVARIANT_DEFINITION,
                 IMPORT_DEFINITION,
 
