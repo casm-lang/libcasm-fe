@@ -89,7 +89,7 @@ void Namespace::registerNamespace(
     }
 }
 
-Ast::Definition::Ptr Namespace::findSymbol( const std::string& name ) const
+Definition::Ptr Namespace::findSymbol( const std::string& name ) const
 {
     const auto it = m_symbols.find( name );
     if( it == m_symbols.end() )
@@ -152,6 +152,30 @@ Namespace::Ptr Namespace::findNamespace( const std::string& name ) const
     }
 
     return it->second.first;
+}
+
+Namespace::Ptr Namespace::findNamespace( const IdentifierPath& path ) const
+{
+    const auto& pathSegments = *path.identifiers();
+    Namespace::Ptr _namespace = nullptr;
+
+    for( u64 i = 0; i < pathSegments.size(); i++ )
+    {
+        const auto& name = pathSegments[ i ]->name();
+
+        _namespace = findNamespace( name );
+        if( not _namespace )
+        {
+            return nullptr;
+        }
+    }
+
+    return _namespace;
+}
+
+const std::unordered_map< std::string, Ast::Definition::Ptr >& Namespace::symbols( void ) const
+{
+    return m_symbols;
 }
 
 std::string Namespace::dump( const std::string& indention ) const

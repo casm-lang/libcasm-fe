@@ -103,6 +103,10 @@ namespace libcasm_fe
          */
         Namespace::Ptr findNamespace( const std::string& name ) const;
 
+        Namespace::Ptr findNamespace( const Ast::IdentifierPath& path ) const;
+
+        const std::unordered_map< std::string, Ast::Definition::Ptr >& symbols( void ) const;
+
         std::string dump( const std::string& indention = "" ) const;
 
       private:
