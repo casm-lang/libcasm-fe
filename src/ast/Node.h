@@ -191,6 +191,12 @@ namespace libcasm_fe
             {
             }
 
+            explicit NodeList( const std::vector< typename T::Ptr >& elements )
+            : Node( Node::ID::NODE_LIST )
+            , libstdhl::List< T >( elements )
+            {
+            }
+
             void accept( Visitor& visitor ) override final
             {
                 for( auto& node : *this )
