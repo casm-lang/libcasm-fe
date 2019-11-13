@@ -44,6 +44,7 @@
 
 #include "Namespace.h"
 
+#include <libstdhl/Ansi>
 #include <libstdhl/String>
 
 #include "various/GrammarToken.h"
@@ -75,7 +76,8 @@ void Namespace::registerSymbol( const std::string& name, const Ast::Definition::
     {
         const auto& existingDefinition = result.first->second;
         throw std::domain_error(
-            "symbol '" + name + "' already defined as '" + existingDefinition->description() + "'" );
+            "symbol '" + name + "' already defined as '" + existingDefinition->description() +
+            "'" );
     }
 }
 
@@ -105,15 +107,14 @@ Namespace::Symbol Namespace::findSymbol( const IdentifierPath& path ) const
     const auto& pathSegments = *path.identifiers();
 
     u1 externalImport = false;
-    u1 inaccessibleNamespace = false;
     auto* _namespace = this;
 
     for( u64 i = 0; i < ( pathSegments.size() - 1 ); i++ )
     {
         const auto& name = pathSegments[ i ]->name();
 
-        const auto it = m_namespaces.find( name );
-        if( it == m_namespaces.end() )
+        const auto it = _namespace->m_namespaces.find( name );
+        if( it == _namespace->m_namespaces.end() )
         {
             return Symbol{ nullptr, false };
         }
@@ -127,7 +128,7 @@ Namespace::Symbol Namespace::findSymbol( const IdentifierPath& path ) const
         }
         else if( visibility == Visibility::Internal and externalImport )
         {
-            inaccessibleNamespace = true;
+            externalImport = false;
         }
     }
 
@@ -138,9 +139,7 @@ Namespace::Symbol Namespace::findSymbol( const IdentifierPath& path ) const
         return Symbol{ nullptr, false };
     }
 
-    return Symbol{ definition,
-                   ( not externalImport or definition->exported() ) and
-                       ( not inaccessibleNamespace ) };
+    return Symbol{ definition, not externalImport or definition->exported() };
 }
 
 Namespace::Ptr Namespace::findNamespace( const std::string& name ) const
@@ -157,17 +156,18 @@ Namespace::Ptr Namespace::findNamespace( const std::string& name ) const
 Namespace::Ptr Namespace::findNamespace( const IdentifierPath& path ) const
 {
     const auto& pathSegments = *path.identifiers();
-    Namespace::Ptr _namespace = nullptr;
+    assert( pathSegments.size() >= 1 );
+    Namespace::Ptr _namespace = findNamespace( pathSegments[ 0 ]->name() );
 
-    for( u64 i = 0; i < pathSegments.size(); i++ )
+    for( u64 i = 1; i < pathSegments.size(); i++ )
     {
-        const auto& name = pathSegments[ i ]->name();
-
-        _namespace = findNamespace( name );
         if( not _namespace )
         {
             return nullptr;
         }
+
+        const auto& name = pathSegments[ i ]->name();
+        _namespace = _namespace->findNamespace( name );
     }
 
     return _namespace;
@@ -187,23 +187,27 @@ std::string Namespace::dump( const std::string& indention ) const
 std::string Namespace::dump(
     const std::string& indention, std::unordered_set< const Namespace* >& visited ) const
 {
-    const auto it = visited.emplace( this );  // definition.get() );
+    std::stringstream stream;
+
+    const auto it = visited.emplace( this );
     if( not it.second )
     {
-        // already processed (visited) this namespace
-        return std::string();
+        stream << indention << "...\n";
+        return stream.str();
     }
 
-    std::stringstream stream;
     for( const auto& symbol : m_symbols )
     {
         const auto& name = symbol.first;
         const auto& definition = symbol.second;
-
         const auto& type = definition->type();
 
-        stream << indention << name << " : " << definition->description() << " "
-               << ( type ? type->description() : "$unresolved$" ) << "\n";
+        stream << indention << name << " "
+               << libstdhl::Ansi::format< libstdhl::Ansi::Color::CYAN >( definition->description() )
+               << " "
+               << libstdhl::Ansi::format< libstdhl::Ansi::Color::BLUE >(
+                      type ? type->description() : "$unresolved$" )
+               << "\n";
     }
 
     for( const auto& _namespace : m_namespaces )
@@ -211,11 +215,26 @@ std::string Namespace::dump(
         const auto& name = _namespace.first;
         const auto& space = _namespace.second.first;
         const auto visibility = _namespace.second.second;
+        const auto prefix = indention + name + Namespace::delimiter();
 
-        stream << space->dump( name + Namespace::delimiter(), visited );
+        stream << prefix << ( visibility == Visibility::Internal ? "-" : "+" ) << "\n";
+        stream << space->dump( prefix, visited );
     }
 
-    return stream.str();
+    if( indention == "" )
+    {
+        std::vector< std::string > lines;
+        libstdhl::String::split( stream.str(), "\n", lines );
+        std::sort( lines.begin(), lines.end() );
+        lines.erase( std::remove_if( lines.begin(), lines.end(), []( const std::string& str ) {
+            return str.length() == 0;
+        } ) );
+        return libstdhl::String::join( lines, "\n" ) + "\n";
+    }
+    else
+    {
+        return stream.str();
+    }
 }
 
 //
