@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.4.
+// A Bison parser, made by GNU Bison 3.4.2.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
@@ -673,6 +673,9 @@ namespace libcasm_fe {
       // UsingDefinition
       char dummy70[sizeof (UsingDefinition::Ptr)];
 
+      // UsingPathDefinition
+      char dummy71[sizeof (UsingPathDefinition::Ptr)];
+
       // "binary"
       // "hexadecimal"
       // "integer"
@@ -685,30 +688,30 @@ namespace libcasm_fe {
       // DecimalLiteral
       // BinaryLiteral
       // StringLiteral
-      char dummy71[sizeof (ValueLiteral::Ptr)];
+      char dummy72[sizeof (ValueLiteral::Ptr)];
 
       // VariableBinding
-      char dummy72[sizeof (VariableBinding::Ptr)];
+      char dummy73[sizeof (VariableBinding::Ptr)];
 
       // VariableBindings
-      char dummy73[sizeof (VariableBindings::Ptr)];
+      char dummy74[sizeof (VariableBindings::Ptr)];
 
       // Variable
       // TypedVariable
       // AttributedVariable
       // TypedAttributedVariable
-      char dummy74[sizeof (VariableDefinition::Ptr)];
+      char dummy75[sizeof (VariableDefinition::Ptr)];
 
       // Parameters
       // AttributedVariables
       // TypedVariables
-      char dummy75[sizeof (VariableDefinitions::Ptr)];
+      char dummy76[sizeof (VariableDefinitions::Ptr)];
 
       // WhileRule
-      char dummy76[sizeof (WhileRule::Ptr)];
+      char dummy77[sizeof (WhileRule::Ptr)];
 
       // Type
-      char dummy77[sizeof (libcasm_fe::Ast::Type::Ptr)];
+      char dummy78[sizeof (libcasm_fe::Ast::Type::Ptr)];
     };
 
     /// The size of the largest semantic type.
@@ -1806,6 +1809,19 @@ namespace libcasm_fe {
       {}
 #endif
 #if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, UsingPathDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const UsingPathDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ValueLiteral::Ptr&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
@@ -1995,67 +2011,67 @@ switch (yytype)
         value.template destroy< Ast::Token::Ptr > ();
         break;
 
-      case 177: // Attribute
+      case 178: // Attribute
         value.template destroy< Attribute::Ptr > ();
         break;
 
-      case 176: // Attributes
+      case 177: // Attributes
         value.template destroy< Attributes::Ptr > ();
         break;
 
-      case 178: // BasicAttribute
+      case 179: // BasicAttribute
         value.template destroy< BasicAttribute::Ptr > ();
         break;
 
-      case 153: // BasicType
+      case 154: // BasicType
         value.template destroy< BasicType::Ptr > ();
         break;
 
-      case 115: // BlockRule
+      case 116: // BlockRule
         value.template destroy< BlockRule::Ptr > ();
         break;
 
-      case 124: // CallExpression
+      case 125: // CallExpression
         value.template destroy< CallExpression::Ptr > ();
         break;
 
-      case 118: // CallRule
+      case 119: // CallRule
         value.template destroy< CallRule::Ptr > ();
         break;
 
-      case 135: // CardinalityExpression
+      case 136: // CardinalityExpression
         value.template destroy< CardinalityExpression::Ptr > ();
         break;
 
-      case 110: // CaseLabel
+      case 111: // CaseLabel
         value.template destroy< Case::Ptr > ();
         break;
 
-      case 108: // CaseRule
+      case 109: // CaseRule
         value.template destroy< CaseRule::Ptr > ();
         break;
 
-      case 109: // CaseLabels
+      case 110: // CaseLabels
         value.template destroy< Cases::Ptr > ();
         break;
 
-      case 132: // ChooseExpression
+      case 133: // ChooseExpression
         value.template destroy< ChooseExpression::Ptr > ();
         break;
 
-      case 113: // ChooseRule
+      case 114: // ChooseRule
         value.template destroy< ChooseRule::Ptr > ();
         break;
 
-      case 131: // ConditionalExpression
+      case 132: // ConditionalExpression
         value.template destroy< ConditionalExpression::Ptr > ();
         break;
 
-      case 107: // ConditionalRule
+      case 108: // ConditionalRule
         value.template destroy< ConditionalRule::Ptr > ();
         break;
 
-      case 162: // MaybeDefined
+      case 163: // MaybeDefined
         value.template destroy< Defined::Ptr > ();
         break;
 
@@ -2072,7 +2088,7 @@ switch (yytype)
         value.template destroy< DerivedDefinition::Ptr > ();
         break;
 
-      case 125: // DirectCallExpression
+      case 126: // DirectCallExpression
         value.template destroy< DirectCallExpression::Ptr > ();
         break;
 
@@ -2088,29 +2104,29 @@ switch (yytype)
         value.template destroy< Enumerators::Ptr > ();
         break;
 
-      case 134: // ExistentialQuantifierExpression
+      case 135: // ExistentialQuantifierExpression
         value.template destroy< ExistentialQuantifierExpression::Ptr > ();
         break;
 
-      case 121: // Term
-      case 122: // SimpleOrClaspedTerm
-      case 123: // OperatorExpression
+      case 122: // Term
+      case 123: // SimpleOrClaspedTerm
+      case 124: // OperatorExpression
         value.template destroy< Expression::Ptr > ();
         break;
 
-      case 179: // ExpressionAttribute
+      case 180: // ExpressionAttribute
         value.template destroy< ExpressionAttribute::Ptr > ();
         break;
 
-      case 120: // Terms
+      case 121: // Terms
         value.template destroy< Expressions::Ptr > ();
         break;
 
-      case 158: // FixedSizedType
+      case 159: // FixedSizedType
         value.template destroy< FixedSizedType::Ptr > ();
         break;
 
-      case 112: // ForallRule
+      case 113: // ForallRule
         value.template destroy< ForallRule::Ptr > ();
         break;
 
@@ -2123,19 +2139,19 @@ switch (yytype)
         break;
 
       case 82: // "identifier"
-      case 166: // Identifier
+      case 167: // Identifier
         value.template destroy< Identifier::Ptr > ();
         break;
 
-      case 167: // IdentifierPath
+      case 168: // IdentifierPath
         value.template destroy< IdentifierPath::Ptr > ();
         break;
 
-      case 103: // ImportDefinition
+      case 104: // ImportDefinition
         value.template destroy< ImportDefinition::Ptr > ();
         break;
 
-      case 128: // IndirectCallExpression
+      case 129: // IndirectCallExpression
         value.template destroy< IndirectCallExpression::Ptr > ();
         break;
 
@@ -2143,79 +2159,79 @@ switch (yytype)
         value.template destroy< InitDefinition::Ptr > ();
         break;
 
-      case 165: // Initializer
+      case 166: // Initializer
         value.template destroy< Initializer::Ptr > ();
         break;
 
-      case 164: // Initializers
+      case 165: // Initializers
         value.template destroy< Initializers::Ptr > ();
         break;
 
-      case 163: // MaybeInitially
+      case 164: // MaybeInitially
         value.template destroy< Initially::Ptr > ();
         break;
 
-      case 102: // InvariantDefinition
+      case 103: // InvariantDefinition
         value.template destroy< InvariantDefinition::Ptr > ();
         break;
 
-      case 114: // IterateRule
+      case 115: // IterateRule
         value.template destroy< IterateRule::Ptr > ();
         break;
 
-      case 130: // LetExpression
+      case 131: // LetExpression
         value.template destroy< LetExpression::Ptr > ();
         break;
 
-      case 111: // LetRule
+      case 112: // LetRule
         value.template destroy< LetRule::Ptr > ();
         break;
 
-      case 145: // ListLiteral
+      case 146: // ListLiteral
         value.template destroy< ListLiteral::Ptr > ();
         break;
 
-      case 136: // Literal
+      case 137: // Literal
         value.template destroy< Literal::Ptr > ();
         break;
 
-      case 127: // LiteralCallExpression
+      case 128: // LiteralCallExpression
         value.template destroy< LiteralCallExpression::Ptr > ();
         break;
 
-      case 126: // MethodCallExpression
+      case 127: // MethodCallExpression
         value.template destroy< MethodCallExpression::Ptr > ();
         break;
 
-      case 150: // Assignment
+      case 151: // Assignment
         value.template destroy< NamedExpression::Ptr > ();
         break;
 
-      case 149: // Assignments
+      case 150: // Assignments
         value.template destroy< NamedExpressions::Ptr > ();
         break;
 
-      case 146: // RangeLiteral
+      case 147: // RangeLiteral
         value.template destroy< RangeLiteral::Ptr > ();
         break;
 
-      case 148: // RecordLiteral
+      case 149: // RecordLiteral
         value.template destroy< RecordLiteral::Ptr > ();
         break;
 
-      case 155: // RecordType
+      case 156: // RecordType
         value.template destroy< RecordType::Ptr > ();
         break;
 
-      case 144: // ReferenceLiteral
+      case 145: // ReferenceLiteral
         value.template destroy< ReferenceLiteral::Ptr > ();
         break;
 
-      case 157: // RelationType
+      case 158: // RelationType
         value.template destroy< RelationType::Ptr > ();
         break;
 
-      case 105: // Rule
+      case 106: // Rule
         value.template destroy< Rule::Ptr > ();
         break;
 
@@ -2223,15 +2239,15 @@ switch (yytype)
         value.template destroy< RuleDefinition::Ptr > ();
         break;
 
-      case 104: // Rules
+      case 105: // Rules
         value.template destroy< Rules::Ptr > ();
         break;
 
-      case 116: // SequenceRule
+      case 117: // SequenceRule
         value.template destroy< SequenceRule::Ptr > ();
         break;
 
-      case 106: // SkipRule
+      case 107: // SkipRule
         value.template destroy< SkipRule::Ptr > ();
         break;
 
@@ -2239,42 +2255,46 @@ switch (yytype)
         value.template destroy< Specification::Ptr > ();
         break;
 
-      case 156: // TemplateType
+      case 157: // TemplateType
         value.template destroy< TemplateType::Ptr > ();
         break;
 
-      case 147: // TupleLiteral
+      case 148: // TupleLiteral
         value.template destroy< TupleLiteral::Ptr > ();
         break;
 
-      case 154: // TupleType
+      case 155: // TupleType
         value.template destroy< TupleType::Ptr > ();
         break;
 
-      case 129: // TypeCastingExpression
+      case 130: // TypeCastingExpression
         value.template destroy< TypeCastingExpression::Ptr > ();
         break;
 
-      case 151: // Types
-      case 159: // FunctionParameters
-      case 160: // MaybeFunctionParameters
+      case 152: // Types
+      case 160: // FunctionParameters
+      case 161: // MaybeFunctionParameters
         value.template destroy< Types::Ptr > ();
         break;
 
-      case 137: // UndefinedLiteral
+      case 138: // UndefinedLiteral
         value.template destroy< UndefLiteral::Ptr > ();
         break;
 
-      case 133: // UniversalQuantifierExpression
+      case 134: // UniversalQuantifierExpression
         value.template destroy< UniversalQuantifierExpression::Ptr > ();
         break;
 
-      case 117: // UpdateRule
+      case 118: // UpdateRule
         value.template destroy< UpdateRule::Ptr > ();
         break;
 
       case 101: // UsingDefinition
         value.template destroy< UsingDefinition::Ptr > ();
+        break;
+
+      case 102: // UsingPathDefinition
+        value.template destroy< UsingPathDefinition::Ptr > ();
         break;
 
       case 76: // "binary"
@@ -2283,41 +2303,41 @@ switch (yytype)
       case 79: // "rational"
       case 80: // "decimal"
       case 81: // "string"
-      case 138: // BooleanLiteral
-      case 139: // IntegerLiteral
-      case 140: // RationalLiteral
-      case 141: // DecimalLiteral
-      case 142: // BinaryLiteral
-      case 143: // StringLiteral
+      case 139: // BooleanLiteral
+      case 140: // IntegerLiteral
+      case 141: // RationalLiteral
+      case 142: // DecimalLiteral
+      case 143: // BinaryLiteral
+      case 144: // StringLiteral
         value.template destroy< ValueLiteral::Ptr > ();
         break;
 
-      case 175: // VariableBinding
+      case 176: // VariableBinding
         value.template destroy< VariableBinding::Ptr > ();
         break;
 
-      case 174: // VariableBindings
+      case 175: // VariableBindings
         value.template destroy< VariableBindings::Ptr > ();
         break;
 
-      case 168: // Variable
-      case 171: // TypedVariable
-      case 172: // AttributedVariable
-      case 173: // TypedAttributedVariable
+      case 169: // Variable
+      case 172: // TypedVariable
+      case 173: // AttributedVariable
+      case 174: // TypedAttributedVariable
         value.template destroy< VariableDefinition::Ptr > ();
         break;
 
-      case 161: // Parameters
-      case 169: // AttributedVariables
-      case 170: // TypedVariables
+      case 162: // Parameters
+      case 170: // AttributedVariables
+      case 171: // TypedVariables
         value.template destroy< VariableDefinitions::Ptr > ();
         break;
 
-      case 119: // WhileRule
+      case 120: // WhileRule
         value.template destroy< WhileRule::Ptr > ();
         break;
 
-      case 152: // Type
+      case 153: // Type
         value.template destroy< libcasm_fe::Ast::Type::Ptr > ();
         break;
 
@@ -3778,7 +3798,7 @@ switch (yytype)
 
 
   private:
-    /// This class is not copiable.
+    /// This class is not copyable.
     Parser (const Parser&);
     Parser& operator= (const Parser&);
 
@@ -4081,8 +4101,8 @@ switch (yytype)
     enum
     {
       yyeof_ = 0,
-      yylast_ = 2640,     ///< Last index in yytable_.
-      yynnts_ = 92,  ///< Number of nonterminal symbols.
+      yylast_ = 2607,     ///< Last index in yytable_.
+      yynnts_ = 93,  ///< Number of nonterminal symbols.
       yyfinal_ = 13, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
@@ -4239,67 +4259,67 @@ switch (yytype)
         value.move< Ast::Token::Ptr > (std::move (that.value));
         break;
 
-      case 177: // Attribute
+      case 178: // Attribute
         value.move< Attribute::Ptr > (std::move (that.value));
         break;
 
-      case 176: // Attributes
+      case 177: // Attributes
         value.move< Attributes::Ptr > (std::move (that.value));
         break;
 
-      case 178: // BasicAttribute
+      case 179: // BasicAttribute
         value.move< BasicAttribute::Ptr > (std::move (that.value));
         break;
 
-      case 153: // BasicType
+      case 154: // BasicType
         value.move< BasicType::Ptr > (std::move (that.value));
         break;
 
-      case 115: // BlockRule
+      case 116: // BlockRule
         value.move< BlockRule::Ptr > (std::move (that.value));
         break;
 
-      case 124: // CallExpression
+      case 125: // CallExpression
         value.move< CallExpression::Ptr > (std::move (that.value));
         break;
 
-      case 118: // CallRule
+      case 119: // CallRule
         value.move< CallRule::Ptr > (std::move (that.value));
         break;
 
-      case 135: // CardinalityExpression
+      case 136: // CardinalityExpression
         value.move< CardinalityExpression::Ptr > (std::move (that.value));
         break;
 
-      case 110: // CaseLabel
+      case 111: // CaseLabel
         value.move< Case::Ptr > (std::move (that.value));
         break;
 
-      case 108: // CaseRule
+      case 109: // CaseRule
         value.move< CaseRule::Ptr > (std::move (that.value));
         break;
 
-      case 109: // CaseLabels
+      case 110: // CaseLabels
         value.move< Cases::Ptr > (std::move (that.value));
         break;
 
-      case 132: // ChooseExpression
+      case 133: // ChooseExpression
         value.move< ChooseExpression::Ptr > (std::move (that.value));
         break;
 
-      case 113: // ChooseRule
+      case 114: // ChooseRule
         value.move< ChooseRule::Ptr > (std::move (that.value));
         break;
 
-      case 131: // ConditionalExpression
+      case 132: // ConditionalExpression
         value.move< ConditionalExpression::Ptr > (std::move (that.value));
         break;
 
-      case 107: // ConditionalRule
+      case 108: // ConditionalRule
         value.move< ConditionalRule::Ptr > (std::move (that.value));
         break;
 
-      case 162: // MaybeDefined
+      case 163: // MaybeDefined
         value.move< Defined::Ptr > (std::move (that.value));
         break;
 
@@ -4316,7 +4336,7 @@ switch (yytype)
         value.move< DerivedDefinition::Ptr > (std::move (that.value));
         break;
 
-      case 125: // DirectCallExpression
+      case 126: // DirectCallExpression
         value.move< DirectCallExpression::Ptr > (std::move (that.value));
         break;
 
@@ -4332,29 +4352,29 @@ switch (yytype)
         value.move< Enumerators::Ptr > (std::move (that.value));
         break;
 
-      case 134: // ExistentialQuantifierExpression
+      case 135: // ExistentialQuantifierExpression
         value.move< ExistentialQuantifierExpression::Ptr > (std::move (that.value));
         break;
 
-      case 121: // Term
-      case 122: // SimpleOrClaspedTerm
-      case 123: // OperatorExpression
+      case 122: // Term
+      case 123: // SimpleOrClaspedTerm
+      case 124: // OperatorExpression
         value.move< Expression::Ptr > (std::move (that.value));
         break;
 
-      case 179: // ExpressionAttribute
+      case 180: // ExpressionAttribute
         value.move< ExpressionAttribute::Ptr > (std::move (that.value));
         break;
 
-      case 120: // Terms
+      case 121: // Terms
         value.move< Expressions::Ptr > (std::move (that.value));
         break;
 
-      case 158: // FixedSizedType
+      case 159: // FixedSizedType
         value.move< FixedSizedType::Ptr > (std::move (that.value));
         break;
 
-      case 112: // ForallRule
+      case 113: // ForallRule
         value.move< ForallRule::Ptr > (std::move (that.value));
         break;
 
@@ -4367,19 +4387,19 @@ switch (yytype)
         break;
 
       case 82: // "identifier"
-      case 166: // Identifier
+      case 167: // Identifier
         value.move< Identifier::Ptr > (std::move (that.value));
         break;
 
-      case 167: // IdentifierPath
+      case 168: // IdentifierPath
         value.move< IdentifierPath::Ptr > (std::move (that.value));
         break;
 
-      case 103: // ImportDefinition
+      case 104: // ImportDefinition
         value.move< ImportDefinition::Ptr > (std::move (that.value));
         break;
 
-      case 128: // IndirectCallExpression
+      case 129: // IndirectCallExpression
         value.move< IndirectCallExpression::Ptr > (std::move (that.value));
         break;
 
@@ -4387,79 +4407,79 @@ switch (yytype)
         value.move< InitDefinition::Ptr > (std::move (that.value));
         break;
 
-      case 165: // Initializer
+      case 166: // Initializer
         value.move< Initializer::Ptr > (std::move (that.value));
         break;
 
-      case 164: // Initializers
+      case 165: // Initializers
         value.move< Initializers::Ptr > (std::move (that.value));
         break;
 
-      case 163: // MaybeInitially
+      case 164: // MaybeInitially
         value.move< Initially::Ptr > (std::move (that.value));
         break;
 
-      case 102: // InvariantDefinition
+      case 103: // InvariantDefinition
         value.move< InvariantDefinition::Ptr > (std::move (that.value));
         break;
 
-      case 114: // IterateRule
+      case 115: // IterateRule
         value.move< IterateRule::Ptr > (std::move (that.value));
         break;
 
-      case 130: // LetExpression
+      case 131: // LetExpression
         value.move< LetExpression::Ptr > (std::move (that.value));
         break;
 
-      case 111: // LetRule
+      case 112: // LetRule
         value.move< LetRule::Ptr > (std::move (that.value));
         break;
 
-      case 145: // ListLiteral
+      case 146: // ListLiteral
         value.move< ListLiteral::Ptr > (std::move (that.value));
         break;
 
-      case 136: // Literal
+      case 137: // Literal
         value.move< Literal::Ptr > (std::move (that.value));
         break;
 
-      case 127: // LiteralCallExpression
+      case 128: // LiteralCallExpression
         value.move< LiteralCallExpression::Ptr > (std::move (that.value));
         break;
 
-      case 126: // MethodCallExpression
+      case 127: // MethodCallExpression
         value.move< MethodCallExpression::Ptr > (std::move (that.value));
         break;
 
-      case 150: // Assignment
+      case 151: // Assignment
         value.move< NamedExpression::Ptr > (std::move (that.value));
         break;
 
-      case 149: // Assignments
+      case 150: // Assignments
         value.move< NamedExpressions::Ptr > (std::move (that.value));
         break;
 
-      case 146: // RangeLiteral
+      case 147: // RangeLiteral
         value.move< RangeLiteral::Ptr > (std::move (that.value));
         break;
 
-      case 148: // RecordLiteral
+      case 149: // RecordLiteral
         value.move< RecordLiteral::Ptr > (std::move (that.value));
         break;
 
-      case 155: // RecordType
+      case 156: // RecordType
         value.move< RecordType::Ptr > (std::move (that.value));
         break;
 
-      case 144: // ReferenceLiteral
+      case 145: // ReferenceLiteral
         value.move< ReferenceLiteral::Ptr > (std::move (that.value));
         break;
 
-      case 157: // RelationType
+      case 158: // RelationType
         value.move< RelationType::Ptr > (std::move (that.value));
         break;
 
-      case 105: // Rule
+      case 106: // Rule
         value.move< Rule::Ptr > (std::move (that.value));
         break;
 
@@ -4467,15 +4487,15 @@ switch (yytype)
         value.move< RuleDefinition::Ptr > (std::move (that.value));
         break;
 
-      case 104: // Rules
+      case 105: // Rules
         value.move< Rules::Ptr > (std::move (that.value));
         break;
 
-      case 116: // SequenceRule
+      case 117: // SequenceRule
         value.move< SequenceRule::Ptr > (std::move (that.value));
         break;
 
-      case 106: // SkipRule
+      case 107: // SkipRule
         value.move< SkipRule::Ptr > (std::move (that.value));
         break;
 
@@ -4483,42 +4503,46 @@ switch (yytype)
         value.move< Specification::Ptr > (std::move (that.value));
         break;
 
-      case 156: // TemplateType
+      case 157: // TemplateType
         value.move< TemplateType::Ptr > (std::move (that.value));
         break;
 
-      case 147: // TupleLiteral
+      case 148: // TupleLiteral
         value.move< TupleLiteral::Ptr > (std::move (that.value));
         break;
 
-      case 154: // TupleType
+      case 155: // TupleType
         value.move< TupleType::Ptr > (std::move (that.value));
         break;
 
-      case 129: // TypeCastingExpression
+      case 130: // TypeCastingExpression
         value.move< TypeCastingExpression::Ptr > (std::move (that.value));
         break;
 
-      case 151: // Types
-      case 159: // FunctionParameters
-      case 160: // MaybeFunctionParameters
+      case 152: // Types
+      case 160: // FunctionParameters
+      case 161: // MaybeFunctionParameters
         value.move< Types::Ptr > (std::move (that.value));
         break;
 
-      case 137: // UndefinedLiteral
+      case 138: // UndefinedLiteral
         value.move< UndefLiteral::Ptr > (std::move (that.value));
         break;
 
-      case 133: // UniversalQuantifierExpression
+      case 134: // UniversalQuantifierExpression
         value.move< UniversalQuantifierExpression::Ptr > (std::move (that.value));
         break;
 
-      case 117: // UpdateRule
+      case 118: // UpdateRule
         value.move< UpdateRule::Ptr > (std::move (that.value));
         break;
 
       case 101: // UsingDefinition
         value.move< UsingDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case 102: // UsingPathDefinition
+        value.move< UsingPathDefinition::Ptr > (std::move (that.value));
         break;
 
       case 76: // "binary"
@@ -4527,41 +4551,41 @@ switch (yytype)
       case 79: // "rational"
       case 80: // "decimal"
       case 81: // "string"
-      case 138: // BooleanLiteral
-      case 139: // IntegerLiteral
-      case 140: // RationalLiteral
-      case 141: // DecimalLiteral
-      case 142: // BinaryLiteral
-      case 143: // StringLiteral
+      case 139: // BooleanLiteral
+      case 140: // IntegerLiteral
+      case 141: // RationalLiteral
+      case 142: // DecimalLiteral
+      case 143: // BinaryLiteral
+      case 144: // StringLiteral
         value.move< ValueLiteral::Ptr > (std::move (that.value));
         break;
 
-      case 175: // VariableBinding
+      case 176: // VariableBinding
         value.move< VariableBinding::Ptr > (std::move (that.value));
         break;
 
-      case 174: // VariableBindings
+      case 175: // VariableBindings
         value.move< VariableBindings::Ptr > (std::move (that.value));
         break;
 
-      case 168: // Variable
-      case 171: // TypedVariable
-      case 172: // AttributedVariable
-      case 173: // TypedAttributedVariable
+      case 169: // Variable
+      case 172: // TypedVariable
+      case 173: // AttributedVariable
+      case 174: // TypedAttributedVariable
         value.move< VariableDefinition::Ptr > (std::move (that.value));
         break;
 
-      case 161: // Parameters
-      case 169: // AttributedVariables
-      case 170: // TypedVariables
+      case 162: // Parameters
+      case 170: // AttributedVariables
+      case 171: // TypedVariables
         value.move< VariableDefinitions::Ptr > (std::move (that.value));
         break;
 
-      case 119: // WhileRule
+      case 120: // WhileRule
         value.move< WhileRule::Ptr > (std::move (that.value));
         break;
 
-      case 152: // Type
+      case 153: // Type
         value.move< libcasm_fe::Ast::Type::Ptr > (std::move (that.value));
         break;
 
@@ -4656,67 +4680,67 @@ switch (yytype)
         value.copy< Ast::Token::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 177: // Attribute
+      case 178: // Attribute
         value.copy< Attribute::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 176: // Attributes
+      case 177: // Attributes
         value.copy< Attributes::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 178: // BasicAttribute
+      case 179: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 153: // BasicType
+      case 154: // BasicType
         value.copy< BasicType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 115: // BlockRule
+      case 116: // BlockRule
         value.copy< BlockRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 124: // CallExpression
+      case 125: // CallExpression
         value.copy< CallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 118: // CallRule
+      case 119: // CallRule
         value.copy< CallRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 135: // CardinalityExpression
+      case 136: // CardinalityExpression
         value.copy< CardinalityExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 110: // CaseLabel
+      case 111: // CaseLabel
         value.copy< Case::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 108: // CaseRule
+      case 109: // CaseRule
         value.copy< CaseRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 109: // CaseLabels
+      case 110: // CaseLabels
         value.copy< Cases::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 132: // ChooseExpression
+      case 133: // ChooseExpression
         value.copy< ChooseExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 113: // ChooseRule
+      case 114: // ChooseRule
         value.copy< ChooseRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 131: // ConditionalExpression
+      case 132: // ConditionalExpression
         value.copy< ConditionalExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 107: // ConditionalRule
+      case 108: // ConditionalRule
         value.copy< ConditionalRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 162: // MaybeDefined
+      case 163: // MaybeDefined
         value.copy< Defined::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -4733,7 +4757,7 @@ switch (yytype)
         value.copy< DerivedDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 125: // DirectCallExpression
+      case 126: // DirectCallExpression
         value.copy< DirectCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -4749,29 +4773,29 @@ switch (yytype)
         value.copy< Enumerators::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 134: // ExistentialQuantifierExpression
+      case 135: // ExistentialQuantifierExpression
         value.copy< ExistentialQuantifierExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 121: // Term
-      case 122: // SimpleOrClaspedTerm
-      case 123: // OperatorExpression
+      case 122: // Term
+      case 123: // SimpleOrClaspedTerm
+      case 124: // OperatorExpression
         value.copy< Expression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 179: // ExpressionAttribute
+      case 180: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 120: // Terms
+      case 121: // Terms
         value.copy< Expressions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 158: // FixedSizedType
+      case 159: // FixedSizedType
         value.copy< FixedSizedType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 112: // ForallRule
+      case 113: // ForallRule
         value.copy< ForallRule::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -4784,19 +4808,19 @@ switch (yytype)
         break;
 
       case 82: // "identifier"
-      case 166: // Identifier
+      case 167: // Identifier
         value.copy< Identifier::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 167: // IdentifierPath
+      case 168: // IdentifierPath
         value.copy< IdentifierPath::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 103: // ImportDefinition
+      case 104: // ImportDefinition
         value.copy< ImportDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 128: // IndirectCallExpression
+      case 129: // IndirectCallExpression
         value.copy< IndirectCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -4804,79 +4828,79 @@ switch (yytype)
         value.copy< InitDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 165: // Initializer
+      case 166: // Initializer
         value.copy< Initializer::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 164: // Initializers
+      case 165: // Initializers
         value.copy< Initializers::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 163: // MaybeInitially
+      case 164: // MaybeInitially
         value.copy< Initially::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 102: // InvariantDefinition
+      case 103: // InvariantDefinition
         value.copy< InvariantDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 114: // IterateRule
+      case 115: // IterateRule
         value.copy< IterateRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 130: // LetExpression
+      case 131: // LetExpression
         value.copy< LetExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 111: // LetRule
+      case 112: // LetRule
         value.copy< LetRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 145: // ListLiteral
+      case 146: // ListLiteral
         value.copy< ListLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 136: // Literal
+      case 137: // Literal
         value.copy< Literal::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 127: // LiteralCallExpression
+      case 128: // LiteralCallExpression
         value.copy< LiteralCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 126: // MethodCallExpression
+      case 127: // MethodCallExpression
         value.copy< MethodCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 150: // Assignment
+      case 151: // Assignment
         value.copy< NamedExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 149: // Assignments
+      case 150: // Assignments
         value.copy< NamedExpressions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 146: // RangeLiteral
+      case 147: // RangeLiteral
         value.copy< RangeLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 148: // RecordLiteral
+      case 149: // RecordLiteral
         value.copy< RecordLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 155: // RecordType
+      case 156: // RecordType
         value.copy< RecordType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 144: // ReferenceLiteral
+      case 145: // ReferenceLiteral
         value.copy< ReferenceLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 157: // RelationType
+      case 158: // RelationType
         value.copy< RelationType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 105: // Rule
+      case 106: // Rule
         value.copy< Rule::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -4884,15 +4908,15 @@ switch (yytype)
         value.copy< RuleDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 104: // Rules
+      case 105: // Rules
         value.copy< Rules::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 116: // SequenceRule
+      case 117: // SequenceRule
         value.copy< SequenceRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 106: // SkipRule
+      case 107: // SkipRule
         value.copy< SkipRule::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -4900,42 +4924,46 @@ switch (yytype)
         value.copy< Specification::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 156: // TemplateType
+      case 157: // TemplateType
         value.copy< TemplateType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 147: // TupleLiteral
+      case 148: // TupleLiteral
         value.copy< TupleLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 154: // TupleType
+      case 155: // TupleType
         value.copy< TupleType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 129: // TypeCastingExpression
+      case 130: // TypeCastingExpression
         value.copy< TypeCastingExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 151: // Types
-      case 159: // FunctionParameters
-      case 160: // MaybeFunctionParameters
+      case 152: // Types
+      case 160: // FunctionParameters
+      case 161: // MaybeFunctionParameters
         value.copy< Types::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 137: // UndefinedLiteral
+      case 138: // UndefinedLiteral
         value.copy< UndefLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 133: // UniversalQuantifierExpression
+      case 134: // UniversalQuantifierExpression
         value.copy< UniversalQuantifierExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 117: // UpdateRule
+      case 118: // UpdateRule
         value.copy< UpdateRule::Ptr > (YY_MOVE (that.value));
         break;
 
       case 101: // UsingDefinition
         value.copy< UsingDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case 102: // UsingPathDefinition
+        value.copy< UsingPathDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
       case 76: // "binary"
@@ -4944,41 +4972,41 @@ switch (yytype)
       case 79: // "rational"
       case 80: // "decimal"
       case 81: // "string"
-      case 138: // BooleanLiteral
-      case 139: // IntegerLiteral
-      case 140: // RationalLiteral
-      case 141: // DecimalLiteral
-      case 142: // BinaryLiteral
-      case 143: // StringLiteral
+      case 139: // BooleanLiteral
+      case 140: // IntegerLiteral
+      case 141: // RationalLiteral
+      case 142: // DecimalLiteral
+      case 143: // BinaryLiteral
+      case 144: // StringLiteral
         value.copy< ValueLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 175: // VariableBinding
+      case 176: // VariableBinding
         value.copy< VariableBinding::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 174: // VariableBindings
+      case 175: // VariableBindings
         value.copy< VariableBindings::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 168: // Variable
-      case 171: // TypedVariable
-      case 172: // AttributedVariable
-      case 173: // TypedAttributedVariable
+      case 169: // Variable
+      case 172: // TypedVariable
+      case 173: // AttributedVariable
+      case 174: // TypedAttributedVariable
         value.copy< VariableDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 161: // Parameters
-      case 169: // AttributedVariables
-      case 170: // TypedVariables
+      case 162: // Parameters
+      case 170: // AttributedVariables
+      case 171: // TypedVariables
         value.copy< VariableDefinitions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 119: // WhileRule
+      case 120: // WhileRule
         value.copy< WhileRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 152: // Type
+      case 153: // Type
         value.copy< libcasm_fe::Ast::Type::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -5080,67 +5108,67 @@ switch (yytype)
         value.move< Ast::Token::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 177: // Attribute
+      case 178: // Attribute
         value.move< Attribute::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 176: // Attributes
+      case 177: // Attributes
         value.move< Attributes::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 178: // BasicAttribute
+      case 179: // BasicAttribute
         value.move< BasicAttribute::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 153: // BasicType
+      case 154: // BasicType
         value.move< BasicType::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 115: // BlockRule
+      case 116: // BlockRule
         value.move< BlockRule::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 124: // CallExpression
+      case 125: // CallExpression
         value.move< CallExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 118: // CallRule
+      case 119: // CallRule
         value.move< CallRule::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 135: // CardinalityExpression
+      case 136: // CardinalityExpression
         value.move< CardinalityExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 110: // CaseLabel
+      case 111: // CaseLabel
         value.move< Case::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 108: // CaseRule
+      case 109: // CaseRule
         value.move< CaseRule::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 109: // CaseLabels
+      case 110: // CaseLabels
         value.move< Cases::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 132: // ChooseExpression
+      case 133: // ChooseExpression
         value.move< ChooseExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 113: // ChooseRule
+      case 114: // ChooseRule
         value.move< ChooseRule::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 131: // ConditionalExpression
+      case 132: // ConditionalExpression
         value.move< ConditionalExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 107: // ConditionalRule
+      case 108: // ConditionalRule
         value.move< ConditionalRule::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 162: // MaybeDefined
+      case 163: // MaybeDefined
         value.move< Defined::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -5157,7 +5185,7 @@ switch (yytype)
         value.move< DerivedDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 125: // DirectCallExpression
+      case 126: // DirectCallExpression
         value.move< DirectCallExpression::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -5173,29 +5201,29 @@ switch (yytype)
         value.move< Enumerators::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 134: // ExistentialQuantifierExpression
+      case 135: // ExistentialQuantifierExpression
         value.move< ExistentialQuantifierExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 121: // Term
-      case 122: // SimpleOrClaspedTerm
-      case 123: // OperatorExpression
+      case 122: // Term
+      case 123: // SimpleOrClaspedTerm
+      case 124: // OperatorExpression
         value.move< Expression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 179: // ExpressionAttribute
+      case 180: // ExpressionAttribute
         value.move< ExpressionAttribute::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 120: // Terms
+      case 121: // Terms
         value.move< Expressions::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 158: // FixedSizedType
+      case 159: // FixedSizedType
         value.move< FixedSizedType::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 112: // ForallRule
+      case 113: // ForallRule
         value.move< ForallRule::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -5208,19 +5236,19 @@ switch (yytype)
         break;
 
       case 82: // "identifier"
-      case 166: // Identifier
+      case 167: // Identifier
         value.move< Identifier::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 167: // IdentifierPath
+      case 168: // IdentifierPath
         value.move< IdentifierPath::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 103: // ImportDefinition
+      case 104: // ImportDefinition
         value.move< ImportDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 128: // IndirectCallExpression
+      case 129: // IndirectCallExpression
         value.move< IndirectCallExpression::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -5228,79 +5256,79 @@ switch (yytype)
         value.move< InitDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 165: // Initializer
+      case 166: // Initializer
         value.move< Initializer::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 164: // Initializers
+      case 165: // Initializers
         value.move< Initializers::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 163: // MaybeInitially
+      case 164: // MaybeInitially
         value.move< Initially::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 102: // InvariantDefinition
+      case 103: // InvariantDefinition
         value.move< InvariantDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 114: // IterateRule
+      case 115: // IterateRule
         value.move< IterateRule::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 130: // LetExpression
+      case 131: // LetExpression
         value.move< LetExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 111: // LetRule
+      case 112: // LetRule
         value.move< LetRule::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 145: // ListLiteral
+      case 146: // ListLiteral
         value.move< ListLiteral::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 136: // Literal
+      case 137: // Literal
         value.move< Literal::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 127: // LiteralCallExpression
+      case 128: // LiteralCallExpression
         value.move< LiteralCallExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 126: // MethodCallExpression
+      case 127: // MethodCallExpression
         value.move< MethodCallExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 150: // Assignment
+      case 151: // Assignment
         value.move< NamedExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 149: // Assignments
+      case 150: // Assignments
         value.move< NamedExpressions::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 146: // RangeLiteral
+      case 147: // RangeLiteral
         value.move< RangeLiteral::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 148: // RecordLiteral
+      case 149: // RecordLiteral
         value.move< RecordLiteral::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 155: // RecordType
+      case 156: // RecordType
         value.move< RecordType::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 144: // ReferenceLiteral
+      case 145: // ReferenceLiteral
         value.move< ReferenceLiteral::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 157: // RelationType
+      case 158: // RelationType
         value.move< RelationType::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 105: // Rule
+      case 106: // Rule
         value.move< Rule::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -5308,15 +5336,15 @@ switch (yytype)
         value.move< RuleDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 104: // Rules
+      case 105: // Rules
         value.move< Rules::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 116: // SequenceRule
+      case 117: // SequenceRule
         value.move< SequenceRule::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 106: // SkipRule
+      case 107: // SkipRule
         value.move< SkipRule::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -5324,42 +5352,46 @@ switch (yytype)
         value.move< Specification::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 156: // TemplateType
+      case 157: // TemplateType
         value.move< TemplateType::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 147: // TupleLiteral
+      case 148: // TupleLiteral
         value.move< TupleLiteral::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 154: // TupleType
+      case 155: // TupleType
         value.move< TupleType::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 129: // TypeCastingExpression
+      case 130: // TypeCastingExpression
         value.move< TypeCastingExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 151: // Types
-      case 159: // FunctionParameters
-      case 160: // MaybeFunctionParameters
+      case 152: // Types
+      case 160: // FunctionParameters
+      case 161: // MaybeFunctionParameters
         value.move< Types::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 137: // UndefinedLiteral
+      case 138: // UndefinedLiteral
         value.move< UndefLiteral::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 133: // UniversalQuantifierExpression
+      case 134: // UniversalQuantifierExpression
         value.move< UniversalQuantifierExpression::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 117: // UpdateRule
+      case 118: // UpdateRule
         value.move< UpdateRule::Ptr > (YY_MOVE (s.value));
         break;
 
       case 101: // UsingDefinition
         value.move< UsingDefinition::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case 102: // UsingPathDefinition
+        value.move< UsingPathDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
       case 76: // "binary"
@@ -5368,41 +5400,41 @@ switch (yytype)
       case 79: // "rational"
       case 80: // "decimal"
       case 81: // "string"
-      case 138: // BooleanLiteral
-      case 139: // IntegerLiteral
-      case 140: // RationalLiteral
-      case 141: // DecimalLiteral
-      case 142: // BinaryLiteral
-      case 143: // StringLiteral
+      case 139: // BooleanLiteral
+      case 140: // IntegerLiteral
+      case 141: // RationalLiteral
+      case 142: // DecimalLiteral
+      case 143: // BinaryLiteral
+      case 144: // StringLiteral
         value.move< ValueLiteral::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 175: // VariableBinding
+      case 176: // VariableBinding
         value.move< VariableBinding::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 174: // VariableBindings
+      case 175: // VariableBindings
         value.move< VariableBindings::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 168: // Variable
-      case 171: // TypedVariable
-      case 172: // AttributedVariable
-      case 173: // TypedAttributedVariable
+      case 169: // Variable
+      case 172: // TypedVariable
+      case 173: // AttributedVariable
+      case 174: // TypedAttributedVariable
         value.move< VariableDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 161: // Parameters
-      case 169: // AttributedVariables
-      case 170: // TypedVariables
+      case 162: // Parameters
+      case 170: // AttributedVariables
+      case 171: // TypedVariables
         value.move< VariableDefinitions::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 119: // WhileRule
+      case 120: // WhileRule
         value.move< WhileRule::Ptr > (YY_MOVE (s.value));
         break;
 
-      case 152: // Type
+      case 153: // Type
         value.move< libcasm_fe::Ast::Type::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -5485,7 +5517,7 @@ switch (yytype)
 
 #line 50 "../../obj/src/GrammarParser.y"
 } // libcasm_fe
-#line 5489 "GrammarParser.tab.h"
+#line 5521 "GrammarParser.tab.h"
 
 
 

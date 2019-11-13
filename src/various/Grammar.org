@@ -53,6 +53,7 @@ Definition ::= InitDefinition
              | RuleDefinition
              | FunctionDefinition
              | UsingDefinition
+             | UsingPathDefinition
              | InvariantDefinition
              | ImportDefinition
 #+end_src
@@ -137,6 +138,16 @@ UsingDefinition ::= "using" Identifier "=" Type
 #+end_src
 
 #+html: {{page>.:grammar:UsingDefinition&noheader&nofooter}}
+
+
+** UsingPathDefinition
+
+#+begin_src
+UsingPathDefinition ::= "using" IdentifierPath
+                      | "using" IdentifierPath "::" "*"
+#+end_src
+
+#+html: {{page>.:grammar:UsingPathDefinition&noheader&nofooter}}
 
 
 ** InvariantDefinition

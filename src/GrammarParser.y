@@ -143,6 +143,7 @@ END       0 "end of file"
 %type <Enumerators::Ptr> Enumerators
 %type <EnumerationDefinition::Ptr> EnumerationDefinition
 %type <UsingDefinition::Ptr> UsingDefinition
+%type <UsingPathDefinition::Ptr> UsingPathDefinition
 %type <InvariantDefinition::Ptr> InvariantDefinition
 %type <ImportDefinition::Ptr> ImportDefinition
 
@@ -346,6 +347,10 @@ Definition
   {
       $$ = $1;
   }
+| UsingPathDefinition
+  {
+      $$ = $1;
+  }
 | InvariantDefinition
   {
       $$ = $1;
@@ -486,6 +491,18 @@ UsingDefinition
 : USING Identifier EQUAL Type
   {
       $$ = Ast::make< UsingDefinition >( @$, $1, $2, $3, $4 );
+  }
+;
+
+
+UsingPathDefinition
+: USING IdentifierPath
+  {
+      $$ = Ast::make< UsingPathDefinition >( @$, $1, $2 );
+  }
+| USING IdentifierPath DOUBLECOLON ASTERIX
+  {
+      $$ = Ast::make< UsingPathDefinition >( @$, $1, $2, $3, $4 );
   }
 ;
 

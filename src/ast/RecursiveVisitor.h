@@ -65,6 +65,7 @@ namespace libcasm_fe
             void visit( EnumeratorDefinition& node ) override;
             void visit( EnumerationDefinition& node ) override;
             void visit( UsingDefinition& node ) override;
+            void visit( UsingPathDefinition& node ) override;
             void visit( InvariantDefinition& node ) override;
             void visit( ImportDefinition& node ) override;
 

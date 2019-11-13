@@ -141,10 +141,13 @@ import lib
 
 import lib as bar
 
+using lib::*
+
 rule test =
 {
     lib::foo
     bar::foo
+    assert( lib::Color::Red = Color::Red )
 }
 
 )***";
@@ -153,6 +156,10 @@ static const auto lib = R"***(
 CASM
 
 [ export ] rule foo = skip
+
+function qux : -> Integer
+
+[ export ] enumeration Color = { Red, Blue, Green }
 
 )***";
 

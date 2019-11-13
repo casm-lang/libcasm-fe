@@ -181,6 +181,10 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     LibraryLoaderVisitor visitor( log, *symboltable, loader );
     specification->definitions()->accept( visitor );
 
+#ifndef NDEBUG
+    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
+#endif
+
     const auto errors = log.errors();
     if( errors > 0 )
     {

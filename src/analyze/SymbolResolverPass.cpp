@@ -75,6 +75,146 @@ static libpass::PassRegistration< SymbolResolverPass > PASS(
     "ast-sym-resolve",
     0 );
 
+//
+//
+// NamespaceResolveVisitor
+//
+
+class NamespaceResolveVisitor final : public RecursiveVisitor
+{
+  public:
+    NamespaceResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
+
+    void visit( UsingPathDefinition& node ) override;
+
+  private:
+    void registerSymbolWithPath(
+        UsingPathDefinition& node, const IdentifierPath& path, const u1 useAll = false );
+
+  private:
+    libcasm_fe::Logger& m_log;
+    Namespace& m_symboltable;
+};
+
+NamespaceResolveVisitor::NamespaceResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
+: m_log( log )
+, m_symboltable( symboltable )
+{
+}
+
+void NamespaceResolveVisitor::visit( UsingPathDefinition& node )
+{
+    const auto& path = *node.path();
+    const auto& name = path.baseName();
+    const auto& pathName = path.path();
+
+    if( node.explicitSymbol() )
+    {
+        registerSymbolWithPath( node, path );
+    }
+    else
+    {
+        const auto usingNamespace = m_symboltable.findNamespace( path );
+        if( not usingNamespace )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "unable to resolve namespace '" + pathName + "'",
+                Code::SymbolIsUnknown );
+
+            return;
+        }
+
+        for( const auto& namespaceSymbol : usingNamespace->symbols() )
+        {
+            const auto& name = namespaceSymbol.first;
+            const auto symbolName = std::make_shared< Identifiers >( path.identifiers()->data() );
+            symbolName->add( std::make_shared< Identifier >( name ) );
+            const IdentifierPath symbolPath( symbolName );
+
+            registerSymbolWithPath( node, symbolPath, true );
+        }
+    }
+}
+
+void NamespaceResolveVisitor::registerSymbolWithPath(
+    UsingPathDefinition& node, const IdentifierPath& path, const u1 useAll )
+{
+    const auto& name = path.baseName();
+    const auto& pathName = path.path();
+
+    const auto& symbol = m_symboltable.findSymbol( path );
+    const auto definition = symbol.first;
+    const auto accessible = symbol.second;
+
+    if( not definition )
+    {
+        m_log.error( { node.sourceLocation() }, "unable to resolve symbol '" + pathName + "'" );
+        return;
+    }
+
+    if( definition->id() == Node::ID::ENUMERATOR_DEFINITION )
+    {
+        m_log.error(
+            { path.sourceLocation() },
+            "enumerator '" + pathName +
+                "' cannot be used in 'using' definition, access it with enumeration namespace",
+            Code::SymbolIsInaccessible );
+        return;
+    }
+
+    if( not useAll and not accessible )
+    {
+        m_log.error(
+            { path.sourceLocation() },
+            "'" + pathName + "' is not accessible",
+            Code::SymbolIsInaccessible );
+        m_log.warning(
+            { definition->sourceLocation() },
+            "'" + definition->identifier()->name() + "' has not been exported" );
+        return;
+    }
+
+    if( useAll and not definition->exported() )
+    {
+        m_log.debug(
+            { node.sourceLocation() }, "omit resolving of not exported symbol '" + pathName + "'" );
+        return;
+    }
+
+    try
+    {
+        m_symboltable.registerSymbol( name, definition );
+    }
+    catch( const std::domain_error& e )
+    {
+        const auto& symbol = m_symboltable.findSymbol( name );
+        m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
+        m_log.info( { definition->sourceLocation() }, e.what() );
+    }
+
+    if( definition->id() == Node::ID::ENUMERATION_DEFINITION )
+    {
+        const auto enumerationNamespace = m_symboltable.findNamespace( path );
+        assert( enumerationNamespace != nullptr );
+
+        try
+        {
+            m_symboltable.registerNamespace(
+                name, enumerationNamespace, Namespace::Visibility::Internal );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.error( { node.sourceLocation() }, e.what() );
+        }
+    }
+}
+
+//
+//
+// SymbolResolveVisitor
+//
+
 class SymbolResolveVisitor final : public RecursiveVisitor
 {
   public:
@@ -481,6 +621,11 @@ Definition::Ptr SymbolResolveVisitor::tryResolveSymbol( const IdentifierPath& id
     return symbol;
 }
 
+//
+//
+// SymbolResolverPass
+//
+
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
@@ -494,6 +639,13 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
 
     const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
+
+    NamespaceResolveVisitor namespaceResolveVisitor( log, *specification->symboltable() );
+    specification->definitions()->accept( namespaceResolveVisitor );
+
+#ifndef NDEBUG
+    log.debug( "symbol table after namespace resolving\n" + specification->symboltable()->dump() );
+#endif
 
     SymbolResolveVisitor visitor( log, *specification->symboltable() );
     specification->definitions()->accept( visitor );

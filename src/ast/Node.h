@@ -77,6 +77,7 @@ namespace libcasm_fe
                 ENUMERATOR_DEFINITION,
                 ENUMERATION_DEFINITION,
                 USING_DEFINITION,
+                USING_PATH_DEFINITION,
                 INVARIANT_DEFINITION,
                 IMPORT_DEFINITION,
 
@@ -187,6 +188,12 @@ namespace libcasm_fe
 
             explicit NodeList( void )
             : Node( Node::ID::NODE_LIST )
+            {
+            }
+
+            explicit NodeList( const std::vector< typename T::Ptr >& elements )
+            : Node( Node::ID::NODE_LIST )
+            , libstdhl::List< T >( elements )
             {
             }
 

@@ -366,6 +366,38 @@ namespace libcasm_fe
             const Token::Ptr m_assignmentToken;
         };
 
+        class UsingPathDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< UsingPathDefinition >;
+
+            UsingPathDefinition(
+                const Token::Ptr& usingToken,
+                const IdentifierPath::Ptr& path,
+                const Token::Ptr& doubleColonToken,
+                const Token::Ptr& asterixToken );
+
+            UsingPathDefinition( const Token::Ptr& usingToken, const IdentifierPath::Ptr& path );
+
+            const IdentifierPath::Ptr& path( void ) const;
+
+            u1 explicitSymbol( void ) const;
+
+            const Token::Ptr& usingToken( void ) const;
+
+            const Token::Ptr& doubleColonToken( void ) const;
+
+            const Token::Ptr& asterixToken( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const IdentifierPath::Ptr m_path;
+            const Token::Ptr m_usingToken;
+            const Token::Ptr m_doubleColonToken;
+            const Token::Ptr m_asterixToken;
+        };
+
         class InvariantDefinition final : public Definition
         {
           public:
