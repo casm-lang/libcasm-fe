@@ -106,7 +106,7 @@ void NamespaceResolveVisitor::visit( UsingPathDefinition& node )
 
     if( node.explicitSymbol() )
     {
-        const auto symbol = m_symboltable.findSymbol( path );
+        const auto& symbol = m_symboltable.findSymbol( path );
         const auto definition = symbol.first;
         const auto accessible = symbol.second;
         if( not definition )
@@ -155,7 +155,15 @@ void NamespaceResolveVisitor::visit( UsingPathDefinition& node )
             const auto& name = namespaceSymbol.first;
             const auto& definition = namespaceSymbol.second;
 
-            if( definition->exported() )
+            const auto symbolName = std::make_shared< Identifiers >( path.identifiers()->data() );
+            symbolName->add( std::make_shared< Identifier >( name ) );
+            const IdentifierPath symbolPath( symbolName );
+
+            const auto& symbol = m_symboltable.findSymbol( symbolPath );
+            assert( definition and definition == symbol.first );
+            const auto accessible = symbol.second;
+
+            if( accessible )
             {
                 try
                 {
