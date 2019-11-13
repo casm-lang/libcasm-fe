@@ -56,6 +56,10 @@ using namespace Ast;
 static const auto source = R"***(
 CASM
 
+enumeration Color = { Red, Blue, Green }
+
+using Color::Red
+
 init test_skip
 
 rule test_skip = skip
@@ -141,6 +145,8 @@ import lib
 
 import lib as bar
 
+using lib::*
+
 rule test =
 {
     lib::foo
@@ -153,6 +159,8 @@ static const auto lib = R"***(
 CASM
 
 [ export ] rule foo = skip
+
+function qux : -> Integer
 
 )***";
 
