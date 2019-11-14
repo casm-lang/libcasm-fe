@@ -58,6 +58,7 @@
 #include <libstdhl/String>
 
 using namespace libcasm_fe;
+using namespace Ast;
 
 SpecificationLoader::SpecificationLoader(
     libstdhl::Log::Stream& logStream, const LoadingStrategy::Ptr& loadingStrategy )
@@ -79,7 +80,7 @@ void SpecificationLoader::setSpecificationRepository(
 }
 
 Specification::Ptr SpecificationLoader::loadSpecification(
-    const Ast::IdentifierPath::Ptr& identifierPath )
+    const IdentifierPath::Ptr& identifierPath )
 {
     libpass::PassLogger log( &LibraryLoaderPass::id, m_logStream );
 
@@ -92,12 +93,12 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     if( specificationRepository()->project()->configuration() )
     {
         const auto configuration = specificationRepository()->project()->configuration();
-        log.info( ">>> WE HAVE A PROJECT CONFIG =D @ '" + configuration->fileName() + "' <<<" );
+        log.debug( ">>> WE HAVE A PROJECT CONFIG =D @ '" + configuration->fileName() + "' <<<" );
 
         const auto dependencyLocation = configuration->import( moduleName );
         if( dependencyLocation )
         {
-            log.info(
+            log.debug(
                 ">>> found module '" + moduleName + "' @ '" + dependencyLocation->path() +
                 "' <<<" );
             assert( dependencyLocation->scheme() == "file" );
@@ -107,8 +108,6 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     }
 
     log.debug( "loadSpecification: module '" + moduleName + "'" );
-
-    // const auto specificationRepository()
 
     const auto uri = loadingStrategy->toURI( identifierPath );
     const auto cachedSpecification = specificationRepository()->get( uri.toString() );
@@ -156,6 +155,7 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     assert( passResult.hasOutput< SourceToAstPass >() );
     const auto passData = passResult.output< SourceToAstPass >();
     const auto specification = passData->specification();
+
     assert( specificationRepository()->get( uri.toString() ) == specification );
     return specification;
 }
