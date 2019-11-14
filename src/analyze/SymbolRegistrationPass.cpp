@@ -94,6 +94,7 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
 
   private:
     void registerSymbol( Definition& node, const u1 isCheck = false );
+    void registerSymbol( Namespace& symboltable, Definition& node, const u1 isCheck = false );
 
   private:
     libcasm_fe::Logger& m_log;
@@ -342,6 +343,12 @@ void SymbolRegistrationVisitor::visit( UsingDefinition& node )
 
 void SymbolRegistrationVisitor::registerSymbol( Definition& node, const u1 isCheck )
 {
+    registerSymbol( m_symboltable, node, isCheck );
+}
+
+void SymbolRegistrationVisitor::registerSymbol(
+    Namespace& symboltable, Definition& node, const u1 isCheck )
+{
     const auto& name = node.identifier()->name();
 
     if( TypeInfo::instance().hasType( name ) )
@@ -360,11 +367,11 @@ void SymbolRegistrationVisitor::registerSymbol( Definition& node, const u1 isChe
 
     try
     {
-        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
+        symboltable.registerSymbol( name, node.ptr< Definition >() );
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.findSymbol( name );
+        const auto& symbol = symboltable.findSymbol( name );
         m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
         m_log.info( { symbol->sourceLocation() }, e.what() );
     }
@@ -465,7 +472,27 @@ void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
 
 void SymbolRegistrationVisitor::visit( BuiltinDefinition& node )
 {
-    registerSymbol( node );
+    const auto name = "CASM";
+
+    // find the builtin namespace to register the definitions
+    auto builtinNamespace = m_symboltable.findNamespace( name );
+    if( not builtinNamespace )
+    {
+        // does not exist, create it
+        builtinNamespace = std::make_shared< Namespace >();
+
+        try
+        {
+            m_symboltable.registerNamespace( name, builtinNamespace );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.error( { node.sourceLocation() }, e.what() );
+            return;
+        }
+    }
+
+    registerSymbol( *builtinNamespace, node );
 
     RecursiveVisitor::visit( node );
 }

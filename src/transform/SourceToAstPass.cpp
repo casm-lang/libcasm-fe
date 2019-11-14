@@ -94,7 +94,7 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
     }
 
     const auto println = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "println" ),
+        std::make_shared< Identifier >( "PrintLnInstruction" ),
         libcasm_ir::PrintLnBuiltin::classid(),
         std::make_shared< libcasm_ir::RelationType >(
             std::make_shared< libcasm_ir::VoidType >(),
@@ -116,6 +116,11 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
                                      libcasm_ir::Property::PURE };
     assert->setProperties( assertProperties );
     specification->definitions()->add( assert );
+
+    // const auto stdImport = std::make_shared< ImportDefinition >(
+    //     Token::unresolved(),
+    //     IdentifierPath::fromIdentifier( std::make_shared< Identifier >( "std" ) ) );
+    // specification->definitions()->add( stdImport );
 
     pr.setOutput< SourceToAstPass >( specification );
     return true;
