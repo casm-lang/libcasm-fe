@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 2014-2021 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2019 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
@@ -42,38 +42,28 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_H_
-#define _LIBCASM_FE_H_
+#ifndef _LIBCASM_FE_SYMBOLIC_EXECUTION_PASS_H_
+#define _LIBCASM_FE_SYMBOLIC_EXECUTION_PASS_H_
 
-#include <libcasm-fe/Namespace>
-#include <libcasm-fe/Specification>
-#include <libcasm-fe/Version>
-#include <libcasm-fe/analyze/AttributionPass>
-#include <libcasm-fe/analyze/ConsistencyCheckPass>
-#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
-#include <libcasm-fe/analyze/PropertyResolverPass>
-#include <libcasm-fe/analyze/PropertyRevisePass>
-#include <libcasm-fe/analyze/SymbolRegistrationPass>
-#include <libcasm-fe/analyze/SymbolResolverPass>
-#include <libcasm-fe/analyze/TypeCheckPass>
-#include <libcasm-fe/analyze/TypeInferencePass>
-#include <libcasm-fe/ast/Span>
-#include <libcasm-fe/execute/NumericExecutionPass>
-#include <libcasm-fe/execute/SymbolicExecutionPass>
-#include <libcasm-fe/execute/UpdateSet>
-#include <libcasm-fe/import/FileLoadingStrategy>
-#include <libcasm-fe/import/ImportError>
-#include <libcasm-fe/import/SpecificationRepository>
-#include <libcasm-fe/transform/AstDumpDotPass>
-#include <libcasm-fe/transform/AstDumpSourcePass>
-#include <libcasm-fe/transform/AstToCasmIRPass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libpass/Pass>
 
 namespace libcasm_fe
 {
+    /**
+     * @brief
+     */
+    class SymbolicExecutionPass final : public libpass::Pass
+    {
+      public:
+        static char id;
+
+        void usage( libpass::PassUsage& pu ) override;
+
+        u1 run( libpass::PassResult& pr ) override;
+    };
 }
 
-#endif  // _LIBCASM_FE_H_
+#endif  // _LIBCASM_FE_SYMBOLIC_EXECUTION_PASS_H_
 
 //
 //  Local variables:
