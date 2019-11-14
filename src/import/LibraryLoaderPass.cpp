@@ -93,19 +93,20 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
     RecursiveVisitor::visit( node );
 
     Specification::Ptr specification;
+    const auto& path = node.path();
     try
     {
-        specification = m_loader.loadSpecification( node.path() );
+        specification = m_loader.loadSpecification( path );
     }
     catch( const ImportError& e )
     {
-        m_log.error( { node.path()->sourceLocation() }, e.what(), Code::ImportError );
+        m_log.error( { path->sourceLocation() }, e.what(), Code::ImportError );
         return;
     }
     assert( specification );
 
     const auto identifier =
-        node.identifier()->empty() ? node.path()->identifiers()->back() : node.identifier();
+        node.identifier()->empty() ? path->identifiers()->back() : node.identifier();
     try
     {
         m_symboltable.registerNamespace(
