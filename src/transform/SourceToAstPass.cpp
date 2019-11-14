@@ -100,13 +100,22 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
             std::make_shared< libcasm_ir::VoidType >(),
             std::vector< libcasm_ir::Type::Ptr >{
                 std::make_shared< libcasm_ir::StringType >() } ) );
-
     const auto printlnProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
                                      libcasm_ir::Property::PURE };
-
     println->setProperties( printlnProperties );
-
     specification->definitions()->add( println );
+
+    const auto assert = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "assert" ),
+        libcasm_ir::AssertBuiltin::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            std::make_shared< libcasm_ir::VoidType >(),
+            std::vector< libcasm_ir::Type::Ptr >{
+                std::make_shared< libcasm_ir::BooleanType >() } ) );
+    const auto assertProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                     libcasm_ir::Property::PURE };
+    assert->setProperties( assertProperties );
+    specification->definitions()->add( assert );
 
     pr.setOutput< SourceToAstPass >( specification );
     return true;
