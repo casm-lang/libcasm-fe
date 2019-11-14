@@ -472,7 +472,7 @@ void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
 
 void SymbolRegistrationVisitor::visit( BuiltinDefinition& node )
 {
-    const auto name = "CASM";
+    const auto name = "IR";
 
     // find the builtin namespace to register the definitions
     auto builtinNamespace = m_symboltable.findNamespace( name );
