@@ -50,10 +50,12 @@
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/analyze/ProjectResolverPass>
 #include <libcasm-fe/transform/SourceToAstPass>
+
 #include <libpass/PassRegistry>
 
 #include "../Lexer.h"
 #include "../various/GrammarParser.tab.h"
+#include "../various/GrammarToken.h"
 
 using namespace libcasm_fe;
 
@@ -61,6 +63,8 @@ char SourceToAstPass::id = 0;
 
 static libpass::PassRegistration< SourceToAstPass > PASS(
     "SourceToAstPass", "parse the source code and generate an AST", "ast-parse", 0 );
+
+static void loadBuiltinDefinitions( const Specification::Ptr& specification );
 
 void SourceToAstPass::usage( libpass::PassUsage& pu )
 {
@@ -93,34 +97,27 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    const auto println = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "PrintLnInstruction" ),
-        libcasm_ir::PrintLnBuiltin::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            std::make_shared< libcasm_ir::VoidType >(),
-            std::vector< libcasm_ir::Type::Ptr >{
-                std::make_shared< libcasm_ir::StringType >() } ) );
-    const auto printlnProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                     libcasm_ir::Property::PURE };
-    println->setProperties( printlnProperties );
-    specification->definitions()->add( println );
+    if( specificationFileName == "./CASM.casm" )
+    {
+        loadBuiltinDefinitions( specification );
+    }
+    else
+    {
+        const auto& sourceLocation = specification->header()->sourceLocation();
+        const auto casmImport = Ast::make< ImportDefinition >(
+            sourceLocation,
+            Token::unresolved(),
+            IdentifierPath::fromIdentifier( Ast::make< Identifier >( sourceLocation, "CASM" ) ) );
+        specification->definitions()->add( casmImport );
 
-    const auto assert = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "assert" ),
-        libcasm_ir::AssertBuiltin::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            std::make_shared< libcasm_ir::VoidType >(),
-            std::vector< libcasm_ir::Type::Ptr >{
-                std::make_shared< libcasm_ir::BooleanType >() } ) );
-    const auto assertProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                     libcasm_ir::Property::PURE };
-    assert->setProperties( assertProperties );
-    specification->definitions()->add( assert );
-
-    // const auto stdImport = std::make_shared< ImportDefinition >(
-    //     Token::unresolved(),
-    //     IdentifierPath::fromIdentifier( std::make_shared< Identifier >( "std" ) ) );
-    // specification->definitions()->add( stdImport );
+        const auto casmUsing = Ast::make< UsingPathDefinition >(
+            sourceLocation,
+            Token::unresolved(),
+            IdentifierPath::fromIdentifier( Ast::make< Identifier >( sourceLocation, "CASM" ) ),
+            std::make_shared< Token >( Grammar::Token::DOUBLECOLON ),
+            std::make_shared< Token >( Grammar::Token::ASTERIX ) );
+        specification->definitions()->add( casmUsing );
+    }
 
     pr.setOutput< SourceToAstPass >( specification );
     return true;
@@ -129,6 +126,35 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
 void SourceToAstPass::setDebug( u1 enable )
 {
     m_debug = enable;
+}
+
+static void loadBuiltinDefinitions( const Specification::Ptr& specification )
+{
+    const auto print = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "PrintInstruction" ),
+        libcasm_ir::PrintBuiltin::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            std::make_shared< libcasm_ir::VoidType >(),
+            std::vector< libcasm_ir::Type::Ptr >{
+                std::make_shared< libcasm_ir::StringType >() } ) );
+    const auto printProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                   libcasm_ir::Property::PURE };
+    print->setProperties( printProperties );
+    print->setExported( true );
+    specification->definitions()->add( print );
+
+    const auto assert = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "AssertInstruction" ),
+        libcasm_ir::AssertBuiltin::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            std::make_shared< libcasm_ir::VoidType >(),
+            std::vector< libcasm_ir::Type::Ptr >{
+                std::make_shared< libcasm_ir::BooleanType >() } ) );
+    const auto assertProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                    libcasm_ir::Property::PURE };
+    assert->setProperties( assertProperties );
+    assert->setExported( true );
+    specification->definitions()->add( assert );
 }
 
 //
