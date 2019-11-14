@@ -1800,6 +1800,11 @@ Identifier
       $$ = Ast::make< Identifier >( @$, $1->tokenString() );
       $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
+| CASM // allow 'CASM' keyword as identifier
+  {
+      $$ = Ast::make< Identifier >( @$, $1->tokenString() );
+      $$->setSpans( m_lexer.fetchSpansAndReset() );
+  }
 ;
 
 
