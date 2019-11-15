@@ -189,9 +189,14 @@ void NamespaceResolveVisitor::registerSymbolWithPath(
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.findSymbol( name );
-        m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
-        m_log.info( { definition->sourceLocation() }, e.what() );
+        const auto& otherSymbol = m_symboltable.findSymbol( name );
+
+        if( definition.get() != otherSymbol.get() )
+        {
+            m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
+            m_log.info( { definition->sourceLocation() }, e.what() );
+            m_log.info( { otherSymbol->sourceLocation() }, e.what() );
+        }
     }
 
     if( definition->id() == Node::ID::ENUMERATION_DEFINITION )
