@@ -951,6 +951,7 @@ Initializer ::= Term
 #+begin_src
 Identifier ::= "([a-ZA-Z_]|UTF8){([a-zA-Z_0-9]|UTF8)}*"
              | "in"
+             | "CASM"
 #+end_src
 
 #+html: {{page>.:grammar:Identifier&noheader&nofooter}}
