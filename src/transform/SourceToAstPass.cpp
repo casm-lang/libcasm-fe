@@ -97,8 +97,9 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    if( specificationFileName == "./CASM.casm" )
+    if( specification->name() == "CASM" )
     {
+        log.debug( "module 'CASM': adding built-ins!" );
         loadBuiltinDefinitions( specification );
     }
     else
