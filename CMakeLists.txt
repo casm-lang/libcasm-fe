@@ -48,7 +48,7 @@ set( PROJECT libcasm-fe )
 cmake_minimum_required( VERSION ${CMAKE_VERSION} )
 
 project( ${PROJECT} LANGUAGES CXX )
-set( CMAKE_CXX_STANDARD 14 )
+set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_EXTENSIONS OFF )
 set( CMAKE_VERSION 3.2 )
 set( CMAKE_MODULE_PATH ${${PROJECT}_SOURCE_DIR}/.cmake )
@@ -125,6 +125,30 @@ add_custom_target( ${PROJECT}-grammar ALL
 
 add_dependencies( ${PROJECT}-cpp
   ${PROJECT}-grammar
+  )
+
+#
+#
+# prelude
+#
+
+set( DEF_CASM_PRELUDE "${CMAKE_CURRENT_SOURCE_DIR}/lib/CASM.casm" )
+set( CXX_CASM_PRELUDE "${CMAKE_CURRENT_BINARY_DIR}/src/CASM.casm.h" )
+
+add_custom_command(
+  OUTPUT         ${CXX_CASM_PRELUDE}
+  COMMAND        make -C ${CMAKE_CURRENT_SOURCE_DIR} ${CXX_CASM_PRELUDE}
+  DEPENDS        ${DEF_CASM_PRELUDE}
+  COMMENT        ""
+  )
+
+add_custom_target( ${PROJECT}-prelude ALL
+  DEPENDS
+    ${CXX_CASM_PRELUDE}
+  )
+
+add_dependencies( ${PROJECT}-cpp
+  ${PROJECT}-prelude
   )
 
 #

@@ -46,6 +46,7 @@
 #include "SpecificationLoader.h"
 
 #include <libcasm-fe/analyze/TypeCheckPass>
+#include <libcasm-fe/import/FileLoadingStrategy>
 #include <libcasm-fe/import/ImportError>
 #include <libcasm-fe/import/LibraryLoaderPass>
 #include <libcasm-fe/import/PathLoadingStrategy>
@@ -56,6 +57,10 @@
 #include <libpass/analyze/LoadFilePass>
 
 #include <libstdhl/String>
+
+#include <filesystem>
+
+#include "CASM.casm.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -107,10 +112,24 @@ Specification::Ptr SpecificationLoader::loadSpecification(
         }
     }
 
-    log.debug( "loadSpecification: module '" + moduleName + "'" );
+    if( identifierPathName == "CASM" )
+    {
+        const std::string temporaryPath = std::filesystem::temp_directory_path();
+        const std::string temporaryName = temporaryPath + "/CASM.casm";
+        auto temporaryFile = libstdhl::File::open( temporaryName, std::fstream::out );
+        temporaryFile << CASM_casm;
+        temporaryFile.close();
+
+        const std::string preludeName = "CASM.casm";
+
+        loadingStrategy = std::make_shared< FileLoadingStrategy >( temporaryPath );
+    }
 
     const auto uri = loadingStrategy->toURI( identifierPath );
-    const auto cachedSpecification = specificationRepository()->get( uri.toString() );
+    const auto& uriString = uri.toString();
+    log.debug( "loadSpecification: module '" + moduleName + "' @ '" + uriString + "'" );
+
+    const auto cachedSpecification = specificationRepository()->get( uriString );
     if( cachedSpecification )
     {
         log.debug( "using '" + identifierPathName + "' from repository" );
@@ -141,8 +160,8 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     if( not passManager.run() )
     {
 #ifndef NDEBUG
-        auto flush = [&passManager, &uri]() {
-            libstdhl::Log::ApplicationFormatter formatter( uri.toString() );
+        auto flush = [&passManager, &uriString]() {
+            libstdhl::Log::ApplicationFormatter formatter( uriString );
             libstdhl::Log::OutputStreamSink sink( std::cerr, formatter );
             passManager.stream().flush( sink );
         };
@@ -156,7 +175,7 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     const auto passData = passResult.output< SourceToAstPass >();
     const auto specification = passData->specification();
 
-    assert( specificationRepository()->get( uri.toString() ) == specification );
+    assert( specificationRepository()->get( uriString ) == specification );
     return specification;
 }
 
