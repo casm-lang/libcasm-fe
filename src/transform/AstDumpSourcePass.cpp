@@ -77,7 +77,8 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
     explicit AstDumpSourceVisitor( std::ostream& stream );
 
     void visit( BuiltinDefinition& node ) override;
-
+    void visit( ImportDefinition& node ) override;
+    void visit( UsingPathDefinition& node ) override;
     void visit( InitDefinition& node ) override;
     void visit( Initializer& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -104,6 +105,24 @@ AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 void AstDumpSourceVisitor::visit( BuiltinDefinition& node )
 {
     // omit builtin information
+}
+
+void AstDumpSourceVisitor::visit( UsingPathDefinition& node )
+{
+    if( node.usingToken()->token() == Grammar::Token::UNRESOLVED )
+    {
+        return;
+    }
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpSourceVisitor::visit( ImportDefinition& node )
+{
+    if( node.importToken()->token() == Grammar::Token::UNRESOLVED )
+    {
+        return;
+    }
+    RecursiveVisitor::visit( node );
 }
 
 void AstDumpSourceVisitor::visit( InitDefinition& node )
