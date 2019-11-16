@@ -248,9 +248,9 @@ std::string DirectCallExpression::targetTypeString( const TargetType targetType 
         {
             return "rule";
         }
-        case TargetType::TYPE_DOMAIN:
+        case TargetType::DOMAIN:
         {
-            return "type domain";
+            return "domain";
         }
         case TargetType::CONSTANT:
         {
