@@ -101,6 +101,11 @@ UnresolvedType::UnresolvedType( void )
 {
 }
 
+std::string UnresolvedType::signature( void ) const
+{
+    return name()->path();
+}
+
 void UnresolvedType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -114,6 +119,11 @@ void UnresolvedType::accept( Visitor& visitor )
 BasicType::BasicType( const IdentifierPath::Ptr& identifier )
 : Type( Node::ID::BASIC_TYPE, identifier )
 {
+}
+
+std::string BasicType::signature( void ) const
+{
+    return name()->path();
 }
 
 void BasicType::accept( Visitor& visitor )
@@ -166,6 +176,22 @@ const Types::Ptr& TupleType::subTypes( void ) const
     return m_subTypes;
 }
 
+std::string TupleType::signature( void ) const
+{
+    std::stringstream stream;
+    stream << leftBraceToken()->tokenString();
+
+    for( const auto& subType : *subTypes() )
+    {
+        stream << " " << subType->signature() << ",";
+    }
+
+    stream.seekp( -1, stream.cur );
+    stream << rightBraceToken()->tokenString();
+
+    return stream.str();
+}
+
 void TupleType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -188,6 +214,22 @@ RecordType::RecordType(
 const VariableDefinitions::Ptr& RecordType::namedSubTypes( void ) const
 {
     return m_namedSubTypes;
+}
+
+std::string RecordType::signature( void ) const
+{
+    std::stringstream stream;
+    stream << leftBraceToken()->tokenString();
+
+    for( const auto& subType : *namedSubTypes() )
+    {
+        stream << " " << subType->variableType()->signature() << ",";
+    }
+
+    stream.seekp( -1, stream.cur );
+    stream << rightBraceToken()->tokenString();
+
+    return stream.str();
 }
 
 void RecordType::accept( Visitor& visitor )
@@ -213,6 +255,23 @@ TemplateType::TemplateType(
 const Types::Ptr& TemplateType::subTypes( void ) const
 {
     return m_subTypes;
+}
+
+std::string TemplateType::signature( void ) const
+{
+    std::stringstream stream;
+    stream << name()->path();
+    stream << leftBraceToken()->tokenString();
+
+    for( const auto& subType : *subTypes() )
+    {
+        stream << " " << subType->signature() << ",";
+    }
+
+    stream.seekp( -1, stream.cur );
+    stream << rightBraceToken()->tokenString();
+
+    return stream.str();
 }
 
 void TemplateType::accept( Visitor& visitor )
@@ -254,6 +313,25 @@ const Token::Ptr& RelationType::mapsToken( void ) const
     return m_mapsToken;
 }
 
+std::string RelationType::signature( void ) const
+{
+    std::stringstream stream;
+    stream << name()->path();
+    stream << leftBraceToken()->tokenString();
+
+    for( const auto& subType : *argumentTypes() )
+    {
+        stream << " " << subType->signature() << "*";
+    }
+
+    stream.seekp( -1, stream.cur );
+    stream << mapsToken()->tokenString() << " ";
+    stream << returnType()->signature() << " ";
+    stream << rightBraceToken()->tokenString();
+
+    return stream.str();
+}
+
 void RelationType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -282,6 +360,15 @@ const Expression::Ptr& FixedSizedType::size( void ) const
 const Token::Ptr& FixedSizedType::markToken( void ) const
 {
     return m_markToken;
+}
+
+std::string FixedSizedType::signature( void ) const
+{
+    std::stringstream stream;
+    stream << name()->path();
+    stream << markToken()->tokenString() << " ";
+    stream << size().get();  // TODO: FIXME: @ppaulweber: use 'size' argument
+    return stream.str();
 }
 
 void FixedSizedType::accept( Visitor& visitor )

@@ -68,6 +68,8 @@ namespace libcasm_fe
             void setDelimiterToken( const Token::Ptr& delimiterToken );
             const Token::Ptr& delimiterToken( void ) const;
 
+            virtual std::string signature( void ) const = 0;
+
           private:
             const IdentifierPath::Ptr m_name;
             Token::Ptr m_delimiterToken;
@@ -82,6 +84,8 @@ namespace libcasm_fe
 
             explicit UnresolvedType( void );
 
+            std::string signature( void ) const override;
+
             void accept( Visitor& visitor ) override final;
         };
 
@@ -91,6 +95,8 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< BasicType >;
 
             explicit BasicType( const IdentifierPath::Ptr& identifier );
+
+            std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
         };
@@ -127,6 +133,8 @@ namespace libcasm_fe
 
             const Types::Ptr& subTypes( void ) const;
 
+            std::string signature( void ) const override;
+
             void accept( Visitor& visitor ) override final;
 
           private:
@@ -144,6 +152,8 @@ namespace libcasm_fe
                 const Token::Ptr& rightBraceToken );
 
             const std::shared_ptr< VariableDefinitions >& namedSubTypes( void ) const;
+
+            std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
@@ -163,6 +173,8 @@ namespace libcasm_fe
                 const Token::Ptr& rightBraceToken );
 
             const Types::Ptr& subTypes( void ) const;
+
+            std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
@@ -189,6 +201,8 @@ namespace libcasm_fe
 
             const Token::Ptr& mapsToken( void ) const;
 
+            std::string signature( void ) const override;
+
             void accept( Visitor& visitor ) override final;
 
           private:
@@ -210,6 +224,8 @@ namespace libcasm_fe
             const Expression::Ptr& size( void ) const;
 
             const Token::Ptr& markToken( void ) const;
+
+            std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
