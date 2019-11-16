@@ -51,34 +51,6 @@
 
 using namespace libcasm_fe;
 
-// basic types
-static const std::unordered_set< std::string > TYPE_NAMES_FOR_BASIC_TYPES = {
-    TypeInfo::TYPE_NAME_VOID,   TypeInfo::TYPE_NAME_BOOLEAN, TypeInfo::TYPE_NAME_INTEGER,
-    TypeInfo::TYPE_NAME_STRING, TypeInfo::TYPE_NAME_DECIMAL, TypeInfo::TYPE_NAME_RATIONAL,
-};
-
-// composed types
-static const std::unordered_set< std::string > TYPE_NAMES_FOR_COMPOSED_TYPES = {
-    TypeInfo::TYPE_NAME_TUPLE, TypeInfo::TYPE_NAME_RECORD
-};
-// template types
-static const std::unordered_set< std::string > TYPE_NAMES_FOR_TEMPLATE_TYPES = {
-    TypeInfo::TYPE_NAME_LIST,
-    TypeInfo::TYPE_NAME_RANGE,
-    TypeInfo::TYPE_NAME_FILE,
-    TypeInfo::TYPE_NAME_PORT
-};
-
-// reference types
-static const std::unordered_set< std::string > TYPE_NAMES_FOR_REFERENCE_TYPES = {
-    TypeInfo::TYPE_NAME_RULEREF, TypeInfo::TYPE_NAME_FUNCREF
-};
-
-// reference types
-static const std::unordered_set< std::string > TYPE_NAMES_FOR_STRUCUTRE_TYPES = {
-    TypeInfo::TYPE_NAME_OBJECT
-};
-
 //
 //
 // TypeInfo
@@ -92,6 +64,13 @@ TypeInfo::TypeInfo( void )
     setType( TypeInfo::TYPE_NAME_STRING, libstdhl::Memory::get< libcasm_ir::StringType >() );
     setType( TypeInfo::TYPE_NAME_RATIONAL, libstdhl::Memory::get< libcasm_ir::RationalType >() );
     setType( TypeInfo::TYPE_NAME_DECIMAL, libstdhl::Memory::get< libcasm_ir::DecimalType >() );
+    setType( TypeInfo::TYPE_NAME_RANGE, nullptr );  // template type
+    setType( TypeInfo::TYPE_NAME_LIST, nullptr );   // template type
+    // setType( TypeInfo::TYPE_NAME_SET, nullptr ); // TODO: FIXME: @ppaulweber: feature/set
+    setType( TypeInfo::TYPE_NAME_PORT, nullptr );  // template type
+    setType( TypeInfo::TYPE_NAME_FILE, nullptr );  // template type
+    setType(
+        TypeInfo::TYPE_NAME_OBJECT, libstdhl::Memory::get< libcasm_ir::ObjectType >( "Object" ) );
 }
 
 void TypeInfo::setType( const std::string& name, const libcasm_ir::Type::Ptr& type )
@@ -118,36 +97,6 @@ u1 TypeInfo::hasType( const std::string& name ) const
 {
     const auto it = m_typeName2typePtr.find( name );
     return it != m_typeName2typePtr.cend();
-}
-
-u1 TypeInfo::isBasicType( const std::string& name ) const
-{
-    const auto it = TYPE_NAMES_FOR_BASIC_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_BASIC_TYPES.cend();
-}
-
-u1 TypeInfo::isComposedType( const std::string& name ) const
-{
-    const auto it = TYPE_NAMES_FOR_COMPOSED_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_COMPOSED_TYPES.cend();
-}
-
-u1 TypeInfo::isTemplateType( const std::string& name ) const
-{
-    const auto it = TYPE_NAMES_FOR_TEMPLATE_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_TEMPLATE_TYPES.cend();
-}
-
-u1 TypeInfo::isReferenceType( const std::string& name ) const
-{
-    const auto it = TYPE_NAMES_FOR_REFERENCE_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_REFERENCE_TYPES.cend();
-}
-
-u1 TypeInfo::isStructureType( const std::string& name ) const
-{
-    const auto it = TYPE_NAMES_FOR_STRUCUTRE_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_STRUCUTRE_TYPES.cend();
 }
 
 //

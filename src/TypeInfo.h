@@ -63,16 +63,6 @@ namespace libcasm_fe
 
         u1 hasType( const std::string& name ) const;
 
-        u1 isBasicType( const std::string& name ) const;
-
-        u1 isComposedType( const std::string& name ) const;
-
-        u1 isTemplateType( const std::string& name ) const;
-
-        u1 isReferenceType( const std::string& name ) const;
-
-        u1 isStructureType( const std::string& name ) const;
-
       protected:
         TypeInfo( void );
 
