@@ -63,6 +63,8 @@ rule test_skip = skip
 
 rule test_update_program_self_undef = program( self ) := undef
 
+function foo : -> Integer
+
 )***";
 
 #define SOURCE( PASS, CONTENT, STATUS, CONFIG )                                                   \
