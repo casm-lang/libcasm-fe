@@ -580,7 +580,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             }
             break;
         }
-        case DirectCallExpression::TargetType::TYPE_DOMAIN:
+        case DirectCallExpression::TargetType::DOMAIN:
         {
             m_evaluationStack.push( IR::DomainConstant( node.type() ) );
             break;
