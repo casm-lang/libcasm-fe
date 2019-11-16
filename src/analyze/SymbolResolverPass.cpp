@@ -183,6 +183,13 @@ void NamespaceResolveVisitor::registerSymbolWithPath(
         return;
     }
 
+    if( useAll and definition->id() == Node::ID::FEATURE_DEFINITION )
+    {
+        m_log.debug(
+            { node.sourceLocation() }, "omit resolving of feature symbol '" + pathName + "'" );
+        return;
+    }
+
     try
     {
         m_symboltable.registerSymbol( name, definition );
@@ -199,15 +206,18 @@ void NamespaceResolveVisitor::registerSymbolWithPath(
         }
     }
 
-    if( definition->id() == Node::ID::ENUMERATION_DEFINITION )
+    if( definition->id() == Node::ID::ENUMERATION_DEFINITION or
+        definition->id() == Node::ID::STRUCTURE_DEFINITION or
+        definition->id() == Node::ID::FEATURE_DEFINITION or
+        definition->id() == Node::ID::DOMAIN_DEFINITION )
     {
-        const auto enumerationNamespace = m_symboltable.findNamespace( path );
-        assert( enumerationNamespace != nullptr );
+        const auto innerNamespace = m_symboltable.findNamespace( path );
+        assert( innerNamespace != nullptr );
 
         try
         {
             m_symboltable.registerNamespace(
-                name, enumerationNamespace, Namespace::Visibility::Internal );
+                name, innerNamespace, Namespace::Visibility::Internal );
         }
         catch( const std::domain_error& e )
         {
@@ -329,10 +339,52 @@ void SymbolResolveVisitor::visit( FeatureDefinition& node )
 
 void SymbolResolveVisitor::visit( ImplementDefinition& node )
 {
+    std::string implementSymbolName = node.identifier()->name();
+
+    // find the namespace to implement the definitions
+    const auto implementNamespace = m_symboltable.findNamespace( implementSymbolName );
+    if( not implementNamespace )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown symbol '" + implementSymbolName + "' found to implement",
+            Code::Unspecified );
+        return;
+    }
+
+    if( node.hasFeature() )
+    {
+        // find the feature symbol
+        const auto featureSymbol = m_symboltable.findSymbol( *node.feature() );
+        if( not featureSymbol.second )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "unknown feature '" + node.feature()->path() + "' found to implement",
+                Code::Unspecified );
+            return;
+        }
+
+        implementSymbolName = featureSymbol.first->identifier()->name();
+    }
+
+    const auto featureNamespace = std::make_shared< Namespace >();
+    SymbolRegistrationVisitor featureVisitor( m_log, *featureNamespace );
+    node.definitions()->accept( featureVisitor );
+
+    try
+    {
+        implementNamespace->registerNamespace( implementSymbolName, featureNamespace );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.debug( { node.sourceLocation() }, e.what() );
+    }
+
     auto name = node.identifier()->name();
-    const auto& structureSymbol = m_symboltable.findSymbol( name );
-    assert( structureSymbol and " inconsistent state, checked during symbol registration " );
-    m_objectDefinition = structureSymbol;
+    const auto& symbolSymbol = m_symboltable.findSymbol( name );
+    assert( symbolSymbol and " inconsistent state, checked during symbol registration " );
+    m_objectDefinition = symbolSymbol;
 
     RecursiveVisitor::visit( node );
 
@@ -463,14 +515,14 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             }
             case Node::ID::ENUMERATION_DEFINITION:
             {
-                node.setTargetType( DirectCallExpression::TargetType::TYPE_DOMAIN );
+                node.setTargetType( DirectCallExpression::TargetType::DOMAIN );
                 break;
             }
             case Node::ID::USING_DEFINITION:
             {
                 // if the using definition points to an IR type then the alias resolving fails,
                 // because there is no definition which can be resolved, and we end up here
-                node.setTargetType( DirectCallExpression::TargetType::TYPE_DOMAIN );
+                node.setTargetType( DirectCallExpression::TargetType::DOMAIN );
                 break;
             }
             default:
@@ -505,11 +557,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         node.setTargetType( DirectCallExpression::TargetType::SELF );
         node.setTargetDefinition( agentSymbol );
         validateArgumentsCount( "", 0 );
-    }
-    else if( TypeInfo::instance().hasType( name ) )
-    {
-        node.setTargetType( DirectCallExpression::TargetType::TYPE_DOMAIN );
-        validateArgumentsCount( "type", 0 );
     }
 }
 
