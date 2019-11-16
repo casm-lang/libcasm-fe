@@ -77,6 +77,7 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
     explicit AstDumpSourceVisitor( std::ostream& stream );
 
     void visit( BuiltinDefinition& node ) override;
+    void visit( DomainDefinition& node ) override;
     void visit( ImportDefinition& node ) override;
     void visit( UsingPathDefinition& node ) override;
     void visit( InitDefinition& node ) override;
@@ -100,6 +101,11 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
 AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 : m_stream( stream )
 {
+}
+
+void AstDumpSourceVisitor::visit( DomainDefinition& node )
+{
+    // omit domain information
 }
 
 void AstDumpSourceVisitor::visit( BuiltinDefinition& node )
