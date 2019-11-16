@@ -48,6 +48,11 @@
 
 #include <libpass/Pass>
 
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
 namespace libcasm_fe
 {
     /**
@@ -62,6 +67,40 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
     };
+
+    //
+    //
+    // SymbolRegistrationVisitor
+    //
+
+    class SymbolRegistrationVisitor final : public Ast::RecursiveVisitor
+    {
+      public:
+        SymbolRegistrationVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
+
+        void visit( Ast::InitDefinition& node ) override;
+        void visit( Ast::FunctionDefinition& node ) override;
+        void visit( Ast::DerivedDefinition& node ) override;
+        void visit( Ast::RuleDefinition& node ) override;
+        void visit( Ast::EnumeratorDefinition& node ) override;
+        void visit( Ast::EnumerationDefinition& node ) override;
+        void visit( Ast::UsingDefinition& node ) override;
+        void visit( Ast::DomainDefinition& node ) override;
+        void visit( Ast::StructureDefinition& node ) override;
+        void visit( Ast::FeatureDefinition& node ) override;
+        void visit( Ast::ImplementDefinition& node ) override;
+        void visit( Ast::BuiltinDefinition& node ) override;
+        void visit( Ast::Declaration& node ) override;
+
+      private:
+        void registerSymbol( Ast::Definition& node );
+        void registerSymbol( Namespace& symboltable, Ast::Definition& node );
+
+      private:
+        libcasm_fe::Logger& m_log;
+        Namespace& m_symboltable;
+    };
+
 }
 
 #endif  // _LIBCASM_FE_SYMBOL_REGISTRATION_PASS_H_

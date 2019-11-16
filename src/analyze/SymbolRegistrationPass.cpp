@@ -45,12 +45,8 @@
 
 #include "SymbolRegistrationPass.h"
 
-#include <libcasm-fe/Logger>
-#include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
-#include <libcasm-fe/ast/EmptyVisitor>
-
 #include <libcasm-fe/analyze/AttributionPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
@@ -68,38 +64,6 @@ static libpass::PassRegistration< SymbolRegistrationPass > PASS(
     "registers defined and declared symbols in the namespace symbol table",
     "ast-sym-reg",
     0 );
-
-//
-//
-// SymbolRegistrationVisitor
-//
-
-class SymbolRegistrationVisitor final : public RecursiveVisitor
-{
-  public:
-    SymbolRegistrationVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
-
-    void visit( InitDefinition& node ) override;
-    void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( EnumeratorDefinition& node ) override;
-    void visit( EnumerationDefinition& node ) override;
-    void visit( UsingDefinition& node ) override;
-    void visit( StructureDefinition& node ) override;
-    void visit( FeatureDefinition& node ) override;
-    void visit( ImplementDefinition& node ) override;
-    void visit( BuiltinDefinition& node ) override;
-    void visit( Declaration& node ) override;
-
-  private:
-    void registerSymbol( Definition& node, const u1 isCheck = false );
-    void registerSymbol( Namespace& symboltable, Definition& node, const u1 isCheck = false );
-
-  private:
-    libcasm_fe::Logger& m_log;
-    Namespace& m_symboltable;
-};
 
 SymbolRegistrationVisitor::SymbolRegistrationVisitor(
     libcasm_fe::Logger& log, Namespace& symboltable )
@@ -341,29 +305,14 @@ void SymbolRegistrationVisitor::visit( UsingDefinition& node )
     registerSymbol( node );
 }
 
-void SymbolRegistrationVisitor::registerSymbol( Definition& node, const u1 isCheck )
+void SymbolRegistrationVisitor::registerSymbol( Definition& node )
 {
-    registerSymbol( m_symboltable, node, isCheck );
+    registerSymbol( m_symboltable, node );
 }
 
-void SymbolRegistrationVisitor::registerSymbol(
-    Namespace& symboltable, Definition& node, const u1 isCheck )
+void SymbolRegistrationVisitor::registerSymbol( Namespace& symboltable, Definition& node )
 {
     const auto& name = node.identifier()->name();
-
-    if( TypeInfo::instance().hasType( name ) )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot use type name '" + name + "' as " + node.description() + " symbol",
-            Code::IdentifierIsTypeName );
-        return;
-    }
-
-    if( isCheck )
-    {
-        return;
-    }
 
     try
     {
@@ -377,10 +326,44 @@ void SymbolRegistrationVisitor::registerSymbol(
     }
 }
 
-void SymbolRegistrationVisitor::visit( StructureDefinition& node )
+void SymbolRegistrationVisitor::visit( DomainDefinition& node )
 {
+    registerSymbol( node );
+
     const auto& name = node.identifier()->name();
 
+    if( not TypeInfo::instance().hasType( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "unknown type name '" + name + "' as " + node.description() + " symbol",
+            Code::SymbolIsUnknown );
+        return;
+    }
+
+    const auto& type = TypeInfo::instance().getType( name );
+    node.setType( type );
+
+    if( not type )
+    {
+        m_log.debug(
+            { node.identifier()->sourceLocation() },
+            "no pre-defined type found for '" + name + "'" );
+    }
+
+    const auto domainNamespace = std::make_shared< Namespace >();
+    try
+    {
+        m_symboltable.registerNamespace( name, domainNamespace );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.debug( { node.sourceLocation() }, e.what() );
+    }
+}
+
+void SymbolRegistrationVisitor::visit( StructureDefinition& node )
+{
     registerSymbol( node );
 
     // register structure definitions in a sub-namespace
@@ -388,6 +371,7 @@ void SymbolRegistrationVisitor::visit( StructureDefinition& node )
     SymbolRegistrationVisitor structureVisitor( m_log, *structureNamespace );
     node.functions()->accept( structureVisitor );
 
+    const auto& name = node.identifier()->name();
     try
     {
         m_symboltable.registerNamespace( name, structureNamespace );
@@ -400,8 +384,6 @@ void SymbolRegistrationVisitor::visit( StructureDefinition& node )
 
 void SymbolRegistrationVisitor::visit( FeatureDefinition& node )
 {
-    const auto& name = node.identifier()->name();
-
     registerSymbol( node );
 
     // register feature definitions in a sub-namespace
@@ -409,6 +391,7 @@ void SymbolRegistrationVisitor::visit( FeatureDefinition& node )
     SymbolRegistrationVisitor featureVisitor( m_log, *featureNamespace );
     node.definitions()->accept( featureVisitor );
 
+    const auto& name = node.identifier()->name();
     try
     {
         m_symboltable.registerNamespace( name, featureNamespace );
@@ -421,53 +404,7 @@ void SymbolRegistrationVisitor::visit( FeatureDefinition& node )
 
 void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
 {
-    auto name = node.identifier()->name();
-
-    registerSymbol( node, true );
-
-    // find the structure namespace to implement the definitions
-    const auto structureNamespace = m_symboltable.findNamespace( name );
-    if( not structureNamespace )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "cannot implement undefined structure '" + name + "'",
-            Code::ImplementDefinitionOfUndefinedStructure );
-        return;
-    }
-
-    if( node.hasFeature() )
-    {
-        // find the feature symbol
-        const auto featureSymbol = m_symboltable.findSymbol( *node.feature() );
-        if( not featureSymbol.second )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "cannot implement undefined feature '" + name + "'",
-                Code::ImplementDefinitionOfUndefinedStructure );
-            return;
-        }
-
-        name = featureSymbol.first->identifier()->name();
-    }
-
-    try
-    {
-        // create implementation namespace inside the structure namespace
-        structureNamespace->registerSymbol( name, node.ptr< Definition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = structureNamespace->findSymbol( name );
-
-        m_log.error( { node.sourceLocation() }, e.what(), Code::ImplementDefinitionAlreadyUsed );
-        m_log.info( { symbol->sourceLocation() }, e.what() );
-    }
-
-    // register implement definitions in the structure namespace
-    SymbolRegistrationVisitor structureVisitor( m_log, *structureNamespace );
-    node.definitions()->accept( structureVisitor );
+    // delay implement definition symbol resolving
 }
 
 void SymbolRegistrationVisitor::visit( BuiltinDefinition& node )
