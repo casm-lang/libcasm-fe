@@ -64,6 +64,7 @@ namespace libcasm_fe
         class UsingPathDefinition;
         class InvariantDefinition;
         class ImportDefinition;
+        class DomainDefinition;
         class StructureDefinition;
         class FeatureDefinition;
         class ImplementDefinition;
@@ -151,6 +152,7 @@ namespace libcasm_fe
             virtual void visit( UsingPathDefinition& node ) = 0;
             virtual void visit( InvariantDefinition& node ) = 0;
             virtual void visit( ImportDefinition& node ) = 0;
+            virtual void visit( DomainDefinition& node ) = 0;
             virtual void visit( StructureDefinition& node ) = 0;
             virtual void visit( FeatureDefinition& node ) = 0;
             virtual void visit( ImplementDefinition& node ) = 0;

@@ -205,6 +205,12 @@ void RecursiveVisitor::visit( ImportDefinition& node )
     }
 }
 
+void RecursiveVisitor::visit( DomainDefinition& node )
+{
+    node.attributes()->accept( *this );
+    node.typeNode()->accept( *this );
+}
+
 void RecursiveVisitor::visit( StructureDefinition& node )
 {
     node.attributes()->accept( *this );

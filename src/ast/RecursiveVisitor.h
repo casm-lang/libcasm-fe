@@ -69,6 +69,7 @@ namespace libcasm_fe
             void visit( UsingPathDefinition& node ) override;
             void visit( InvariantDefinition& node ) override;
             void visit( ImportDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
             void visit( StructureDefinition& node ) override;
             void visit( FeatureDefinition& node ) override;
             void visit( ImplementDefinition& node ) override;

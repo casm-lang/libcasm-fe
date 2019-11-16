@@ -108,6 +108,10 @@ void EmptyVisitor::visit( ImportDefinition& )
 {
 }
 
+void EmptyVisitor::visit( DomainDefinition& )
+{
+}
+
 void EmptyVisitor::visit( StructureDefinition& )
 {
 }
