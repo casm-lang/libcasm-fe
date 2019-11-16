@@ -65,7 +65,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Definition >;
 
-            Definition( Node::ID id, const Identifier::Ptr& identifier );
+            Definition( const Node::ID id, const Identifier::Ptr& identifier );
 
             const Identifier::Ptr& identifier( void ) const;
 
@@ -431,6 +431,30 @@ namespace libcasm_fe
             const Expression::Ptr m_expression;
             const Token::Ptr m_invariantToken;
             const Token::Ptr m_assignmentToken;
+        };
+
+        class TypeDefinition : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< TypeDefinition >;
+
+            TypeDefinition( const Node::ID id, const Type::Ptr& typeNode );
+
+            const Type::Ptr& typeNode( void ) const;
+
+          private:
+            const Type::Ptr m_typeNode;
+            // behavior & implement
+        };
+
+        class DomainDefinition final : public TypeDefinition
+        {
+          public:
+            using Ptr = std::shared_ptr< DomainDefinition >;
+
+            DomainDefinition( const Type::Ptr& typeNode );
+
+            void accept( Visitor& visitor ) override final;
         };
 
         class StructureDefinition final : public Definition

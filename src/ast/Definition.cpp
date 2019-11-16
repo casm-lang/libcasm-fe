@@ -707,6 +707,37 @@ void InvariantDefinition::accept( Visitor& visitor )
 
 //
 //
+// TypeDefinition
+//
+
+TypeDefinition::TypeDefinition( const Node::ID id, const Type::Ptr& typeNode )
+: Definition( id, Ast::make< Identifier >( typeNode->name()->sourceLocation(), typeNode->name()->path() ) )
+, m_typeNode( typeNode )
+{
+}
+
+const Type::Ptr& TypeDefinition::typeNode( void ) const
+{
+    return m_typeNode;
+}
+
+//
+//
+// DomainDefinition
+//
+
+DomainDefinition::DomainDefinition( const Type::Ptr& typeNode )
+: TypeDefinition( Node::ID::DOMAIN_DEFINITION, typeNode )
+{
+}
+
+void DomainDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
 // StructureDefinition
 //
 

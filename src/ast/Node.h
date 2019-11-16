@@ -79,6 +79,7 @@ namespace libcasm_fe
                 USING_PATH_DEFINITION,
                 INVARIANT_DEFINITION,
                 IMPORT_DEFINITION,
+                DOMAIN_DEFINITION,
                 STRUCTURE_DEFINITION,
                 FEATURE_DEFINITION,
                 IMPLEMENT_DEFINITION,

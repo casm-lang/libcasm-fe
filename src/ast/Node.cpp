@@ -129,6 +129,10 @@ std::string Node::description( void ) const
         {
             return "import";
         }
+        case ID::DOMAIN_DEFINITION:
+        {
+            return "domain";
+        }
         case ID::STRUCTURE_DEFINITION:
         {
             return "structure";
