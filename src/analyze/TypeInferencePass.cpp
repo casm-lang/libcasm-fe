@@ -266,8 +266,6 @@ void TypeInferenceVisitor::visit( VariableDefinition& node )
 
 void TypeInferenceVisitor::visit( FunctionDefinition& node )
 {
-    m_log.debug( { node.sourceLocation() }, node.identifier()->name() );
-
     if( node.type() )
     {
         // may be invoked multiple times -> only type once
@@ -535,6 +533,7 @@ void TypeInferenceVisitor::visit( EmbracedExpression& node )
     {
         m_typeIDs[ node.expression().get() ].emplace( typeId );
     }
+
     RecursiveVisitor::visit( node );
     node.setType( node.expression()->type() );
 }
@@ -550,16 +549,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     if( node.type() )
     {
         return;
-    }
-
-    if( node.sourceLocation().begin.fileName )
-    {
-        m_log.debug(
-            { node.sourceLocation() }, node.identifier()->path() + " @ " + node.targetTypeName() );
-    }
-    else
-    {
-        m_log.debug( node.identifier()->path() );
     }
 
     assert( node.identifier() );
@@ -596,7 +585,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::RULE:      // [[fallthrough]]
         case DirectCallExpression::TargetType::SELF:      // [[fallthrough]]
         case DirectCallExpression::TargetType::THIS:      // [[fallthrough]]
-        case DirectCallExpression::TargetType::CONSTANT:
+        case DirectCallExpression::TargetType::CONSTANT:  // [[fallthrough]]
+        case DirectCallExpression::TargetType::DOMAIN:
         {
             // make sure that the definition has been typed
             const auto& definition = node.targetDefinition();
@@ -616,31 +606,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
 
             node.setType( definition->type()->ptr_result() );
-            break;
-        }
-        case DirectCallExpression::TargetType::TYPE_DOMAIN:
-        {
-            assert( node.arguments()->size() == 0 );
-
-            // if the type domain has FE definition use this type!
-            const auto& definition = node.targetDefinition();
-            if( definition )
-            {
-                definition->accept( *this );
-                assert( definition->type()->arguments().size() == 0 );
-                node.setType( definition->type() );
-                break;
-            }
-
-            try
-            {
-                const auto& typeDomain = TypeInfo::instance().getType( identifier->path() );
-                node.setType( typeDomain );
-            }
-            catch( const std::domain_error& e )
-            {
-                m_log.error( { node.sourceLocation() }, e.what() );
-            }
             break;
         }
         case DirectCallExpression::TargetType::UNKNOWN:
@@ -740,11 +705,32 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
             throw std::domain_error( "invalid type namespace '" + methodType + "'" );
         }
 
-        const auto& symbol = nspace->findSymbol( methodName );
-        if( not symbol )
+        std::vector< Definition::Ptr > methods = {};
+        for( const auto& ns : nspace->namespaces() )
         {
-            throw std::domain_error( "invalid method name '" + methodName + "'" );
+            const auto& symbol = nspace->findNamespace( ns.first )->findSymbol( methodName );
+            if( symbol )
+            {
+                m_log.debug(
+                    { node.sourceLocation() }, ns.first + Namespace::delimiter() + methodName );
+                methods.emplace_back( symbol );
+            }
         }
+
+        if( methods.size() == 0 )
+        {
+            throw std::domain_error(
+                "type '" + methodType + "' does not have a method '" + methodName + "'" );
+        }
+
+        if( methods.size() > 1 )
+        {
+            throw std::domain_error(
+                "type '" + methodType + "' has more than one method '" + methodName + "'" );
+        }
+
+        // nspace->findNamespace( methodType )->findSymbol( methodName );
+        const auto& symbol = methods.front();
 
         switch( symbol->id() )
         {
