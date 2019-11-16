@@ -204,6 +204,7 @@ class DefinitionVisitor final : public RecursiveVisitor
     void visit( UsingDefinition& node ) override;
     void visit( ImportDefinition& node ) override;
     void visit( StructureDefinition& node ) override;
+    void visit( FeatureDefinition& node ) override;
 
   private:
     libcasm_fe::Logger& m_log;
@@ -406,6 +407,32 @@ void DefinitionVisitor::visit( StructureDefinition& node )
 
     DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+    for( const auto& name : attributeNames )
+    {
+        if( name == EXPORT_ATTRIBUTE )
+        {
+            node.setExported( true );
+        }
+    }
+}
+
+void DefinitionVisitor::visit( FeatureDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    DefinitionAttributionVisitor visitor( m_log, node );
+    node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+    for( const auto& name : attributeNames )
+    {
+        if( name == EXPORT_ATTRIBUTE )
+        {
+            node.setExported( true );
+        }
+    }
 }
 
 class HeaderVisitor final : public RecursiveVisitor
