@@ -125,9 +125,8 @@ void TypeCheckVisitor::visit( UsingDefinition& node )
 void TypeCheckVisitor::visit( StructureDefinition& node )
 {
     const auto& name = node.identifier()->name();
-    m_log.debug( "creating IR structure type '" + name + "'" );
-    const auto structure = std::make_shared< libcasm_ir::Structure >( name );
-    const auto type = std::make_shared< libcasm_ir::StructureType >( structure );
+    m_log.debug( "creating IR object type for " + node.description() + " '" + name + "'" );
+    const auto type = std::make_shared< libcasm_ir::ObjectType >( name );
     node.setType( type );
     m_objectType = node.type();
 
@@ -139,9 +138,8 @@ void TypeCheckVisitor::visit( StructureDefinition& node )
 void TypeCheckVisitor::visit( FeatureDefinition& node )
 {
     const auto& name = node.identifier()->name();
-    m_log.debug( "creating IR feature type '" + name + "'" );
-    const auto feature = std::make_shared< libcasm_ir::Feature >( name );
-    const auto type = std::make_shared< libcasm_ir::FeatureType >( feature );
+    m_log.debug( "creating IR object type for " + node.description() + " '" + name + "'" );
+    const auto type = std::make_shared< libcasm_ir::ObjectType >( name );
     node.setType( type );
     m_objectType = node.type();
 
@@ -153,10 +151,20 @@ void TypeCheckVisitor::visit( FeatureDefinition& node )
 void TypeCheckVisitor::visit( ImplementDefinition& node )
 {
     const auto& name = node.identifier()->name();
-    const auto structureSymbol = m_symboltable.findSymbol( name );
-    assert( structureSymbol and " inconsistent state, checked during symbol registration " );
-    assert( structureSymbol->id() == Node::ID::STRUCTURE_DEFINITION );
-    node.setType( structureSymbol->type() );
+    const auto implementSymbol = m_symboltable.findSymbol( name );
+    assert( implementSymbol and " inconsistent state, checked during symbol registration " );
+    if( implementSymbol->id() != Node::ID::ENUMERATION_DEFINITION and
+        implementSymbol->id() != Node::ID::STRUCTURE_DEFINITION and
+        implementSymbol->id() != Node::ID::DOMAIN_DEFINITION )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "implement not allowed on '" + implementSymbol->description() + "' ",
+            Code::Unspecified );
+        return;
+    }
+
+    node.setType( implementSymbol->type() );
     m_objectType = node.type();
 
     RecursiveVisitor::visit( node );
@@ -175,33 +183,42 @@ void TypeCheckVisitor::visit( BasicType& node )
 
     const auto& name = node.name()->path();
 
-    if( TypeInfo::instance().isBasicType( name ) )
-    {
-        assert( TypeInfo::instance().hasType( name ) );
-        node.setType( TypeInfo::instance().getType( name ) );
-        return;
-    }
-
     const auto maybeSymbol = m_symboltable.findSymbol( *node.name() );
     const auto symbol = maybeSymbol.first;
     const auto accessible = maybeSymbol.second;
 
+    if( symbol and not accessible )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            symbol->description() + " '" + name + "' is not accessible",
+            Code::SymbolIsInaccessible );
+        m_log.warning(
+            { symbol->sourceLocation() },
+            "'" + symbol->identifier()->name() + "' has not been exported" );
+        return;
+    }
+
     if( symbol )
     {
-        if( not accessible )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                symbol->description() + " '" + name + "' is not accessible",
-                Code::SymbolIsInaccessible );
-            m_log.warning(
-                { symbol->sourceLocation() },
-                "'" + symbol->identifier()->name() + "' has not been exported" );
-            return;
-        }
-
         switch( symbol->id() )
         {
+            case Node::ID::DOMAIN_DEFINITION:
+            {
+                const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
+                const auto domainDefinitionType =
+                    static_cast< const Ast::Type* >( domainDefinition.typeNode().get() );
+                if( node.id() != domainDefinitionType->id() )
+                {
+                    m_log.error(
+                        { node.sourceLocation() },
+                        node.description() + "  '" + name + "' is not a" +
+                            domainDefinitionType->description(),
+                        Code::TypeAnnotationInvalidBasicTypeName );
+                    return;
+                }
+                break;
+            }
             case Node::ID::USING_DEFINITION:        // [[fallthrough]]
             case Node::ID::ENUMERATION_DEFINITION:  // [[fallthrough]]
             case Node::ID::STRUCTURE_DEFINITION:    // [[fallthrough]]
@@ -224,41 +241,10 @@ void TypeCheckVisitor::visit( BasicType& node )
         return;
     }
 
-    // error handling
-    if( TypeInfo::instance().isTemplateType( name ) )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "template type '" + name + "' defined without sub-types, use '" + name +
-                "< /* sub-type(s) */  >'",
-            Code::TypeAnnotationTemplateTypeHasNoSubType );
-    }
-    else if( TypeInfo::instance().isReferenceType( name ) )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "reference type '" + name + "' defined without a relation, use '" + name +
-                "< /* relation type */  >'",
-            Code::TypeAnnotationRelationTypeHasNoSubType );
-    }
-    else if( TypeInfo::instance().isStructureType( name ) )
-    {
-        if( not m_objectType )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "type '" + name + "' can only be used inside feature and implement definitions" );
-            return;
-        }
-        node.setType( m_objectType );
-    }
-    else
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown type '" + name + "' found",
-            Code::TypeAnnotationInvalidBasicTypeName );
-    }
+    m_log.error(
+        { node.sourceLocation() },
+        "unknown type '" + name + "' found",
+        Code::TypeAnnotationInvalidBasicTypeName );
 }
 
 void TypeCheckVisitor::visit( TupleType& node )
@@ -342,100 +328,138 @@ void TypeCheckVisitor::visit( TemplateType& node )
         subTypeList.add( subType->type() );
     }
 
-    if( name == TypeInfo::TYPE_NAME_RANGE )
-    {
-        if( subTypeList.size() == 1 )
-        {
-            const auto type = libstdhl::Memory::make< libcasm_ir::RangeType >( subTypeList[ 0 ] );
-            node.setType( type );
-        }
-        else
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "template type '" + name + "' can only have one sub-type",
-                Code::TypeAnnotationInvalidTemplateTypeSize );
-        }
-    }
-    else if( name == TypeInfo::TYPE_NAME_TUPLE )
-    {
-        if( subTypeList.size() >= 2 )
-        {
-            const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
-            m_log.error(
-                { node.sourceLocation() },
-                "'" + name + "' is a built-in composed type, use syntax '" + type->description() +
-                    "'",
-                Code::TypeAnnotationInvalidTemplateTypeName );
-        }
-        else
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "'" + name + "' is a built-in composed type, use syntax '(" +
-                    subTypeList[ 0 ]->description() + ", ...)'",
-                Code::TypeAnnotationInvalidTemplateTypeName );
-            m_log.info(
-                { node.sourceLocation() },
-                "'" + name + "' is a built-in composed type, and needs at least 2 sub-types" );
-        }
-    }
-    else if( name == TypeInfo::TYPE_NAME_LIST )
-    {
-        if( subTypeList.size() == 1 )
-        {
-            const auto type = libstdhl::Memory::make< libcasm_ir::ListType >( subTypeList[ 0 ] );
-            node.setType( type );
-        }
-        else
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "template type '" + name + "' can only have one sub-type",
-                Code::TypeAnnotationInvalidTemplateTypeSize );
-        }
-    }
-    else if( name == TypeInfo::TYPE_NAME_FILE )
-    {
-        if( subTypeList.size() == 1 )
-        {
-            m_log.info( { node.sourceLocation() }, "template type '" + name + "' is experimental" );
+    const auto maybeSymbol = m_symboltable.findSymbol( *node.name() );
+    const auto symbol = maybeSymbol.first;
+    const auto accessible = maybeSymbol.second;
 
-            const auto type = libstdhl::Memory::make< libcasm_ir::FileType >( subTypeList[ 0 ] );
-            node.setType( type );
-        }
-        else
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "template type '" + name + "' can only have one sub-type",
-                Code::TypeAnnotationInvalidTemplateTypeSize );
-        }
-    }
-    else if( name == TypeInfo::TYPE_NAME_PORT )
-    {
-        if( subTypeList.size() == 1 )
-        {
-            m_log.info( { node.sourceLocation() }, "template type '" + name + "' is experimental" );
-
-            const auto type = libstdhl::Memory::make< libcasm_ir::PortType >( subTypeList[ 0 ] );
-            node.setType( type );
-        }
-        else
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "template type '" + name + "' can only have one sub-type",
-                Code::TypeAnnotationInvalidTemplateTypeSize );
-        }
-    }
-    else
+    if( symbol and not accessible )
     {
         m_log.error(
             { node.sourceLocation() },
-            "unknown template type '" + name + "' found",
-            Code::TypeAnnotationInvalidTemplateTypeName );
+            symbol->description() + " '" + name + "' is not accessible",
+            Code::SymbolIsInaccessible );
+        m_log.warning(
+            { symbol->sourceLocation() },
+            "'" + symbol->identifier()->name() + "' has not been exported" );
+        return;
     }
+
+    if( symbol )
+    {
+        switch( symbol->id() )
+        {
+            case Node::ID::DOMAIN_DEFINITION:
+            {
+                const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
+                const auto domainDefinitionType =
+                    static_cast< const Ast::Type* >( domainDefinition.typeNode().get() );
+                if( node.id() != domainDefinitionType->id() )
+                {
+                    m_log.error(
+                        { node.sourceLocation() },
+                        node.description() + "  '" + name + "' is not a" +
+                            domainDefinitionType->description(),
+                        Code::TypeAnnotationInvalidTemplateTypeName );
+                    return;
+                }
+
+                const auto domainDefinitionTemplateType =
+                    static_cast< const TemplateType& >( *domainDefinition.typeNode() );
+                const auto domainTypeArgumentSize = domainDefinitionTemplateType.subTypes()->size();
+                const auto templateTypeArgumentSize = subTypeList.size();
+                if( domainTypeArgumentSize != templateTypeArgumentSize )
+                {
+                    m_log.error(
+                        { node.sourceLocation() },
+                        symbol->description() + "  '" + name +
+                            "' template type argument size mismatch, given " +
+                            std::to_string( templateTypeArgumentSize ) + ", needs " +
+                            std::to_string( domainTypeArgumentSize ),
+                        Code::TypeAnnotationInvalidTemplateTypeName );
+                    return;
+                }
+
+                const auto domainNamespace = m_symboltable.findNamespace( *node.name() );
+                assert( domainNamespace );
+
+                const auto domainSymbolName = node.signature();
+                const auto domainSymbol = domainNamespace->findSymbol( domainSymbolName );
+                if( domainSymbol )
+                {
+                    node.setType( domainSymbol->type() );
+                }
+                else
+                {
+                    libcasm_ir::Type::Ptr type = nullptr;
+
+                    if( name == TypeInfo::TYPE_NAME_RANGE )
+                    {
+                        assert( subTypeList.size() == 1 );
+                        type = libstdhl::Memory::make< libcasm_ir::RangeType >( subTypeList[ 0 ] );
+                    }
+                    else if( name == TypeInfo::TYPE_NAME_LIST )
+                    {
+                        assert( subTypeList.size() == 1 );
+                        type = libstdhl::Memory::make< libcasm_ir::ListType >( subTypeList[ 0 ] );
+                    }
+                    // TODO: FIXME: @ppaulweber: feature/set
+                    // else if( name == TypeInfo::TYPE_NAME_SET )
+                    // {
+                    //     assert( subTypeList.size() == 1 );
+                    //     type = libstdhl::Memory::make< libcasm_ir::SetType >( subTypeList[ 0 ] );
+                    // }
+                    else if( name == TypeInfo::TYPE_NAME_FILE )
+                    {
+                        assert( subTypeList.size() == 1 );
+                        m_log.info(
+                            { node.sourceLocation() },
+                            node.description() + " '" + name + "' is experimental" );
+                        type = libstdhl::Memory::make< libcasm_ir::FileType >( subTypeList[ 0 ] );
+                    }
+                    else if( name == TypeInfo::TYPE_NAME_PORT )
+                    {
+                        assert( subTypeList.size() == 1 );
+                        m_log.info(
+                            { node.sourceLocation() },
+                            node.description() + " '" + name + "' is experimental" );
+                        type = libstdhl::Memory::make< libcasm_ir::PortType >( subTypeList[ 0 ] );
+                    }
+
+                    if( type )
+                    {
+                        const auto domainDefinitionTemplateTypeInstance =
+                            std::make_shared< DomainDefinition >( domainDefinition );
+                        domainDefinitionTemplateTypeInstance->setType( type );
+                        domainNamespace->registerSymbol(
+                            domainSymbolName, node.ptr< Definition >() );
+                        node.setType( type );
+                    }
+                }
+                break;
+            }
+            default:
+            {
+                m_log.error(
+                    { node.sourceLocation() },
+                    "cannot use " + symbol->description() + " '" + name + "' as type",
+                    Code::TypeAnnotationInvalidTemplateTypeName );
+                return;
+            }
+        }
+
+        if( not node.type() )
+        {
+            // add check of type size etc.
+            m_log.warning( { node.sourceLocation() }, "unimplemented!" );
+        }
+
+        return;
+    }
+
+    m_log.error(
+        { node.sourceLocation() },
+        "unknown template type '" + name + "' found",
+        Code::TypeAnnotationInvalidTemplateTypeName );
 }
 
 void TypeCheckVisitor::visit( RelationType& node )
