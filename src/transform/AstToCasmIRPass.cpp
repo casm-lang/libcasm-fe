@@ -436,7 +436,7 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
             assert( not" unimplemented direct expr call " );
             break;
         }
-        case DirectCallExpression::TargetType::TYPE_DOMAIN:
+        case DirectCallExpression::TargetType::DOMAIN:
         {
             assert( not" unimplemented direct expr call " );
             break;
