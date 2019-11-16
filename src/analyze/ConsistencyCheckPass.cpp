@@ -45,6 +45,8 @@
 
 #include "ConsistencyCheckPass.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
@@ -93,6 +95,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
     void visit( UsingDefinition& node ) override;
     void visit( InvariantDefinition& node ) override;
+    void visit( DomainDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
@@ -212,6 +215,19 @@ void ConsistencyCheckVisitor::visit( InvariantDefinition& node )
 {
     RecursiveVisitor::visit( node );
     verifyHasTypeOfKind( *node.expression(), IR::Type::Kind::BOOLEAN );
+}
+
+void ConsistencyCheckVisitor::visit( DomainDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    if( node.typeNode()->id() == Node::ID::TEMPLATE_TYPE )
+    {
+        // internal template type definition
+        return;
+    }
+
+    verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( UndefLiteral& node )
@@ -492,6 +508,14 @@ void ConsistencyCheckVisitor::visit( RecordType& node )
 void ConsistencyCheckVisitor::visit( TemplateType& node )
 {
     RecursiveVisitor::visit( node );
+
+    if( node.leftBraceToken()->token() == Grammar::Token::UNRESOLVED and
+        node.rightBraceToken()->token() == Grammar::Token::UNRESOLVED )
+    {
+        // internal created template type
+        return;
+    }
+
     verifyHasType( node );
 }
 
