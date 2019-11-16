@@ -179,6 +179,11 @@ const std::unordered_map< std::string, Ast::Definition::Ptr >& Namespace::symbol
     return m_symbols;
 }
 
+const std::unordered_map< std::string, Namespace::Linkage >& Namespace::namespaces( void ) const
+{
+    return m_namespaces;
+}
+
 std::string Namespace::dump( const std::string& indention ) const
 {
     std::unordered_set< const Namespace* > visited;
@@ -188,15 +193,18 @@ std::string Namespace::dump( const std::string& indention ) const
 std::string Namespace::dump(
     const std::string& indention, std::unordered_set< const Namespace* >& visited ) const
 {
-    std::stringstream stream;
-
     const auto it = visited.emplace( this );
     if( not it.second )
     {
-        stream << indention << "...\n";
-        return stream.str();
+        return std::string();
     }
 
+    if( m_symbols.size() == 0 and m_namespaces.size() == 0 )
+    {
+        return indention + "\n";
+    }
+
+    std::stringstream stream;
     for( const auto& symbol : m_symbols )
     {
         const auto& name = symbol.first;
@@ -215,10 +223,8 @@ std::string Namespace::dump(
     {
         const auto& name = _namespace.first;
         const auto& space = _namespace.second.first;
-        const auto visibility = _namespace.second.second;
-        const auto prefix = indention + name + Namespace::delimiter();
-
-        stream << prefix << ( visibility == Visibility::Internal ? "-" : "+" ) << "\n";
+        const auto visibility = ( _namespace.second.second == Visibility::Internal ? "-" : "+" );
+        const auto prefix = indention + name + Namespace::delimiter() + visibility;
         stream << space->dump( prefix, visited );
     }
 

@@ -108,6 +108,8 @@ namespace libcasm_fe
 
         const std::unordered_map< std::string, Ast::Definition::Ptr >& symbols( void ) const;
 
+        const std::unordered_map< std::string, Linkage >& namespaces( void ) const;
+
         std::string dump( const std::string& indention = "" ) const;
 
       private:
