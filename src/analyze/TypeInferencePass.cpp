@@ -123,6 +123,12 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
   private:
     bool tryResolveCallInTypeNamespace( DirectCallExpression& node ) const;
+    void resolveTypeFeatureSymbol(
+        TargetCallExpression& node,
+        const std::string& typeName,
+        const std::string& featureName,
+        const std::string& symbolName,
+        const libcasm_ir::RelationType::Ptr& relationType ) const;
 
     void assignment(
         TypedNode& lhs,
@@ -908,7 +914,7 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
     {
         m_log.error(
             { node.fromExpression()->sourceLocation() },
-            "unable to infer expression type of 'as operator'",
+            "unable to infer expression type of 'as' operator",
             Code::TypeInferenceTypeCastingExpressionFromHasNoType );
     }
 
@@ -922,59 +928,25 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
     const auto& fromExpressionType = node.fromExpression()->type();
     const auto& fromExpressionTypeName = fromExpressionType->description();
 
-    const auto fromExpressionTypeNamespace = m_symboltable.findNamespace( fromExpressionTypeName );
-    if( not fromExpressionTypeNamespace )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "'" + fromExpressionTypeName + "' is unknown",
-            Code::TypeInferenceInvalidTypeCastingExpression );
-        return;
-    }
-
-    const auto featureName = "TypeCasting" + resultTypeName;
-    const auto featureNamespace = fromExpressionTypeNamespace->findNamespace( featureName );
-    if( not featureNamespace )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "'" + featureName + "' not implemented for type '" + fromExpressionTypeName + "'",
-            Code::TypeInferenceInvalidTypeCastingExpression );
-        return;
-    }
-
-    const auto methodName = "to" + resultTypeName;
-    const auto symbol = featureNamespace->findSymbol( methodName );
-
-    if( not symbol )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "'" + methodName + "' has not been defined in namespace '" + featureName + "'",
-            Code::SymbolIsUnknown );
-        return;
-    }
-
+    const auto& typeName = fromExpressionTypeName;
+    const auto& featureName = "TypeCasting" + resultTypeName;
+    const auto& symbolName = "to" + resultTypeName;
     std::vector< libcasm_ir::Type::Ptr > argumentTypes;
     argumentTypes.emplace_back( fromExpressionType );
     const auto relationType =
         libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
 
-    if( *symbol->type() != *relationType )
+    try
+    {
+        resolveTypeFeatureSymbol( node, typeName, featureName, symbolName, relationType );
+    }
+    catch( const std::domain_error& e )
     {
         m_log.error(
             { node.sourceLocation() },
-            "use: '" + relationType->description() + ", def: '" + symbol->type()->description() +
-                "'",
+            "type casting 'as' operator: " + std::string( e.what() ),
             Code::TypeInferenceInvalidTypeCastingExpression );
-        m_log.info( { symbol->sourceLocation() }, "TODO" );
     }
-
-    // "unknown 'as operator' type casting relation '" + relationType->description() + "'
-    //  found",  );
-
-    node.setTargetDefinition( symbol );
-    node.setType( resultType );
 }
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
@@ -1775,6 +1747,45 @@ void TypeInferenceVisitor::assignment(
                 assignmentErr );
         }
     }
+}
+
+void TypeInferenceVisitor::resolveTypeFeatureSymbol(
+    TargetCallExpression& node,
+    const std::string& typeName,
+    const std::string& featureName,
+    const std::string& symbolName,
+    const libcasm_ir::RelationType::Ptr& relationType ) const
+{
+    const auto typeNamespace = m_symboltable.findNamespace( typeName );
+    if( not typeNamespace )
+    {
+        throw std::domain_error( "'" + typeName + "' is unknown" );
+    }
+
+    const auto featureNamespace = typeNamespace->findNamespace( featureName );
+    if( not featureNamespace )
+    {
+        throw std::domain_error(
+            "'" + featureName + "' not implemented for type '" + typeName + "'" );
+    }
+
+    const auto symbol = featureNamespace->findSymbol( symbolName );
+    if( not symbol )
+    {
+        throw std::domain_error(
+            "'" + symbolName + "' has not been defined in namespace '" + featureName + "'" );
+    }
+
+    if( *symbol->type() != *relationType )
+    {
+        const auto msg = "use: '" + relationType->description() + ", def: '" +
+                         symbol->type()->description() + "'";
+        m_log.info( { symbol->sourceLocation() }, msg );
+        throw std::domain_error( msg );
+    }
+
+    node.setTargetDefinition( symbol );
+    node.setType( relationType->ptr_result() );
 }
 
 void TypeInferenceVisitor::inference(
