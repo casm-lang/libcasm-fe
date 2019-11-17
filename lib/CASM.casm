@@ -55,3 +55,18 @@ rule println( text : String ) =
 [ export ]
 rule assert( value : Boolean ) =
     IR::AssertInstruction( value )
+
+//
+//
+// Type Casting
+//
+
+[ export ]
+feature TypeCastingString = {
+    derived toString : Object -> String
+}
+
+implement TypeCastingString for Integer = {
+    derived toString( this ) -> String =
+        IR::AsStringInstruction( this )
+}
