@@ -641,6 +641,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             continue;
         }
 
+        if( callArgType->isObject() and not exprArgType->isObject() )
+        {
+            // OK if argument expression type (not Object) passed to argument call type (Object)
+            continue;
+        }
+
         if( *callArgType != *exprArgType )
         {
             const std::map< DirectCallExpression::TargetType, Code > codes = {
@@ -911,23 +917,64 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         return;
     }
 
-    const auto resultType = node.asType()->type();
-    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
-
+    const auto& resultType = node.asType()->type();
+    const auto& resultTypeName = resultType->description();
     const auto& fromExpressionType = node.fromExpression()->type();
-    argumentTypes.emplace_back( fromExpressionType );
+    const auto& fromExpressionTypeName = fromExpressionType->description();
 
+    const auto fromExpressionTypeNamespace = m_symboltable.findNamespace( fromExpressionTypeName );
+    if( not fromExpressionTypeNamespace )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "'" + fromExpressionTypeName + "' is unknown",
+            Code::TypeInferenceInvalidTypeCastingExpression );
+        return;
+    }
+
+    const auto featureName = "TypeCasting" + resultTypeName;
+    const auto featureNamespace = fromExpressionTypeNamespace->findNamespace( featureName );
+    if( not featureNamespace )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "'" + featureName + "' not implemented for type '" + fromExpressionTypeName + "'",
+            Code::TypeInferenceInvalidTypeCastingExpression );
+        return;
+    }
+
+    const auto methodName = "to" + resultTypeName;
+    const auto symbol = featureNamespace->findSymbol( methodName );
+
+    if( not symbol )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "'" + methodName + "' has not been defined in namespace '" + featureName + "'",
+            Code::SymbolIsUnknown );
+        return;
+    }
+
+    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+    argumentTypes.emplace_back( fromExpressionType );
     const auto relationType =
         libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
 
-    // TODO: FIXME: @ppaulweber: implement here possible derived and feature type
-    // casting expressions
-    m_log.error(
-        { node.sourceLocation() },
-        "unknown 'as operator' type casting relation '" + relationType->description() + "' found",
-        Code::TypeInferenceInvalidTypeCastingExpression );
+    if( *symbol->type() != *relationType )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "use: '" + relationType->description() + ", def: '" + symbol->type()->description() +
+                "'",
+            Code::TypeInferenceInvalidTypeCastingExpression );
+        m_log.info( { symbol->sourceLocation() }, "TODO" );
+    }
 
-    // TODO: FIXME: @ppaulweber: node.setType( resultType );
+    // "unknown 'as operator' type casting relation '" + relationType->description() + "'
+    //  found",  );
+
+    node.setTargetDefinition( symbol );
+    node.setType( resultType );
 }
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
