@@ -959,14 +959,10 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
 
 void ExecutionVisitor::visit( CardinalityExpression& node )
 {
-    node.expression()->accept( *this );
-    const auto object = m_evaluationStack.pop();
-
-    throw RuntimeException(
-        node.sourceLocation(),
-        "unimplemented",
-        m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-        Code::Unspecified );
+    const auto& definition = node.targetDefinition();
+    m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+    definition->accept( *this );
+    m_frameStack.pop();
 }
 
 void ExecutionVisitor::visit( ConditionalRule& node )
