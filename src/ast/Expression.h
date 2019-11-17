@@ -148,7 +148,22 @@ namespace libcasm_fe
             Token::Ptr m_rightBracketToken;
         };
 
-        class DirectCallExpression : public CallExpression
+        class TargetCallExpression : public CallExpression
+        {
+          public:
+            using Ptr = std::shared_ptr< TargetCallExpression >;
+
+            TargetCallExpression( const Node::ID id, const Expressions::Ptr& arguments );
+
+            void setTargetDefinition( const std::shared_ptr< Definition >& definition );
+
+            const std::shared_ptr< Definition >& targetDefinition( void ) const;
+
+          private:
+            std::shared_ptr< Definition > m_targetDefinition;
+        };
+
+        class DirectCallExpression : public TargetCallExpression
         {
           public:
             enum class TargetType
@@ -175,16 +190,7 @@ namespace libcasm_fe
 
             void setTargetType( TargetType targetType );
             TargetType targetType( void ) const;
-
             std::string targetTypeName( void ) const;
-
-            /**
-               Sets the definition of this call.
-
-               @note Assigned by SymbolResolved and used during execution
-             */
-            void setTargetDefinition( const std::shared_ptr< Definition >& definition );
-            const std::shared_ptr< Definition >& targetDefinition( void ) const;
 
             void accept( Visitor& visitor ) override;
 
@@ -193,10 +199,9 @@ namespace libcasm_fe
           private:
             IdentifierPath::Ptr m_identifier;
             TargetType m_targetType;
-            std::shared_ptr< Definition > m_targetDefinition;
         };
 
-        class MethodCallExpression final : public CallExpression
+        class MethodCallExpression final : public TargetCallExpression
         {
           public:
             enum class MethodType
@@ -225,14 +230,6 @@ namespace libcasm_fe
 
             std::string methodTypeName( void ) const;
 
-            /**
-             *     Sets the definition of this call.
-             *
-             *     @note Assigned by SymbolResolved and used during execution
-             */
-            void setTargetDefinition( const std::shared_ptr< Definition >& definition );
-            const std::shared_ptr< Definition >& targetDefinition( void ) const;
-
             void accept( Visitor& visitor ) override final;
 
           private:
@@ -240,7 +237,6 @@ namespace libcasm_fe
             Identifier::Ptr m_methodName;
             const Token::Ptr m_dotToken;
             MethodType m_methodType;
-            std::shared_ptr< Definition > m_targetDefinition;
         };
 
         class LiteralCallExpression final : public Expression
@@ -285,7 +281,7 @@ namespace libcasm_fe
             const Expression::Ptr m_expression;
         };
 
-        class TypeCastingExpression final : public CallExpression
+        class TypeCastingExpression final : public TargetCallExpression
         {
           public:
             using Ptr = std::shared_ptr< TypeCastingExpression >;
@@ -301,16 +297,11 @@ namespace libcasm_fe
 
             const Token::Ptr& asToken( void ) const;
 
-            void setTargetDefinition( const std::shared_ptr< Definition >& definition );
-
-            const std::shared_ptr< Definition >& targetDefinition( void ) const;
-
             void accept( Visitor& visitor ) override;
 
           private:
             const std::shared_ptr< Type > m_asType;
             const Token::Ptr m_asToken;
-            std::shared_ptr< Definition > m_targetDefinition;
         };
 
         class UnaryExpression final : public Expression
@@ -549,16 +540,10 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class CardinalityExpression final : public CallExpression
+        class CardinalityExpression final : public TargetCallExpression
         {
           public:
             using Ptr = std::shared_ptr< CardinalityExpression >;
-
-            enum class CardinalityType
-            {
-                BUILTIN,
-                UNKNOWN
-            };
 
             CardinalityExpression(
                 const Token::Ptr& leftVerticalBarToken,
@@ -568,19 +553,14 @@ namespace libcasm_fe
             const Expression::Ptr& expression( void ) const;
 
             const Token::Ptr& leftVerticalBarToken( void ) const;
-            const Token::Ptr& rightVerticalBarToken( void ) const;
 
-            void setCardinalityType( CardinalityType cardinalityType );
-            CardinalityType cardinalityType( void ) const;
-            std::string cardinalityTypeName( void ) const;
+            const Token::Ptr& rightVerticalBarToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const Expression::Ptr m_expression;
             const Token::Ptr m_leftVerticalBarToken;
             const Token::Ptr m_rightVerticalBarToken;
-            CardinalityType m_cardinalityType;
         };
     }
 }

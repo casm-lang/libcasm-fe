@@ -191,15 +191,36 @@ const Token::Ptr& CallExpression::rightBracketToken( void ) const
 
 //
 //
+// TargetCallExpression
+//
+
+TargetCallExpression::TargetCallExpression( const Node::ID id, const Expressions::Ptr& arguments )
+: CallExpression( id, arguments )
+, m_targetDefinition()
+{
+}
+
+void TargetCallExpression::setTargetDefinition( const Definition::Ptr& definition )
+{
+    m_targetDefinition = definition;
+}
+
+const Definition::Ptr& TargetCallExpression::targetDefinition( void ) const
+{
+    assert( m_targetDefinition != nullptr );
+    return m_targetDefinition;
+}
+
+//
+//
 // DirectCallExpression
 //
 
 DirectCallExpression::DirectCallExpression(
     const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
-: CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
+: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
 , m_identifier( identifier )
 , m_targetType( TargetType::UNKNOWN )
-, m_targetDefinition()
 {
 }
 
@@ -278,17 +299,6 @@ std::string DirectCallExpression::targetTypeString( const TargetType targetType 
     return std::string();
 }
 
-void DirectCallExpression::setTargetDefinition( const Definition::Ptr& definition )
-{
-    m_targetDefinition = definition;
-}
-
-const Definition::Ptr& DirectCallExpression::targetDefinition( void ) const
-{
-    assert( targetType() != TargetType::UNKNOWN );
-    return m_targetDefinition;
-}
-
 void DirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -304,7 +314,7 @@ MethodCallExpression::MethodCallExpression(
     const Token::Ptr& dotToken,
     const Identifier::Ptr& methodName,
     const Expressions::Ptr& arguments )
-: CallExpression( Node::ID::METHOD_CALL_EXPRESSION, arguments )
+: TargetCallExpression( Node::ID::METHOD_CALL_EXPRESSION, arguments )
 , m_object( object )
 , m_methodName( methodName )
 , m_dotToken( dotToken )
@@ -361,18 +371,6 @@ std::string MethodCallExpression::methodTypeName( void ) const
 
     assert( !" internal error! " );
     return std::string();
-}
-
-void MethodCallExpression::setTargetDefinition( const Definition::Ptr& definition )
-{
-    m_targetDefinition = definition;
-}
-
-const Definition::Ptr& MethodCallExpression::targetDefinition( void ) const
-{
-    assert( m_methodType != MethodType::UNKNOWN );
-
-    return m_targetDefinition;
 }
 
 void MethodCallExpression::accept( Visitor& visitor )
@@ -455,7 +453,7 @@ void IndirectCallExpression::accept( Visitor& visitor )
 
 TypeCastingExpression::TypeCastingExpression(
     const Expression::Ptr& fromExpression, const Token::Ptr& asToken, const Type::Ptr& asType )
-: CallExpression( Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
+: TargetCallExpression( Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
 , m_asType( asType )
 , m_asToken( asToken )
 {
@@ -476,16 +474,6 @@ const Type::Ptr& TypeCastingExpression::asType( void ) const
 const Token::Ptr& TypeCastingExpression::asToken( void ) const
 {
     return m_asToken;
-}
-
-void TypeCastingExpression::setTargetDefinition( const Definition::Ptr& definition )
-{
-    m_targetDefinition = definition;
-}
-
-const Definition::Ptr& TypeCastingExpression::targetDefinition( void ) const
-{
-    return m_targetDefinition;
 }
 
 void TypeCastingExpression::accept( Visitor& visitor )
@@ -893,17 +881,17 @@ CardinalityExpression::CardinalityExpression(
     const Token::Ptr& leftVerticalBarToken,
     const Expression::Ptr& expression,
     const Token::Ptr& rightVerticalBarToken )
-: CallExpression( Node::ID::CARDINALITY_EXPRESSION, std::make_shared< Expressions >() )
-, m_expression( expression )
-, m_cardinalityType( CardinalityType::UNKNOWN )
+: TargetCallExpression( Node::ID::CARDINALITY_EXPRESSION, std::make_shared< Expressions >() )
 , m_leftVerticalBarToken( leftVerticalBarToken )
 , m_rightVerticalBarToken( rightVerticalBarToken )
 {
+    arguments()->add( expression );
 }
 
 const Expression::Ptr& CardinalityExpression::expression( void ) const
 {
-    return m_expression;
+    assert( arguments()->size() == 1 );
+    return arguments()->front();
 }
 
 const Token::Ptr& CardinalityExpression::leftVerticalBarToken( void ) const
@@ -914,34 +902,6 @@ const Token::Ptr& CardinalityExpression::leftVerticalBarToken( void ) const
 const Token::Ptr& CardinalityExpression::rightVerticalBarToken( void ) const
 {
     return m_rightVerticalBarToken;
-}
-
-void CardinalityExpression::setCardinalityType( const CardinalityType cardinalityType )
-{
-    m_cardinalityType = cardinalityType;
-}
-
-CardinalityExpression::CardinalityType CardinalityExpression::cardinalityType( void ) const
-{
-    return m_cardinalityType;
-}
-
-std::string CardinalityExpression::cardinalityTypeName( void ) const
-{
-    switch( cardinalityType() )
-    {
-        case CardinalityExpression::CardinalityType::BUILTIN:
-        {
-            return "built-in";
-        }
-        case CardinalityExpression::CardinalityType::UNKNOWN:
-        {
-            return "unknown";
-        }
-    }
-
-    assert( !" internal error! " );
-    return std::string();
 }
 
 void CardinalityExpression::accept( Visitor& visitor )
