@@ -70,3 +70,17 @@ implement TypeCastingString for Integer = {
     derived toString( this ) -> String =
         IR::AsStringInstruction( this )
 }
+
+//
+//
+// Cardinality
+//
+
+[ export ]
+feature Cardinality = {
+    [ pure ] derived size : Object -> Integer
+}
+
+implement Cardinality for Integer = {
+    [ pure ] derived size( this ) -> Integer = 1
+}
