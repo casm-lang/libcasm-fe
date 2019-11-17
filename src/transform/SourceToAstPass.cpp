@@ -339,6 +339,19 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
     assert->setProperties( assertProperties );
     assert->setExported( true );
     specification->definitions()->add( assert );
+
+    const auto asString = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "AsStringInstruction" ),
+        libcasm_ir::AsStringBuiltin::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            std::make_shared< libcasm_ir::StringType >(),
+            std::vector< libcasm_ir::Type::Ptr >{
+                TypeInfo::instance().getType( TypeInfo::TYPE_NAME_OBJECT ) } ) );
+    const auto asStringProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                      libcasm_ir::Property::PURE };
+    asString->setProperties( asStringProperties );
+    asString->setExported( true );
+    specification->definitions()->add( asString );
 }
 
 //
