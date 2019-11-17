@@ -711,7 +711,8 @@ void InvariantDefinition::accept( Visitor& visitor )
 //
 
 TypeDefinition::TypeDefinition( const Node::ID id, const Type::Ptr& typeNode )
-: Definition( id, Ast::make< Identifier >( typeNode->name()->sourceLocation(), typeNode->name()->path() ) )
+: Definition(
+      id, Ast::make< Identifier >( typeNode->name()->sourceLocation(), typeNode->name()->path() ) )
 , m_typeNode( typeNode )
 {
 }
