@@ -456,16 +456,16 @@ void IndirectCallExpression::accept( Visitor& visitor )
 TypeCastingExpression::TypeCastingExpression(
     const Expression::Ptr& fromExpression, const Token::Ptr& asToken, const Type::Ptr& asType )
 : CallExpression( Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
-, m_fromExpression( fromExpression )
 , m_asType( asType )
 , m_asToken( asToken )
-, m_castingType( CastingType::UNKNOWN )
 {
+    arguments()->add( fromExpression );
 }
 
 const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
 {
-    return m_fromExpression;
+    assert( arguments()->size() == 1 );
+    return arguments()->front();
 }
 
 const Type::Ptr& TypeCastingExpression::asType( void ) const
@@ -478,34 +478,6 @@ const Token::Ptr& TypeCastingExpression::asToken( void ) const
     return m_asToken;
 }
 
-void TypeCastingExpression::setCastingType( const CastingType castingType )
-{
-    m_castingType = castingType;
-}
-
-TypeCastingExpression::CastingType TypeCastingExpression::castingType( void ) const
-{
-    return m_castingType;
-}
-
-std::string TypeCastingExpression::castingTypeName( void ) const
-{
-    switch( m_castingType )
-    {
-        case CastingType::BUILTIN:
-        {
-            return "built-in";
-        }
-        case CastingType::UNKNOWN:
-        {
-            return "unknown";
-        }
-    }
-
-    assert( !" internal error! " );
-    return std::string();
-}
-
 void TypeCastingExpression::setTargetDefinition( const Definition::Ptr& definition )
 {
     m_targetDefinition = definition;
@@ -513,7 +485,6 @@ void TypeCastingExpression::setTargetDefinition( const Definition::Ptr& definiti
 
 const Definition::Ptr& TypeCastingExpression::targetDefinition( void ) const
 {
-    assert( m_castingType != CastingType::UNKNOWN );
     return m_targetDefinition;
 }
 

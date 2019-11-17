@@ -288,12 +288,6 @@ namespace libcasm_fe
         class TypeCastingExpression final : public CallExpression
         {
           public:
-            enum class CastingType
-            {
-                BUILTIN,
-                UNKNOWN
-            };
-
             using Ptr = std::shared_ptr< TypeCastingExpression >;
 
             TypeCastingExpression(
@@ -307,25 +301,15 @@ namespace libcasm_fe
 
             const Token::Ptr& asToken( void ) const;
 
-            void setCastingType( const CastingType castingType );
-            CastingType castingType( void ) const;
-            std::string castingTypeName( void ) const;
-
-            /**
-             *     Sets the definition of this call.
-             *
-             *     @note Assigned by SymbolResolved and used during execution
-             */
             void setTargetDefinition( const std::shared_ptr< Definition >& definition );
+
             const std::shared_ptr< Definition >& targetDefinition( void ) const;
 
             void accept( Visitor& visitor ) override;
 
           private:
-            const Expression::Ptr m_fromExpression;
             const std::shared_ptr< Type > m_asType;
             const Token::Ptr m_asToken;
-            CastingType m_castingType;
             std::shared_ptr< Definition > m_targetDefinition;
         };
 
