@@ -910,11 +910,12 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 
     node.fromExpression()->accept( *this );
 
+    const std::string description = "'as' operator";
     if( not node.fromExpression()->type() )
     {
         m_log.error(
             { node.fromExpression()->sourceLocation() },
-            "unable to infer expression type of 'as' operator",
+            "unable to infer expression type of " + description,
             Code::TypeInferenceTypeCastingExpressionFromHasNoType );
     }
 
@@ -925,14 +926,14 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 
     const auto& resultType = node.asType()->type();
     const auto& resultTypeName = resultType->description();
-    const auto& fromExpressionType = node.fromExpression()->type();
-    const auto& fromExpressionTypeName = fromExpressionType->description();
+    const auto& expressionType = node.fromExpression()->type();
+    const auto& expressionTypeName = expressionType->description();
 
-    const auto& typeName = fromExpressionTypeName;
+    const auto& typeName = expressionTypeName;
     const auto& featureName = "TypeCasting" + resultTypeName;
     const auto& symbolName = "to" + resultTypeName;
     std::vector< libcasm_ir::Type::Ptr > argumentTypes;
-    argumentTypes.emplace_back( fromExpressionType );
+    argumentTypes.emplace_back( expressionType );
     const auto relationType =
         libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
 
@@ -944,7 +945,7 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
     {
         m_log.error(
             { node.sourceLocation() },
-            "type casting 'as' operator: " + std::string( e.what() ),
+            "type casting " + description + ": " + std::string( e.what() ),
             Code::TypeInferenceInvalidTypeCastingExpression );
     }
 }
@@ -1337,22 +1338,35 @@ void TypeInferenceVisitor::visit( CardinalityExpression& node )
     {
         m_log.error(
             { node.expression()->sourceLocation() },
-            "unable to infer expression type of '" + description + "'",
+            "unable to infer expression type of " + description,
             Code::TypeInferenceCardinalityExpressionHasNoType );
         return;
     }
 
-    const auto resultType = node.type();
-    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
-    argumentTypes.emplace_back( node.expression()->type() );
+    const auto& resultType = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_INTEGER );
+    const auto& resultTypeName = resultType->description();
+    const auto& expressionType = node.expression()->type();
+    const auto& expressionTypeName = expressionType->description();
 
+    const auto& typeName = expressionTypeName;
+    const auto& featureName = "Cardinality";
+    const auto& symbolName = "size";
+    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+    argumentTypes.emplace_back( expressionType );
     const auto relationType =
         libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
 
-    m_log.error(
-        { node.sourceLocation() },
-        "invalid '" + description + "' type relation '" + relationType->description() + "' found'",
-        Code::TypeInferenceCardinalityExpressionInvalid );
+    try
+    {
+        resolveTypeFeatureSymbol( node, typeName, featureName, symbolName, relationType );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "type casting " + description + ": " + std::string( e.what() ),
+            Code::TypeInferenceCardinalityExpressionInvalid );
+    }
 }
 
 void TypeInferenceVisitor::visit( ConditionalRule& node )
