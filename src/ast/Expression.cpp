@@ -211,6 +211,11 @@ const Definition::Ptr& TargetCallExpression::targetDefinition( void ) const
     return m_targetDefinition;
 }
 
+u1 TargetCallExpression::hasTargetDefinition( void ) const
+{
+    return m_targetDefinition != nullptr;
+}
+
 //
 //
 // DirectCallExpression
@@ -487,22 +492,17 @@ void TypeCastingExpression::accept( Visitor& visitor )
 //
 
 UnaryExpression::UnaryExpression(
-    const Token::Ptr& operationToken, const Expression::Ptr& expression, libcasm_ir::Value::ID op )
-: Expression( Node::ID::UNARY_EXPRESSION )
-, m_op( op )
-, m_expression( expression )
+    const Token::Ptr& operationToken, const Expression::Ptr& expression )
+: TargetCallExpression( Node::ID::UNARY_EXPRESSION, std::make_shared< Expressions >() )
 , m_operationToken( operationToken )
 {
-}
-
-libcasm_ir::Value::ID UnaryExpression::op( void ) const
-{
-    return m_op;
+    arguments()->add( expression );
 }
 
 const Expression::Ptr& UnaryExpression::expression( void ) const
 {
-    return m_expression;
+    assert( arguments()->size() == 1 );
+    return arguments()->front();
 }
 
 const Token::Ptr& UnaryExpression::operationToken( void ) const
@@ -525,12 +525,12 @@ BinaryExpression::BinaryExpression(
     const Token::Ptr& operationToken,
     const Expression::Ptr& right,
     libcasm_ir::Value::ID op )
-: Expression( Node::ID::BINARY_EXPRESSION )
+: TargetCallExpression( Node::ID::BINARY_EXPRESSION, std::make_shared< Expressions >() )
 , m_op( op )
-, m_left( left )
-, m_right( right )
 , m_operationToken( operationToken )
 {
+    arguments()->add( left );
+    arguments()->add( right );
 }
 
 libcasm_ir::Value::ID BinaryExpression::op( void ) const
@@ -540,12 +540,14 @@ libcasm_ir::Value::ID BinaryExpression::op( void ) const
 
 const Expression::Ptr& BinaryExpression::left( void ) const
 {
-    return m_left;
+    assert( arguments()->size() == 2 );
+    return arguments()->front();
 }
 
 const Expression::Ptr& BinaryExpression::right( void ) const
 {
-    return m_right;
+    assert( arguments()->size() == 2 );
+    return arguments()->back();
 }
 
 const Token::Ptr& BinaryExpression::operationToken( void ) const

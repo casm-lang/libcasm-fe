@@ -159,6 +159,8 @@ namespace libcasm_fe
 
             const std::shared_ptr< Definition >& targetDefinition( void ) const;
 
+            u1 hasTargetDefinition( void ) const;
+
           private:
             std::shared_ptr< Definition > m_targetDefinition;
         };
@@ -304,29 +306,24 @@ namespace libcasm_fe
             const Token::Ptr m_asToken;
         };
 
-        class UnaryExpression final : public Expression
+        class UnaryExpression final : public TargetCallExpression
         {
           public:
             using Ptr = std::shared_ptr< UnaryExpression >;
 
-            UnaryExpression(
-                const Token::Ptr& operationToken,
-                const Expression::Ptr& expression,
-                libcasm_ir::Value::ID op );
+            UnaryExpression( const Token::Ptr& operationToken, const Expression::Ptr& expression );
 
-            libcasm_ir::Value::ID op( void ) const;
             const Expression::Ptr& expression( void ) const;
+
             const Token::Ptr& operationToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const libcasm_ir::Value::ID m_op;
-            const Expression::Ptr m_expression;
             const Token::Ptr m_operationToken;
         };
 
-        class BinaryExpression final : public Expression
+        class BinaryExpression final : public TargetCallExpression
         {
           public:
             using Ptr = std::shared_ptr< BinaryExpression >;
@@ -338,16 +335,17 @@ namespace libcasm_fe
                 const libcasm_ir::Value::ID op );
 
             libcasm_ir::Value::ID op( void ) const;
+
             const Expression::Ptr& left( void ) const;
+
             const Expression::Ptr& right( void ) const;
+
             const Token::Ptr& operationToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const libcasm_ir::Value::ID m_op;
-            const Expression::Ptr m_left;
-            const Expression::Ptr m_right;
             const Token::Ptr m_operationToken;
         };
 
