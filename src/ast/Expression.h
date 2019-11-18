@@ -49,7 +49,6 @@
 #include <libcasm-fe/ast/Identifier>
 #include <libcasm-fe/ast/Node>
 #include <libcasm-fe/ast/Token>
-#include <libcasm-ir/Constant>
 
 namespace libcasm_fe
 {
@@ -331,10 +330,7 @@ namespace libcasm_fe
             BinaryExpression(
                 const Expression::Ptr& left,
                 const Token::Ptr& operationToken,
-                const Expression::Ptr& right,
-                const libcasm_ir::Value::ID op );
-
-            libcasm_ir::Value::ID op( void ) const;
+                const Expression::Ptr& right );
 
             const Expression::Ptr& left( void ) const;
 
@@ -345,7 +341,6 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            const libcasm_ir::Value::ID m_op;
             const Token::Ptr m_operationToken;
         };
 

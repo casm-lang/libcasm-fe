@@ -521,21 +521,12 @@ void UnaryExpression::accept( Visitor& visitor )
 //
 
 BinaryExpression::BinaryExpression(
-    const Expression::Ptr& left,
-    const Token::Ptr& operationToken,
-    const Expression::Ptr& right,
-    libcasm_ir::Value::ID op )
+    const Expression::Ptr& left, const Token::Ptr& operationToken, const Expression::Ptr& right )
 : TargetCallExpression( Node::ID::BINARY_EXPRESSION, std::make_shared< Expressions >() )
-, m_op( op )
 , m_operationToken( operationToken )
 {
     arguments()->add( left );
     arguments()->add( right );
-}
-
-libcasm_ir::Value::ID BinaryExpression::op( void ) const
-{
-    return m_op;
 }
 
 const Expression::Ptr& BinaryExpression::left( void ) const
