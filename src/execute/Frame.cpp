@@ -47,6 +47,8 @@
 
 #include "../ast/Definition.h"
 
+#include <libcasm-ir/Constant>
+
 #include <libstdhl/String>
 
 using namespace libcasm_fe;
