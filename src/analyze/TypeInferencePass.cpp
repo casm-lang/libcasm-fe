@@ -45,6 +45,8 @@
 
 #include "TypeInferencePass.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
@@ -53,9 +55,11 @@
 #include <libcasm-fe/import/SpecificationMergerPass>
 #include <libcasm-ir/Builtin>
 #include <libcasm-ir/Exception>
+
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
+
 #include <libstdhl/String>
 
 using namespace libcasm_fe;
@@ -128,7 +132,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         const std::string& typeName,
         const std::string& featureName,
         const std::string& symbolName,
-        const libcasm_ir::RelationType::Ptr& relationType ) const;
+        const libcasm_ir::Type::Ptr& resultType = nullptr );
 
     void assignment(
         TypedNode& lhs,
@@ -932,52 +936,164 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
     const auto& typeName = expressionTypeName;
     const auto& featureName = "TypeCasting" + resultTypeName;
     const auto& symbolName = "to" + resultTypeName;
-    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
-    argumentTypes.emplace_back( expressionType );
-    const auto relationType =
-        libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
 
     try
     {
-        resolveTypeFeatureSymbol( node, typeName, featureName, symbolName, relationType );
+        resolveTypeFeatureSymbol( node, typeName, featureName, symbolName, resultType );
     }
     catch( const std::domain_error& e )
     {
         m_log.error(
             { node.sourceLocation() },
-            "type casting " + description + ": " + std::string( e.what() ),
+            "invalid " + description + ", because " + std::string( e.what() ),
             Code::TypeInferenceInvalidTypeCastingExpression );
     }
 }
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
 {
-    if( node.op() == libcasm_ir::Value::ADD_INSTRUCTION )
+    RecursiveVisitor::visit( node );
+
+    const auto& operationToken = *node.operationToken();
+    const auto& operationTokenName = operationToken.tokenString();
+    const auto& description = "unary operator '" + operationTokenName + "'";
+
+    const auto& expression = node.expression();
+    inference( description, node, { expression } );
+
+    if( not expression->type() )
     {
-        // add unary expression (e.g. '+4') will not be annotated,
-        // just visit sub-nodes, propagate the expression type to this node and return
-        RecursiveVisitor::visit( node );
-        node.setType( node.expression()->type() );
+        m_log.error(
+            { expression->sourceLocation() },
+            "unable to infer expression type of " + description,
+            Code::TypeInferenceTypeCastingExpressionFromHasNoType );
         return;
     }
 
-    RecursiveVisitor::visit( node );
+    const auto& expressionType = expression->type();
+    const auto& expressionTypeName = expressionType->description();
 
-    const auto description = "unary operator '" + node.operationToken()->tokenString() + "'";
+    static const std::unordered_map< std::string, std::pair< std::string, std::string > >
+        featureToSymbol = {
+            { Grammar::tokenAsString( Grammar::Token::PLUS ), { "Positive", "sign" } },
+            { Grammar::tokenAsString( Grammar::Token::MINUS ), { "Inversion", "invert" } },
+            { Grammar::tokenAsString( Grammar::Token::NOT ), { "Negation", "negate" } },
+        };
 
-    inference( description, node, { node.expression() } );
+    const auto operation = featureToSymbol.find( operationTokenName );
+    if( operation == featureToSymbol.end() )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unimplemented " + description + " type inference mapping",
+            Code::Unspecified );
+        return;
+    }
 
-    RecursiveVisitor::visit( node );
+    const auto& typeName = expressionTypeName;
+    const auto& featureName = operation->second.first;
+    const auto& symbolName = operation->second.second;
+
+    try
+    {
+        resolveTypeFeatureSymbol( node, typeName, featureName, symbolName );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "invalid " + description + ", because " + std::string( e.what() ),
+            Code::Unspecified );
+    }
 }
 
 void TypeInferenceVisitor::visit( BinaryExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto description = "binary operator '" + node.operationToken()->tokenString() + "'";
-    inference( description, node, { node.left(), node.right() } );
+    const auto& operationToken = *node.operationToken();
+    const auto& operationTokenName = operationToken.tokenString();
+    const auto& description = "binary operator '" + operationTokenName + "'";
 
-    RecursiveVisitor::visit( node );
+    const auto& lhsExpression = node.left();
+    const auto& rhsExpression = node.right();
+    inference( description, node, { lhsExpression, rhsExpression } );
+
+    if( not lhsExpression->type() )
+    {
+        m_log.error(
+            { lhsExpression->sourceLocation() },
+            "unable to infer left expression type of " + description,
+            Code::Unspecified );
+    }
+
+    if( not rhsExpression->type() )
+    {
+        m_log.error(
+            { rhsExpression->sourceLocation() },
+            "unable to infer right expression type of " + description,
+            Code::Unspecified );
+    }
+
+    if( not lhsExpression->type() or not rhsExpression->type() )
+    {
+        return;
+    }
+
+    const auto& lhsType = lhsExpression->type();
+    const auto& lhsTypeName = lhsType->description();
+    const auto& rhsType = rhsExpression->type();
+    const auto& rhsTypeName = rhsType->description();
+
+    static const std::unordered_map< std::string, std::pair< std::string, std::string > >
+        featureToSymbol = {
+            { Grammar::tokenAsString( Grammar::Token::PLUS ), { "Addition", "add" } },
+            { Grammar::tokenAsString( Grammar::Token::MINUS ), { "Subtraction", "subtract" } },
+            { Grammar::tokenAsString( Grammar::Token::ASTERIX ), { "Multiplication", "multiply" } },
+            { Grammar::tokenAsString( Grammar::Token::SLASH ), { "Division", "divide" } },
+            { Grammar::tokenAsString( Grammar::Token::PERCENT ), { "Modulus", "modulo" } },
+            { Grammar::tokenAsString( Grammar::Token::CARET ), { "Exponentiation", "power" } },
+            { Grammar::tokenAsString( Grammar::Token::EQUAL ), { "Equality", "equal" } },
+            { Grammar::tokenAsString( Grammar::Token::NEQUAL ), { "Equality", "unequal" } },
+            { Grammar::tokenAsString( Grammar::Token::LESSER ), { "PartialOrder", "lessThan" } },
+            { Grammar::tokenAsString( Grammar::Token::GREATER ),
+              { "PartialOrder", "greaterThan" } },
+            { Grammar::tokenAsString( Grammar::Token::LESSEQ ),
+              { "TotalOrder", "lessThanOrEqual" } },
+            { Grammar::tokenAsString( Grammar::Token::GREATEREQ ),
+              { "TotalOrder", "greaterThanOrEqual" } },
+            { Grammar::tokenAsString( Grammar::Token::OR ), { "Logical", "or" } },
+            { Grammar::tokenAsString( Grammar::Token::XOR ), { "Logical", "xor" } },
+            { Grammar::tokenAsString( Grammar::Token::AND ), { "Logical", "and" } },
+            { Grammar::tokenAsString( Grammar::Token::ARROW ), { "Logical", "implies" } },
+            { Grammar::tokenAsString( Grammar::Token::IMPLIES ), { "Logical", "implies" } },
+        };
+
+    const auto operation = featureToSymbol.find( operationTokenName );
+    if( operation == featureToSymbol.end() )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unimplemented " + description + " type inference mapping",
+            Code::Unspecified );
+        return;
+    }
+
+    const auto& typeName = lhsTypeName;
+    const auto& featureName = operation->second.first;
+    const auto& symbolName = operation->second.second;
+
+    try
+    {
+        resolveTypeFeatureSymbol( node, typeName, featureName, symbolName );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "invalid " + description + ", because " + std::string( e.what() ),
+            Code::Unspecified );
+    }
 }
 
 void TypeInferenceVisitor::visit( ListLiteral& node )
@@ -1343,28 +1459,22 @@ void TypeInferenceVisitor::visit( CardinalityExpression& node )
         return;
     }
 
-    const auto& resultType = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_INTEGER );
-    const auto& resultTypeName = resultType->description();
     const auto& expressionType = node.expression()->type();
     const auto& expressionTypeName = expressionType->description();
 
     const auto& typeName = expressionTypeName;
     const auto& featureName = "Cardinality";
     const auto& symbolName = "size";
-    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
-    argumentTypes.emplace_back( expressionType );
-    const auto relationType =
-        libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
 
     try
     {
-        resolveTypeFeatureSymbol( node, typeName, featureName, symbolName, relationType );
+        resolveTypeFeatureSymbol( node, typeName, featureName, symbolName );
     }
     catch( const std::domain_error& e )
     {
         m_log.error(
             { node.sourceLocation() },
-            "type casting " + description + ": " + std::string( e.what() ),
+            "invalid " + description + ", because " + std::string( e.what() ),
             Code::TypeInferenceCardinalityExpressionInvalid );
     }
 }
@@ -1768,7 +1878,7 @@ void TypeInferenceVisitor::resolveTypeFeatureSymbol(
     const std::string& typeName,
     const std::string& featureName,
     const std::string& symbolName,
-    const libcasm_ir::RelationType::Ptr& relationType ) const
+    const libcasm_ir::Type::Ptr& resultType )
 {
     const auto typeNamespace = m_symboltable.findNamespace( typeName );
     if( not typeNamespace )
@@ -1790,10 +1900,26 @@ void TypeInferenceVisitor::resolveTypeFeatureSymbol(
             "'" + symbolName + "' has not been defined in namespace '" + featureName + "'" );
     }
 
-    if( *symbol->type() != *relationType )
+    if( not symbol->type() )
     {
-        const auto msg = "use: '" + relationType->description() + ", def: '" +
-                         symbol->type()->description() + "'";
+        symbol->accept( *this );
+    }
+
+    const auto& symbolType = symbol->type();
+    const auto returnType = ( resultType ? resultType : symbolType->ptr_result() );
+
+    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+    for( const auto& expression : *node.arguments() )
+    {
+        argumentTypes.emplace_back( expression->type()->ptr_result() );
+    }
+    const auto relationType =
+        libstdhl::Memory::make< libcasm_ir::RelationType >( returnType, argumentTypes );
+
+    if( *symbolType != *relationType )
+    {
+        const auto msg =
+            "use: '" + relationType->description() + ", def: '" + symbolType->description() + "'";
         m_log.info( { symbol->sourceLocation() }, msg );
         throw std::domain_error( msg );
     }
