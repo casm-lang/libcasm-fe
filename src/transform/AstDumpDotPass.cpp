@@ -1,3 +1,4 @@
+
 //
 //  Copyright (C) 2014-2021 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
@@ -193,9 +194,12 @@ class AstDumpDotVisitor final : public RecursiveVisitor
   private:
     void dumpNode( const Node& node, const std::string& name );
     void dumpNode( const TypedNode& node, const std::string& name );
+    void dumpNode( const TypedPropertyNode& node, const std::string& name );
+    void dumpNode( const TargetCallExpression& node, const std::string& name );
     void dumpLabel( const Node& node );
     void dumpLabel( const TypedNode& node );
     void dumpLabel( const TypedPropertyNode& node );
+    void dumpLabel( const TargetCallExpression& node );
     void dumpLink( void* from, void* to );
 
   private:
@@ -221,7 +225,9 @@ void AstDumpDotVisitor::setDumpNodeLocation( u1 dumpNodeLocation )
 void AstDumpDotVisitor::visit( Specification& specification )
 {
     m_stream << "subgraph \"" << specification.name() << "\" {\n"
-             << "\"" << &specification << "\" [label=\"Specification\"];\n";
+             << "\"" << &specification << "\" [label=\"Specification\n"
+             << specification.name() << "\n"
+             << specification.location()->toString() << "\"];\n";
 
     {
         DotLink link( this, &specification );
@@ -440,14 +446,14 @@ void AstDumpDotVisitor::visit( NamedExpression& node )
 void AstDumpDotVisitor::visit( DirectCallExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "DirectCallExpression\nTarget type: " + node.targetTypeName() );
+    dumpNode( node, "DirectCallExpression" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( MethodCallExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "MethodCallExpression\nMethod type: " + node.methodTypeName() );
+    dumpNode( node, "MethodCallExpression" );
     RecursiveVisitor::visit( node );
 }
 
@@ -475,14 +481,14 @@ void AstDumpDotVisitor::visit( TypeCastingExpression& node )
 void AstDumpDotVisitor::visit( UnaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "UnaryExpression\n" + node.operationToken()->tokenString() );
+    dumpNode( node, "UnaryExpression '" + node.operationToken()->tokenString() + "'" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BinaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "BinaryExpression\n" + node.operationToken()->tokenString() );
+    dumpNode( node, "Binaryxpression '" + node.operationToken()->tokenString() + "'" );
     RecursiveVisitor::visit( node );
 }
 
@@ -623,7 +629,7 @@ void AstDumpDotVisitor::visit( UnresolvedType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "UnresolvedType" );
-    RecursiveVisitor::visit( node );
+    // omit recursive visiting of node
 }
 
 void AstDumpDotVisitor::visit( BasicType& node )
@@ -782,6 +788,24 @@ void AstDumpDotVisitor::dumpNode( const TypedNode& node, const std::string& name
     m_stream << "\"];\n";
 }
 
+void AstDumpDotVisitor::dumpNode( const TypedPropertyNode& node, const std::string& name )
+{
+    m_stream << "\"" << &node << "\" [label=\"" << name;
+
+    dumpLabel( node );
+
+    m_stream << "\"];\n";
+}
+
+void AstDumpDotVisitor::dumpNode( const TargetCallExpression& node, const std::string& name )
+{
+    m_stream << "\"" << &node << "\" [label=\"" << name;
+
+    dumpLabel( node );
+
+    m_stream << "\"];\n";
+}
+
 void AstDumpDotVisitor::dumpLabel( const Node& node )
 {
     if( m_dumpNodeLocation )
@@ -815,7 +839,7 @@ void AstDumpDotVisitor::dumpLabel( const TypedPropertyNode& node )
 
     if( true )  // m_dumpProperties
     {
-        m_stream << "\n{ ";
+        m_stream << " { ";
 
         if( node.properties().isSet( libcasm_ir::Property::SIDE_EFFECT_FREE ) )
         {
@@ -828,6 +852,33 @@ void AstDumpDotVisitor::dumpLabel( const TypedPropertyNode& node )
 
         m_stream << "}";
     }
+}
+
+void AstDumpDotVisitor::dumpLabel( const TargetCallExpression& node )
+{
+    m_stream << "\n";
+
+    if( node.hasTargetDefinition() )
+    {
+        const auto& targetDefinition = node.targetDefinition();
+        m_stream << "[" << targetDefinition->description() << "] "
+                 << targetDefinition->identifier()->name() << ": ";
+
+        if( targetDefinition->type() )
+        {
+            m_stream << targetDefinition->type()->description();
+        }
+        else
+        {
+            m_stream << "UNRESOLVED";
+        }
+    }
+    else
+    {
+        m_stream << "[ UNRESOLVED ] UNRESOLVED: UNRESOLVED";
+    }
+
+    dumpLabel( static_cast< const TypedPropertyNode& >( node ) );
 }
 
 void AstDumpDotVisitor::dumpLink( void* from, void* to )
