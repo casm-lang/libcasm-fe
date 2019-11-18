@@ -1076,11 +1076,11 @@ SimpleOrClaspedTerm
   }
 | PLUS SimpleOrClaspedTerm %prec UPLUS
   {
-      $$ = Ast::make< UnaryExpression >( @$, $1, $2, libcasm_ir::Value::ADD_INSTRUCTION );
+      $$ = Ast::make< UnaryExpression >( @$, $1, $2 );
   }
 | MINUS SimpleOrClaspedTerm %prec UMINUS
   {
-      $$ = Ast::make< UnaryExpression >( @$, $1, $2, libcasm_ir::Value::INV_INSTRUCTION );
+      $$ = Ast::make< UnaryExpression >( @$, $1, $2 );
   }
 ;
 
@@ -1092,75 +1092,75 @@ SimpleOrClaspedTerm
 OperatorExpression
 : Term PLUS Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::ADD_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term MINUS Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::SUB_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term ASTERIX Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::MUL_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term SLASH Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::DIV_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term PERCENT Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::MOD_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term CARET Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::POW_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term NEQUAL Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term EQUAL Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::EQU_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term LESSER Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::LTH_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term GREATER Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::GTH_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term LESSEQ Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term GREATEREQ Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term OR Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::OR_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term XOR Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::XOR_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term AND Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::AND_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term ARROW Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::IMP_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | Term IMPLIES Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::IMP_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3 );
   }
 | NOT Term
   {
-      $$ = Ast::make< UnaryExpression >( @$, $1, $2, libcasm_ir::Value::NOT_INSTRUCTION );
+      $$ = Ast::make< UnaryExpression >( @$, $1, $2 );
   }
 ;
 
