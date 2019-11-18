@@ -758,51 +758,18 @@ void ExecutionVisitor::visit( TypeCastingExpression& node )
 
 void ExecutionVisitor::visit( UnaryExpression& node )
 {
-    node.expression()->accept( *this );
-
-    if( node.op() == libcasm_ir::Value::ADD_INSTRUCTION )
-    {
-        // add unary expression (e.g. '+4') will not be executed,
-        // just return without touching the unary expression value on the stack
-        return;
-    }
-
-    auto& value = m_evaluationStack.top();
-
-    try
-    {
-        IR::Operation::execute( node.op(), node.type(), value, value );
-    }
-    catch( const std::exception& e )
-    {
-        throw RuntimeException(
-            { node.sourceLocation() },
-            "unary expression has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::Unspecified );
-    }
+    const auto& definition = node.targetDefinition();
+    m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+    definition->accept( *this );
+    m_frameStack.pop();
 }
 
 void ExecutionVisitor::visit( BinaryExpression& node )
 {
-    node.left()->accept( *this );
-    const auto lhs = m_evaluationStack.pop();
-
-    node.right()->accept( *this );
-    auto& rhs = m_evaluationStack.top();
-
-    try
-    {
-        IR::Operation::execute( node.op(), node.type(), rhs, lhs, rhs );
-    }
-    catch( const IR::Exception& e )
-    {
-        throw RuntimeException(
-            { node.sourceLocation() },
-            "binary expression has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::Unspecified );
-    }
+    const auto& definition = node.targetDefinition();
+    m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+    definition->accept( *this );
+    m_frameStack.pop();
 }
 
 void ExecutionVisitor::visit( LetExpression& node )
