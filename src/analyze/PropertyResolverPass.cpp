@@ -284,25 +284,28 @@ void PropertyResolverVisitor::visit( TypeCastingExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    // propagate the fromExpression properties
-    node.setProperties( node.fromExpression()->properties() );
+    const auto& definition = node.targetDefinition();
+    const auto& definitionProperties = definition->properties();
+    node.setProperties( definitionProperties * node.fromExpression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( UnaryExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
-    node.setProperties( annotation.properties() * node.expression()->properties() );
+    const auto& definition = node.targetDefinition();
+    const auto& definitionProperties = definition->properties();
+    node.setProperties( definitionProperties * node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( BinaryExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
+    const auto& definition = node.targetDefinition();
+    const auto& definitionProperties = definition->properties();
     node.setProperties(
-        annotation.properties() * node.left()->properties() * node.right()->properties() );
+        definitionProperties * node.left()->properties() * node.right()->properties() );
 }
 
 void PropertyResolverVisitor::visit( LetExpression& node )
@@ -352,6 +355,10 @@ void PropertyResolverVisitor::visit( ExistentialQuantifierExpression& node )
 void PropertyResolverVisitor::visit( CardinalityExpression& node )
 {
     RecursiveVisitor::visit( node );
+
+    const auto& definition = node.targetDefinition();
+    const auto& definitionProperties = definition->properties();
+    node.setProperties( definitionProperties * node.expression()->properties() );
 }
 
 //
