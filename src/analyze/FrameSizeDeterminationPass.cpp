@@ -133,7 +133,6 @@ void FrameSizeDeterminationVisitor::visit( Specification& node )
 void FrameSizeDeterminationVisitor::visit( InitDefinition& node )
 {
     node.programFunction()->accept( *this );
-    ;
 }
 
 void FrameSizeDeterminationVisitor::visit( FunctionDefinition& node )
