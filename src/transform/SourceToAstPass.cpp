@@ -52,6 +52,8 @@
 #include <libcasm-fe/analyze/ProjectResolverPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
+#include <libcasm-ir/Instruction>
+
 #include <libpass/PassRegistry>
 
 #include "../Lexer.h"
@@ -314,6 +316,11 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
     // Instructions
     //
 
+    const auto& BOOLEAN = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_BOOLEAN );
+    const auto& INTEGER = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_INTEGER );
+    const auto& STRING = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_STRING );
+    const auto& OBJECT = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_OBJECT );
+
     const auto print = std::make_shared< BuiltinDefinition >(
         std::make_shared< Identifier >( "PrintInstruction" ),
         libcasm_ir::PrintBuiltin::classid(),
@@ -340,13 +347,88 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
     assert->setExported( true );
     specification->definitions()->add( assert );
 
+    const auto notInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "NotInstruction" ),
+        libcasm_ir::NotInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ BOOLEAN } ) );
+    const auto notInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                            libcasm_ir::Property::PURE };
+    notInstruction->setProperties( notInstructionProperties );
+    notInstruction->setExported( true );
+    specification->definitions()->add( notInstruction );
+
+    const auto addInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "AddInstruction" ),
+        libcasm_ir::AddInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            INTEGER, std::vector< libcasm_ir::Type::Ptr >{ INTEGER, INTEGER } ) );
+    const auto addInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                            libcasm_ir::Property::PURE };
+    addInstruction->setProperties( addInstructionProperties );
+    addInstruction->setExported( true );
+    specification->definitions()->add( addInstruction );
+
+    const auto subInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "SubInstruction" ),
+        libcasm_ir::SubInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            INTEGER, std::vector< libcasm_ir::Type::Ptr >{ INTEGER, INTEGER } ) );
+    const auto subInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                            libcasm_ir::Property::PURE };
+    subInstruction->setProperties( subInstructionProperties );
+    subInstruction->setExported( true );
+    specification->definitions()->add( subInstruction );
+
+    const auto concatInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "ConcatInstruction" ),
+        libcasm_ir::AddInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            STRING, std::vector< libcasm_ir::Type::Ptr >{ STRING, STRING } ) );
+    const auto concatInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                               libcasm_ir::Property::PURE };
+    concatInstruction->setProperties( concatInstructionProperties );
+    concatInstruction->setExported( true );
+    specification->definitions()->add( concatInstruction );
+
+    const auto equInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "EquInstruction" ),
+        libcasm_ir::EquInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ OBJECT, OBJECT } ) );
+    const auto equInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                            libcasm_ir::Property::PURE };
+    equInstruction->setProperties( equInstructionProperties );
+    equInstruction->setExported( true );
+    specification->definitions()->add( equInstruction );
+
+    const auto lthInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "LthInstruction" ),
+        libcasm_ir::LthInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ OBJECT, OBJECT } ) );
+    const auto lthInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                            libcasm_ir::Property::PURE };
+    lthInstruction->setProperties( lthInstructionProperties );
+    lthInstruction->setExported( true );
+    specification->definitions()->add( lthInstruction );
+
+    const auto gthInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "GthInstruction" ),
+        libcasm_ir::GthInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ OBJECT, OBJECT } ) );
+    const auto gthInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                            libcasm_ir::Property::PURE };
+    gthInstruction->setProperties( gthInstructionProperties );
+    gthInstruction->setExported( true );
+    specification->definitions()->add( gthInstruction );
+
     const auto asString = std::make_shared< BuiltinDefinition >(
         std::make_shared< Identifier >( "AsStringInstruction" ),
         libcasm_ir::AsStringBuiltin::classid(),
         std::make_shared< libcasm_ir::RelationType >(
-            std::make_shared< libcasm_ir::StringType >(),
-            std::vector< libcasm_ir::Type::Ptr >{
-                TypeInfo::instance().getType( TypeInfo::TYPE_NAME_OBJECT ) } ) );
+            STRING, std::vector< libcasm_ir::Type::Ptr >{ OBJECT } ) );
     const auto asStringProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
                                       libcasm_ir::Property::PURE };
     asString->setProperties( asStringProperties );
