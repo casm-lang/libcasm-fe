@@ -221,7 +221,7 @@ void NamespaceResolveVisitor::registerSymbolWithPath(
         }
         catch( const std::domain_error& e )
         {
-            m_log.error( { node.sourceLocation() }, e.what() );
+            m_log.debug( { node.sourceLocation() }, std::string( e.what() ) );
         }
     }
 }
