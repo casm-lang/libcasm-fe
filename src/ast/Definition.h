@@ -53,6 +53,8 @@
 #include <libcasm-fe/ast/Token>
 #include <libcasm-fe/ast/Type>
 
+#include <libcasm-ir/Value>
+
 namespace libcasm_fe
 {
     namespace Ast
