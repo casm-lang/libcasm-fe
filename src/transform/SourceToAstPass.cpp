@@ -138,194 +138,58 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
 
     //
     //
-    // Types
+    // Domain Types via IR::Types
     //
 
-    const auto domainVoid = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< BasicType >(
+    const auto domainBasicType = [&specification, &srcLoc]( const std::string& name ) {
+        const auto domain = Ast::make< DomainDefinition >(
             srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_VOID ) ) ) );
-    const auto domainVoidProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+            Ast::make< BasicType >(
+                srcLoc,
+                IdentifierPath::fromIdentifier( Ast::make< Identifier >( srcLoc, name ) ) ) );
+        const auto domainProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
                                         libcasm_ir::Property::PURE };
-    domainVoid->setProperties( domainVoidProperties );
-    domainVoid->setExported( true );
-    specification->definitions()->add( domainVoid );
+        domain->setProperties( domainProperties );
+        domain->setExported( true );
+        specification->definitions()->add( domain );
+    };
 
-    const auto domainObject = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< BasicType >(
+    const auto domainTemplateType = [&specification, &srcLoc]( const std::string& name ) {
+        const auto domainTypes = Ast::make< Types >( srcLoc );
+        domainTypes->add( Ast::make< UnresolvedType >( srcLoc ) );
+        const auto domain = Ast::make< DomainDefinition >(
             srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_OBJECT ) ) ) );
-    const auto domainObjectProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                          libcasm_ir::Property::PURE };
-    domainObject->setProperties( domainObjectProperties );
-    domainObject->setExported( true );
-    specification->definitions()->add( domainObject );
-
-    const auto domainEnumeration = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< BasicType >(
-            srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_ENUMERATION ) ) ) );
-    const auto domainEnumerationProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                               libcasm_ir::Property::PURE };
-    domainEnumeration->setProperties( domainEnumerationProperties );
-    domainEnumeration->setExported( true );
-    specification->definitions()->add( domainEnumeration );
-
-    const auto domainBoolean = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< BasicType >(
-            srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_BOOLEAN ) ) ) );
-    const auto domainBooleanProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                           libcasm_ir::Property::PURE };
-    domainBoolean->setProperties( domainBooleanProperties );
-    domainBoolean->setExported( true );
-    specification->definitions()->add( domainBoolean );
-
-    const auto domainInteger = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< BasicType >(
-            srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_INTEGER ) ) ) );
-    const auto domainIntegerProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                           libcasm_ir::Property::PURE };
-    domainInteger->setProperties( domainIntegerProperties );
-    domainInteger->setExported( true );
-    specification->definitions()->add( domainInteger );
-
-    const auto domainString = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< BasicType >(
-            srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_STRING ) ) ) );
-    const auto domainStringProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                          libcasm_ir::Property::PURE };
-    domainString->setProperties( domainStringProperties );
-    domainString->setExported( true );
-    specification->definitions()->add( domainString );
-
-    const auto domainRational = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< BasicType >(
-            srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_RATIONAL ) ) ) );
-    const auto domainRationalProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                            libcasm_ir::Property::PURE };
-    domainRational->setProperties( domainRationalProperties );
-    domainRational->setExported( true );
-    specification->definitions()->add( domainRational );
-
-    const auto domainDecimal = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< BasicType >(
-            srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_DECIMAL ) ) ) );
-    const auto domainDecimalProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                           libcasm_ir::Property::PURE };
-    domainDecimal->setProperties( domainDecimalProperties );
-    domainDecimal->setExported( true );
-    specification->definitions()->add( domainDecimal );
-
-    const auto domainRangeTypes = Ast::make< Types >( srcLoc );
-    domainRangeTypes->add( Ast::make< UnresolvedType >( srcLoc ) );
-    const auto domainRange = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< TemplateType >(
-            srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_RANGE ) ),
-            Token::unresolved(),
-            domainRangeTypes,
-            Token::unresolved() ) );
-    const auto domainRangeProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                         libcasm_ir::Property::PURE };
-    domainRange->setProperties( domainRangeProperties );
-    domainRange->setExported( true );
-    specification->definitions()->add( domainRange );
-
-    const auto domainListTypes = Ast::make< Types >( srcLoc );
-    domainListTypes->add( Ast::make< UnresolvedType >( srcLoc ) );
-    const auto domainList = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< TemplateType >(
-            srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_LIST ) ),
-            Token::unresolved(),
-            domainListTypes,
-            Token::unresolved() ) );
-    const auto domainListProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+            Ast::make< TemplateType >(
+                srcLoc,
+                IdentifierPath::fromIdentifier( Ast::make< Identifier >( srcLoc, name ) ),
+                Token::unresolved(),
+                domainTypes,
+                Token::unresolved() ) );
+        const auto domainProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
                                         libcasm_ir::Property::PURE };
-    domainList->setProperties( domainListProperties );
-    domainList->setExported( true );
-    specification->definitions()->add( domainList );
+        domain->setProperties( domainProperties );
+        domain->setExported( true );
+        specification->definitions()->add( domain );
+    };
 
-    // TODO: FIXME: @ppaulweber: feature/set
-    // const auto domainSetTypes = Ast::make< Types >( srcLoc );
-    // domainSetTypes->add( Ast::make< UnresolvedType >( srcLoc ) );
-    // const auto domainSet = Ast::make< DomainDefinition >(
-    //     srcLoc,
-    //     Ast::make< TemplateType >(
-    //         srcLoc,
-    //         IdentifierPath::fromIdentifier(
-    //             Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_SET ) ),
-    //         Token::unresolved(),
-    //         domainSetTypes,
-    //         Token::unresolved() ) );
-    // const auto domainSetProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-    //                                libcasm_ir::Property::PURE };
-    // domainSet->setProperties( domainSetProperties );
-    // domainSet->setExported( true );
-    // specification->definitions()->add( domainSet );
+    domainBasicType( TypeInfo::TYPE_NAME_VOID );
+    domainBasicType( TypeInfo::TYPE_NAME_OBJECT );
+    domainBasicType( TypeInfo::TYPE_NAME_ENUMERATION );
+    domainBasicType( TypeInfo::TYPE_NAME_BOOLEAN );
+    domainBasicType( TypeInfo::TYPE_NAME_INTEGER );
+    domainBasicType( TypeInfo::TYPE_NAME_STRING );
+    domainBasicType( TypeInfo::TYPE_NAME_RATIONAL );
+    domainBasicType( TypeInfo::TYPE_NAME_DECIMAL );
 
-    const auto domainPortTypes = Ast::make< Types >( srcLoc );
-    domainPortTypes->add( Ast::make< UnresolvedType >( srcLoc ) );
-    const auto domainPort = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< TemplateType >(
-            srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_PORT ) ),
-            Token::unresolved(),
-            domainPortTypes,
-            Token::unresolved() ) );
-    const auto domainPortProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                        libcasm_ir::Property::PURE };
-    domainPort->setProperties( domainPortProperties );
-    domainPort->setExported( true );
-    specification->definitions()->add( domainPort );
-
-    const auto domainFileTypes = Ast::make< Types >( srcLoc );
-    domainFileTypes->add( Ast::make< UnresolvedType >( srcLoc ) );
-    const auto domainFile = Ast::make< DomainDefinition >(
-        srcLoc,
-        Ast::make< TemplateType >(
-            srcLoc,
-            IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_FILE ) ),
-            Token::unresolved(),
-            domainFileTypes,
-            Token::unresolved() ) );
-    const auto domainFileProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                        libcasm_ir::Property::PURE };
-    domainFile->setProperties( domainFileProperties );
-    domainFile->setExported( true );
-    specification->definitions()->add( domainFile );
+    domainTemplateType( TypeInfo::TYPE_NAME_RANGE );
+    domainTemplateType( TypeInfo::TYPE_NAME_LIST );
+    // domainTemplateType( TypeInfo::TYPE_NAME_SET );  // TODO: FIXME: @ppaulweber: feature/set
+    domainTemplateType( TypeInfo::TYPE_NAME_PORT );
+    domainTemplateType( TypeInfo::TYPE_NAME_FILE );
 
     //
     //
-    // Instructions
+    // Builtin Definitions via IR::Instructions
     //
 
     const auto& VOID = std::make_shared< libcasm_ir::VoidType >();
