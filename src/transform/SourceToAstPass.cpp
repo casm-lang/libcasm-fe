@@ -328,181 +328,52 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
     // Instructions
     //
 
+    const auto& VOID = std::make_shared< libcasm_ir::VoidType >();
     const auto& BOOLEAN = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_BOOLEAN );
     const auto& INTEGER = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_INTEGER );
     const auto& STRING = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_STRING );
     const auto& OBJECT = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_OBJECT );
 
-    const auto print = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "PrintInstruction" ),
-        libcasm_ir::PrintBuiltin::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            std::make_shared< libcasm_ir::VoidType >(),
-            std::vector< libcasm_ir::Type::Ptr >{
-                std::make_shared< libcasm_ir::StringType >() } ) );
-    const auto printProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                   libcasm_ir::Property::PURE };
-    print->setProperties( printProperties );
-    print->setExported( true );
-    specification->definitions()->add( print );
-
-    const auto assert = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "AssertInstruction" ),
-        libcasm_ir::AssertBuiltin::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            std::make_shared< libcasm_ir::VoidType >(),
-            std::vector< libcasm_ir::Type::Ptr >{
-                std::make_shared< libcasm_ir::BooleanType >() } ) );
-    const auto assertProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                    libcasm_ir::Property::PURE };
-    assert->setProperties( assertProperties );
-    assert->setExported( true );
-    specification->definitions()->add( assert );
-
-    const auto notInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "NotInstruction" ),
-        libcasm_ir::NotInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ BOOLEAN } ) );
-    const auto notInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+    const auto builtin = [&specification, &srcLoc](
+                             const std::string& name,
+                             const libcasm_ir::Value::ID id,
+                             const libcasm_ir::Type::Ptr& returnType,
+                             const std::vector< libcasm_ir::Type::Ptr >& argumentTypes ) {
+        const auto definition = Ast::make< BuiltinDefinition >(
+            srcLoc,
+            Ast::make< Identifier >( srcLoc, name ),
+            id,
+            std::make_shared< libcasm_ir::RelationType >( returnType, argumentTypes ) );
+        const auto definitionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
                                             libcasm_ir::Property::PURE };
-    notInstruction->setProperties( notInstructionProperties );
-    notInstruction->setExported( true );
-    specification->definitions()->add( notInstruction );
+        definition->setProperties( definitionProperties );
+        definition->setExported( true );
+        specification->definitions()->add( definition );
+    };
 
-    const auto orInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "OrInstruction" ),
-        libcasm_ir::OrInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ BOOLEAN, BOOLEAN } ) );
-    const auto orInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                           libcasm_ir::Property::PURE };
-    orInstruction->setProperties( orInstructionProperties );
-    orInstruction->setExported( true );
-    specification->definitions()->add( orInstruction );
-
-    const auto xorInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "XorInstruction" ),
-        libcasm_ir::XorInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ BOOLEAN, BOOLEAN } ) );
-    const auto xorInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                            libcasm_ir::Property::PURE };
-    xorInstruction->setProperties( xorInstructionProperties );
-    xorInstruction->setExported( true );
-    specification->definitions()->add( xorInstruction );
-
-    const auto andInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "AndInstruction" ),
-        libcasm_ir::AndInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ BOOLEAN, BOOLEAN } ) );
-    const auto andInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                            libcasm_ir::Property::PURE };
-    andInstruction->setProperties( andInstructionProperties );
-    andInstruction->setExported( true );
-    specification->definitions()->add( andInstruction );
-
-    const auto impInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "ImpInstruction" ),
-        libcasm_ir::ImpInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ BOOLEAN, BOOLEAN } ) );
-    const auto impInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                            libcasm_ir::Property::PURE };
-    impInstruction->setProperties( impInstructionProperties );
-    impInstruction->setExported( true );
-    specification->definitions()->add( impInstruction );
-
-    const auto addInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "AddInstruction" ),
-        libcasm_ir::AddInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            INTEGER, std::vector< libcasm_ir::Type::Ptr >{ INTEGER, INTEGER } ) );
-    const auto addInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                            libcasm_ir::Property::PURE };
-    addInstruction->setProperties( addInstructionProperties );
-    addInstruction->setExported( true );
-    specification->definitions()->add( addInstruction );
-
-    const auto subInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "SubInstruction" ),
-        libcasm_ir::SubInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            INTEGER, std::vector< libcasm_ir::Type::Ptr >{ INTEGER, INTEGER } ) );
-    const auto subInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                            libcasm_ir::Property::PURE };
-    subInstruction->setProperties( subInstructionProperties );
-    subInstruction->setExported( true );
-    specification->definitions()->add( subInstruction );
-
-    const auto concatInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "ConcatInstruction" ),
-        libcasm_ir::AddInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            STRING, std::vector< libcasm_ir::Type::Ptr >{ STRING, STRING } ) );
-    const auto concatInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                               libcasm_ir::Property::PURE };
-    concatInstruction->setProperties( concatInstructionProperties );
-    concatInstruction->setExported( true );
-    specification->definitions()->add( concatInstruction );
-
-    const auto size = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "SizeInstruction" ),
-        libcasm_ir::SizeBuiltin::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            std::make_shared< libcasm_ir::IntegerType >(),
-            std::vector< libcasm_ir::Type::Ptr >{
-                TypeInfo::instance().getType( TypeInfo::TYPE_NAME_OBJECT ) } ) );
-    const auto sizeProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                  libcasm_ir::Property::PURE };
-    size->setProperties( sizeProperties );
-    size->setExported( true );
-    specification->definitions()->add( size );
-
-    const auto equInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "EquInstruction" ),
-        libcasm_ir::EquInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ OBJECT, OBJECT } ) );
-    const auto equInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                            libcasm_ir::Property::PURE };
-    equInstruction->setProperties( equInstructionProperties );
-    equInstruction->setExported( true );
-    specification->definitions()->add( equInstruction );
-
-    const auto lthInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "LthInstruction" ),
-        libcasm_ir::LthInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ OBJECT, OBJECT } ) );
-    const auto lthInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                            libcasm_ir::Property::PURE };
-    lthInstruction->setProperties( lthInstructionProperties );
-    lthInstruction->setExported( true );
-    specification->definitions()->add( lthInstruction );
-
-    const auto gthInstruction = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "GthInstruction" ),
-        libcasm_ir::GthInstruction::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ OBJECT, OBJECT } ) );
-    const auto gthInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                            libcasm_ir::Property::PURE };
-    gthInstruction->setProperties( gthInstructionProperties );
-    gthInstruction->setExported( true );
-    specification->definitions()->add( gthInstruction );
-
-    const auto asString = std::make_shared< BuiltinDefinition >(
-        std::make_shared< Identifier >( "AsStringInstruction" ),
-        libcasm_ir::AsStringBuiltin::classid(),
-        std::make_shared< libcasm_ir::RelationType >(
-            STRING, std::vector< libcasm_ir::Type::Ptr >{ OBJECT } ) );
-    const auto asStringProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                      libcasm_ir::Property::PURE };
-    asString->setProperties( asStringProperties );
-    asString->setExported( true );
-    specification->definitions()->add( asString );
+    builtin( "AbortInstruction", libcasm_ir::AbortBuiltin::classid(), VOID, {} );
+    builtin( "AssertInstruction", libcasm_ir::AssertBuiltin::classid(), VOID, { BOOLEAN } );
+    builtin( "AssureInstruction", libcasm_ir::AssureBuiltin::classid(), VOID, { BOOLEAN } );
+    builtin( "PrintInstruction", libcasm_ir::PrintBuiltin::classid(), VOID, { STRING } );
+    builtin( "NotInstruction", libcasm_ir::NotInstruction::classid(), BOOLEAN, { BOOLEAN } );
+    builtin( "OrInstruction", libcasm_ir::OrInstruction::classid(), BOOLEAN, { BOOLEAN, BOOLEAN } );
+    // builtin( "XorInstruction", libcasm_ir::XorInstruction::classid(), BOOLEAN, {
+    // BOOLEAN, BOOLEAN, } );
+    // builtin( "AndInstruction", libcasm_ir::AndInstruction::classid(), BOOLEAN, {
+    // BOOLEAN, BOOLEAN, } );
+    // builtin( "ImpInstruction", libcasm_ir::ImpInstruction::classid(), BOOLEAN, {
+    // BOOLEAN, BOOLEAN, } );
+    builtin(
+        "ConcatInstruction", libcasm_ir::AddInstruction::classid(), STRING, { STRING, STRING } );
+    builtin(
+        "AddInstruction", libcasm_ir::AddInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
+    builtin(
+        "SubInstruction", libcasm_ir::SubInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
+    builtin( "SizeInstruction", libcasm_ir::SizeBuiltin::classid(), INTEGER, { OBJECT } );
+    builtin( "EquInstruction", libcasm_ir::EquInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
+    builtin( "LthInstruction", libcasm_ir::LthInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
+    builtin( "GthInstruction", libcasm_ir::GthInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
+    builtin( "AsStringInstruction", libcasm_ir::AsStringBuiltin::classid(), STRING, { OBJECT } );
 }
 
 //
