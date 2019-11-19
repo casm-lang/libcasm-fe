@@ -240,8 +240,9 @@ FeatureDefinitionList ::= FeatureDefinitionList FeatureDefinitionElement
 ** ImplementDefinition
 
 #+begin_src
-ImplementDefinition ::= "implement" IdentifierPath "for" Identifier "=" "{" ImplementDefinitionList "}"
-                      | "implement" Identifier "=" "{" ImplementDefinitionList "}"
+ImplementDefinition ::= "implement" Identifier "=" "{" ImplementDefinitionList "}"
+                      | "implement" IdentifierPath "for" Identifier "=" "{" ImplementDefinitionList "}"
+                      | "implement" IdentifierPath "for" "enumeration" "=" "{" ImplementDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:ImplementDefinition&noheader&nofooter}}
