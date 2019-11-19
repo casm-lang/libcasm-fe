@@ -669,13 +669,18 @@ FeatureDefinitionList
 //
 
 ImplementDefinition
-: IMPLEMENT IdentifierPath FOR Identifier EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
+: IMPLEMENT Identifier EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
+  {
+      $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6 );
+  }
+| IMPLEMENT IdentifierPath FOR Identifier EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
   {
       $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6, $7, $8 );
   }
-| IMPLEMENT Identifier EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
+| IMPLEMENT IdentifierPath FOR ENUMERATION EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
   {
-      $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6 );
+      const auto enumeration = Ast::make< Identifier >( @4, $4->tokenString() );
+      $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, enumeration, $5, $6, $7, $8 );
   }
 ;
 
@@ -1795,12 +1800,12 @@ Identifier
   {
       $$ = $1;
   }
-| IN // allow 'in' keyword as identifier
+| IN
   {
       $$ = Ast::make< Identifier >( @$, $1->tokenString() );
       $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
-| CASM // allow 'CASM' keyword as identifier
+| CASM
   {
       $$ = Ast::make< Identifier >( @$, $1->tokenString() );
       $$->setSpans( m_lexer.fetchSpansAndReset() );
