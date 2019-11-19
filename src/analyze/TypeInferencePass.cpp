@@ -1063,11 +1063,11 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
               { "TotalOrder", "lessThanOrEqual" } },
             { Grammar::tokenAsString( Grammar::Token::GREATEREQ ),
               { "TotalOrder", "greaterThanOrEqual" } },
-            { Grammar::tokenAsString( Grammar::Token::OR ), { "Logical", "or" } },
-            { Grammar::tokenAsString( Grammar::Token::XOR ), { "Logical", "xor" } },
-            { Grammar::tokenAsString( Grammar::Token::AND ), { "Logical", "and" } },
-            { Grammar::tokenAsString( Grammar::Token::ARROW ), { "Logical", "implies" } },
-            { Grammar::tokenAsString( Grammar::Token::IMPLIES ), { "Logical", "implies" } },
+            { Grammar::tokenAsString( Grammar::Token::OR ), { "Logical", "or_" } },
+            { Grammar::tokenAsString( Grammar::Token::XOR ), { "Logical", "xor_" } },
+            { Grammar::tokenAsString( Grammar::Token::AND ), { "Logical", "and_" } },
+            { Grammar::tokenAsString( Grammar::Token::ARROW ), { "Logical", "implies_" } },
+            { Grammar::tokenAsString( Grammar::Token::IMPLIES ), { "Logical", "implies_" } },
         };
 
     const auto operation = featureToSymbol.find( operationTokenName );
