@@ -729,7 +729,8 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
             {
                 m_log.debug(
                     { node.sourceLocation() },
-                    "method found: " + ns.first + Namespace::delimiter() + methodName );
+                    "method found: " + methodType + Namespace::delimiter() + ns.first +
+                        Namespace::delimiter() + methodName );
                 methods.emplace_back( symbol );
             }
         }
@@ -1010,6 +1011,18 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
 
 void TypeInferenceVisitor::visit( BinaryExpression& node )
 {
+    RecursiveVisitor::visit( node );
+
+    if( node.left()->type() )
+    {
+        m_typeIDs[ node.right().get() ].emplace( node.left()->type()->id() );
+    }
+
+    if( node.right()->type() )
+    {
+        m_typeIDs[ node.left().get() ].emplace( node.right()->type()->id() );
+    }
+
     RecursiveVisitor::visit( node );
 
     const auto& operationToken = *node.operationToken();
@@ -2220,7 +2233,7 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     const auto checkErrors = log.errors();
     if( checkErrors > 0 )
     {
-        log.debug( "found %lu error(s) during type inference", checkErrors );
+        log.debug( "found %lu error(s) during call target checks", checkErrors );
         return false;
     }
 
