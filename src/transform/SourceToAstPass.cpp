@@ -62,6 +62,8 @@
 
 using namespace libcasm_fe;
 
+namespace IR = libcasm_ir;
+
 char SourceToAstPass::id = 0;
 
 static libpass::PassRegistration< SourceToAstPass > PASS(
@@ -147,8 +149,7 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
             Ast::make< BasicType >(
                 srcLoc,
                 IdentifierPath::fromIdentifier( Ast::make< Identifier >( srcLoc, name ) ) ) );
-        const auto domainProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                        libcasm_ir::Property::PURE };
+        const auto domainProperties = { IR::Property::SIDE_EFFECT_FREE, IR::Property::PURE };
         domain->setProperties( domainProperties );
         domain->setExported( true );
         specification->definitions()->add( domain );
@@ -165,8 +166,7 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
                 Token::unresolved(),
                 domainTypes,
                 Token::unresolved() ) );
-        const auto domainProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                        libcasm_ir::Property::PURE };
+        const auto domainProperties = { IR::Property::SIDE_EFFECT_FREE, IR::Property::PURE };
         domain->setProperties( domainProperties );
         domain->setExported( true );
         specification->definitions()->add( domain );
@@ -192,7 +192,7 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
     // Builtin Definitions via IR::Instructions
     //
 
-    const auto& VOID = std::make_shared< libcasm_ir::VoidType >();
+    const auto& VOID = std::make_shared< IR::VoidType >();
     const auto& BOOLEAN = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_BOOLEAN );
     const auto& INTEGER = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_INTEGER );
     const auto& STRING = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_STRING );
@@ -200,44 +200,40 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
 
     const auto builtin = [&specification, &srcLoc](
                              const std::string& name,
-                             const libcasm_ir::Value::ID id,
-                             const libcasm_ir::Type::Ptr& returnType,
-                             const std::vector< libcasm_ir::Type::Ptr >& argumentTypes ) {
+                             const IR::Value::ID id,
+                             const IR::Type::Ptr& returnType,
+                             const std::vector< IR::Type::Ptr >& argumentTypes ) {
         const auto definition = Ast::make< BuiltinDefinition >(
             srcLoc,
             Ast::make< Identifier >( srcLoc, name ),
             id,
-            std::make_shared< libcasm_ir::RelationType >( returnType, argumentTypes ) );
-        const auto definitionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                            libcasm_ir::Property::PURE };
+            std::make_shared< IR::RelationType >( returnType, argumentTypes ) );
+        const auto definitionProperties = { IR::Property::SIDE_EFFECT_FREE, IR::Property::PURE };
         definition->setProperties( definitionProperties );
         definition->setExported( true );
         specification->definitions()->add( definition );
     };
 
-    builtin( "AbortInstruction", libcasm_ir::AbortBuiltin::classid(), VOID, {} );
-    builtin( "AssertInstruction", libcasm_ir::AssertBuiltin::classid(), VOID, { BOOLEAN } );
-    builtin( "AssureInstruction", libcasm_ir::AssureBuiltin::classid(), VOID, { BOOLEAN } );
-    builtin( "PrintInstruction", libcasm_ir::PrintBuiltin::classid(), VOID, { STRING } );
-    builtin( "NotInstruction", libcasm_ir::NotInstruction::classid(), BOOLEAN, { BOOLEAN } );
-    builtin( "OrInstruction", libcasm_ir::OrInstruction::classid(), BOOLEAN, { BOOLEAN, BOOLEAN } );
-    // builtin( "XorInstruction", libcasm_ir::XorInstruction::classid(), BOOLEAN, {
+    builtin( "AbortInstruction", IR::AbortBuiltin::classid(), VOID, {} );
+    builtin( "AssertInstruction", IR::AssertBuiltin::classid(), VOID, { BOOLEAN } );
+    builtin( "AssureInstruction", IR::AssureBuiltin::classid(), VOID, { BOOLEAN } );
+    builtin( "PrintInstruction", IR::PrintBuiltin::classid(), VOID, { STRING } );
+    builtin( "NotInstruction", IR::NotInstruction::classid(), BOOLEAN, { BOOLEAN } );
+    builtin( "OrInstruction", IR::OrInstruction::classid(), BOOLEAN, { BOOLEAN, BOOLEAN } );
+    // builtin( "XorInstruction", IR::XorInstruction::classid(), BOOLEAN, {
     // BOOLEAN, BOOLEAN, } );
-    // builtin( "AndInstruction", libcasm_ir::AndInstruction::classid(), BOOLEAN, {
+    // builtin( "AndInstruction", IR::AndInstruction::classid(), BOOLEAN, {
     // BOOLEAN, BOOLEAN, } );
-    // builtin( "ImpInstruction", libcasm_ir::ImpInstruction::classid(), BOOLEAN, {
+    // builtin( "ImpInstruction", IR::ImpInstruction::classid(), BOOLEAN, {
     // BOOLEAN, BOOLEAN, } );
-    builtin(
-        "ConcatInstruction", libcasm_ir::AddInstruction::classid(), STRING, { STRING, STRING } );
-    builtin(
-        "AddInstruction", libcasm_ir::AddInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
-    builtin(
-        "SubInstruction", libcasm_ir::SubInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
-    builtin( "SizeInstruction", libcasm_ir::SizeBuiltin::classid(), INTEGER, { OBJECT } );
-    builtin( "EquInstruction", libcasm_ir::EquInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
-    builtin( "LthInstruction", libcasm_ir::LthInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
-    builtin( "GthInstruction", libcasm_ir::GthInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
-    builtin( "AsStringInstruction", libcasm_ir::AsStringBuiltin::classid(), STRING, { OBJECT } );
+    builtin( "ConcatInstruction", IR::AddInstruction::classid(), STRING, { STRING, STRING } );
+    builtin( "AddInstruction", IR::AddInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
+    builtin( "SubInstruction", IR::SubInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
+    builtin( "SizeInstruction", IR::SizeBuiltin::classid(), INTEGER, { OBJECT } );
+    builtin( "EquInstruction", IR::EquInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
+    builtin( "LthInstruction", IR::LthInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
+    builtin( "GthInstruction", IR::GthInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
+    builtin( "AsStringInstruction", IR::AsStringBuiltin::classid(), STRING, { OBJECT } );
 }
 
 //
