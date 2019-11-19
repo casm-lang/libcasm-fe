@@ -45,16 +45,24 @@
 CASM
 
 [ export ]
+rule abort =
+    IR::AbortInstruction
+
+[ export ]
+rule assert( value : Boolean ) =
+    IR::AssertInstruction( value )
+
+[ export ]
+rule assure( value : Boolean ) =
+    IR::AssureInstruction( value )
+
+[ export ]
 rule print( text : String ) =
     IR::PrintInstruction( text )
 
 [ export ]
 rule println( text : String ) =
     print( text + "\n" )
-
-[ export ]
-rule assert( value : Boolean ) =
-    IR::AssertInstruction( value )
 
 
 /**
@@ -204,17 +212,15 @@ implement Logical for Boolean = {
 
     [ pure ]
     derived xor_( this, other : Boolean ) -> Boolean =
-        // IR::XorInstruction( this, other )
 	this and (not other)
 
     [ pure ]
     derived and_( this, other : Boolean ) -> Boolean =
-        // IR::AndInstruction( this, other )
 	not ( not this or not other )
 
     [ pure ]
     derived implies_( this, other : Boolean ) -> Boolean =
-        IR::ImpInstruction( this, other )
+	( not this ) or other
 }
 
 implement TypeCastingString for Boolean = {
