@@ -370,6 +370,50 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
     notInstruction->setExported( true );
     specification->definitions()->add( notInstruction );
 
+    const auto orInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "OrInstruction" ),
+        libcasm_ir::OrInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ BOOLEAN, BOOLEAN } ) );
+    const auto orInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                           libcasm_ir::Property::PURE };
+    orInstruction->setProperties( orInstructionProperties );
+    orInstruction->setExported( true );
+    specification->definitions()->add( orInstruction );
+
+    const auto xorInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "XorInstruction" ),
+        libcasm_ir::XorInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ BOOLEAN, BOOLEAN } ) );
+    const auto xorInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                            libcasm_ir::Property::PURE };
+    xorInstruction->setProperties( xorInstructionProperties );
+    xorInstruction->setExported( true );
+    specification->definitions()->add( xorInstruction );
+
+    const auto andInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "AndInstruction" ),
+        libcasm_ir::AndInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ BOOLEAN, BOOLEAN } ) );
+    const auto andInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                            libcasm_ir::Property::PURE };
+    andInstruction->setProperties( andInstructionProperties );
+    andInstruction->setExported( true );
+    specification->definitions()->add( andInstruction );
+
+    const auto impInstruction = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "ImpInstruction" ),
+        libcasm_ir::ImpInstruction::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            BOOLEAN, std::vector< libcasm_ir::Type::Ptr >{ BOOLEAN, BOOLEAN } ) );
+    const auto impInstructionProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                            libcasm_ir::Property::PURE };
+    impInstruction->setProperties( impInstructionProperties );
+    impInstruction->setExported( true );
+    specification->definitions()->add( impInstruction );
+
     const auto addInstruction = std::make_shared< BuiltinDefinition >(
         std::make_shared< Identifier >( "AddInstruction" ),
         libcasm_ir::AddInstruction::classid(),
@@ -411,7 +455,7 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
             std::vector< libcasm_ir::Type::Ptr >{
                 TypeInfo::instance().getType( TypeInfo::TYPE_NAME_OBJECT ) } ) );
     const auto sizeProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                      libcasm_ir::Property::PURE };
+                                  libcasm_ir::Property::PURE };
     size->setProperties( sizeProperties );
     size->setExported( true );
     specification->definitions()->add( size );
