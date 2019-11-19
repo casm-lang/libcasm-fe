@@ -165,6 +165,18 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
     domainObject->setExported( true );
     specification->definitions()->add( domainObject );
 
+    const auto domainEnumeration = Ast::make< DomainDefinition >(
+        srcLoc,
+        Ast::make< BasicType >(
+            srcLoc,
+            IdentifierPath::fromIdentifier(
+                Ast::make< Identifier >( srcLoc, TypeInfo::TYPE_NAME_ENUMERATION ) ) ) );
+    const auto domainEnumerationProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                               libcasm_ir::Property::PURE };
+    domainEnumeration->setProperties( domainEnumerationProperties );
+    domainEnumeration->setExported( true );
+    specification->definitions()->add( domainEnumeration );
+
     const auto domainBoolean = Ast::make< DomainDefinition >(
         srcLoc,
         Ast::make< BasicType >(
@@ -390,6 +402,19 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
     concatInstruction->setProperties( concatInstructionProperties );
     concatInstruction->setExported( true );
     specification->definitions()->add( concatInstruction );
+
+    const auto size = std::make_shared< BuiltinDefinition >(
+        std::make_shared< Identifier >( "SizeInstruction" ),
+        libcasm_ir::SizeBuiltin::classid(),
+        std::make_shared< libcasm_ir::RelationType >(
+            std::make_shared< libcasm_ir::IntegerType >(),
+            std::vector< libcasm_ir::Type::Ptr >{
+                TypeInfo::instance().getType( TypeInfo::TYPE_NAME_OBJECT ) } ) );
+    const auto sizeProperties = { libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                      libcasm_ir::Property::PURE };
+    size->setProperties( sizeProperties );
+    size->setExported( true );
+    specification->definitions()->add( size );
 
     const auto equInstruction = std::make_shared< BuiltinDefinition >(
         std::make_shared< Identifier >( "EquInstruction" ),
