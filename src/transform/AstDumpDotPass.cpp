@@ -488,7 +488,7 @@ void AstDumpDotVisitor::visit( UnaryExpression& node )
 void AstDumpDotVisitor::visit( BinaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "Binaryxpression '" + node.operationToken()->tokenString() + "'" );
+    dumpNode( node, "BinaryExpression '" + node.operationToken()->tokenString() + "'" );
     RecursiveVisitor::visit( node );
 }
 
