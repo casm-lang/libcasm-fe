@@ -64,9 +64,13 @@ rule print( text : String ) =
 rule println( text : String ) =
     print( text + "\n" )
 
+//
+//
+// Unary Operator Features
+//
 
 /**
-    Operator '+' (unary)
+    Operator '+'
 */
 
 [ export ]
@@ -76,7 +80,7 @@ feature Positive = {
 }
 
 /**
-    Operator '-' (unary)
+    Operator '-'
 */
 
 [ export ]
@@ -86,7 +90,7 @@ feature Inversion = {
 }
 
 /**
-    Operator 'not' (unary)
+    Operator 'not'
 */
 
 [ export ]
@@ -95,8 +99,116 @@ feature Negation = {
     derived negate : Object -> Object
 }
 
+//
+//
+// Binary Operator Features
+//
+
 /**
-    Operator 'and', 'or', 'xor' (unary)
+    Operator '+'
+*/
+
+[ export ]
+feature Addition = {
+    [ pure ]
+    derived add : Object * Object -> Object
+}
+
+/**
+    Operator '-'
+*/
+
+[ export ]
+feature Subtraction = {
+    [ pure ]
+    derived subtract : Object * Object -> Object
+}
+
+/**
+    Operator '*'
+*/
+
+[ export ]
+feature Multiplication  = {
+    [ pure ]
+    derived multiply : Object * Object -> Object
+}
+
+/**
+    Operator '/'
+*/
+
+[ export ]
+feature Division = {
+    [ pure ]
+    derived divide : Object * Object -> Object
+}
+
+/**
+    Operator '%'
+*/
+
+[ export ]
+feature Modulus = {
+    [ pure ]
+    derived modulo : Object * Object -> Object
+}
+
+/**
+    Operator '^'
+*/
+
+[ export ]
+feature Exponentiation = {
+    [ pure ]
+    derived power : Object * Object -> Object
+}
+
+/**
+    Operator '=' and '!='
+*/
+
+[ export ]
+feature Equality = {
+    [ pure ]
+    derived
+    equal : Object * Object -> Boolean
+
+    [ pure ]
+    derived unequal : Object * Object -> Boolean
+// @ppaulweber: enable default implementation support
+//    derived unequal( this, other : Equality ) -> Boolean =
+//        not this.equal( other )
+}
+
+/**
+    Operator '<' and '>'
+*/
+
+[ export ]
+feature PartialOrder = {
+    [ pure ]
+    derived less : Equality * Equality -> Boolean
+
+    [ pure ]
+    derived greater : Equality * Equality -> Boolean
+}
+
+/**
+    Operator '<=' and '>='
+*/
+
+[ export ]
+feature TotalOrder = {
+    [ pure ]
+    derived lessOrEqual : PartialOrder * PartialOrder -> Boolean
+
+    [ pure ]
+    derived greaterOrEqual : PartialOrder * PartialOrder -> Boolean
+}
+
+/**
+    Operator 'or', 'xor', 'and', and '->' ('implies')
 */
 
 [ export ]
@@ -115,69 +227,7 @@ feature Logical = {
 }
 
 /**
-    Operator '+' (binary)
-*/
-
-[ export ]
-feature Addition = {
-    [ pure ]
-    derived add : Object * Object -> Object
-}
-
-/**
-    Operator '-' (binary)
-*/
-
-[ export ]
-feature Subtraction = {
-    [ pure ]
-    derived subtract : Object * Object -> Object
-}
-
-/**
-    Operator '='
-*/
-
-[ export ]
-feature Equality = {
-    [ pure ]
-    derived
-    equal : Object * Object -> Boolean
-
-    [ pure ]
-    derived unequal : Object * Object -> Boolean
-//    derived unequal( this ), other : Equality ) -> Boolean =
-//        not this.equal( other )
-}
-
-/**
-    Operator '<', '>'
-*/
-
-[ export ]
-feature PartialOrder = {
-    [ pure ]
-    derived less : Equality * Equality -> Boolean
-
-    [ pure ]
-    derived greater : Equality * Equality -> Boolean
-}
-
-/**
-    Operator '<=', '>='
-*/
-
-[ export ]
-feature TotalOrder = {
-    [ pure ]
-    derived lessOrEqual : PartialOrder * PartialOrder -> Boolean
-
-    [ pure ]
-    derived greaterOrEqual : PartialOrder * PartialOrder -> Boolean
-}
-
-/**
-    Operator 'as'
+    Operator 'as' (type casting expression ::= <expr> 'as' <type>)
 */
 
 [ export ]
@@ -187,7 +237,7 @@ feature TypeCastingString = {
 }
 
 /**
-    Operator '|' <expr> |'
+    Operator '||' (cardinality expression ::= '|' <expr> '|')
 */
 
 [ export ]
@@ -197,8 +247,24 @@ feature Cardinality = {
 }
 
 /**
+    Symbolic facility
+*/
+
+[ export ]
+feature Symbolic = {
+    [ pure ]
+    derived isSymbolic : Object -> Boolean
+}
+
+/**
     Boolean
 */
+
+implement Symbolic for Boolean = {
+    [ pure ]
+    derived isSymbolic( this ) -> Boolean =
+        IR::SymInstruction( this )
+}
 
 implement Negation for Boolean = {
     [ pure ]
@@ -223,6 +289,16 @@ implement Logical for Boolean = {
 	( not this ) or other
 }
 
+implement Equality for Boolean = {
+    [ pure ]
+    derived equal( this, other : Boolean ) -> Boolean =
+        IR::EquInstruction( this, other )
+
+    [ pure ]
+    derived unequal( this, other : Boolean ) -> Boolean =
+        IR::NeqInstruction( this, other )
+}
+
 implement TypeCastingString for Boolean = {
     [ pure ]
     derived toString( this ) -> String = IR::AsStringInstruction( this )
@@ -231,6 +307,12 @@ implement TypeCastingString for Boolean = {
 /**
     Integer
 */
+
+implement Symbolic for Integer = {
+    [ pure ]
+    derived isSymbolic( this ) -> Boolean =
+        IR::SymInstruction( this )
+}
 
 implement Positive for Integer = {
     [ pure ]
@@ -254,6 +336,30 @@ implement Subtraction for Integer = {
         IR::SubInstruction( this, other )
 }
 
+implement Multiplication for Integer  = {
+    [ pure ]
+    derived multiply( this, other : Integer ) -> Integer =
+        IR::MulInstruction( this, other )
+}
+
+implement Division for Integer = {
+    [ pure ]
+    derived divide( this, other : Integer ) -> Integer =
+        IR::DivInstruction( this, other )
+}
+
+implement Modulus for Integer = {
+    [ pure ]
+    derived modulo( this, other : Integer ) -> Integer =
+        IR::ModInstruction( this, other )
+}
+
+implement Exponentiation for Integer = {
+    [ pure ]
+    derived power( this, other : Integer ) -> Integer =
+        IR::PowInstruction( this, other )
+}
+
 implement Equality for Integer = {
     [ pure ]
     derived equal( this, other : Integer ) -> Boolean =
@@ -261,7 +367,7 @@ implement Equality for Integer = {
 
     [ pure ]
     derived unequal( this, other : Integer ) -> Boolean =
-        not this.equal( other )
+        IR::NeqInstruction( this, other )
 }
 
 implement PartialOrder for Integer = {
@@ -299,10 +405,26 @@ implement Cardinality for Integer = {
     String
 */
 
+implement Symbolic for String = {
+    [ pure ]
+    derived isSymbolic( this ) -> Boolean =
+        IR::SymInstruction( this )
+}
+
 implement Addition for String = {
     [ pure ]
     derived add( this, other : String ) -> String =
         IR::ConcatInstruction( this, other )
+}
+
+implement Equality for String = {
+    [ pure ]
+    derived equal( this, other : String ) -> Boolean =
+        IR::EquInstruction( this, other )
+
+    [ pure ]
+    derived unequal( this, other : String ) -> Boolean =
+        IR::NeqInstruction( this, other )
 }
 
 implement TypeCastingString for String = {
@@ -314,10 +436,20 @@ implement TypeCastingString for String = {
     enumeration features for all definitions
 */
 
+implement Symbolic for enumeration = {
+    [ pure ]
+    derived isSymbolic( this ) -> Boolean =
+        IR::SymInstruction( this )
+}
+
 implement Equality for enumeration = {
     [ pure ]
     derived equal( this, other : Object ) -> Boolean =
         IR::EquInstruction( this, other )
+
+    [ pure ]
+    derived unequal( this, other : Object ) -> Boolean =
+        IR::NeqInstruction( this, other )
 }
 
 implement Cardinality for enumeration = {
