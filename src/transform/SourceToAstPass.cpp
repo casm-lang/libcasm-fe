@@ -229,8 +229,14 @@ static void loadBuiltinDefinitions( const Specification::Ptr& specification )
     builtin( "ConcatInstruction", IR::AddInstruction::classid(), STRING, { STRING, STRING } );
     builtin( "AddInstruction", IR::AddInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
     builtin( "SubInstruction", IR::SubInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
+    builtin( "MulInstruction", IR::MulInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
+    builtin( "DivInstruction", IR::DivInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
+    builtin( "ModInstruction", IR::ModInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
+    builtin( "PowInstruction", IR::PowInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
     builtin( "SizeInstruction", IR::SizeBuiltin::classid(), INTEGER, { OBJECT } );
+    builtin( "SymInstruction", IR::IsSymbolicBuiltin::classid(), BOOLEAN, { OBJECT } );
     builtin( "EquInstruction", IR::EquInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
+    builtin( "NeqInstruction", IR::NeqInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
     builtin( "LthInstruction", IR::LthInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
     builtin( "GthInstruction", IR::GthInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
     builtin( "AsStringInstruction", IR::AsStringBuiltin::classid(), STRING, { OBJECT } );
