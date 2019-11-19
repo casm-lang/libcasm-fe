@@ -62,15 +62,17 @@ TypeInfo::TypeInfo( void )
     setType( TypeInfo::TYPE_NAME_BOOLEAN, libstdhl::Memory::get< libcasm_ir::BooleanType >() );
     setType( TypeInfo::TYPE_NAME_INTEGER, libstdhl::Memory::get< libcasm_ir::IntegerType >() );
     setType( TypeInfo::TYPE_NAME_STRING, libstdhl::Memory::get< libcasm_ir::StringType >() );
-    setType( TypeInfo::TYPE_NAME_RATIONAL, libstdhl::Memory::get< libcasm_ir::RationalType >() );
     setType( TypeInfo::TYPE_NAME_DECIMAL, libstdhl::Memory::get< libcasm_ir::DecimalType >() );
+    setType( TypeInfo::TYPE_NAME_RATIONAL, libstdhl::Memory::get< libcasm_ir::RationalType >() );
     setType( TypeInfo::TYPE_NAME_RANGE, nullptr );  // template type
     setType( TypeInfo::TYPE_NAME_LIST, nullptr );   // template type
     // setType( TypeInfo::TYPE_NAME_SET, nullptr ); // TODO: FIXME: @ppaulweber: feature/set
     setType( TypeInfo::TYPE_NAME_PORT, nullptr );  // template type
     setType( TypeInfo::TYPE_NAME_FILE, nullptr );  // template type
     setType(
-        TypeInfo::TYPE_NAME_OBJECT, libstdhl::Memory::get< libcasm_ir::ObjectType >( "Object" ) );
+        TypeInfo::TYPE_NAME_OBJECT,
+        libstdhl::Memory::get< libcasm_ir::ObjectType >( TypeInfo::TYPE_NAME_OBJECT ) );
+    setType( TypeInfo::TYPE_NAME_ENUMERATION, getType( TypeInfo::TYPE_NAME_OBJECT ) );
 }
 
 void TypeInfo::setType( const std::string& name, const libcasm_ir::Type::Ptr& type )

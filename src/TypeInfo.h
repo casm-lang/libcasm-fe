@@ -95,7 +95,8 @@ namespace libcasm_fe
         static constexpr const char* TYPE_NAME_RULEREF = "RuleRef";
         static constexpr const char* TYPE_NAME_FUNCREF = "FuncRef";
 
-        // structure/object types
+        // object types
+        static constexpr const char* TYPE_NAME_ENUMERATION = "enumeration";
         static constexpr const char* TYPE_NAME_OBJECT = "Object";
 
         static TypeInfo& instance( void )
