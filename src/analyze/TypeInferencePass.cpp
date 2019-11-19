@@ -728,7 +728,8 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
             if( symbol )
             {
                 m_log.debug(
-                    { node.sourceLocation() }, ns.first + Namespace::delimiter() + methodName );
+                    { node.sourceLocation() },
+                    "method found: " + ns.first + Namespace::delimiter() + methodName );
                 methods.emplace_back( symbol );
             }
         }
@@ -1883,21 +1884,23 @@ void TypeInferenceVisitor::resolveTypeFeatureSymbol(
     const auto typeNamespace = m_symboltable.findNamespace( typeName );
     if( not typeNamespace )
     {
-        throw std::domain_error( "'" + typeName + "' is unknown" );
+        throw std::domain_error( "the type '" + typeName + "' is unknown" );
     }
 
     const auto featureNamespace = typeNamespace->findNamespace( featureName );
     if( not featureNamespace )
     {
         throw std::domain_error(
-            "'" + featureName + "' not implemented for type '" + typeName + "'" );
+            "the feature 'CASM::" + featureName + "' is not implemented for type '" + typeName +
+            "'" );
     }
 
     const auto symbol = featureNamespace->findSymbol( symbolName );
     if( not symbol )
     {
         throw std::domain_error(
-            "'" + symbolName + "' has not been defined in namespace '" + featureName + "'" );
+            "the method '" + symbolName + "' is not defined in the namespace '" + featureName +
+            "'" );
     }
 
     if( not symbol->type() )
@@ -1918,10 +1921,33 @@ void TypeInferenceVisitor::resolveTypeFeatureSymbol(
 
     if( *symbolType != *relationType )
     {
-        const auto msg =
-            "use: '" + relationType->description() + ", def: '" + symbolType->description() + "'";
-        m_log.info( { symbol->sourceLocation() }, msg );
-        throw std::domain_error( msg );
+        const auto& symbolArgumentTypes = symbolType->arguments();
+        const auto& relationArgumentTypes = relationType->arguments();
+
+        u1 valid = true;
+        for( std::size_t i = 0; i < symbolArgumentTypes.size(); i++ )
+        {
+            const auto& symbolArgumentType = symbolArgumentTypes[ i ];
+            const auto& relationArgumentType = relationArgumentTypes[ i ];
+            if( relationArgumentType->isEnumeration() and symbolArgumentType->isObject() )
+            {
+                continue;
+            }
+
+            if( symbolArgumentType != relationArgumentType )
+            {
+                valid = false;
+                break;
+            }
+        }
+
+        if( not valid )
+        {
+            const auto msg = "use: '" + relationType->description() + ", def: '" +
+                             symbolType->description() + "'";
+            m_log.info( { symbol->sourceLocation() }, msg );
+            throw std::domain_error( msg );
+        }
     }
 
     node.setTargetDefinition( symbol );
