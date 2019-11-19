@@ -239,6 +239,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( InitDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( EnumerationDefinition& node ) override;
     void visit( FeatureDefinition& node ) override;
     void visit( ImplementDefinition& node ) override;
 
@@ -323,6 +324,60 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
     pushSymbols< VariableDefinition >( node.arguments() );
     node.rule()->accept( *this );
     popSymbols< VariableDefinition >( node.arguments() );
+}
+
+void SymbolResolveVisitor::visit( EnumerationDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto& sourceLocation = node.sourceLocation();
+    const auto enumerationNames = Ast::make< Identifiers >( sourceLocation );
+    enumerationNames->add( Ast::make< Identifier >( sourceLocation, "CASM" ) );
+    enumerationNames->add( Ast::make< Identifier >( sourceLocation, "enumeration" ) );
+    // enumerationNames->add( Ast::make< Identifier >( sourceLocation, "" ) );
+    const auto enumerationName = Ast::make< IdentifierPath >( sourceLocation, enumerationNames );
+
+    // find the namespace
+    const auto implementNamespace = m_symboltable.findNamespace( *enumerationName );
+    if( not implementNamespace )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown symbol '" + enumerationName->path() + "' found to implement",
+            Code::Unspecified );
+        return;
+    }
+
+    m_log.warning( { node.sourceLocation() }, implementNamespace->dump() );
+
+    const auto& name = node.identifier()->name();
+    const auto& enumerationNamespace = m_symboltable.findNamespace( name );
+    assert( enumerationNamespace );
+
+    for( const auto& namespaceInformation : implementNamespace->namespaces() )
+    {
+        const auto& featureName = namespaceInformation.first;
+        const auto& featureNamespace = implementNamespace->findNamespace( featureName );
+        assert( featureNamespace );
+
+        const auto enumerationFeatureNamespace = std::make_shared< Namespace >();
+        SymbolRegistrationVisitor featureVisitor( m_log, *enumerationFeatureNamespace );
+
+        for( const auto& symbol : featureNamespace->symbols() )
+        {
+            symbol.second->accept( featureVisitor );
+        }
+
+        try
+        {
+            enumerationNamespace->registerNamespace(
+                featureName, enumerationFeatureNamespace, Namespace::Visibility::Internal );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.debug( { node.sourceLocation() }, "WTF! ENUM! " + std::string( e.what() ) );
+        }
+    }
 }
 
 void SymbolResolveVisitor::visit( FeatureDefinition& node )
