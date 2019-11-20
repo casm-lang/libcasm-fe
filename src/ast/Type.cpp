@@ -91,6 +91,27 @@ const Token::Ptr& Type::delimiterToken( void ) const
     return m_delimiterToken;
 }
 
+IdentifierPath::Ptr Type::signaturePath( void ) const
+{
+    const auto& signatureIdentifier = Ast::make< Identifier >( sourceLocation(), signature() );
+
+    assert( name()->identifiers() != 0 );
+    if( name()->identifiers()->size() <= 1 )
+    {
+        return IdentifierPath::fromIdentifier( signatureIdentifier );
+    }
+
+    const auto path = IdentifierPath::fromIdentifier( name()->identifiers()->front() );
+    for( std::size_t i = 1; i < name()->identifiers()->size() - 1; i++ )
+    {
+        const auto identifier = ( *name()->identifiers() )[ i ];
+        path->addIdentifier( identifier );
+    }
+
+    path->addIdentifier( signatureIdentifier );
+    return path;
+}
+
 //
 //
 // UnresolvedType
@@ -262,15 +283,20 @@ std::string TemplateType::signature( void ) const
     std::stringstream stream;
     stream << name()->path();
     stream << leftBraceToken()->tokenString();
+    stream << " ";
 
     for( const auto& subType : *subTypes() )
     {
-        stream << " " << subType->signature() << ",";
+        stream << subType->signature() << ", ";
     }
 
-    stream.seekp( -1, stream.cur );
-    stream << rightBraceToken()->tokenString();
+    if( subTypes()->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+        stream << " ";
+    }
 
+    stream << rightBraceToken()->tokenString();
     return stream.str();
 }
 
@@ -318,13 +344,19 @@ std::string RelationType::signature( void ) const
     std::stringstream stream;
     stream << name()->path();
     stream << leftBraceToken()->tokenString();
+    stream << " ";
 
     for( const auto& subType : *argumentTypes() )
     {
-        stream << " " << subType->signature() << "*";
+        stream << subType->signature() << "* ";
     }
 
-    stream.seekp( -1, stream.cur );
+    if( argumentTypes()->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+        stream << " ";
+    }
+
     stream << mapsToken()->tokenString() << " ";
     stream << returnType()->signature() << " ";
     stream << rightBraceToken()->tokenString();
@@ -365,9 +397,18 @@ const Token::Ptr& FixedSizedType::markToken( void ) const
 std::string FixedSizedType::signature( void ) const
 {
     std::stringstream stream;
-    stream << name()->path();
-    stream << markToken()->tokenString() << " ";
-    stream << size().get();  // TODO: FIXME: @ppaulweber: use 'size' argument
+
+    if( not type() )
+    {
+        stream << name()->path();
+        stream << markToken()->tokenString() << "$unresolved$";
+    }
+    else
+    {
+        stream << name()->baseDir();
+        stream << type()->description();
+    }
+
     return stream.str();
 }
 

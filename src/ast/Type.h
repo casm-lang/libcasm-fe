@@ -70,6 +70,8 @@ namespace libcasm_fe
 
             virtual std::string signature( void ) const = 0;
 
+            IdentifierPath::Ptr signaturePath( void ) const;
+
           private:
             const IdentifierPath::Ptr m_name;
             Token::Ptr m_delimiterToken;
