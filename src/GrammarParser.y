@@ -131,8 +131,9 @@ END       0 "end of file"
 %type <Definitions::Ptr> Definitions
 %type <HeaderDefinition::Ptr> Header
 %type <InitDefinition::Ptr> InitDefinition
-%type <VariableDefinition::Ptr> Variable TypedVariable AttributedVariable TypedAttributedVariable
-%type <VariableDefinitions::Ptr> TypedVariables
+%type <VariableDefinition::Ptr> Variable TypedVariable TemplateVariable AttributedVariable TypedAttributedVariable
+%type <VariableDefinitions::Ptr> TypedVariables TemplateVariables TemplateSymbols
+%type <DomainDefinition::Ptr> DomainDefinition
 %type <FunctionDefinition::Ptr> FunctionDefinition
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
@@ -379,6 +380,10 @@ Definition
       $$ = $1;
   }
 | ImplementDefinition
+  {
+      $$ = $1;
+  }
+| DomainDefinition
   {
       $$ = $1;
   }
@@ -663,24 +668,33 @@ FeatureDefinitionList
   }
 ;
 
+
+TemplateSymbols
+: LESSER TemplateVariables GREATER
+  {
+      $$ = $2;
+      // TODO: FIXME: @ppaulweber: handle token $1 and $3
+  }
+| %empty
+  {
+      $$ = Ast::make< VariableDefinitions >( @$ );
+  }
+;
+
+
 //
 //
 // ImplementDefinition
 //
 
 ImplementDefinition
-: IMPLEMENT Identifier EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
+: IMPLEMENT TemplateSymbols Type EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
   {
-      $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6 );
+      $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
   }
-| IMPLEMENT IdentifierPath FOR Identifier EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
+| IMPLEMENT TemplateSymbols IdentifierPath FOR Type EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
   {
-      $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6, $7, $8 );
-  }
-| IMPLEMENT IdentifierPath FOR ENUMERATION EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
-  {
-      const auto enumeration = Ast::make< Identifier >( @4, $4->tokenString() );
-      $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, enumeration, $5, $6, $7, $8 );
+      $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6, $7, $8, $9 );
   }
 ;
 
@@ -721,6 +735,18 @@ ImplementDefinitionList
       auto definitions = Ast::make< Definitions >( @$ );
       definitions->add( $1 );
       $$ = definitions;
+  }
+;
+
+//
+//
+// DomainDefinition
+//
+
+DomainDefinition
+: DOMAIN TemplateSymbols Type
+  {
+      $$ = Ast::make< DomainDefinition >( @$, $1, $2, $3 );
   }
 ;
 
@@ -1810,6 +1836,11 @@ Identifier
       $$ = Ast::make< Identifier >( @$, $1->tokenString() );
       $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
+| ENUMERATION
+  {
+      $$ = Ast::make< Identifier >( @$, $1->tokenString() );
+      $$->setSpans( m_lexer.fetchSpansAndReset() );
+  }
 ;
 
 
@@ -1914,6 +1945,32 @@ TypedAttributedVariable
       $$ = $1;
   }
 ;
+
+
+TemplateVariables
+: TemplateVariables COMMA TemplateVariable
+  {
+      auto templateVariables = $1;
+      $3->setDelimiterToken( $2 );
+      templateVariables->add( $3 );
+      $$ = templateVariables;
+  }
+| TemplateVariable
+  {
+      auto templateVariables = Ast::make< VariableDefinitions >( @$ );
+      templateVariables->add( $1 );
+      $$ = templateVariables;
+  }
+;
+
+
+TemplateVariable
+: Variable
+  {
+      $$ = $1;
+  }
+;
+
 
 //
 //

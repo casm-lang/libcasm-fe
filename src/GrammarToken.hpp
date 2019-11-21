@@ -59,6 +59,7 @@ IMPLEMENT       "implement"
 FOR             "for"
 SELF            "self"
 THIS            "this"
+DOMAIN          "domain"
 
 FUNCTION        "function"
 DEFINED         "defined"
