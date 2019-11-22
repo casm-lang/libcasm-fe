@@ -60,6 +60,7 @@ FOR             "for"
 SELF            "self"
 THIS            "this"
 DOMAIN          "domain"
+BUILTIN         "builtin"
 
 FUNCTION        "function"
 DEFINED         "defined"

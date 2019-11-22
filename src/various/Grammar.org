@@ -59,6 +59,8 @@ Definition ::= InitDefinition
              | StructureDefinition
              | FeatureDefinition
              | ImplementDefinition
+             | DomainDefinition
+             | BuiltinDefinition
 #+end_src
 
 #+html: {{page>.:grammar:Definition&noheader&nofooter}}
@@ -237,12 +239,21 @@ FeatureDefinitionList ::= FeatureDefinitionList FeatureDefinitionElement
 #+html: {{page>.:grammar:FeatureDefinitionList&noheader&nofooter}}
 
 
+** TemplateSymbols
+
+#+begin_src
+TemplateSymbols ::= "<" TemplateVariables ">"
+                  | null
+#+end_src
+
+#+html: {{page>.:grammar:TemplateSymbols&noheader&nofooter}}
+
+
 ** ImplementDefinition
 
 #+begin_src
-ImplementDefinition ::= "implement" Identifier "=" "{" ImplementDefinitionList "}"
-                      | "implement" IdentifierPath "for" Identifier "=" "{" ImplementDefinitionList "}"
-                      | "implement" IdentifierPath "for" "enumeration" "=" "{" ImplementDefinitionList "}"
+ImplementDefinition ::= "implement" TemplateSymbols Type "=" "{" ImplementDefinitionList "}"
+                      | "implement" TemplateSymbols IdentifierPath "for" Type "=" "{" ImplementDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:ImplementDefinition&noheader&nofooter}}
@@ -268,6 +279,24 @@ ImplementDefinitionList ::= ImplementDefinitionList ImplementDefinitionElement
 #+end_src
 
 #+html: {{page>.:grammar:ImplementDefinitionList&noheader&nofooter}}
+
+
+** DomainDefinition
+
+#+begin_src
+DomainDefinition ::= "domain" TemplateSymbols Type
+#+end_src
+
+#+html: {{page>.:grammar:DomainDefinition&noheader&nofooter}}
+
+
+** BuiltinDefinition
+
+#+begin_src
+BuiltinDefinition ::= "builtin" TemplateSymbols RelationType
+#+end_src
+
+#+html: {{page>.:grammar:BuiltinDefinition&noheader&nofooter}}
 
 
 ** Declaration
@@ -953,6 +982,7 @@ Initializer ::= Term
 Identifier ::= "([a-ZA-Z_]|UTF8){([a-zA-Z_0-9]|UTF8)}*"
              | "in"
              | "CASM"
+             | "enumeration"
 #+end_src
 
 #+html: {{page>.:grammar:Identifier&noheader&nofooter}}
@@ -1025,6 +1055,25 @@ TypedAttributedVariable ::= Attributes TypedVariable
 #+end_src
 
 #+html: {{page>.:grammar:TypedAttributedVariable&noheader&nofooter}}
+
+
+** TemplateVariables
+
+#+begin_src
+TemplateVariables ::= TemplateVariables "," TemplateVariable
+                    | TemplateVariable
+#+end_src
+
+#+html: {{page>.:grammar:TemplateVariables&noheader&nofooter}}
+
+
+** TemplateVariable
+
+#+begin_src
+TemplateVariable ::= Variable
+#+end_src
+
+#+html: {{page>.:grammar:TemplateVariable&noheader&nofooter}}
 
 
 ** VariableBindings

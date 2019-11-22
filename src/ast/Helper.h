@@ -48,6 +48,7 @@
 
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/Node>
+#include <libcasm-fe/ast/Rule>
 #include <libcasm-fe/ast/Token>
 
 namespace libcasm_fe

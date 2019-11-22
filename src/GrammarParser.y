@@ -99,11 +99,9 @@
 
     static BasicType::Ptr createVoidType( libstdhl::SourceLocation& sourceLocation )
     {
-        const auto type = libstdhl::Memory::get< libcasm_ir::VoidType >();
-        const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
+        const auto name = Ast::make< Identifier >( sourceLocation, TypeInfo::TYPE_NAME_VOID );
         const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
         const auto node = Ast::make< BasicType >( sourceLocation, path );
-        node->setType( type );
         return node;
     }
 }
@@ -134,6 +132,7 @@ END       0 "end of file"
 %type <VariableDefinition::Ptr> Variable TypedVariable TemplateVariable AttributedVariable TypedAttributedVariable
 %type <VariableDefinitions::Ptr> TypedVariables TemplateVariables TemplateSymbols
 %type <DomainDefinition::Ptr> DomainDefinition
+%type <BuiltinDefinition::Ptr> BuiltinDefinition
 %type <FunctionDefinition::Ptr> FunctionDefinition
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
@@ -384,6 +383,10 @@ Definition
       $$ = $1;
   }
 | DomainDefinition
+  {
+      $$ = $1;
+  }
+| BuiltinDefinition
   {
       $$ = $1;
   }
@@ -747,6 +750,18 @@ DomainDefinition
 : DOMAIN TemplateSymbols Type
   {
       $$ = Ast::make< DomainDefinition >( @$, $1, $2, $3 );
+  }
+;
+
+//
+//
+// BuiltinDefinition
+//
+
+BuiltinDefinition
+: BUILTIN TemplateSymbols RelationType
+  {
+      $$ = Ast::make< BuiltinDefinition >( @$, $1, $2, $3 );
   }
 ;
 
