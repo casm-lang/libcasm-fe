@@ -307,11 +307,14 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
                 return;
             }
 
-            const auto function = m_globalState.get( *location );
-            if( function )
+            if( not node.isLocal() )
             {
-                m_evaluationStack.push( function.value() );
-                return;
+                const auto function = m_globalState.get( *location );
+                if( function )
+                {
+                    m_evaluationStack.push( function.value() );
+                    return;
+                }
             }
         }
 
@@ -979,6 +982,42 @@ void ExecutionVisitor::visit( LetRule& node )
     }
 }
 
+void ExecutionVisitor::visit( LocalRule& node )
+{
+    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
+
+    std::unordered_set< Ast::FunctionDefinition* > localFunctions;
+
+    {
+        Transaction initTransaction( &m_updateSetManager, Semantics::Parallel, 100 );
+        for( const auto& function : *node.localFunctions() )
+        {
+            localFunctions.insert( function.get() );
+            function->initially()->accept( *this );
+        }
+        initTransaction.merge();
+    }
+
+    node.rule()->accept( *this );
+
+    // ignore local function updates
+    auto* updateSet = m_updateSetManager.currentUpdateSet();
+    updateSet->setUpdateFilter(
+        [&localFunctions](
+            const UpdateSetDetails::Location& location, const UpdateSetDetails::Value& value ) {
+            return localFunctions.find( location.function() ) == localFunctions.cend();
+        } );
+
+    try
+    {
+        transaction.merge();
+    }
+    catch( const ExecutionUpdateSet::Conflict& conflict )
+    {
+        handleMergeConflict( node, conflict );
+    }
+}
+
 void ExecutionVisitor::visit( ForallRule& node )
 {
     Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
@@ -1432,6 +1471,8 @@ void StateInitializationVisitor::visit( InitDefinition& node )
 
 void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
+    assert( not node.isLocal() );
+
     Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
     ExecutionVisitor executionVisitor(
         m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant() );

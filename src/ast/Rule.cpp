@@ -314,6 +314,49 @@ void LetRule::accept( Visitor& visitor )
 
 //
 //
+// LocalRule
+//
+
+LocalRule::LocalRule(
+    const Token::Ptr& localToken,
+    const FunctionDefinitions::Ptr& localFunctions,
+    const Token::Ptr& inToken,
+    const Rule::Ptr& rule )
+: Rule( Node::ID::LOCAL_RULE )
+, m_localFunctions( localFunctions )
+, m_rule( rule )
+, m_localToken( localToken )
+, m_inToken( inToken )
+{
+}
+
+const FunctionDefinitions::Ptr& LocalRule::localFunctions( void ) const
+{
+    return m_localFunctions;
+}
+
+const Rule::Ptr& LocalRule::rule( void ) const
+{
+    return m_rule;
+}
+
+const Token::Ptr& LocalRule::localToken( void ) const
+{
+    return m_localToken;
+}
+
+const Token::Ptr& LocalRule::inToken( void ) const
+{
+    return m_inToken;
+}
+
+void LocalRule::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
 // ForallRule
 //
 

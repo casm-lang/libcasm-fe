@@ -97,6 +97,7 @@ namespace libcasm_fe
             void visit( ConditionalRule& node ) override;
             void visit( CaseRule& node ) override;
             void visit( LetRule& node ) override;
+            void visit( LocalRule& node ) override;
             void visit( ForallRule& node ) override;
             void visit( ChooseRule& node ) override;
             void visit( IterateRule& node ) override;

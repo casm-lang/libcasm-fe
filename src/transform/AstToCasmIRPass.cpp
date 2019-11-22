@@ -103,6 +103,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( ConditionalRule& node ) override;
     void visit( CaseRule& node ) override;
     void visit( LetRule& node ) override;
+    void visit( LocalRule& node ) override;
     void visit( ForallRule& node ) override;
     void visit( ChooseRule& node ) override;
     void visit( IterateRule& node ) override;
@@ -549,6 +550,11 @@ void AstToCasmIRVisitor::visit( CaseRule& node )
 }
 
 void AstToCasmIRVisitor::visit( LetRule& node )
+{
+    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
+}
+
+void AstToCasmIRVisitor::visit( LocalRule& node )
 {
     m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }

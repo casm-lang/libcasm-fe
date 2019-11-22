@@ -231,6 +231,10 @@ std::string Node::description( void ) const
         {
             return "let";
         }
+        case ID::LOCAL_RULE:
+        {
+            return "local";
+        }
         case ID::FORALL_RULE:
         {
             return "forall";

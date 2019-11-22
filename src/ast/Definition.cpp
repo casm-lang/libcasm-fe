@@ -213,6 +213,11 @@ bool FunctionDefinition::isProgram( void ) const
     return m_isProgram;
 }
 
+bool FunctionDefinition::isLocal( void ) const
+{
+    return m_classification == Classification::LOCAL;
+}
+
 const Types::Ptr& FunctionDefinition::argumentTypes( void ) const
 {
     return m_argumentTypes;
@@ -285,6 +290,10 @@ std::string FunctionDefinition::toString( const Classification classification )
         case FunctionDefinition::Classification::STATIC:
         {
             return "static";
+        }
+        case FunctionDefinition::Classification::LOCAL:
+        {
+            return "local";
         }
     }
 

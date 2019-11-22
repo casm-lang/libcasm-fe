@@ -233,6 +233,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( ExistentialQuantifierExpression& node ) override;
 
     void visit( LetRule& node ) override;
+    void visit( LocalRule& node ) override;
     void visit( ForallRule& node ) override;
     void visit( ChooseRule& node ) override;
 
@@ -518,6 +519,20 @@ void SymbolResolveVisitor::visit( LetRule& node )
     pushVariableBindings( node.variableBindings() );
     node.rule()->accept( *this );
     popVariableBindings( node.variableBindings() );
+}
+
+void SymbolResolveVisitor::visit( LocalRule& node )
+{
+    for( const auto& function : *node.localFunctions() )
+    {
+        pushSymbol( function );
+        function->accept( *this );
+        popSymbol( function );
+    }
+
+    pushSymbols< FunctionDefinition >( node.localFunctions() );
+    node.rule()->accept( *this );
+    popSymbols< FunctionDefinition >( node.localFunctions() );
 }
 
 void SymbolResolveVisitor::visit( ForallRule& node )

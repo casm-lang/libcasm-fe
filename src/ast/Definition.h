@@ -152,7 +152,8 @@ namespace libcasm_fe
                 CONTROLLED, /**< read and written by an ASM */
                 SHARED,     /**< read and written by an ASM and its env. */
                 OUT,        /**< only written by an ASM, only read by its env. */
-                STATIC
+                STATIC,
+                LOCAL
             };
 
             static std::string toString( const Classification classification );
@@ -171,6 +172,7 @@ namespace libcasm_fe
                 const Initially::Ptr& initially );
 
             bool isProgram( void ) const;
+            bool isLocal( void ) const;
 
             const Types::Ptr& argumentTypes( void ) const;
 
@@ -207,6 +209,8 @@ namespace libcasm_fe
             Initially::Ptr m_initially;
             const bool m_isProgram;
         };
+
+        using FunctionDefinitions = NodeList< FunctionDefinition >;
 
         class DerivedDefinition final : public Definition
         {

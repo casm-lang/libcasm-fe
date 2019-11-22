@@ -63,6 +63,7 @@ ENDPAR          "endpar"
 
 SKIP            "skip"
 LET             "let"
+LOCAL           "local"
 IN              "in"
 FORALL          "forall"
 CHOOSE          "choose"

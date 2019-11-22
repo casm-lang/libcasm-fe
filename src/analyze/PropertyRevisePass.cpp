@@ -136,11 +136,14 @@ void PropertyReviseVisitor::visit( Initializer& node )
             Code::UpdateRuleFunctionArgumentInvalidProperty );
     }
 
-    checkIfPropertiesHold(
-        *node.value(),
-        { Property::SIDE_EFFECT_FREE },
-        "update expression",
-        Code::UpdateRuleUpdateExpressionInvalidProperty );
+    if( not node.function()->isLocal() )
+    {
+        checkIfPropertiesHold(
+            *node.value(),
+            { Property::SIDE_EFFECT_FREE },
+            "update expression",
+            Code::UpdateRuleUpdateExpressionInvalidProperty );
+    }
 }
 
 void PropertyReviseVisitor::visit( FunctionDefinition& node )

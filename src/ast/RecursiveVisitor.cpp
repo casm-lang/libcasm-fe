@@ -457,6 +457,14 @@ void RecursiveVisitor::visit( LetRule& node )
     node.rule()->accept( *this );
 }
 
+void RecursiveVisitor::visit( LocalRule& node )
+{
+    node.localToken()->accept( *this );
+    node.localFunctions()->accept( *this );
+    node.inToken()->accept( *this );
+    node.rule()->accept( *this );
+}
+
 void RecursiveVisitor::visit( ForallRule& node )
 {
     node.forallToken()->accept( *this );

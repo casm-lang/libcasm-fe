@@ -92,6 +92,7 @@ namespace libcasm_fe
         class ConditionalRule;
         class CaseRule;
         class LetRule;
+        class LocalRule;
         class ForallRule;
         class ChooseRule;
         class IterateRule;
@@ -173,6 +174,7 @@ namespace libcasm_fe
             virtual void visit( ConditionalRule& node ) = 0;
             virtual void visit( CaseRule& node ) = 0;
             virtual void visit( LetRule& node ) = 0;
+            virtual void visit( LocalRule& node ) = 0;
             virtual void visit( ForallRule& node ) = 0;
             virtual void visit( ChooseRule& node ) = 0;
             virtual void visit( IterateRule& node ) = 0;

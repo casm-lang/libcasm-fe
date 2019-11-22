@@ -112,6 +112,7 @@ namespace libcasm_fe
                 CONDITIONAL_RULE,
                 CASE_RULE,
                 LET_RULE,
+                LOCAL_RULE,
                 FORALL_RULE,
                 CHOOSE_RULE,
                 ITERATE_RULE,
