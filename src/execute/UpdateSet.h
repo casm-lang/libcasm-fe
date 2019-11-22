@@ -52,6 +52,7 @@
 #include <libstdhl/Optional>
 
 #include <algorithm>
+#include <functional>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -161,6 +162,7 @@ class UpdateSet
     : m_set( initialSize )
     , m_parent( parent )
     , m_epoch( 0UL )
+    , m_updateFilter()
     {
     }
 
@@ -168,6 +170,12 @@ class UpdateSet
      * Destroys the update-set
      */
     virtual ~UpdateSet() = default;
+
+    void setUpdateFilter(
+        std::function< bool( const Location& location, const Value& value ) > pred )
+    {
+        m_updateFilter = pred;
+    }
 
     /**
      * @return The semantics of the update-set
@@ -302,6 +310,9 @@ class UpdateSet
     /**
      * Merges all updates of the current update-set into the update-set \a other
      *
+     * If the update filter predicate is set, then only updates which satisfy the filter-predicate
+     * will be merged.
+     *
      * @post The current update-set is cleared.
      *
      * @param other The update-set which should receive the updates (must not
@@ -320,7 +331,7 @@ class UpdateSet
             return;
         }
 
-        if( other->m_set.empty() )
+        if( other->m_set.empty() and not m_updateFilter )
         {
             std::swap( other->m_set, m_set );
 
@@ -329,10 +340,25 @@ class UpdateSet
         else
         {
             other->reserveAdditionally( m_set.size() );
-            const auto end = m_set.end();
-            for( auto it = m_set.begin(); it != end; ++it )
+
+            if( m_updateFilter )
             {
-                other->add( it.key(), it.value() );
+                const auto end = m_set.end();
+                for( auto it = m_set.begin(); it != end; ++it )
+                {
+                    if( m_updateFilter( it.key(), it.value() ) )
+                    {
+                        other->add( it.key(), it.value() );
+                    }
+                }
+            }
+            else
+            {
+                const auto end = m_set.end();
+                for( auto it = m_set.begin(); it != end; ++it )
+                {
+                    other->add( it.key(), it.value() );
+                }
             }
 
             this->clear();
@@ -408,6 +434,7 @@ class UpdateSet
   private:
     UpdateSet* const m_parent;
     std::size_t m_epoch;
+    std::function< bool( const Location& location, const Value& value ) > m_updateFilter;
 };
 
 /**
