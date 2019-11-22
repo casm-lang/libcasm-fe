@@ -887,8 +887,24 @@ void ExecutionVisitor::visit( CaseRule& node )
 
 void ExecutionVisitor::visit( LetRule& node )
 {
-    node.variableBindings()->accept( *this );
+    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
+
+    {
+        Transaction initTransaction( &m_updateSetManager, Semantics::Parallel, 100 );
+        node.variableBindings()->accept( *this );
+        initTransaction.merge();
+    }
+
     node.rule()->accept( *this );
+
+    try
+    {
+        transaction.merge();
+    }
+    catch( const ExecutionUpdateSet::Conflict& conflict )
+    {
+        handleMergeConflict( node, conflict );
+    }
 }
 
 void ExecutionVisitor::visit( ForallRule& node )
