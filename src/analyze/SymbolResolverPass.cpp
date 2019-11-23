@@ -464,6 +464,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
 void SymbolResolveVisitor::visit( LetExpression& node )
 {
+    node.variableBindings()->accept( *this );
+
     pushVariableBindings( node.variableBindings() );
     node.expression()->accept( *this );
     popVariableBindings( node.variableBindings() );
@@ -498,6 +500,8 @@ void SymbolResolveVisitor::visit( ExistentialQuantifierExpression& node )
 
 void SymbolResolveVisitor::visit( LetRule& node )
 {
+    node.variableBindings()->accept( *this );
+
     pushVariableBindings( node.variableBindings() );
     node.rule()->accept( *this );
     popVariableBindings( node.variableBindings() );
@@ -567,7 +571,6 @@ void SymbolResolveVisitor::pushVariableBindings( const VariableBindings::Ptr& va
 {
     for( const auto& variableBinding : *variableBindings )
     {
-        variableBinding->expression()->accept( *this );
         pushVariable( variableBinding->variable() );
     }
 }
