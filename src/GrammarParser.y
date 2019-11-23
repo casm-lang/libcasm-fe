@@ -557,10 +557,6 @@ InvariantDefinition
   }
 ;
 
-//
-//
-// StructureDefinition
-//
 
 ImportDefinition
 : IMPORT IdentifierPath
@@ -573,6 +569,10 @@ ImportDefinition
   }
 ;
 
+//
+//
+// StructureDefinition
+//
 
 StructureDefinition
 : STRUCTURE Identifier EQUAL LCURPAREN StructureDefinitionList RCURPAREN
@@ -615,9 +615,9 @@ StructureDefinitionElement
 //
 
 FeatureDefinition
-: FEATURE Identifier EQUAL LCURPAREN FeatureDefinitionList RCURPAREN
+: FEATURE TemplateSymbols Type EQUAL LCURPAREN FeatureDefinitionList RCURPAREN
   {
-      $$ = Ast::make< FeatureDefinition >( @$, $1, $2, $3, $4, $5, $6 );
+      $$ = Ast::make< FeatureDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
   }
 ;
 
@@ -695,7 +695,7 @@ ImplementDefinition
   {
       $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
   }
-| IMPLEMENT TemplateSymbols IdentifierPath FOR Type EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
+| IMPLEMENT TemplateSymbols Type FOR Type EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
   {
       $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6, $7, $8, $9 );
   }
@@ -1552,6 +1552,7 @@ TupleLiteral
       $$->setLeftBracket( $1 );
       $$->setRightBracket( $5 );
   }
+;
 
 
 RecordLiteral
