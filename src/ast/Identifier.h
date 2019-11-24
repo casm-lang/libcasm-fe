@@ -62,6 +62,7 @@ namespace libcasm_fe
             explicit Identifier( const std::string& name );
 
             const std::string& name( void ) const;
+            void setName( const std::string& name );
             bool empty( void ) const;
 
             void setDoubleColon( const Token::Ptr& doubleColon );
@@ -71,6 +72,8 @@ namespace libcasm_fe
             const Spans::Ptr& spans( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             std::string m_name;
@@ -118,13 +121,18 @@ namespace libcasm_fe
             void addIdentifier( const Identifier::Ptr& identifier );
 
             Identifiers::Ptr identifiers( void ) const;
+
             Type type( void ) const;
 
             const std::string& baseName( void ) const;
+
             std::string baseDir( void ) const;
+
             std::string path( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           public:
             static IdentifierPath::Ptr fromIdentifier( const Identifier::Ptr& identifier );
@@ -133,14 +141,6 @@ namespace libcasm_fe
             const Identifiers::Ptr m_identifiers;
             const Type m_type;
         };
-
-        template < typename T, typename... Args >
-        typename T::Ptr make( const libstdhl::SourceLocation& sourceLocation, Args&&... args )
-        {
-            auto node = std::make_shared< T >( std::forward< Args >( args )... );
-            node->setSourceLocation( sourceLocation );
-            return node;
-        }
     }
 }
 

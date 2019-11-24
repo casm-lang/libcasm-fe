@@ -78,6 +78,11 @@ const std::string& Identifier::name( void ) const
     return m_name;
 }
 
+void Identifier::setName( const std::string& name )
+{
+    m_name = name;
+}
+
 bool Identifier::empty( void ) const
 {
     return m_name.empty();
@@ -107,6 +112,16 @@ const Spans::Ptr& Identifier::spans( void ) const
 void Identifier::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr Identifier::clone( void ) const
+{
+    auto duplicate = std::make_shared< Identifier >( std::string( name() ) );
+
+    Node::clone( *duplicate );
+    duplicate->setDoubleColon( doubleColon() );
+    duplicate->setSpans( spans() );
+    return duplicate;
 }
 
 //
@@ -191,6 +206,15 @@ std::string IdentifierPath::path( void ) const
 void IdentifierPath::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr IdentifierPath::clone( void ) const
+{
+    auto duplicate =
+        std::make_shared< IdentifierPath >( identifiers()->duplicate< Identifiers >(), type() );
+
+    Node::clone( *duplicate );
+    return duplicate;
 }
 
 IdentifierPath::Ptr IdentifierPath::fromIdentifier( const Identifier::Ptr& identifier )
