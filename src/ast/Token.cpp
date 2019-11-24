@@ -93,6 +93,14 @@ void Token::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr Token::clone( void ) const
+{
+    auto duplicate = std::make_shared< Token >( token() );
+
+    Node::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //  Local variables:
 //  mode: c++

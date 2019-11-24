@@ -76,6 +76,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             libcasm_fe::Grammar::Token m_token;
             Spans::Ptr m_spans;
