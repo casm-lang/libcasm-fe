@@ -70,6 +70,9 @@ namespace libcasm_fe
             void setDelimiterToken( const Token::Ptr& delimiterToken );
             const Token::Ptr& delimiterToken( void ) const;
 
+          protected:
+            void clone( Expression& duplicate ) const;
+
           private:
             Token::Ptr m_delimiterToken;
         };
@@ -93,6 +96,8 @@ namespace libcasm_fe
             const Token::Ptr& rightBraceToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Expression::Ptr m_expression;
@@ -118,6 +123,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Identifier::Ptr m_identifier;
             const Expression::Ptr m_expression;
@@ -141,6 +148,9 @@ namespace libcasm_fe
             void setRightBracketToken( const Token::Ptr& rightBracketToken );
             const Token::Ptr& rightBracketToken( void ) const;
 
+          protected:
+            void clone( CallExpression& duplicate ) const;
+
           private:
             const Expressions::Ptr m_arguments;
             Token::Ptr m_leftBracketToken;
@@ -160,11 +170,14 @@ namespace libcasm_fe
 
             u1 hasTargetDefinition( void ) const;
 
+          protected:
+            void clone( TargetCallExpression& duplicate ) const;
+
           private:
             std::shared_ptr< Definition > m_targetDefinition;
         };
 
-        class DirectCallExpression : public TargetCallExpression
+        class DirectCallExpression final : public TargetCallExpression
         {
           public:
             enum class TargetType
@@ -194,6 +207,8 @@ namespace libcasm_fe
             std::string targetTypeName( void ) const;
 
             void accept( Visitor& visitor ) override;
+
+            Node::Ptr clone( void ) const override final;
 
             static std::string targetTypeString( const TargetType targetType );
 
@@ -233,6 +248,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             Expression::Ptr m_object;
             Identifier::Ptr m_methodName;
@@ -257,6 +274,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Expression::Ptr m_object;
             const std::shared_ptr< Literal > m_literal;
@@ -277,6 +296,8 @@ namespace libcasm_fe
             bool isFunctionCall( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Expression::Ptr m_expression;
@@ -300,6 +321,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const std::shared_ptr< Type > m_asType;
             const Token::Ptr m_asToken;
@@ -317,6 +340,8 @@ namespace libcasm_fe
             const Token::Ptr& operationToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Token::Ptr m_operationToken;
@@ -340,11 +365,13 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Token::Ptr m_operationToken;
         };
 
-        class VariableBinding : public Node
+        class VariableBinding final : public Node
         {
           public:
             using Ptr = std::shared_ptr< VariableBinding >;
@@ -363,6 +390,8 @@ namespace libcasm_fe
             const Token::Ptr& delimiterToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const std::shared_ptr< VariableDefinition > m_variable;
@@ -392,6 +421,8 @@ namespace libcasm_fe
             const Token::Ptr& inToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const VariableBindings::Ptr m_variableBindings;
@@ -424,6 +455,8 @@ namespace libcasm_fe
             const Token::Ptr& elseToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Expression::Ptr m_condition;
@@ -459,6 +492,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const std::shared_ptr< VariableDefinitions > m_variables;
             const Expression::Ptr m_universe;
@@ -492,6 +527,9 @@ namespace libcasm_fe
 
             const Token::Ptr& doToken( void ) const;
 
+          protected:
+            void clone( QuantifierExpression& duplicate ) const;
+
           private:
             const std::shared_ptr< VariableDefinitions > m_predicateVariables;
             const Expression::Ptr m_universe;
@@ -515,6 +553,8 @@ namespace libcasm_fe
                 const Expression::Ptr& proposition );
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
         };
 
         class ExistentialQuantifierExpression final : public QuantifierExpression
@@ -531,6 +571,8 @@ namespace libcasm_fe
                 const Expression::Ptr& proposition );
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
         };
 
         class CardinalityExpression final : public TargetCallExpression
@@ -550,6 +592,8 @@ namespace libcasm_fe
             const Token::Ptr& rightVerticalBarToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Token::Ptr m_leftVerticalBarToken;

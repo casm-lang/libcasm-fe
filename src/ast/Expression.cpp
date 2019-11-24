@@ -77,6 +77,12 @@ const Token::Ptr& Expression::delimiterToken( void ) const
     return m_delimiterToken;
 }
 
+void Expression::clone( Expression& duplicate ) const
+{
+    TypedPropertyNode::clone( duplicate );
+    duplicate.setDelimiterToken( delimiterToken() );
+}
+
 //
 //
 // EmbracedExpression
@@ -113,6 +119,15 @@ void EmbracedExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr EmbracedExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< EmbracedExpression >(
+        leftBraceToken(), expression()->duplicate< Expression >(), rightBraceToken() );
+
+    Expression::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // NamedExpression
@@ -147,6 +162,17 @@ const Token::Ptr& NamedExpression::colonToken( void ) const
 void NamedExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr NamedExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< NamedExpression >(
+        identifier()->duplicate< Identifier >(),
+        colonToken(),
+        expression()->duplicate< Expression >() );
+
+    Expression::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -189,6 +215,13 @@ const Token::Ptr& CallExpression::rightBracketToken( void ) const
     return m_rightBracketToken;
 }
 
+void CallExpression::clone( CallExpression& duplicate ) const
+{
+    Expression::clone( duplicate );
+    duplicate.setLeftBracketToken( leftBracketToken() );
+    duplicate.setRightBracketToken( rightBracketToken() );
+}
+
 //
 //
 // TargetCallExpression
@@ -214,6 +247,12 @@ const Definition::Ptr& TargetCallExpression::targetDefinition( void ) const
 u1 TargetCallExpression::hasTargetDefinition( void ) const
 {
     return m_targetDefinition != nullptr;
+}
+
+void TargetCallExpression::clone( TargetCallExpression& duplicate ) const
+{
+    CallExpression::clone( duplicate );
+    duplicate.setTargetDefinition( m_targetDefinition );
 }
 
 //
@@ -309,6 +348,16 @@ void DirectCallExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr DirectCallExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< DirectCallExpression >(
+        identifier()->duplicate< IdentifierPath >(), arguments()->duplicate< Expressions >() );
+
+    TargetCallExpression::clone( *duplicate );
+    duplicate->setTargetType( targetType() );
+    return duplicate;
+}
+
 //
 //
 // MethodCallExpression
@@ -383,6 +432,19 @@ void MethodCallExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr MethodCallExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< MethodCallExpression >(
+        object()->duplicate< Expression >(),
+        dotToken(),
+        methodName()->duplicate< Identifier >(),
+        arguments()->duplicate< Expressions >() );
+
+    TargetCallExpression::clone( *duplicate );
+    duplicate->setMethodType( methodType() );
+    return duplicate;
+}
+
 //
 //
 // LiteralCallExpression
@@ -419,6 +481,15 @@ void LiteralCallExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr LiteralCallExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< LiteralCallExpression >(
+        object()->duplicate< Expression >(), dotToken(), literal()->duplicate< Literal >() );
+
+    Expression::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // IndirectCallExpression
@@ -449,6 +520,15 @@ bool IndirectCallExpression::isFunctionCall( void ) const
 void IndirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr IndirectCallExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< IndirectCallExpression >(
+        expression()->duplicate< Expression >(), arguments()->duplicate< Expressions >() );
+
+    CallExpression::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -486,6 +566,15 @@ void TypeCastingExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr TypeCastingExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< TypeCastingExpression >(
+        fromExpression()->duplicate< Expression >(), asToken(), asType()->duplicate< Type >() );
+
+    TargetCallExpression::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // UnaryExpression
@@ -513,6 +602,15 @@ const Token::Ptr& UnaryExpression::operationToken( void ) const
 void UnaryExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr UnaryExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< UnaryExpression >(
+        operationToken(), expression()->duplicate< Expression >() );
+
+    TargetCallExpression::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -549,6 +647,15 @@ const Token::Ptr& BinaryExpression::operationToken( void ) const
 void BinaryExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr BinaryExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< BinaryExpression >(
+        left()->duplicate< Expression >(), operationToken(), right()->duplicate< Expression >() );
+
+    TargetCallExpression::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -599,6 +706,18 @@ void VariableBinding::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr VariableBinding::clone( void ) const
+{
+    auto duplicate = std::make_shared< VariableBinding >(
+        variable()->duplicate< VariableDefinition >(),
+        equalToken(),
+        expression()->duplicate< Expression >() );
+
+    Node::clone( *duplicate );
+    duplicate->setDelimiterToken( delimiterToken() );
+    return duplicate;
+}
+
 //
 //
 // LetExpression
@@ -640,6 +759,18 @@ const Token::Ptr& LetExpression::inToken( void ) const
 void LetExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr LetExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< LetExpression >(
+        letToken(),
+        variableBindings()->duplicate< VariableBindings >(),
+        inToken(),
+        expression()->duplicate< Expression >() );
+
+    Expression::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -699,6 +830,20 @@ void ConditionalExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr ConditionalExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< ConditionalExpression >(
+        ifToken(),
+        condition()->duplicate< Expression >(),
+        thenToken(),
+        thenExpression()->duplicate< Expression >(),
+        elseToken(),
+        elseExpression()->duplicate< Expression >() );
+
+    Expression::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // ChooseExpression
@@ -756,6 +901,20 @@ void ChooseExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr ChooseExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< ChooseExpression >(
+        chooseToken(),
+        variables()->duplicate< VariableDefinitions >(),
+        inToken(),
+        universe()->duplicate< Expression >(),
+        doToken(),
+        expression()->duplicate< Expression >() );
+
+    Expression::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // QuantifierExpression
@@ -809,6 +968,11 @@ const Token::Ptr& QuantifierExpression::doToken( void ) const
     return m_doToken;
 }
 
+void QuantifierExpression::clone( QuantifierExpression& duplicate ) const
+{
+    Expression::clone( duplicate );
+}
+
 //
 //
 // UniversalQuantifierExpression
@@ -837,6 +1001,20 @@ void UniversalQuantifierExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr UniversalQuantifierExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< UniversalQuantifierExpression >(
+        quantifierToken(),
+        predicateVariables()->duplicate< VariableDefinitions >(),
+        inToken(),
+        universe()->duplicate< Expression >(),
+        doToken(),
+        proposition()->duplicate< Expression >() );
+
+    QuantifierExpression::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // ExistentialQuantifierExpression
@@ -863,6 +1041,20 @@ ExistentialQuantifierExpression::ExistentialQuantifierExpression(
 void ExistentialQuantifierExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr ExistentialQuantifierExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< ExistentialQuantifierExpression >(
+        quantifierToken(),
+        predicateVariables()->duplicate< VariableDefinitions >(),
+        inToken(),
+        universe()->duplicate< Expression >(),
+        doToken(),
+        proposition()->duplicate< Expression >() );
+
+    QuantifierExpression::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -900,6 +1092,15 @@ const Token::Ptr& CardinalityExpression::rightVerticalBarToken( void ) const
 void CardinalityExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr CardinalityExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< CardinalityExpression >(
+        leftVerticalBarToken(), expression()->duplicate< Expression >(), leftVerticalBarToken() );
+
+    TargetCallExpression::clone( *duplicate );
+    return duplicate;
 }
 
 //
