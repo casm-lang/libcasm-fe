@@ -72,6 +72,9 @@ namespace libcasm_fe
 
             IdentifierPath::Ptr signaturePath( void ) const;
 
+          protected:
+            void clone( Type& duplicate ) const;
+
           private:
             const IdentifierPath::Ptr m_name;
             Token::Ptr m_delimiterToken;
@@ -89,6 +92,8 @@ namespace libcasm_fe
             std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
         };
 
         class BasicType final : public Type
@@ -101,6 +106,8 @@ namespace libcasm_fe
             std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
         };
 
         class EmbracedType : public Type
@@ -117,6 +124,9 @@ namespace libcasm_fe
             const Token::Ptr& leftBraceToken( void ) const;
 
             const Token::Ptr& rightBraceToken( void ) const;
+
+          protected:
+            void clone( EmbracedType& duplicate ) const;
 
           private:
             const Token::Ptr m_leftBraceToken;
@@ -139,6 +149,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Types::Ptr m_subTypes;
         };
@@ -158,6 +170,8 @@ namespace libcasm_fe
             std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const std::shared_ptr< VariableDefinitions > m_namedSubTypes;
@@ -179,6 +193,8 @@ namespace libcasm_fe
             std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Types::Ptr m_subTypes;
@@ -207,6 +223,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Types::Ptr m_argumentTypes;
             const Type::Ptr m_returnType;
@@ -230,6 +248,8 @@ namespace libcasm_fe
             std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Expression::Ptr m_size;
