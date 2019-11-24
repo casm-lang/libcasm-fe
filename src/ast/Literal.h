@@ -46,6 +46,7 @@
 #ifndef _LIBCASM_FE_LITERAL_H_
 #define _LIBCASM_FE_LITERAL_H_
 
+#include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/Token>
 #include <libcasm-fe/ast/Type>
@@ -72,6 +73,9 @@ namespace libcasm_fe
             void setRightBracket( const Token::Ptr& rightBracket );
             const Token::Ptr& rightBracket( void ) const;
 
+          protected:
+            void clone( Literal& duplicate ) const;
+
           private:
             Token::Ptr m_leftBracket;
             Token::Ptr m_rightBracket;
@@ -88,6 +92,8 @@ namespace libcasm_fe
             explicit UndefLiteral( void );
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
         };
 
         class ValueLiteral final : public Literal
@@ -109,6 +115,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             libcasm_ir::Constant::Ptr m_value;
             libstdhl::Type::Radix m_radix;
@@ -121,7 +129,6 @@ namespace libcasm_fe
             {
                 FUNCTION,
                 DERIVED,
-                BUILTIN,
                 RULE,
                 UNKNOWN
             };
@@ -136,22 +143,22 @@ namespace libcasm_fe
             const Token::Ptr& at( void ) const;
 
             void setReferenceType( ReferenceType referenceType );
+
             ReferenceType referenceType( void ) const;
 
-            void setReference( const TypedNode::Ptr& reference );
-            const TypedNode::Ptr& reference( void ) const;
+            void setReference( const Definition::Ptr& reference );
 
-            void setBuiltinId( libcasm_ir::Value::ID builtinId );
-            libcasm_ir::Value::ID builtinId( void ) const;
+            const Definition::Ptr& reference( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const IdentifierPath::Ptr m_identifier;
             const Token::Ptr m_at;
             ReferenceType m_referenceType;
-            TypedNode::Ptr m_reference;
-            libcasm_ir::Value::ID m_builtinId;
+            Definition::Ptr m_reference;
         };
 
         class ListLiteral final : public Literal
@@ -164,6 +171,8 @@ namespace libcasm_fe
             const Expressions::Ptr& expressions( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Expressions::Ptr m_expressions;
@@ -185,6 +194,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Expression::Ptr m_left;
             const Expression::Ptr m_right;
@@ -202,6 +213,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Expressions::Ptr m_expressions;
         };
@@ -216,6 +229,8 @@ namespace libcasm_fe
             const NamedExpressions::Ptr& namedExpressions( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const NamedExpressions::Ptr m_namedExpressions;

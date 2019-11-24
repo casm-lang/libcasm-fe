@@ -57,6 +57,11 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+//
+//
+// Literal
+//
+
 Literal::Literal( Node::ID id )
 : Expression( id )
 , m_leftBracket( Token::unresolved() )
@@ -97,6 +102,14 @@ const Token::Ptr& Literal::rightBracket( void ) const
     return m_rightBracket;
 }
 
+void Literal::clone( Literal& duplicate ) const
+{
+    Expression::clone( duplicate );
+    duplicate.setLeftBracket( leftBracket() );
+    duplicate.setRightBracket( rightBracket() );
+    duplicate.setSpans( spans() );
+}
+
 //
 //
 // UndefLiteral
@@ -112,6 +125,14 @@ UndefLiteral::UndefLiteral( void )
 void UndefLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr UndefLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< UndefLiteral >();
+
+    Literal::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -161,6 +182,15 @@ void ValueLiteral::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr ValueLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< ValueLiteral >( value() );
+
+    Literal::clone( *duplicate );
+    duplicate->setRadix( radix() );
+    return duplicate;
+}
+
 //
 //
 // ReferenceLiteral
@@ -171,8 +201,7 @@ ReferenceLiteral::ReferenceLiteral( const Token::Ptr& at, const IdentifierPath::
 , m_identifier( identifier )
 , m_at( at )
 , m_referenceType( ReferenceType::UNKNOWN )
-, m_reference( nullptr )
-, m_builtinId( libcasm_ir::Value::ID::_SIZE_ )
+, m_reference()
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
     setProperty( libcasm_ir::Property::PURE );
@@ -198,35 +227,31 @@ ReferenceLiteral::ReferenceType ReferenceLiteral::referenceType( void ) const
     return m_referenceType;
 }
 
-void ReferenceLiteral::setReference( const TypedNode::Ptr& reference )
+void ReferenceLiteral::setReference( const Definition::Ptr& reference )
 {
     m_reference = reference;
 }
 
-const TypedNode::Ptr& ReferenceLiteral::reference( void ) const
+const Definition::Ptr& ReferenceLiteral::reference( void ) const
 {
-    assert(
-        ( m_referenceType != ReferenceType::BUILTIN ) and
-        ( m_referenceType != ReferenceType::UNKNOWN ) );
-
+    assert( m_reference != nullptr );
     return m_reference;
-}
-
-void ReferenceLiteral::setBuiltinId( libcasm_ir::Value::ID builtinId )
-{
-    m_builtinId = builtinId;
-}
-
-libcasm_ir::Value::ID ReferenceLiteral::builtinId( void ) const
-{
-    assert( m_referenceType == ReferenceType::BUILTIN );
-
-    return m_builtinId;
 }
 
 void ReferenceLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr ReferenceLiteral::clone( void ) const
+{
+    auto duplicate =
+        std::make_shared< ReferenceLiteral >( at(), identifier()->duplicate< IdentifierPath >() );
+
+    Literal::clone( *duplicate );
+    duplicate->setReferenceType( referenceType() );
+    duplicate->setReference( m_reference );
+    return duplicate;
 }
 
 //
@@ -248,6 +273,14 @@ const Expressions::Ptr& ListLiteral::expressions( void ) const
 void ListLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr ListLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< ListLiteral >( expressions()->duplicate< Expressions >() );
+
+    Literal::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -284,6 +317,15 @@ void RangeLiteral::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr RangeLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< RangeLiteral >(
+        left()->duplicate< Expression >(), dotdot(), right()->duplicate< Expression >() );
+
+    Literal::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // TupleLiteral
@@ -305,6 +347,14 @@ void TupleLiteral::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr TupleLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< TupleLiteral >( expressions()->duplicate< Expressions >() );
+
+    Literal::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // RecordLiteral
@@ -324,6 +374,15 @@ const NamedExpressions::Ptr& RecordLiteral::namedExpressions( void ) const
 void RecordLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr RecordLiteral::clone( void ) const
+{
+    auto duplicate =
+        std::make_shared< RecordLiteral >( namedExpressions()->duplicate< NamedExpressions >() );
+
+    Literal::clone( *duplicate );
+    return duplicate;
 }
 
 //
