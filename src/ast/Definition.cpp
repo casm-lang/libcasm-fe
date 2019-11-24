@@ -53,18 +53,6 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-static IdentifierPath::Ptr asIdentifierPath( const std::string& name )
-{
-    const auto identifier = std::make_shared< Identifier >( name );
-    return std::make_shared< IdentifierPath >( identifier );
-}
-
-static const auto unresolvedIdentifierPath = asIdentifierPath( "$unresolved$" );
-
-static const auto unresolvedToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-
-static const auto initDefinitionIdentifier = std::make_shared< Identifier >( "$init$" );
-
 //
 //
 // Definition
@@ -74,7 +62,7 @@ Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 : TypedPropertyNode( type )
 , m_identifier( identifier )
 , m_attributes( std::make_shared< Attributes >() )
-, m_delimiterToken( unresolvedToken )
+, m_delimiterToken( Token::unresolved() )
 , m_maxNumberOfLocals( 0 )
 , m_exported( false )
 {
@@ -126,13 +114,24 @@ u1 Definition::exported( void ) const
     return m_exported;
 }
 
+void Definition::clone( Definition& duplicate ) const
+{
+    TypedPropertyNode::clone( duplicate );
+    duplicate.setAttributes( attributes()->duplicate< Attributes >() );
+    duplicate.setDelimiterToken( delimiterToken() );
+    duplicate.setMaximumNumberOfLocals( maximumNumberOfLocals() );
+    duplicate.setExported( exported() );
+}
+
 //
 //
 // HeaderDefinition
 //
 
 HeaderDefinition::HeaderDefinition( const Token::Ptr& headerToken )
-: Definition( Node::ID::HEADER_DEFINITION, std::make_shared< Identifier >( "$header$" ) )
+: Definition(
+      Node::ID::HEADER_DEFINITION,
+      Ast::make< Identifier >( headerToken->sourceLocation(), headerToken->tokenString() ) )
 , m_headerToken( headerToken )
 {
 }
@@ -145,6 +144,14 @@ const Token::Ptr& HeaderDefinition::headerToken( void ) const
 void HeaderDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr HeaderDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< HeaderDefinition >( headerToken() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -197,6 +204,82 @@ const Definition::Ptr& VariableDefinition::objectDefinition( void ) const
 void VariableDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr VariableDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< VariableDefinition >(
+        identifier()->duplicate< Identifier >(),
+        colonToken(),
+        variableType()->duplicate< Type >() );
+
+    Definition::clone( *duplicate );
+    duplicate->setLocalIndex( localIndex() );
+    duplicate->setObjectDefinition( objectDefinition() );
+    return duplicate;
+}
+
+//
+//
+// TypeDefinition
+//
+
+TypeDefinition::TypeDefinition( const Node::ID id, const Type::Ptr& domainType )
+: Definition(
+      id,
+      Ast::make< Identifier >( domainType->name()->sourceLocation(), domainType->name()->path() ) )
+, m_domainType( domainType )
+{
+}
+
+const Type::Ptr& TypeDefinition::domainType( void ) const
+{
+    return m_domainType;
+}
+
+void TypeDefinition::clone( TypeDefinition& duplicate ) const
+{
+    Definition::clone( duplicate );
+}
+
+//
+//
+// TemplateTypeDefinition
+//
+
+TemplateTypeDefinition::TemplateTypeDefinition(
+    const Node::ID id,
+    const Type::Ptr& domainType,
+    const VariableDefinitions::Ptr& templateSymbols )
+: TypeDefinition( id, domainType )
+, m_templateSymbols( templateSymbols )
+, m_templateInstances( std::make_shared< TypeDefinitions >() )
+{
+}
+
+const VariableDefinitions::Ptr& TemplateTypeDefinition::templateSymbols( void ) const
+{
+    return m_templateSymbols;
+}
+
+void TemplateTypeDefinition::addTemplateInstance(
+    const TypeDefinition::Ptr& templateInstance ) const
+{
+    m_templateInstances->add( templateInstance );
+}
+
+const TypeDefinitions::Ptr& TemplateTypeDefinition::templateInstances( void ) const
+{
+    return m_templateInstances;
+}
+
+void TemplateTypeDefinition::clone( TemplateTypeDefinition& duplicate ) const
+{
+    TypeDefinition::clone( duplicate );
+    for( const auto& templateInstance : *templateInstances() )
+    {
+        duplicate.addTemplateInstance( templateInstance );
+    }
 }
 
 //
@@ -341,6 +424,24 @@ void FunctionDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr FunctionDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< FunctionDefinition >(
+        functionToken(),
+        identifier()->duplicate< Identifier >(),
+        colonToken(),
+        argumentTypes()->duplicate< Types >(),
+        mapsToken(),
+        returnType()->duplicate< Type >(),
+        defined()->duplicate< Defined >(),
+        initially()->duplicate< Initially >() );
+
+    Definition::clone( *duplicate );
+    duplicate->setClassification( classification() );
+    duplicate->setSymbolic( symbolic() );
+    return duplicate;
+}
+
 //
 //
 // DerivedDefinition
@@ -349,7 +450,7 @@ void FunctionDefinition::accept( Visitor& visitor )
 DerivedDefinition::DerivedDefinition(
     const Token::Ptr& derivedToken,
     const Identifier::Ptr& identifier,
-    const NodeList< VariableDefinition >::Ptr& arguments,
+    const VariableDefinitions::Ptr& arguments,
     const Token::Ptr& mapsToken,
     const Type::Ptr& returnType,
     const Token::Ptr& assignmentToken,
@@ -361,13 +462,13 @@ DerivedDefinition::DerivedDefinition(
 , m_derivedToken( derivedToken )
 , m_mapsToken( mapsToken )
 , m_assignmentToken( assignmentToken )
-, m_leftBracketToken( unresolvedToken )
-, m_rightBracketToken( unresolvedToken )
+, m_leftBracketToken( Token::unresolved() )
+, m_rightBracketToken( Token::unresolved() )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
 }
 
-const NodeList< VariableDefinition >::Ptr& DerivedDefinition::arguments( void ) const
+const VariableDefinitions::Ptr& DerivedDefinition::arguments( void ) const
 {
     return m_arguments;
 }
@@ -424,6 +525,23 @@ void DerivedDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr DerivedDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< DerivedDefinition >(
+        derivedToken(),
+        identifier()->duplicate< Identifier >(),
+        arguments()->duplicate< VariableDefinitions >(),
+        mapsToken(),
+        returnType()->duplicate< Type >(),
+        assignmentToken(),
+        expression()->duplicate< Expression >() );
+
+    Definition::clone( *duplicate );
+    duplicate->setLeftBracketToken( leftBracketToken() );
+    duplicate->setRightBracketToken( rightBracketToken() );
+    return duplicate;
+}
+
 //
 //
 // RuleDefinition
@@ -432,7 +550,7 @@ void DerivedDefinition::accept( Visitor& visitor )
 RuleDefinition::RuleDefinition(
     const Token::Ptr& ruleToken,
     const Identifier::Ptr& identifier,
-    const NodeList< VariableDefinition >::Ptr& arguments,
+    const VariableDefinitions::Ptr& arguments,
     const Token::Ptr& mapsToken,
     const Type::Ptr& returnType,
     const Token::Ptr& assignmentToken,
@@ -444,12 +562,12 @@ RuleDefinition::RuleDefinition(
 , m_ruleToken( ruleToken )
 , m_mapsToken( mapsToken )
 , m_assignmentToken( assignmentToken )
-, m_leftBracketToken( unresolvedToken )
-, m_rightBracketToken( unresolvedToken )
+, m_leftBracketToken( Token::unresolved() )
+, m_rightBracketToken( Token::unresolved() )
 {
 }
 
-const NodeList< VariableDefinition >::Ptr& RuleDefinition::arguments( void ) const
+const VariableDefinitions::Ptr& RuleDefinition::arguments( void ) const
 {
     return m_arguments;
 }
@@ -506,6 +624,23 @@ void RuleDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr RuleDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< RuleDefinition >(
+        ruleToken(),
+        identifier()->duplicate< Identifier >(),
+        arguments()->duplicate< VariableDefinitions >(),
+        mapsToken(),
+        returnType()->duplicate< Type >(),
+        assignmentToken(),
+        rule()->duplicate< Rule >() );
+
+    Definition::clone( *duplicate );
+    duplicate->setLeftBracketToken( leftBracketToken() );
+    duplicate->setRightBracketToken( rightBracketToken() );
+    return duplicate;
+}
+
 //
 //
 // EnumeratorDefinition
@@ -523,6 +658,15 @@ void EnumeratorDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr EnumeratorDefinition::clone( void ) const
+{
+    auto duplicate =
+        std::make_shared< EnumeratorDefinition >( identifier()->duplicate< Identifier >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // EnumerationDefinition
@@ -535,7 +679,11 @@ EnumerationDefinition::EnumerationDefinition(
     const Token::Ptr& leftBraceToken,
     const Enumerators::Ptr& enumerators,
     const Token::Ptr& rightBraceToken )
-: Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
+: TemplateTypeDefinition(
+      Node::ID::ENUMERATION_DEFINITION,
+      Ast::make< BasicType >(
+          identifier->sourceLocation(), IdentifierPath::fromIdentifier( identifier ) ),
+      Ast::make< VariableDefinitions >( identifier->sourceLocation() ) )
 , m_enumerators( enumerators )
 , m_enumerationToken( enumerationToken )
 , m_assignmentToken( assignmentToken )
@@ -576,6 +724,20 @@ void EnumerationDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr EnumerationDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< EnumerationDefinition >(
+        enumerationToken(),
+        identifier()->duplicate< Identifier >(),
+        assignmentToken(),
+        leftBraceToken(),
+        enumerators()->duplicate< Enumerators >(),
+        rightBraceToken() );
+
+    TemplateTypeDefinition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // UsingDefinition
@@ -613,6 +775,18 @@ void UsingDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr UsingDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< UsingDefinition >(
+        usingToken(),
+        identifier()->duplicate< Identifier >(),
+        assignmentToken(),
+        type()->duplicate< Type >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // UsingPathDefinition
@@ -623,7 +797,9 @@ UsingPathDefinition::UsingPathDefinition(
     const IdentifierPath::Ptr& path,
     const Token::Ptr& doubleColonToken,
     const Token::Ptr& asterixToken )
-: Definition( Node::ID::USING_PATH_DEFINITION, std::make_shared< Identifier >() )
+: Definition(
+      Node::ID::USING_PATH_DEFINITION,
+      Ast::make< Identifier >( path->sourceLocation(), path->path() ) )
 , m_path( path )
 , m_usingToken( usingToken )
 , m_doubleColonToken( doubleColonToken )
@@ -668,6 +844,15 @@ void UsingPathDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr UsingPathDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< UsingPathDefinition >(
+        usingToken(), path()->duplicate< IdentifierPath >(), doubleColonToken(), asterixToken() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // InvariantDefinition
@@ -705,21 +890,16 @@ void InvariantDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-//
-//
-// TypeDefinition
-//
-
-TypeDefinition::TypeDefinition( const Node::ID id, const Type::Ptr& typeNode )
-: Definition(
-      id, Ast::make< Identifier >( typeNode->name()->sourceLocation(), typeNode->name()->path() ) )
-, m_typeNode( typeNode )
+Node::Ptr InvariantDefinition::clone( void ) const
 {
-}
+    auto duplicate = std::make_shared< InvariantDefinition >(
+        invariantToken(),
+        identifier()->duplicate< Identifier >(),
+        assignmentToken(),
+        expression()->duplicate< Expression >() );
 
-const Type::Ptr& TypeDefinition::typeNode( void ) const
-{
-    return m_typeNode;
+    Definition::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -727,14 +907,34 @@ const Type::Ptr& TypeDefinition::typeNode( void ) const
 // DomainDefinition
 //
 
-DomainDefinition::DomainDefinition( const Type::Ptr& typeNode )
-: TypeDefinition( Node::ID::DOMAIN_DEFINITION, typeNode )
+DomainDefinition::DomainDefinition(
+    const Token::Ptr& domainToken,
+    const VariableDefinitions::Ptr& templateSymbols,
+    const Type::Ptr& domainType )
+: TemplateTypeDefinition( Node::ID::DOMAIN_DEFINITION, domainType, templateSymbols )
+, m_domainToken( domainToken )
 {
+}
+
+const Token::Ptr& DomainDefinition::domainToken( void ) const
+{
+    return m_domainToken;
 }
 
 void DomainDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr DomainDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< DomainDefinition >(
+        domainToken(),
+        templateSymbols()->duplicate< VariableDefinitions >(),
+        domainType()->duplicate< Type >() );
+
+    TemplateTypeDefinition::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -749,7 +949,11 @@ StructureDefinition::StructureDefinition(
     const Token::Ptr& leftBraceToken,
     const FunctionDefinitions::Ptr& functions,
     const Token::Ptr& rightBraceToken )
-: Definition( Node::ID::STRUCTURE_DEFINITION, identifier )
+: TemplateTypeDefinition(
+      Node::ID::STRUCTURE_DEFINITION,
+      Ast::make< BasicType >(
+          identifier->sourceLocation(), IdentifierPath::fromIdentifier( identifier ) ),
+      std::make_shared< VariableDefinitions >() )
 , m_functions( functions )
 , m_structureToken( structureToken )
 , m_assignmentToken( assignmentToken )
@@ -788,6 +992,20 @@ void StructureDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr StructureDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< StructureDefinition >(
+        structureToken(),
+        identifier()->duplicate< Identifier >(),
+        assignmentToken(),
+        leftBraceToken(),
+        functions()->duplicate< FunctionDefinitions >(),
+        rightBraceToken() );
+
+    TemplateTypeDefinition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // FeatureDefinition
@@ -795,12 +1013,13 @@ void StructureDefinition::accept( Visitor& visitor )
 
 FeatureDefinition::FeatureDefinition(
     const Token::Ptr& featureToken,
-    const Identifier::Ptr& identifier,
+    const VariableDefinitions::Ptr& templateSymbols,
+    const Type::Ptr& domainType,
     const Token::Ptr& assignmentToken,
     const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
     const Token::Ptr& rightBraceToken )
-: Definition( Node::ID::FEATURE_DEFINITION, identifier )
+: TemplateTypeDefinition( Node::ID::FEATURE_DEFINITION, domainType, templateSymbols )
 , m_definitions( definitions )
 , m_featureToken( featureToken )
 , m_assignmentToken( assignmentToken )
@@ -839,6 +1058,21 @@ void FeatureDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr FeatureDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< FeatureDefinition >(
+        featureToken(),
+        templateSymbols()->duplicate< VariableDefinitions >(),
+        domainType()->duplicate< Type >(),
+        assignmentToken(),
+        leftBraceToken(),
+        definitions()->duplicate< Definitions >(),
+        rightBraceToken() );
+
+    TemplateTypeDefinition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // ImplementDefinition
@@ -846,15 +1080,16 @@ void FeatureDefinition::accept( Visitor& visitor )
 
 ImplementDefinition::ImplementDefinition(
     const Token::Ptr& implementToken,
-    const IdentifierPath::Ptr& feature,
+    const VariableDefinitions::Ptr& templateSymbols,
+    const Type::Ptr& featureType,
     const Token::Ptr& forToken,
-    const Identifier::Ptr& identifier,
+    const Type::Ptr& domainType,
     const Token::Ptr& assignmentToken,
     const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
     const Token::Ptr& rightBraceToken )
-: Definition( Node::ID::IMPLEMENT_DEFINITION, identifier )
-, m_feature( feature )
+: TemplateTypeDefinition( Node::ID::IMPLEMENT_DEFINITION, domainType, templateSymbols )
+, m_featureType( featureType )
 , m_definitions( definitions )
 , m_implementToken( implementToken )
 , m_forToken( forToken )
@@ -866,16 +1101,18 @@ ImplementDefinition::ImplementDefinition(
 
 ImplementDefinition::ImplementDefinition(
     const Token::Ptr& implementToken,
-    const Identifier::Ptr& identifier,
+    const VariableDefinitions::Ptr& templateSymbols,
+    const Type::Ptr& domainType,
     const Token::Ptr& assignmentToken,
     const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
     const Token::Ptr& rightBraceToken )
 : ImplementDefinition(
       implementToken,
-      unresolvedIdentifierPath,
-      unresolvedToken,
-      identifier,
+      templateSymbols,
+      domainType,  // domainType is featureType
+      Token::unresolved(),
+      domainType,
       assignmentToken,
       leftBraceToken,
       definitions,
@@ -883,9 +1120,9 @@ ImplementDefinition::ImplementDefinition(
 {
 }
 
-const IdentifierPath::Ptr& ImplementDefinition::feature( void ) const
+const Type::Ptr& ImplementDefinition::featureType( void ) const
 {
-    return m_feature;
+    return m_featureType;
 }
 
 const Definitions::Ptr& ImplementDefinition::definitions( void ) const
@@ -928,35 +1165,75 @@ void ImplementDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr ImplementDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< ImplementDefinition >(
+        implementToken(),
+        templateSymbols()->duplicate< VariableDefinitions >(),
+        featureType()->duplicate< Type >(),
+        forToken(),
+        domainType()->duplicate< Type >(),
+        assignmentToken(),
+        leftBraceToken(),
+        definitions()->duplicate< Definitions >(),
+        rightBraceToken() );
+
+    TemplateTypeDefinition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // BuiltinDefinition
 //
 
 BuiltinDefinition::BuiltinDefinition(
-    const Identifier::Ptr& name,
-    const libcasm_ir::Value::ID builtinId,
-    const libcasm_ir::RelationType::Ptr& builtinType )
-: Definition( Node::ID::BUILTIN_DEFINITION, name )
-, m_builtinId( builtinId )
-, m_builtinType( builtinType )
+    const Token::Ptr& builtinToken,
+    const VariableDefinitions::Ptr& templateSymbols,
+    const RelationType::Ptr& domainType )
+: TemplateTypeDefinition( Node::ID::BUILTIN_DEFINITION, domainType, templateSymbols )
+, m_builtinToken( builtinToken )
+, m_targetId( libcasm_ir::Value::_SIZE_ )
 {
-    setType( targetBuiltinType() );
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    setProperty( libcasm_ir::Property::PURE );
 }
 
-libcasm_ir::Value::ID BuiltinDefinition::targetBuiltinId( void ) const
+const Token::Ptr& BuiltinDefinition::builtinToken( void ) const
 {
-    return m_builtinId;
+    return m_builtinToken;
 }
 
-const libcasm_ir::RelationType::Ptr& BuiltinDefinition::targetBuiltinType( void ) const
+const RelationType& BuiltinDefinition::relationType( void ) const
 {
-    return m_builtinType;
+    return static_cast< const RelationType& >( *domainType() );
+}
+
+libcasm_ir::Value::ID BuiltinDefinition::targetId( void ) const
+{
+    assert( m_targetId != libcasm_ir::Value::_SIZE_ );
+    return m_targetId;
+}
+
+void BuiltinDefinition::setTargetId( const libcasm_ir::Value::ID targetId )
+{
+    m_targetId = targetId;
 }
 
 void BuiltinDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr BuiltinDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< BuiltinDefinition >(
+        builtinToken(),
+        templateSymbols()->duplicate< VariableDefinitions >(),
+        relationType().duplicate< RelationType >() );
+
+    TemplateTypeDefinition::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -965,13 +1242,16 @@ void BuiltinDefinition::accept( Visitor& visitor )
 //
 
 InitDefinition::InitDefinition( const Token::Ptr& initToken, const IdentifierPath::Ptr& initPath )
-: Definition( Node::ID::INIT_DEFINITION, initDefinitionIdentifier )
+: Definition(
+      Node::ID::INIT_DEFINITION,
+      Ast::make< Identifier >( initToken->sourceLocation(), initToken->tokenString() ) )
 , m_initPath( initPath )
 , m_initializers( std::make_shared< Initializers >() )
 , m_initToken( initToken )
-, m_leftBraceToken( unresolvedToken )
-, m_rightBraceToken( unresolvedToken )
+, m_leftBraceToken( Token::unresolved() )
+, m_rightBraceToken( Token::unresolved() )
 , m_programFunction( nullptr )
+, m_agentDefinition( nullptr )
 {
 }
 
@@ -980,13 +1260,16 @@ InitDefinition::InitDefinition(
     const Token::Ptr& leftBraceToken,
     const Initializers::Ptr& initializers,
     const Token::Ptr& rightBraceToken )
-: Definition( Node::ID::INIT_DEFINITION, initDefinitionIdentifier )
+: Definition(
+      Node::ID::INIT_DEFINITION,
+      Ast::make< Identifier >( initToken->sourceLocation(), initToken->tokenString() ) )
 , m_initPath( nullptr )
 , m_initializers( initializers )
 , m_initToken( initToken )
 , m_leftBraceToken( leftBraceToken )
 , m_rightBraceToken( rightBraceToken )
 , m_programFunction( nullptr )
+, m_agentDefinition( nullptr )
 {
 }
 
@@ -1026,6 +1309,16 @@ const FunctionDefinition::Ptr& InitDefinition::programFunction( void ) const
     return m_programFunction;
 }
 
+void InitDefinition::setAgentDefinition( const Definition::Ptr& agentDefinition )
+{
+    m_agentDefinition = agentDefinition;
+}
+
+const Definition::Ptr& InitDefinition::agentDefinition( void ) const
+{
+    return m_agentDefinition;
+}
+
 u1 InitDefinition::isSingleAgent( void ) const
 {
     return m_initPath != nullptr;
@@ -1036,13 +1329,31 @@ void InitDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr InitDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< InitDefinition >(
+        initToken(),
+        leftBraceToken(),
+        initializers()->duplicate< Initializers >(),
+        rightBraceToken() );
+
+    Definition::clone( *duplicate );
+    duplicate->setProgramFunction( programFunction() );
+    duplicate->setAgentDefinition( agentDefinition() );
+    return duplicate;
+}
+
 //
 //
 // ImportDefinition
 //
 
 ImportDefinition::ImportDefinition( const Token::Ptr& importToken, const IdentifierPath::Ptr& path )
-: ImportDefinition( importToken, path, unresolvedToken, std::make_shared< Identifier >() )
+: ImportDefinition(
+      importToken,
+      path,
+      Token::unresolved(),
+      Ast::make< Identifier >( path->sourceLocation(), path->path() ) )
 {
 }
 
@@ -1076,6 +1387,18 @@ const Token::Ptr& ImportDefinition::asToken( void ) const
 void ImportDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr ImportDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< ImportDefinition >(
+        importToken(),
+        path()->duplicate< IdentifierPath >(),
+        asToken(),
+        identifier()->duplicate< Identifier >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
 }
 
 //
