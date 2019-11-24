@@ -179,6 +179,17 @@ namespace libcasm_fe
 
             virtual void accept( Visitor& visitor ) = 0;
 
+            template < typename T >
+            typename T::Ptr duplicate( void ) const
+            {
+                return std::static_pointer_cast< T >( clone() );
+            }
+
+          protected:
+            virtual Node::Ptr clone( void ) const = 0;
+
+            void clone( Node& duplicate ) const;
+
           private:
             const ID m_id;
             libstdhl::SourceLocation m_sourceLocation;
@@ -210,6 +221,18 @@ namespace libcasm_fe
                     node->accept( visitor );
                 }
             }
+
+            Node::Ptr clone( void ) const override final
+            {
+                auto duplicate = std::make_shared< NodeList< T > >();
+                for( const auto& element : *this )
+                {
+                    const auto duplicateElement = element->template duplicate< T >();
+                    duplicate->add( duplicateElement );
+                }
+                Node::clone( *duplicate );
+                return duplicate;
+            }
         };
 
         class TypedNode : public Node
@@ -221,6 +244,9 @@ namespace libcasm_fe
 
             void setType( const libcasm_ir::Type::Ptr& type );
             const libcasm_ir::Type::Ptr& type( void ) const;
+
+          protected:
+            void clone( TypedNode& duplicate ) const;
 
           private:
             libcasm_ir::Type::Ptr m_type;
@@ -237,9 +263,20 @@ namespace libcasm_fe
             void setProperties( const libcasm_ir::Properties& properties );
             const libcasm_ir::Properties& properties( void ) const;
 
+          protected:
+            void clone( TypedPropertyNode& duplicate ) const;
+
           private:
             libcasm_ir::Properties m_properties;
         };
+
+        template < typename T, typename... Args >
+        typename T::Ptr make( const libstdhl::SourceLocation& sourceLocation, Args&&... args )
+        {
+            auto node = std::make_shared< T >( std::forward< Args >( args )... );
+            node->setSourceLocation( sourceLocation );
+            return node;
+        }
     }
 }
 

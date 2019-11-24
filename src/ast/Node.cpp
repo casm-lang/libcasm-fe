@@ -379,6 +379,11 @@ std::string Node::description( void ) const
     return std::string();
 }
 
+void Node::clone( Node& duplicate ) const
+{
+    duplicate.setSourceLocation( sourceLocation() );
+}
+
 //
 //
 // TypedNode
@@ -398,6 +403,12 @@ void TypedNode::setType( const libcasm_ir::Type::Ptr& type )
 const libcasm_ir::Type::Ptr& TypedNode::type( void ) const
 {
     return m_type;
+}
+
+void TypedNode::clone( TypedNode& duplicate ) const
+{
+    Node::clone( duplicate );
+    // duplicate.setType( type() ); // TODO: FIXME: @ppaulweber
 }
 
 //
@@ -424,6 +435,12 @@ void TypedPropertyNode::setProperties( const libcasm_ir::Properties& properties 
 const libcasm_ir::Properties& TypedPropertyNode::properties( void ) const
 {
     return m_properties;
+}
+
+void TypedPropertyNode::clone( TypedPropertyNode& duplicate ) const
+{
+    TypedNode::clone( duplicate );
+    duplicate.setProperties( properties() );
 }
 
 //
