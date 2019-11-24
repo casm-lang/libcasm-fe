@@ -69,6 +69,9 @@ namespace libcasm_fe
             void setRightBrace( const Token::Ptr& rightBrace );
             const Token::Ptr& rightBrace( void ) const;
 
+          protected:
+            void clone( Attribute& duplicate ) const;
+
           private:
             const Identifier::Ptr m_identifier;
             Token::Ptr m_leftBrace;
@@ -85,6 +88,8 @@ namespace libcasm_fe
             explicit BasicAttribute( const Identifier::Ptr& identifier );
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
         };
 
         class ExpressionAttribute final : public Attribute
@@ -98,6 +103,8 @@ namespace libcasm_fe
             const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Expression::Ptr m_expression;

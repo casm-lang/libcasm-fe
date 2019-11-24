@@ -54,6 +54,11 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+//
+//
+// Attribute
+//
+
 Attribute::Attribute( Node::ID type, const Identifier::Ptr& identifier )
 : Node( type )
 , m_identifier( identifier )
@@ -89,6 +94,18 @@ const Token::Ptr& Attribute::rightBrace( void ) const
     return m_rightBrace;
 }
 
+void Attribute::clone( Attribute& duplicate ) const
+{
+    Node::clone( duplicate );
+    duplicate.setLeftBrace( leftBrace() );
+    duplicate.setRightBrace( rightBrace() );
+}
+
+//
+//
+// BasicAttribute
+//
+
 BasicAttribute::BasicAttribute( const Identifier::Ptr& identifier )
 : Attribute( Node::ID::BASIC_ATTRIBUTE, identifier )
 {
@@ -98,6 +115,19 @@ void BasicAttribute::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+Node::Ptr BasicAttribute::clone( void ) const
+{
+    auto duplicate = std::make_shared< BasicAttribute >( identifier()->duplicate< Identifier >() );
+
+    Attribute::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//
+// ExpressionAttribute
+//
 
 ExpressionAttribute::ExpressionAttribute(
     const Identifier::Ptr& identifier, const Expression::Ptr& expression )
@@ -115,3 +145,22 @@ void ExpressionAttribute::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+Node::Ptr ExpressionAttribute::clone( void ) const
+{
+    auto duplicate = std::make_shared< ExpressionAttribute >(
+        identifier()->duplicate< Identifier >(), expression()->duplicate< Expression >() );
+
+    Attribute::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//
