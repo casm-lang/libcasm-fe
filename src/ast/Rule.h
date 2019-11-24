@@ -67,7 +67,10 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Rule >;
 
-            using Node::Node;
+            Rule( const Node::ID id );
+
+          protected:
+            void clone( Rule& duplicate ) const;
         };
 
         using Rules = NodeList< Rule >;
@@ -84,6 +87,8 @@ namespace libcasm_fe
             const Token::Ptr& skipToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Token::Ptr m_skipToken;
@@ -120,6 +125,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Expression::Ptr m_condition;
             const Rule::Ptr m_thenRule;
@@ -140,6 +147,9 @@ namespace libcasm_fe
 
             const Token::Ptr& colonToken( void ) const;
 
+          protected:
+            void clone( Case& duplicate ) const;
+
           private:
             const Rule::Ptr m_rule;
             const Token::Ptr m_colonToken;
@@ -159,6 +169,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Token::Ptr m_labelToken;
         };
@@ -176,6 +188,8 @@ namespace libcasm_fe
             const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Expression::Ptr m_expression;
@@ -207,6 +221,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Expression::Ptr m_expression;
             const Cases::Ptr m_cases;
@@ -235,6 +251,8 @@ namespace libcasm_fe
             const Token::Ptr& inToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const VariableBindings::Ptr m_variableBindings;
@@ -308,6 +326,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const std::shared_ptr< VariableDefinitions > m_variables;
             const Expression::Ptr m_universe;
@@ -344,6 +364,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const std::shared_ptr< VariableDefinitions > m_variables;
             const Expression::Ptr m_universe;
@@ -365,6 +387,8 @@ namespace libcasm_fe
             const Token::Ptr& iterateToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Rule::Ptr m_rule;
@@ -388,6 +412,8 @@ namespace libcasm_fe
             const Token::Ptr& rightBraceToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Rules::Ptr m_rules;
@@ -413,6 +439,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Rules::Ptr m_rules;
             const Token::Ptr m_leftBraceToken;
@@ -436,6 +464,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const CallExpression::Ptr m_function;
             const Expression::Ptr m_expression;
@@ -454,6 +484,8 @@ namespace libcasm_fe
             const CallExpression::Ptr& call( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const CallExpression::Ptr m_call;
@@ -478,6 +510,8 @@ namespace libcasm_fe
             const Token::Ptr& doToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Expression::Ptr m_condition;

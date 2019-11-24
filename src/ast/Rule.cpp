@@ -56,6 +56,21 @@ using namespace Ast;
 
 //
 //
+// Rule
+//
+
+Rule::Rule( const Node::ID id )
+: Node( id )
+{
+}
+
+void Rule::clone( Rule& duplicate ) const
+{
+    Node::clone( duplicate );
+}
+
+//
+//
 // SkipRule
 //
 
@@ -78,6 +93,14 @@ const Token::Ptr& SkipRule::skipToken( void ) const
 void SkipRule::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr SkipRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< SkipRule >( skipToken() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -147,6 +170,20 @@ void ConditionalRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr ConditionalRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< ConditionalRule >(
+        ifToken(),
+        condition()->duplicate< Expression >(),
+        thenToken(),
+        thenRule()->duplicate< Rule >(),
+        elseToken(),
+        elseRule()->duplicate< Rule >() );
+
+    Node::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // Case
@@ -167,6 +204,11 @@ const Rule::Ptr& Case::rule( void ) const
 const Token::Ptr& Case::colonToken( void ) const
 {
     return m_colonToken;
+}
+
+void Case::clone( Case& duplicate ) const
+{
+    Node::clone( duplicate );
 }
 
 //
@@ -191,6 +233,15 @@ void DefaultCase::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr DefaultCase::clone( void ) const
+{
+    auto duplicate =
+        std::make_shared< DefaultCase >( labelToken(), colonToken(), rule()->duplicate< Rule >() );
+
+    Case::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // ExpressionCase
@@ -211,6 +262,15 @@ const Expression::Ptr& ExpressionCase::expression( void ) const
 void ExpressionCase::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr ExpressionCase::clone( void ) const
+{
+    auto duplicate = std::make_shared< ExpressionCase >(
+        expression()->duplicate< Expression >(), colonToken(), rule()->duplicate< Rule >() );
+
+    Case::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -268,6 +328,20 @@ const Token::Ptr& CaseRule::rightBraceToken( void ) const
 void CaseRule::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr CaseRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< CaseRule >(
+        caseToken(),
+        expression()->duplicate< Expression >(),
+        ofToken(),
+        leftBraceToken(),
+        cases()->duplicate< Cases >(),
+        rightBraceToken() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -354,6 +428,18 @@ const Token::Ptr& LocalRule::inToken( void ) const
 void LocalRule::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr LetRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< LetRule >(
+        letToken(),
+        variableBindings()->duplicate< VariableBindings >(),
+        inToken(),
+        rule()->duplicate< Rule >() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -447,6 +533,22 @@ void ForallRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr ForallRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< ForallRule >(
+        forallToken(),
+        variables()->duplicate< VariableDefinitions >(),
+        inToken(),
+        universe()->duplicate< Expression >(),
+        withToken(),
+        condition()->duplicate< Expression >(),
+        doToken(),
+        rule()->duplicate< Rule >() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // ChooseRule
@@ -504,6 +606,20 @@ void ChooseRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr ChooseRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< ChooseRule >(
+        chooseToken(),
+        variables()->duplicate< VariableDefinitions >(),
+        inToken(),
+        universe()->duplicate< Expression >(),
+        doToken(),
+        rule()->duplicate< Rule >() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // IterateRule
@@ -529,6 +645,14 @@ const Token::Ptr& IterateRule::iterateToken( void ) const
 void IterateRule::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr IterateRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< IterateRule >( iterateToken(), rule()->duplicate< Rule >() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -565,6 +689,15 @@ void BlockRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr BlockRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< BlockRule >(
+        leftBraceToken(), rules()->duplicate< Rules >(), rightBraceToken() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // SequenceRule
@@ -597,6 +730,15 @@ const Token::Ptr& SequenceRule::rightBraceToken( void ) const
 void SequenceRule::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr SequenceRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< SequenceRule >(
+        leftBraceToken(), rules()->duplicate< Rules >(), rightBraceToken() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -635,6 +777,17 @@ void UpdateRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr UpdateRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< UpdateRule >(
+        function()->duplicate< CallExpression >(),
+        updateToken(),
+        expression()->duplicate< Expression >() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // CallRule
@@ -654,6 +807,14 @@ const CallExpression::Ptr& CallRule::call( void ) const
 void CallRule::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr CallRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< CallRule >( call()->duplicate< CallExpression >() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -697,6 +858,18 @@ const Token::Ptr& WhileRule::doToken( void ) const
 void WhileRule::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr WhileRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< WhileRule >(
+        whileToken(),
+        condition()->duplicate< Expression >(),
+        doToken(),
+        rule()->duplicate< Rule >() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
 }
 
 //
