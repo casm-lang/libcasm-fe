@@ -133,6 +133,20 @@ void Declaration::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr Declaration::clone( void ) const
+{
+    auto duplicate = std::make_shared< Declaration >(
+        kindToken(),
+        identifier()->duplicate< Identifier >(),
+        colonToken(),
+        argumentTypes()->duplicate< Types >(),
+        mapsToken(),
+        returnType()->duplicate< Type >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //  Local variables:
 //  mode: c++

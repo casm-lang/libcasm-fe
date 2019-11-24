@@ -86,6 +86,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Types::Ptr m_argumentTypes;
             const Type::Ptr m_returnType;
