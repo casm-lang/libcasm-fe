@@ -91,6 +91,12 @@ const Token::Ptr& Helper::delimiterToken( void ) const
     return m_delimiterToken;
 }
 
+void Helper::clone( Helper& duplicate ) const
+{
+    Node::clone( duplicate );
+    duplicate.setDelimiterToken( delimiterToken() );
+}
+
 //
 //
 // Defined
@@ -120,6 +126,18 @@ const Token::Ptr& Defined::definedToken( void ) const
 void Defined::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr Defined::clone( void ) const
+{
+    auto duplicate = std::make_shared< Defined >(
+        definedToken(),
+        leftBraceToken(),
+        expression()->duplicate< Expression >(),
+        rightBraceToken() );
+
+    Helper::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -194,6 +212,20 @@ void Initializer::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr Initializer::clone( void ) const
+{
+    auto duplicate = std::make_shared< Initializer >(
+        leftBraceToken(),
+        arguments()->duplicate< Expressions >(),
+        rightBraceToken(),
+        mapsToken(),
+        value()->duplicate< Expression >() );
+
+    Helper::clone( *duplicate );
+    duplicate->m_updateRule = updateRule()->duplicate< UpdateRule >();
+    return duplicate;
+}
+
 //
 //
 // Initially
@@ -223,6 +255,18 @@ const Token::Ptr& Initially::initiallyToken( void ) const
 void Initially::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr Initially::clone( void ) const
+{
+    auto duplicate = std::make_shared< Initially >(
+        initiallyToken(),
+        leftBraceToken(),
+        initializers()->duplicate< Initializers >(),
+        rightBraceToken() );
+
+    Helper::clone( *duplicate );
+    return duplicate;
 }
 
 //

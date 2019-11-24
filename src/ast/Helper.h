@@ -72,6 +72,9 @@ namespace libcasm_fe
             void setDelimiterToken( const Token::Ptr& delimiterToken );
             const Token::Ptr& delimiterToken( void ) const;
 
+          protected:
+            void clone( Helper& duplicate ) const;
+
           private:
             const Token::Ptr m_leftBraceToken;
             const Token::Ptr m_rightBraceToken;
@@ -94,6 +97,8 @@ namespace libcasm_fe
             const Token::Ptr& definedToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Expression::Ptr m_expression;
@@ -124,6 +129,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Expressions::Ptr m_arguments;
             const Expression::Ptr m_value;
@@ -149,6 +156,8 @@ namespace libcasm_fe
             const Token::Ptr& initiallyToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Initializers::Ptr m_initializers;
