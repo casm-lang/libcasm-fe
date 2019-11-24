@@ -67,15 +67,24 @@ void RecursiveVisitor::visit( InitDefinition& node )
 {
     node.attributes()->accept( *this );
     node.initToken()->accept( *this );
-    if( node.isSingleAgent() )
+
+    if( node.initPath() )
     {
         node.initPath()->accept( *this );
     }
-    else
+
+    node.leftBraceToken()->accept( *this );
+    node.initializers()->accept( *this );
+    node.rightBraceToken()->accept( *this );
+
+    if( node.agentDefinition() )
     {
-        node.leftBraceToken()->accept( *this );
-        node.initializers()->accept( *this );
-        node.rightBraceToken()->accept( *this );
+        node.agentDefinition()->accept( *this );
+    }
+
+    if( node.programFunction() )
+    {
+        node.programFunction()->accept( *this );
     }
 }
 
@@ -159,11 +168,13 @@ void RecursiveVisitor::visit( EnumerationDefinition& node )
 {
     node.attributes()->accept( *this );
     node.enumerationToken()->accept( *this );
-    node.identifier()->accept( *this );
+    node.templateSymbols()->accept( *this );
+    node.domainType()->accept( *this );
     node.assignmentToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
     node.enumerators()->accept( *this );
     node.rightBraceToken()->accept( *this );
+    node.templateInstances()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UsingDefinition& node )
@@ -208,48 +219,60 @@ void RecursiveVisitor::visit( ImportDefinition& node )
 void RecursiveVisitor::visit( DomainDefinition& node )
 {
     node.attributes()->accept( *this );
-    node.typeNode()->accept( *this );
+    node.domainToken()->accept( *this );
+    node.templateSymbols()->accept( *this );
+    node.domainType()->accept( *this );
+    node.templateInstances()->accept( *this );
 }
 
 void RecursiveVisitor::visit( StructureDefinition& node )
 {
     node.attributes()->accept( *this );
     node.structureToken()->accept( *this );
-    node.identifier()->accept( *this );
+    node.templateSymbols()->accept( *this );
+    node.domainType()->accept( *this );
     node.assignmentToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
     node.functions()->accept( *this );
     node.rightBraceToken()->accept( *this );
+    node.templateInstances()->accept( *this );
 }
 
 void RecursiveVisitor::visit( FeatureDefinition& node )
 {
     node.attributes()->accept( *this );
     node.featureToken()->accept( *this );
-    node.identifier()->accept( *this );
+    node.templateSymbols()->accept( *this );
+    node.domainType()->accept( *this );
     node.assignmentToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
     node.definitions()->accept( *this );
     node.rightBraceToken()->accept( *this );
+    node.templateInstances()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ImplementDefinition& node )
 {
     node.attributes()->accept( *this );
     node.implementToken()->accept( *this );
-    node.feature()->accept( *this );
+    node.templateSymbols()->accept( *this );
+    node.featureType()->accept( *this );
     node.forToken()->accept( *this );
-    node.identifier()->accept( *this );
+    node.domainType()->accept( *this );
     node.assignmentToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
     node.definitions()->accept( *this );
     node.rightBraceToken()->accept( *this );
+    node.templateInstances()->accept( *this );
 }
 
 void RecursiveVisitor::visit( BuiltinDefinition& node )
 {
     node.attributes()->accept( *this );
-    node.identifier()->accept( *this );
+    node.builtinToken()->accept( *this );
+    node.templateSymbols()->accept( *this );
+    node.domainType()->accept( *this );
+    node.templateInstances()->accept( *this );
 }
 
 void RecursiveVisitor::visit( Declaration& node )
