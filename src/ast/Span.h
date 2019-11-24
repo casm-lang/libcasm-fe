@@ -68,6 +68,7 @@ namespace libcasm_fe
         {
           public:
             using Ptr = std::shared_ptr< Span >;
+
             Span( const Grammar::Span kind, const std::size_t length );
 
             const Grammar::Span kind( void ) const;
@@ -79,6 +80,8 @@ namespace libcasm_fe
             std::string toString( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Grammar::Span m_kind;

@@ -134,6 +134,14 @@ void Span::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr Span::clone( void ) const
+{
+    auto duplicate = std::make_shared< Span >( kind(), length() );
+
+    Node::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //  Local variables:
 //  mode: c++
