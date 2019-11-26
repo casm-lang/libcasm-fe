@@ -237,10 +237,26 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( ChooseRule& node ) override;
 
   private:
-    void pushVariable( const VariableDefinition::Ptr& variable );
-    void pushVariables( const VariableDefinitions::Ptr& variables );
-    void popVariable( const VariableDefinition::Ptr& variable );
-    void popVariables( const VariableDefinitions::Ptr& variables );
+    void pushSymbol( const Definition::Ptr& symbol );
+    void popSymbol( const Definition::Ptr& symbol );
+
+    template < typename T >
+    void pushSymbols( const typename NodeList< T >::Ptr& symbols )
+    {
+        for( const auto& symbol : *symbols )
+        {
+            pushSymbol( symbol );
+        }
+    }
+
+    template < typename T >
+    void popSymbols( const typename NodeList< T >::Ptr& symbols )
+    {
+        for( const auto& symbol : *symbols )
+        {
+            popSymbol( symbol );
+        }
+    }
 
     void pushVariableBindings( const VariableBindings::Ptr& variableBindings );
     void popVariableBindings( const VariableBindings::Ptr& variableBindings );
@@ -258,13 +274,13 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 
-    std::unordered_map< std::string, VariableDefinition::Ptr > m_variables;
+    std::unordered_map< std::string, Definition::Ptr > m_scopeSymbols;
 };
 
 SymbolResolveVisitor::SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
-, m_variables()
+, m_scopeSymbols()
 {
 }
 
@@ -276,16 +292,16 @@ void SymbolResolveVisitor::visit( InitDefinition& node )
 
 void SymbolResolveVisitor::visit( DerivedDefinition& node )
 {
-    pushVariables( node.arguments() );
+    pushSymbols< VariableDefinition >( node.arguments() );
     node.expression()->accept( *this );
-    popVariables( node.arguments() );
+    popSymbols< VariableDefinition >( node.arguments() );
 }
 
 void SymbolResolveVisitor::visit( RuleDefinition& node )
 {
-    pushVariables( node.arguments() );
+    pushSymbols< VariableDefinition >( node.arguments() );
     node.rule()->accept( *this );
-    popVariables( node.arguments() );
+    popSymbols< VariableDefinition >( node.arguments() );
 }
 
 void SymbolResolveVisitor::visit( ReferenceLiteral& node )
@@ -359,15 +375,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         }
     };
 
-    const auto variableIt = m_variables.find( name );
-    if( variableIt != m_variables.cend() )
-    {
-        node.setTargetType( DirectCallExpression::TargetType::VARIABLE );
-        node.setTargetDefinition( variableIt->second );
-        validateArgumentsCount( "variable", 0 );
-        return;
-    }
-
     if( libcasm_ir::Builtin::available( name ) )
     {
         const auto& annotation = libcasm_ir::Annotation::find( name );
@@ -387,6 +394,12 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         switch( symbol->id() )
         {
+            case Node::ID::VARIABLE_DEFINITION:
+            {
+                node.setTargetType( DirectCallExpression::TargetType::VARIABLE );
+                expectedNumberOfArguments = 0;
+                break;
+            }
             case Node::ID::FUNCTION_DEFINITION:
             {
                 node.setTargetType( DirectCallExpression::TargetType::FUNCTION );
@@ -464,6 +477,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
 void SymbolResolveVisitor::visit( LetExpression& node )
 {
+    node.variableBindings()->accept( *this );
+
     pushVariableBindings( node.variableBindings() );
     node.expression()->accept( *this );
     popVariableBindings( node.variableBindings() );
@@ -473,31 +488,33 @@ void SymbolResolveVisitor::visit( ChooseExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushVariables( node.variables() );
+    pushSymbols< VariableDefinition >( node.variables() );
     node.expression()->accept( *this );
-    popVariables( node.variables() );
+    popSymbols< VariableDefinition >( node.variables() );
 }
 
 void SymbolResolveVisitor::visit( UniversalQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushVariables( node.predicateVariables() );
+    pushSymbols< VariableDefinition >( node.predicateVariables() );
     node.proposition()->accept( *this );
-    popVariables( node.predicateVariables() );
+    popSymbols< VariableDefinition >( node.predicateVariables() );
 }
 
 void SymbolResolveVisitor::visit( ExistentialQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushVariables( node.predicateVariables() );
+    pushSymbols< VariableDefinition >( node.predicateVariables() );
     node.proposition()->accept( *this );
-    popVariables( node.predicateVariables() );
+    popSymbols< VariableDefinition >( node.predicateVariables() );
 }
 
 void SymbolResolveVisitor::visit( LetRule& node )
 {
+    node.variableBindings()->accept( *this );
+
     pushVariableBindings( node.variableBindings() );
     node.rule()->accept( *this );
     popVariableBindings( node.variableBindings() );
@@ -507,68 +524,50 @@ void SymbolResolveVisitor::visit( ForallRule& node )
 {
     node.universe()->accept( *this );
 
-    pushVariables( node.variables() );
+    pushSymbols< VariableDefinition >( node.variables() );
     node.condition()->accept( *this );
     node.rule()->accept( *this );
-    popVariables( node.variables() );
+    popSymbols< VariableDefinition >( node.variables() );
 }
 
 void SymbolResolveVisitor::visit( ChooseRule& node )
 {
     node.universe()->accept( *this );
 
-    pushVariables( node.variables() );
+    pushSymbols< VariableDefinition >( node.variables() );
     node.rule()->accept( *this );
-    popVariables( node.variables() );
+    popSymbols< VariableDefinition >( node.variables() );
 }
 
-void SymbolResolveVisitor::pushVariable( const VariableDefinition::Ptr& variable )
+void SymbolResolveVisitor::pushSymbol( const Definition::Ptr& symbol )
 {
-    const auto& name = variable->identifier()->name();
+    const auto& name = symbol->identifier()->name();
 
-    const auto result = m_variables.emplace( name, variable );
+    const auto result = m_scopeSymbols.emplace( name, symbol );
     if( not result.second )
     {
         m_log.error(
-            { variable->sourceLocation() },
+            { symbol->sourceLocation() },
             "redefinition of symbol '" + name + "'",
             Code::SymbolAlreadyDefined );
 
-        const auto& existingVariable = result.first->second;
+        const auto& existingSymbol = result.first->second;
         m_log.info(
-            { existingVariable->sourceLocation() },
-            "previous definition of '" + name + "' is here" );
+            { existingSymbol->sourceLocation() }, "previous definition of '" + name + "' is here" );
     }
 }
 
-void SymbolResolveVisitor::pushVariables( const VariableDefinitions::Ptr& variables )
+void SymbolResolveVisitor::popSymbol( const Definition::Ptr& symbol )
 {
-    for( const auto& variable : *variables )
-    {
-        pushVariable( variable );
-    }
-}
-
-void SymbolResolveVisitor::popVariable( const VariableDefinition::Ptr& variable )
-{
-    const auto& name = variable->identifier()->name();
-    m_variables.erase( name );
-}
-
-void SymbolResolveVisitor::popVariables( const VariableDefinitions::Ptr& variables )
-{
-    for( const auto& variable : *variables )
-    {
-        popVariable( variable );
-    }
+    const auto& name = symbol->identifier()->name();
+    m_scopeSymbols.erase( name );
 }
 
 void SymbolResolveVisitor::pushVariableBindings( const VariableBindings::Ptr& variableBindings )
 {
     for( const auto& variableBinding : *variableBindings )
     {
-        variableBinding->expression()->accept( *this );
-        pushVariable( variableBinding->variable() );
+        pushSymbol( variableBinding->variable() );
     }
 }
 
@@ -576,7 +575,7 @@ void SymbolResolveVisitor::popVariableBindings( const VariableBindings::Ptr& var
 {
     for( const auto& variableBinding : *variableBindings )
     {
-        popVariable( variableBinding->variable() );
+        popSymbol( variableBinding->variable() );
     }
 }
 
@@ -603,6 +602,13 @@ Definition::Ptr SymbolResolveVisitor::resolveIfAlias( const Definition::Ptr& def
 Definition::Ptr SymbolResolveVisitor::tryResolveSymbol( const IdentifierPath& identifierPath ) const
 {
     const auto name = identifierPath.path();
+
+    const auto scopeSymbolIt = m_scopeSymbols.find( name );
+    if( scopeSymbolIt != m_scopeSymbols.cend() )
+    {
+        return scopeSymbolIt->second;
+    }
+
     const auto maybeSymbol = m_symboltable.findSymbol( identifierPath );
     const auto symbol = maybeSymbol.first;
     const auto accessible = maybeSymbol.second;

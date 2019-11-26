@@ -48,7 +48,7 @@
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
-#include <libcasm-fe/ast/RecursiveVisitor>
+#include <libcasm-fe/ast/EmptyVisitor>
 
 #include <libcasm-fe/analyze/AttributionPass>
 #include <libcasm-fe/transform/SourceToAstPass>
@@ -70,7 +70,7 @@ static libpass::PassRegistration< SymbolRegistrationPass > PASS(
     "ast-sym-reg",
     0 );
 
-class SymbolRegistrationVisitor final : public RecursiveVisitor
+class SymbolRegistrationVisitor final : public EmptyVisitor
 {
   public:
     SymbolRegistrationVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
@@ -245,29 +245,21 @@ void SymbolRegistrationVisitor::visit( InitDefinition& node )
     }
 
     registerSymbol( *node.programFunction() );
-
-    RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 {
     registerSymbol( node );
-
-    RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 {
     registerSymbol( node );
-
-    RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( RuleDefinition& node )
 {
     registerSymbol( node );
-
-    RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
@@ -320,8 +312,6 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 void SymbolRegistrationVisitor::visit( UsingDefinition& node )
 {
     registerSymbol( node );
-
-    RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::registerSymbol( Definition& node )

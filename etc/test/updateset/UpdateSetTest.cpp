@@ -316,3 +316,23 @@ TEST( UpdateSetTest, mergeShouldIncreaseEpochOfTargetUpdateSetIfSourceUpateSetIs
     source->mergeInto( target.get() );  // uses swap because target is empty
     EXPECT_NE( epochBeforeMerge, target->epoch() );
 }
+
+TEST(
+    UpdateSetTest, mergeWithUpdateFilterShouldIgnoreUpdatesWhichAreNotAcceptedByTheFilterPredicate )
+{
+    const auto updateSet1 =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+
+    const auto updateSet2 = std::unique_ptr< TestUpdateSet >(
+        updateSet1->fork( TestUpdateSet::Semantics::Parallel, 10UL ) );
+    updateSet2->add( 1UL, "update 1" );
+    updateSet2->add( 2UL, "update 2" );
+    updateSet2->setUpdateFilter(
+        []( const UpdateSetDetails::Location& location, const UpdateSetDetails::Value& value ) {
+            return location != 1UL;
+        } );
+    updateSet2->merge();
+
+    EXPECT_FALSE( updateSet1->lookup( 1UL ) );  // not accepted by the filter
+    EXPECT_EQ( "update 2", updateSet1->lookup( 2UL ).value() );
+}
