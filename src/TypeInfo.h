@@ -98,6 +98,7 @@ namespace libcasm_fe
         // object types
         static constexpr const char* TYPE_NAME_ENUMERATION = "enumeration";
         static constexpr const char* TYPE_NAME_OBJECT = "Object";
+        static constexpr const char* TYPE_NAME_AGENT = "Agent";
 
         static TypeInfo& instance( void )
         {

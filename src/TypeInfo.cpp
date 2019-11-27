@@ -51,6 +51,9 @@
 
 using namespace libcasm_fe;
 
+namespace IR = libcasm_ir;
+namespace MEM = libstdhl::Memory;
+
 //
 //
 // TypeInfo
@@ -58,24 +61,29 @@ using namespace libcasm_fe;
 
 TypeInfo::TypeInfo( void )
 {
-    setType( TypeInfo::TYPE_NAME_VOID, libstdhl::Memory::get< libcasm_ir::VoidType >() );
-    setType( TypeInfo::TYPE_NAME_BOOLEAN, libstdhl::Memory::get< libcasm_ir::BooleanType >() );
-    setType( TypeInfo::TYPE_NAME_INTEGER, libstdhl::Memory::get< libcasm_ir::IntegerType >() );
-    setType( TypeInfo::TYPE_NAME_STRING, libstdhl::Memory::get< libcasm_ir::StringType >() );
-    setType( TypeInfo::TYPE_NAME_DECIMAL, libstdhl::Memory::get< libcasm_ir::DecimalType >() );
-    setType( TypeInfo::TYPE_NAME_RATIONAL, libstdhl::Memory::get< libcasm_ir::RationalType >() );
-    setType( TypeInfo::TYPE_NAME_RANGE, nullptr );  // template type
-    setType( TypeInfo::TYPE_NAME_LIST, nullptr );   // template type
+    setType( TypeInfo::TYPE_NAME_VOID, MEM::get< IR::VoidType >() );
+    setType( TypeInfo::TYPE_NAME_OBJECT, MEM::get< IR::ObjectType >( TypeInfo::TYPE_NAME_OBJECT ) );
+    setType(
+        TypeInfo::TYPE_NAME_ENUMERATION,
+        MEM::get< IR::ObjectType >( TypeInfo::TYPE_NAME_ENUMERATION ) );
+
+    setType( TypeInfo::TYPE_NAME_BOOLEAN, MEM::get< IR::BooleanType >() );
+    setType( TypeInfo::TYPE_NAME_INTEGER, MEM::get< IR::IntegerType >() );
+    setType( TypeInfo::TYPE_NAME_STRING, MEM::get< IR::StringType >() );
+    setType( TypeInfo::TYPE_NAME_DECIMAL, MEM::get< IR::DecimalType >() );
+    setType( TypeInfo::TYPE_NAME_RATIONAL, MEM::get< IR::RationalType >() );
+
+    setType( TypeInfo::TYPE_NAME_BINARY, nullptr );
+    setType( TypeInfo::TYPE_NAME_RULEREF, nullptr );  // template type
+    setType( TypeInfo::TYPE_NAME_FUNCREF, nullptr );  // template type
+    setType( TypeInfo::TYPE_NAME_RANGE, nullptr );    // template type
+    setType( TypeInfo::TYPE_NAME_LIST, nullptr );     // template type
     // setType( TypeInfo::TYPE_NAME_SET, nullptr ); // TODO: FIXME: @ppaulweber: feature/set
     setType( TypeInfo::TYPE_NAME_PORT, nullptr );  // template type
     setType( TypeInfo::TYPE_NAME_FILE, nullptr );  // template type
-    setType(
-        TypeInfo::TYPE_NAME_OBJECT,
-        libstdhl::Memory::get< libcasm_ir::ObjectType >( TypeInfo::TYPE_NAME_OBJECT ) );
-    setType( TypeInfo::TYPE_NAME_ENUMERATION, getType( TypeInfo::TYPE_NAME_OBJECT ) );
 }
 
-void TypeInfo::setType( const std::string& name, const libcasm_ir::Type::Ptr& type )
+void TypeInfo::setType( const std::string& name, const IR::Type::Ptr& type )
 {
     const auto result = m_typeName2typePtr.emplace( name, type );
     if( not result.second )
@@ -84,7 +92,7 @@ void TypeInfo::setType( const std::string& name, const libcasm_ir::Type::Ptr& ty
     }
 }
 
-libcasm_ir::Type::Ptr TypeInfo::getType( const std::string& name ) const
+IR::Type::Ptr TypeInfo::getType( const std::string& name ) const
 {
     const auto it = m_typeName2typePtr.find( name );
     if( it == m_typeName2typePtr.cend() )
