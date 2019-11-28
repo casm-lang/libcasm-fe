@@ -1228,37 +1228,28 @@ CallExpression
 
 
 DirectCallExpression
-: SELF %prec CALL_WITHOUT_ARGS
+: THIS %prec CALL_WITHOUT_ARGS
   {
       const auto identifier = Ast::make< Identifier >( @1, $1->tokenString() );
       const auto identifierPath = IdentifierPath::fromIdentifier( identifier );
-      const auto arguments = Ast::make< Expressions >( @$ );
-      $$ = Ast::make< DirectCallExpression >( @$, identifierPath, arguments );
-  }
-| THIS %prec CALL_WITHOUT_ARGS
-  {
-      const auto identifier = Ast::make< Identifier >( @1, $1->tokenString() );
-      const auto identifierPath = IdentifierPath::fromIdentifier( identifier );
-      const auto arguments = Ast::make< Expressions >( @$ );
-      $$ = Ast::make< DirectCallExpression >( @$, identifierPath, arguments );
+      $$ = Ast::make< DirectCallExpression >( @$, identifierPath );
   }
 | IdentifierPath %prec CALL_WITHOUT_ARGS
   {
-      const auto arguments = Ast::make< Expressions >( @$ );
-      $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
+      $$ = Ast::make< DirectCallExpression >( @$, $1 );
   }
 | IdentifierPath LPAREN RPAREN
   {
       const auto arguments = Ast::make< Expressions >( @$ );
-      $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
-      $$->setLeftBracketToken( $2 );
-      $$->setRightBracketToken( $3 );
+      $$ = Ast::make< DirectCallExpression >( @$, $1, $2, arguments, $3 );
   }
 | IdentifierPath LPAREN Terms RPAREN
   {
-      $$ = Ast::make< DirectCallExpression >( @$, $1, $3 );
-      $$->setLeftBracketToken( $2 );
-      $$->setRightBracketToken( $4 );
+      $$ = Ast::make< DirectCallExpression >( @$, $1, $2, $3, $4 );
+  }
+| TEMPLATE TemplateSymbols IdentifierPath  LPAREN Terms RPAREN
+  {
+      $$ = Ast::make< DirectCallExpression >( @$, $1, $2, $3, $4, $5, $6 );
   }
 | IdentifierPath LPAREN error RPAREN // error recovery
   {
@@ -1848,6 +1839,11 @@ Identifier
       $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
 | CASM
+  {
+      $$ = Ast::make< Identifier >( @$, $1->tokenString() );
+      $$->setSpans( m_lexer.fetchSpansAndReset() );
+  }
+| SELF
   {
       $$ = Ast::make< Identifier >( @$, $1->tokenString() );
       $$->setSpans( m_lexer.fetchSpansAndReset() );

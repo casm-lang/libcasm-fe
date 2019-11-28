@@ -61,6 +61,7 @@ SELF            "self"
 THIS            "this"
 DOMAIN          "domain"
 BUILTIN         "builtin"
+TEMPLATE        "template"
 
 FUNCTION        "function"
 DEFINED         "defined"
