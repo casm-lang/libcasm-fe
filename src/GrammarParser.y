@@ -1652,7 +1652,7 @@ TupleType
 
 
 RecordType
-: LPAREN TypedVariables COMMA TypedVariable RPAREN
+: LCURPAREN TypedVariables COMMA TypedVariable RCURPAREN
   {
       auto namedSubTypes = $2;
       $4->setDelimiterToken( $3 );
