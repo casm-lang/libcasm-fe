@@ -128,14 +128,29 @@ SOURCE_TEST( transform, AstDumpDotPass, source, true, , );
 SOURCE_TEST( execute, NumericExecutionPass, source, true, , );  // TODO: FIXME:
 // https://github.com/casm-lang/casm/issues/93
 //
-// static const auto source_with_no_init = R"***(
-// CASM
-//
-// rule test = skip
-//
-// )***";
-//
-// SOURCE_TEST( execute, NumericExecutionPass, source_with_no_init, true, _noInitDefinition, );
+static const auto source_with_no_init = R"***(
+CASM
+
+rule test = skip
+
+)***";
+
+SOURCE_TEST( execute, NumericExecutionPass, source_with_no_init, true, _noInitDefinition, );
+
+static const auto source_with_multi_agent = R"***(
+CASM
+
+using Agent = Integer
+
+init { ( 0 ) -> @foo, ( 1 ) -> @bar }
+
+rule foo = println( self as String )
+
+rule bar = println( self as String )
+
+)***";
+
+SOURCE_TEST( execute, NumericExecutionPass, source_with_multi_agent, true, _multiAgent, );
 
 static const auto source_add = R"***(
 CASM
