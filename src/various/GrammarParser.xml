@@ -1481,7 +1481,7 @@
       <rule number="193" usefulness="useful">
         <lhs>MaybeInitially</lhs>
         <rhs>
-          <symbol>&quot;initially&quot;</symbol>
+          <symbol>&quot;=&quot;</symbol>
           <symbol>&quot;{&quot;</symbol>
           <symbol>Initializers</symbol>
           <symbol>&quot;}&quot;</symbol>
@@ -1716,177 +1716,176 @@
       <terminal symbol-number="9" token-number="264" name="&quot;invariant&quot;" usefulness="useful"/>
       <terminal symbol-number="10" token-number="265" name="&quot;import&quot;" usefulness="useful"/>
       <terminal symbol-number="11" token-number="266" name="&quot;function&quot;" usefulness="useful"/>
-      <terminal symbol-number="12" token-number="267" name="&quot;initially&quot;" usefulness="useful"/>
-      <terminal symbol-number="13" token-number="268" name="&quot;defined&quot;" usefulness="useful"/>
-      <terminal symbol-number="14" token-number="269" name="&quot;seq&quot;" usefulness="useful"/>
-      <terminal symbol-number="15" token-number="270" name="&quot;endseq&quot;" usefulness="useful"/>
-      <terminal symbol-number="16" token-number="271" name="&quot;par&quot;" usefulness="useful"/>
-      <terminal symbol-number="17" token-number="272" name="&quot;endpar&quot;" usefulness="useful"/>
-      <terminal symbol-number="18" token-number="273" name="&quot;skip&quot;" usefulness="useful"/>
-      <terminal symbol-number="19" token-number="274" name="&quot;let&quot;" usefulness="useful"/>
-      <terminal symbol-number="20" token-number="275" name="&quot;in&quot;" usefulness="useful" prec="2" assoc="precedence"/>
-      <terminal symbol-number="21" token-number="276" name="&quot;forall&quot;" usefulness="useful"/>
-      <terminal symbol-number="22" token-number="277" name="&quot;choose&quot;" usefulness="useful"/>
-      <terminal symbol-number="23" token-number="278" name="&quot;iterate&quot;" usefulness="useful"/>
-      <terminal symbol-number="24" token-number="279" name="&quot;do&quot;" usefulness="useful" prec="3" assoc="precedence"/>
-      <terminal symbol-number="25" token-number="280" name="&quot;if&quot;" usefulness="useful"/>
-      <terminal symbol-number="26" token-number="281" name="&quot;then&quot;" usefulness="useful" prec="4" assoc="precedence"/>
-      <terminal symbol-number="27" token-number="282" name="&quot;else&quot;" usefulness="useful" prec="5" assoc="precedence"/>
-      <terminal symbol-number="28" token-number="283" name="&quot;case&quot;" usefulness="useful"/>
-      <terminal symbol-number="29" token-number="284" name="&quot;of&quot;" usefulness="useful"/>
-      <terminal symbol-number="30" token-number="285" name="&quot;default&quot;" usefulness="useful"/>
-      <terminal symbol-number="31" token-number="286" name="&quot;holds&quot;" usefulness="useful" prec="6" assoc="precedence"/>
-      <terminal symbol-number="32" token-number="287" name="&quot;exists&quot;" usefulness="useful"/>
-      <terminal symbol-number="33" token-number="288" name="&quot;with&quot;" usefulness="useful" prec="6" assoc="precedence"/>
-      <terminal symbol-number="34" token-number="289" name="&quot;as&quot;" usefulness="useful"/>
-      <terminal symbol-number="35" token-number="290" name="&quot;while&quot;" usefulness="useful"/>
-      <terminal symbol-number="36" token-number="291" name="&quot;undef&quot;" usefulness="useful"/>
-      <terminal symbol-number="37" token-number="292" name="&quot;false&quot;" usefulness="useful"/>
-      <terminal symbol-number="38" token-number="293" name="&quot;true&quot;" usefulness="useful"/>
-      <terminal symbol-number="39" token-number="294" name="&quot;and&quot;" usefulness="useful" prec="12" assoc="left"/>
-      <terminal symbol-number="40" token-number="295" name="&quot;or&quot;" usefulness="useful" prec="10" assoc="left"/>
-      <terminal symbol-number="41" token-number="296" name="&quot;xor&quot;" usefulness="useful" prec="11" assoc="left"/>
-      <terminal symbol-number="42" token-number="297" name="&quot;implies&quot;" usefulness="useful" prec="9" assoc="left"/>
-      <terminal symbol-number="43" token-number="298" name="&quot;not&quot;" usefulness="useful" prec="20" assoc="precedence"/>
-      <terminal symbol-number="44" token-number="299" name="&quot;+&quot;" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="45" token-number="300" name="&quot;-&quot;" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="46" token-number="301" name="&quot;=&quot;" usefulness="useful" prec="13" assoc="left"/>
-      <terminal symbol-number="47" token-number="302" name="&quot;(&quot;" usefulness="useful" prec="22" assoc="precedence"/>
-      <terminal symbol-number="48" token-number="303" name="&quot;)&quot;" usefulness="useful"/>
-      <terminal symbol-number="49" token-number="304" name="&quot;[&quot;" usefulness="useful"/>
-      <terminal symbol-number="50" token-number="305" name="&quot;]&quot;" usefulness="useful"/>
-      <terminal symbol-number="51" token-number="306" name="&quot;{&quot;" usefulness="useful"/>
-      <terminal symbol-number="52" token-number="307" name="&quot;}&quot;" usefulness="useful"/>
-      <terminal symbol-number="53" token-number="308" name="&quot;:&quot;" usefulness="useful"/>
-      <terminal symbol-number="54" token-number="309" name="&quot;::&quot;" usefulness="useful"/>
-      <terminal symbol-number="55" token-number="310" name="&quot;_&quot;" usefulness="useful"/>
-      <terminal symbol-number="56" token-number="311" name="&quot;|&quot;" usefulness="useful"/>
-      <terminal symbol-number="57" token-number="312" name="&quot;@&quot;" usefulness="useful"/>
-      <terminal symbol-number="58" token-number="313" name="&quot;,&quot;" usefulness="useful"/>
-      <terminal symbol-number="59" token-number="314" name="&quot;&lt;&quot;" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="60" token-number="315" name="&quot;&gt;&quot;" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="61" token-number="316" name="&quot;*&quot;" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="62" token-number="317" name="&quot;/&quot;" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="63" token-number="318" name="&quot;%&quot;" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="64" token-number="319" name="&quot;^&quot;" usefulness="useful" prec="17" assoc="left"/>
-      <terminal symbol-number="65" token-number="320" name="&quot;'&quot;" usefulness="useful" prec="23" assoc="precedence"/>
-      <terminal symbol-number="66" token-number="321" name="&quot;..&quot;" usefulness="useful"/>
-      <terminal symbol-number="67" token-number="322" name="&quot;.&quot;" usefulness="useful" prec="18" assoc="precedence"/>
-      <terminal symbol-number="68" token-number="323" name="&quot;-&gt;&quot;" usefulness="useful"/>
-      <terminal symbol-number="69" token-number="324" name="&quot;=&gt;&quot;" usefulness="useful" prec="9" assoc="left"/>
-      <terminal symbol-number="70" token-number="325" name="&quot;:=&quot;" usefulness="useful" prec="8" assoc="precedence"/>
-      <terminal symbol-number="71" token-number="326" name="&quot;!=&quot;" usefulness="useful" prec="13" assoc="left"/>
-      <terminal symbol-number="72" token-number="327" name="&quot;&lt;=&quot;" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="73" token-number="328" name="&quot;&gt;=&quot;" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="74" token-number="329" name="&quot;{|&quot;" usefulness="useful"/>
-      <terminal symbol-number="75" token-number="330" name="&quot;|}&quot;" usefulness="useful"/>
-      <terminal symbol-number="76" token-number="331" name="&quot;binary&quot;" usefulness="useful"/>
-      <terminal symbol-number="77" token-number="332" name="&quot;hexadecimal&quot;" usefulness="useful"/>
-      <terminal symbol-number="78" token-number="333" name="&quot;integer&quot;" usefulness="useful"/>
-      <terminal symbol-number="79" token-number="334" name="&quot;rational&quot;" usefulness="useful"/>
-      <terminal symbol-number="80" token-number="335" name="&quot;decimal&quot;" usefulness="useful"/>
-      <terminal symbol-number="81" token-number="336" name="&quot;string&quot;" usefulness="useful"/>
-      <terminal symbol-number="82" token-number="337" name="&quot;identifier&quot;" usefulness="useful"/>
-      <terminal symbol-number="83" token-number="338" name="BASIC_TYPE" usefulness="useful" prec="1" assoc="precedence"/>
-      <terminal symbol-number="84" token-number="339" name="CALL" usefulness="useful" prec="7" assoc="precedence"/>
-      <terminal symbol-number="85" token-number="340" name="UPLUS" usefulness="useful" prec="19" assoc="precedence"/>
-      <terminal symbol-number="86" token-number="341" name="UMINUS" usefulness="useful" prec="19" assoc="precedence"/>
-      <terminal symbol-number="87" token-number="342" name="CALL_WITHOUT_ARGS" usefulness="useful" prec="21" assoc="precedence"/>
+      <terminal symbol-number="12" token-number="267" name="&quot;defined&quot;" usefulness="useful"/>
+      <terminal symbol-number="13" token-number="268" name="&quot;seq&quot;" usefulness="useful"/>
+      <terminal symbol-number="14" token-number="269" name="&quot;endseq&quot;" usefulness="useful"/>
+      <terminal symbol-number="15" token-number="270" name="&quot;par&quot;" usefulness="useful"/>
+      <terminal symbol-number="16" token-number="271" name="&quot;endpar&quot;" usefulness="useful"/>
+      <terminal symbol-number="17" token-number="272" name="&quot;skip&quot;" usefulness="useful"/>
+      <terminal symbol-number="18" token-number="273" name="&quot;let&quot;" usefulness="useful"/>
+      <terminal symbol-number="19" token-number="274" name="&quot;in&quot;" usefulness="useful" prec="2" assoc="precedence"/>
+      <terminal symbol-number="20" token-number="275" name="&quot;forall&quot;" usefulness="useful"/>
+      <terminal symbol-number="21" token-number="276" name="&quot;choose&quot;" usefulness="useful"/>
+      <terminal symbol-number="22" token-number="277" name="&quot;iterate&quot;" usefulness="useful"/>
+      <terminal symbol-number="23" token-number="278" name="&quot;do&quot;" usefulness="useful" prec="3" assoc="precedence"/>
+      <terminal symbol-number="24" token-number="279" name="&quot;if&quot;" usefulness="useful"/>
+      <terminal symbol-number="25" token-number="280" name="&quot;then&quot;" usefulness="useful" prec="4" assoc="precedence"/>
+      <terminal symbol-number="26" token-number="281" name="&quot;else&quot;" usefulness="useful" prec="5" assoc="precedence"/>
+      <terminal symbol-number="27" token-number="282" name="&quot;case&quot;" usefulness="useful"/>
+      <terminal symbol-number="28" token-number="283" name="&quot;of&quot;" usefulness="useful"/>
+      <terminal symbol-number="29" token-number="284" name="&quot;default&quot;" usefulness="useful"/>
+      <terminal symbol-number="30" token-number="285" name="&quot;holds&quot;" usefulness="useful" prec="6" assoc="precedence"/>
+      <terminal symbol-number="31" token-number="286" name="&quot;exists&quot;" usefulness="useful"/>
+      <terminal symbol-number="32" token-number="287" name="&quot;with&quot;" usefulness="useful" prec="6" assoc="precedence"/>
+      <terminal symbol-number="33" token-number="288" name="&quot;as&quot;" usefulness="useful"/>
+      <terminal symbol-number="34" token-number="289" name="&quot;while&quot;" usefulness="useful"/>
+      <terminal symbol-number="35" token-number="290" name="&quot;undef&quot;" usefulness="useful"/>
+      <terminal symbol-number="36" token-number="291" name="&quot;false&quot;" usefulness="useful"/>
+      <terminal symbol-number="37" token-number="292" name="&quot;true&quot;" usefulness="useful"/>
+      <terminal symbol-number="38" token-number="293" name="&quot;and&quot;" usefulness="useful" prec="12" assoc="left"/>
+      <terminal symbol-number="39" token-number="294" name="&quot;or&quot;" usefulness="useful" prec="10" assoc="left"/>
+      <terminal symbol-number="40" token-number="295" name="&quot;xor&quot;" usefulness="useful" prec="11" assoc="left"/>
+      <terminal symbol-number="41" token-number="296" name="&quot;implies&quot;" usefulness="useful" prec="9" assoc="left"/>
+      <terminal symbol-number="42" token-number="297" name="&quot;not&quot;" usefulness="useful" prec="20" assoc="precedence"/>
+      <terminal symbol-number="43" token-number="298" name="&quot;+&quot;" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="44" token-number="299" name="&quot;-&quot;" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="45" token-number="300" name="&quot;=&quot;" usefulness="useful" prec="13" assoc="left"/>
+      <terminal symbol-number="46" token-number="301" name="&quot;(&quot;" usefulness="useful" prec="22" assoc="precedence"/>
+      <terminal symbol-number="47" token-number="302" name="&quot;)&quot;" usefulness="useful"/>
+      <terminal symbol-number="48" token-number="303" name="&quot;[&quot;" usefulness="useful"/>
+      <terminal symbol-number="49" token-number="304" name="&quot;]&quot;" usefulness="useful"/>
+      <terminal symbol-number="50" token-number="305" name="&quot;{&quot;" usefulness="useful"/>
+      <terminal symbol-number="51" token-number="306" name="&quot;}&quot;" usefulness="useful"/>
+      <terminal symbol-number="52" token-number="307" name="&quot;:&quot;" usefulness="useful"/>
+      <terminal symbol-number="53" token-number="308" name="&quot;::&quot;" usefulness="useful"/>
+      <terminal symbol-number="54" token-number="309" name="&quot;_&quot;" usefulness="useful"/>
+      <terminal symbol-number="55" token-number="310" name="&quot;|&quot;" usefulness="useful"/>
+      <terminal symbol-number="56" token-number="311" name="&quot;@&quot;" usefulness="useful"/>
+      <terminal symbol-number="57" token-number="312" name="&quot;,&quot;" usefulness="useful"/>
+      <terminal symbol-number="58" token-number="313" name="&quot;&lt;&quot;" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="59" token-number="314" name="&quot;&gt;&quot;" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="60" token-number="315" name="&quot;*&quot;" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="61" token-number="316" name="&quot;/&quot;" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="62" token-number="317" name="&quot;%&quot;" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="63" token-number="318" name="&quot;^&quot;" usefulness="useful" prec="17" assoc="left"/>
+      <terminal symbol-number="64" token-number="319" name="&quot;'&quot;" usefulness="useful" prec="23" assoc="precedence"/>
+      <terminal symbol-number="65" token-number="320" name="&quot;..&quot;" usefulness="useful"/>
+      <terminal symbol-number="66" token-number="321" name="&quot;.&quot;" usefulness="useful" prec="18" assoc="precedence"/>
+      <terminal symbol-number="67" token-number="322" name="&quot;-&gt;&quot;" usefulness="useful"/>
+      <terminal symbol-number="68" token-number="323" name="&quot;=&gt;&quot;" usefulness="useful" prec="9" assoc="left"/>
+      <terminal symbol-number="69" token-number="324" name="&quot;:=&quot;" usefulness="useful" prec="8" assoc="precedence"/>
+      <terminal symbol-number="70" token-number="325" name="&quot;!=&quot;" usefulness="useful" prec="13" assoc="left"/>
+      <terminal symbol-number="71" token-number="326" name="&quot;&lt;=&quot;" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="72" token-number="327" name="&quot;&gt;=&quot;" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="73" token-number="328" name="&quot;{|&quot;" usefulness="useful"/>
+      <terminal symbol-number="74" token-number="329" name="&quot;|}&quot;" usefulness="useful"/>
+      <terminal symbol-number="75" token-number="330" name="&quot;binary&quot;" usefulness="useful"/>
+      <terminal symbol-number="76" token-number="331" name="&quot;hexadecimal&quot;" usefulness="useful"/>
+      <terminal symbol-number="77" token-number="332" name="&quot;integer&quot;" usefulness="useful"/>
+      <terminal symbol-number="78" token-number="333" name="&quot;rational&quot;" usefulness="useful"/>
+      <terminal symbol-number="79" token-number="334" name="&quot;decimal&quot;" usefulness="useful"/>
+      <terminal symbol-number="80" token-number="335" name="&quot;string&quot;" usefulness="useful"/>
+      <terminal symbol-number="81" token-number="336" name="&quot;identifier&quot;" usefulness="useful"/>
+      <terminal symbol-number="82" token-number="337" name="BASIC_TYPE" usefulness="useful" prec="1" assoc="precedence"/>
+      <terminal symbol-number="83" token-number="338" name="CALL" usefulness="useful" prec="7" assoc="precedence"/>
+      <terminal symbol-number="84" token-number="339" name="UPLUS" usefulness="useful" prec="19" assoc="precedence"/>
+      <terminal symbol-number="85" token-number="340" name="UMINUS" usefulness="useful" prec="19" assoc="precedence"/>
+      <terminal symbol-number="86" token-number="341" name="CALL_WITHOUT_ARGS" usefulness="useful" prec="21" assoc="precedence"/>
     </terminals>
     <nonterminals>
-      <nonterminal symbol-number="88" name="$accept" usefulness="useful"/>
-      <nonterminal symbol-number="89" name="Specification" usefulness="useful"/>
-      <nonterminal symbol-number="90" name="Header" usefulness="useful"/>
-      <nonterminal symbol-number="91" name="Definitions" usefulness="useful"/>
-      <nonterminal symbol-number="92" name="AttributedDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="93" name="Definition" usefulness="useful"/>
-      <nonterminal symbol-number="94" name="InitDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="95" name="EnumerationDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="96" name="DerivedDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="97" name="RuleDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="98" name="FunctionDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="99" name="EnumeratorDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="100" name="Enumerators" usefulness="useful"/>
-      <nonterminal symbol-number="101" name="UsingDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="102" name="UsingPathDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="103" name="InvariantDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="104" name="ImportDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="105" name="Rules" usefulness="useful"/>
-      <nonterminal symbol-number="106" name="Rule" usefulness="useful"/>
-      <nonterminal symbol-number="107" name="SkipRule" usefulness="useful"/>
-      <nonterminal symbol-number="108" name="ConditionalRule" usefulness="useful"/>
-      <nonterminal symbol-number="109" name="CaseRule" usefulness="useful"/>
-      <nonterminal symbol-number="110" name="CaseLabels" usefulness="useful"/>
-      <nonterminal symbol-number="111" name="CaseLabel" usefulness="useful"/>
-      <nonterminal symbol-number="112" name="LetRule" usefulness="useful"/>
-      <nonterminal symbol-number="113" name="ForallRule" usefulness="useful"/>
-      <nonterminal symbol-number="114" name="ChooseRule" usefulness="useful"/>
-      <nonterminal symbol-number="115" name="IterateRule" usefulness="useful"/>
-      <nonterminal symbol-number="116" name="BlockRule" usefulness="useful"/>
-      <nonterminal symbol-number="117" name="SequenceRule" usefulness="useful"/>
-      <nonterminal symbol-number="118" name="UpdateRule" usefulness="useful"/>
-      <nonterminal symbol-number="119" name="CallRule" usefulness="useful"/>
-      <nonterminal symbol-number="120" name="WhileRule" usefulness="useful"/>
-      <nonterminal symbol-number="121" name="Terms" usefulness="useful"/>
-      <nonterminal symbol-number="122" name="Term" usefulness="useful"/>
-      <nonterminal symbol-number="123" name="SimpleOrClaspedTerm" usefulness="useful"/>
-      <nonterminal symbol-number="124" name="OperatorExpression" usefulness="useful"/>
-      <nonterminal symbol-number="125" name="CallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="126" name="DirectCallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="127" name="MethodCallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="128" name="LiteralCallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="129" name="IndirectCallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="130" name="TypeCastingExpression" usefulness="useful"/>
-      <nonterminal symbol-number="131" name="LetExpression" usefulness="useful"/>
-      <nonterminal symbol-number="132" name="ConditionalExpression" usefulness="useful"/>
-      <nonterminal symbol-number="133" name="ChooseExpression" usefulness="useful"/>
-      <nonterminal symbol-number="134" name="UniversalQuantifierExpression" usefulness="useful"/>
-      <nonterminal symbol-number="135" name="ExistentialQuantifierExpression" usefulness="useful"/>
-      <nonterminal symbol-number="136" name="CardinalityExpression" usefulness="useful"/>
-      <nonterminal symbol-number="137" name="Literal" usefulness="useful"/>
-      <nonterminal symbol-number="138" name="UndefinedLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="139" name="BooleanLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="140" name="IntegerLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="141" name="RationalLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="142" name="DecimalLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="143" name="BinaryLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="144" name="StringLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="145" name="ReferenceLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="146" name="ListLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="147" name="RangeLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="148" name="TupleLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="149" name="RecordLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="150" name="Assignments" usefulness="useful"/>
-      <nonterminal symbol-number="151" name="Assignment" usefulness="useful"/>
-      <nonterminal symbol-number="152" name="Types" usefulness="useful"/>
-      <nonterminal symbol-number="153" name="Type" usefulness="useful"/>
-      <nonterminal symbol-number="154" name="BasicType" usefulness="useful"/>
-      <nonterminal symbol-number="155" name="TupleType" usefulness="useful"/>
-      <nonterminal symbol-number="156" name="RecordType" usefulness="useful"/>
-      <nonterminal symbol-number="157" name="TemplateType" usefulness="useful"/>
-      <nonterminal symbol-number="158" name="RelationType" usefulness="useful"/>
-      <nonterminal symbol-number="159" name="FixedSizedType" usefulness="useful"/>
-      <nonterminal symbol-number="160" name="FunctionParameters" usefulness="useful"/>
-      <nonterminal symbol-number="161" name="MaybeFunctionParameters" usefulness="useful"/>
-      <nonterminal symbol-number="162" name="Parameters" usefulness="useful"/>
-      <nonterminal symbol-number="163" name="MaybeDefined" usefulness="useful"/>
-      <nonterminal symbol-number="164" name="MaybeInitially" usefulness="useful"/>
-      <nonterminal symbol-number="165" name="Initializers" usefulness="useful"/>
-      <nonterminal symbol-number="166" name="Initializer" usefulness="useful"/>
-      <nonterminal symbol-number="167" name="Identifier" usefulness="useful"/>
-      <nonterminal symbol-number="168" name="IdentifierPath" usefulness="useful"/>
-      <nonterminal symbol-number="169" name="Variable" usefulness="useful"/>
-      <nonterminal symbol-number="170" name="AttributedVariables" usefulness="useful"/>
-      <nonterminal symbol-number="171" name="TypedVariables" usefulness="useful"/>
-      <nonterminal symbol-number="172" name="TypedVariable" usefulness="useful"/>
-      <nonterminal symbol-number="173" name="AttributedVariable" usefulness="useful"/>
-      <nonterminal symbol-number="174" name="TypedAttributedVariable" usefulness="useful"/>
-      <nonterminal symbol-number="175" name="VariableBindings" usefulness="useful"/>
-      <nonterminal symbol-number="176" name="VariableBinding" usefulness="useful"/>
-      <nonterminal symbol-number="177" name="Attributes" usefulness="useful"/>
-      <nonterminal symbol-number="178" name="Attribute" usefulness="useful"/>
-      <nonterminal symbol-number="179" name="BasicAttribute" usefulness="useful"/>
-      <nonterminal symbol-number="180" name="ExpressionAttribute" usefulness="useful"/>
+      <nonterminal symbol-number="87" name="$accept" usefulness="useful"/>
+      <nonterminal symbol-number="88" name="Specification" usefulness="useful"/>
+      <nonterminal symbol-number="89" name="Header" usefulness="useful"/>
+      <nonterminal symbol-number="90" name="Definitions" usefulness="useful"/>
+      <nonterminal symbol-number="91" name="AttributedDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="92" name="Definition" usefulness="useful"/>
+      <nonterminal symbol-number="93" name="InitDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="94" name="EnumerationDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="95" name="DerivedDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="96" name="RuleDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="97" name="FunctionDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="98" name="EnumeratorDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="99" name="Enumerators" usefulness="useful"/>
+      <nonterminal symbol-number="100" name="UsingDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="101" name="UsingPathDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="102" name="InvariantDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="103" name="ImportDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="104" name="Rules" usefulness="useful"/>
+      <nonterminal symbol-number="105" name="Rule" usefulness="useful"/>
+      <nonterminal symbol-number="106" name="SkipRule" usefulness="useful"/>
+      <nonterminal symbol-number="107" name="ConditionalRule" usefulness="useful"/>
+      <nonterminal symbol-number="108" name="CaseRule" usefulness="useful"/>
+      <nonterminal symbol-number="109" name="CaseLabels" usefulness="useful"/>
+      <nonterminal symbol-number="110" name="CaseLabel" usefulness="useful"/>
+      <nonterminal symbol-number="111" name="LetRule" usefulness="useful"/>
+      <nonterminal symbol-number="112" name="ForallRule" usefulness="useful"/>
+      <nonterminal symbol-number="113" name="ChooseRule" usefulness="useful"/>
+      <nonterminal symbol-number="114" name="IterateRule" usefulness="useful"/>
+      <nonterminal symbol-number="115" name="BlockRule" usefulness="useful"/>
+      <nonterminal symbol-number="116" name="SequenceRule" usefulness="useful"/>
+      <nonterminal symbol-number="117" name="UpdateRule" usefulness="useful"/>
+      <nonterminal symbol-number="118" name="CallRule" usefulness="useful"/>
+      <nonterminal symbol-number="119" name="WhileRule" usefulness="useful"/>
+      <nonterminal symbol-number="120" name="Terms" usefulness="useful"/>
+      <nonterminal symbol-number="121" name="Term" usefulness="useful"/>
+      <nonterminal symbol-number="122" name="SimpleOrClaspedTerm" usefulness="useful"/>
+      <nonterminal symbol-number="123" name="OperatorExpression" usefulness="useful"/>
+      <nonterminal symbol-number="124" name="CallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="125" name="DirectCallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="126" name="MethodCallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="127" name="LiteralCallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="128" name="IndirectCallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="129" name="TypeCastingExpression" usefulness="useful"/>
+      <nonterminal symbol-number="130" name="LetExpression" usefulness="useful"/>
+      <nonterminal symbol-number="131" name="ConditionalExpression" usefulness="useful"/>
+      <nonterminal symbol-number="132" name="ChooseExpression" usefulness="useful"/>
+      <nonterminal symbol-number="133" name="UniversalQuantifierExpression" usefulness="useful"/>
+      <nonterminal symbol-number="134" name="ExistentialQuantifierExpression" usefulness="useful"/>
+      <nonterminal symbol-number="135" name="CardinalityExpression" usefulness="useful"/>
+      <nonterminal symbol-number="136" name="Literal" usefulness="useful"/>
+      <nonterminal symbol-number="137" name="UndefinedLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="138" name="BooleanLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="139" name="IntegerLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="140" name="RationalLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="141" name="DecimalLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="142" name="BinaryLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="143" name="StringLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="144" name="ReferenceLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="145" name="ListLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="146" name="RangeLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="147" name="TupleLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="148" name="RecordLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="149" name="Assignments" usefulness="useful"/>
+      <nonterminal symbol-number="150" name="Assignment" usefulness="useful"/>
+      <nonterminal symbol-number="151" name="Types" usefulness="useful"/>
+      <nonterminal symbol-number="152" name="Type" usefulness="useful"/>
+      <nonterminal symbol-number="153" name="BasicType" usefulness="useful"/>
+      <nonterminal symbol-number="154" name="TupleType" usefulness="useful"/>
+      <nonterminal symbol-number="155" name="RecordType" usefulness="useful"/>
+      <nonterminal symbol-number="156" name="TemplateType" usefulness="useful"/>
+      <nonterminal symbol-number="157" name="RelationType" usefulness="useful"/>
+      <nonterminal symbol-number="158" name="FixedSizedType" usefulness="useful"/>
+      <nonterminal symbol-number="159" name="FunctionParameters" usefulness="useful"/>
+      <nonterminal symbol-number="160" name="MaybeFunctionParameters" usefulness="useful"/>
+      <nonterminal symbol-number="161" name="Parameters" usefulness="useful"/>
+      <nonterminal symbol-number="162" name="MaybeDefined" usefulness="useful"/>
+      <nonterminal symbol-number="163" name="MaybeInitially" usefulness="useful"/>
+      <nonterminal symbol-number="164" name="Initializers" usefulness="useful"/>
+      <nonterminal symbol-number="165" name="Initializer" usefulness="useful"/>
+      <nonterminal symbol-number="166" name="Identifier" usefulness="useful"/>
+      <nonterminal symbol-number="167" name="IdentifierPath" usefulness="useful"/>
+      <nonterminal symbol-number="168" name="Variable" usefulness="useful"/>
+      <nonterminal symbol-number="169" name="AttributedVariables" usefulness="useful"/>
+      <nonterminal symbol-number="170" name="TypedVariables" usefulness="useful"/>
+      <nonterminal symbol-number="171" name="TypedVariable" usefulness="useful"/>
+      <nonterminal symbol-number="172" name="AttributedVariable" usefulness="useful"/>
+      <nonterminal symbol-number="173" name="TypedAttributedVariable" usefulness="useful"/>
+      <nonterminal symbol-number="174" name="VariableBindings" usefulness="useful"/>
+      <nonterminal symbol-number="175" name="VariableBinding" usefulness="useful"/>
+      <nonterminal symbol-number="176" name="Attributes" usefulness="useful"/>
+      <nonterminal symbol-number="177" name="Attribute" usefulness="useful"/>
+      <nonterminal symbol-number="178" name="BasicAttribute" usefulness="useful"/>
+      <nonterminal symbol-number="179" name="ExpressionAttribute" usefulness="useful"/>
     </nonterminals>
   </grammar>
 
@@ -4157,7 +4156,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -4273,7 +4271,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -4724,7 +4721,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -5504,7 +5500,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -5615,7 +5610,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -5717,7 +5711,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -6096,7 +6089,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -11913,7 +11905,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -12040,7 +12031,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -12170,7 +12160,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -12302,7 +12291,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -12415,7 +12403,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -12545,7 +12532,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -12680,7 +12666,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -12810,7 +12795,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -12940,7 +12924,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -13062,7 +13045,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -13192,7 +13174,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -13322,7 +13303,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -13452,7 +13432,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -13590,7 +13569,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -13710,7 +13688,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -13843,7 +13820,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -13973,7 +13949,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -14238,7 +14213,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -14354,7 +14328,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -17192,7 +17165,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -20838,7 +20810,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -22839,7 +22810,7 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
+            <symbol>&quot;=&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
           </lookaheads>
         </item>
@@ -22888,7 +22859,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -23017,7 +22987,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -23146,7 +23115,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -23275,7 +23243,6 @@
             <symbol>&quot;invariant&quot;</symbol>
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -24087,7 +24054,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;initially&quot;" state="430"/>
+          <transition type="shift" symbol="&quot;=&quot;" state="430"/>
           <transition type="goto" symbol="MaybeInitially" state="431"/>
         </transitions>
         <errors/>
