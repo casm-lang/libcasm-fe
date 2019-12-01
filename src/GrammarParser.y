@@ -1470,7 +1470,7 @@ MaybeDefined
 
 
 MaybeInitially
-: INITIALLY LCURPAREN Initializers RCURPAREN
+: EQUAL LCURPAREN Initializers RCURPAREN
   {
       $$ = Ast::make< Initially >( @$, $1, $2, $3, $4 );
   }

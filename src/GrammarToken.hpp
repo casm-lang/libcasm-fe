@@ -54,7 +54,6 @@ INVARIANT       "invariant"
 IMPORT          "import"
 
 FUNCTION        "function"
-INITIALLY       "initially"
 DEFINED         "defined"
 
 SEQ             "seq"

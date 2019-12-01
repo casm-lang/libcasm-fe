@@ -785,7 +785,7 @@ MaybeDefined ::= "defined" "{" Term "}"
 ** MaybeInitially
 
 #+begin_src
-MaybeInitially ::= "initially" "{" Initializers "}"
+MaybeInitially ::= "=" "{" Initializers "}"
                  | null
 #+end_src
 
