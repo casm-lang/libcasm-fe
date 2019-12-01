@@ -52,8 +52,6 @@
 #include <libcasm-fe/analyze/ProjectResolverPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
-#include <libcasm-ir/Instruction>
-
 #include <libpass/PassRegistry>
 
 #include "../Lexer.h"
@@ -68,8 +66,6 @@ char SourceToAstPass::id = 0;
 
 static libpass::PassRegistration< SourceToAstPass > PASS(
     "SourceToAstPass", "parse the source code and generate an AST", "ast-parse", 0 );
-
-static void loadBuiltinDefinitions( const Specification::Ptr& specification );
 
 void SourceToAstPass::usage( libpass::PassUsage& pu )
 {
@@ -104,8 +100,7 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
 
     if( specification->name() == "CASM" )
     {
-        log.debug( "module 'CASM': adding built-ins!" );
-        loadBuiltinDefinitions( specification );
+        log.debug( "module 'CASM' found" );
     }
     else
     {
@@ -132,114 +127,6 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
 void SourceToAstPass::setDebug( u1 enable )
 {
     m_debug = enable;
-}
-
-static void loadBuiltinDefinitions( const Specification::Ptr& specification )
-{
-    const auto& srcLoc = specification->header()->sourceLocation();
-
-    //
-    //
-    // Domain Types via IR::Types
-    //
-
-    const auto domainBasicType = [&specification, &srcLoc]( const std::string& name ) {
-        const auto domain = Ast::make< DomainDefinition >(
-            srcLoc,
-            Ast::make< BasicType >(
-                srcLoc,
-                IdentifierPath::fromIdentifier( Ast::make< Identifier >( srcLoc, name ) ) ) );
-        const auto domainProperties = { IR::Property::SIDE_EFFECT_FREE, IR::Property::PURE };
-        domain->setProperties( domainProperties );
-        domain->setExported( true );
-        specification->definitions()->add( domain );
-    };
-
-    const auto domainTemplateType = [&specification, &srcLoc]( const std::string& name ) {
-        const auto domainTypes = Ast::make< Types >( srcLoc );
-        domainTypes->add( Ast::make< UnresolvedType >( srcLoc ) );
-        const auto domain = Ast::make< DomainDefinition >(
-            srcLoc,
-            Ast::make< TemplateType >(
-                srcLoc,
-                IdentifierPath::fromIdentifier( Ast::make< Identifier >( srcLoc, name ) ),
-                Token::unresolved(),
-                domainTypes,
-                Token::unresolved() ) );
-        const auto domainProperties = { IR::Property::SIDE_EFFECT_FREE, IR::Property::PURE };
-        domain->setProperties( domainProperties );
-        domain->setExported( true );
-        specification->definitions()->add( domain );
-    };
-
-    domainBasicType( TypeInfo::TYPE_NAME_VOID );
-    domainBasicType( TypeInfo::TYPE_NAME_OBJECT );
-    domainBasicType( TypeInfo::TYPE_NAME_ENUMERATION );
-    domainBasicType( TypeInfo::TYPE_NAME_BOOLEAN );
-    domainBasicType( TypeInfo::TYPE_NAME_INTEGER );
-    domainBasicType( TypeInfo::TYPE_NAME_STRING );
-    domainBasicType( TypeInfo::TYPE_NAME_RATIONAL );
-    domainBasicType( TypeInfo::TYPE_NAME_DECIMAL );
-
-    domainTemplateType( TypeInfo::TYPE_NAME_RANGE );
-    domainTemplateType( TypeInfo::TYPE_NAME_LIST );
-    // domainTemplateType( TypeInfo::TYPE_NAME_SET );  // TODO: FIXME: @ppaulweber: feature/set
-    domainTemplateType( TypeInfo::TYPE_NAME_PORT );
-    domainTemplateType( TypeInfo::TYPE_NAME_FILE );
-
-    //
-    //
-    // Builtin Definitions via IR::Instructions
-    //
-
-    const auto& VOID = std::make_shared< IR::VoidType >();
-    const auto& BOOLEAN = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_BOOLEAN );
-    const auto& INTEGER = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_INTEGER );
-    const auto& STRING = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_STRING );
-    const auto& OBJECT = TypeInfo::instance().getType( TypeInfo::TYPE_NAME_OBJECT );
-
-    const auto builtin = [&specification, &srcLoc](
-                             const std::string& name,
-                             const IR::Value::ID id,
-                             const IR::Type::Ptr& returnType,
-                             const std::vector< IR::Type::Ptr >& argumentTypes ) {
-        const auto definition = Ast::make< BuiltinDefinition >(
-            srcLoc,
-            Ast::make< Identifier >( srcLoc, name ),
-            id,
-            std::make_shared< IR::RelationType >( returnType, argumentTypes ) );
-        const auto definitionProperties = { IR::Property::SIDE_EFFECT_FREE, IR::Property::PURE };
-        definition->setProperties( definitionProperties );
-        definition->setExported( true );
-        specification->definitions()->add( definition );
-    };
-
-    builtin( "AbortInstruction", IR::AbortBuiltin::classid(), VOID, {} );
-    builtin( "AssertInstruction", IR::AssertBuiltin::classid(), VOID, { BOOLEAN } );
-    builtin( "AssureInstruction", IR::AssureBuiltin::classid(), VOID, { BOOLEAN } );
-    builtin( "PrintInstruction", IR::PrintBuiltin::classid(), VOID, { STRING } );
-    builtin( "NotInstruction", IR::NotInstruction::classid(), BOOLEAN, { BOOLEAN } );
-    builtin( "OrInstruction", IR::OrInstruction::classid(), BOOLEAN, { BOOLEAN, BOOLEAN } );
-    // builtin( "XorInstruction", IR::XorInstruction::classid(), BOOLEAN, {
-    // BOOLEAN, BOOLEAN, } );
-    // builtin( "AndInstruction", IR::AndInstruction::classid(), BOOLEAN, {
-    // BOOLEAN, BOOLEAN, } );
-    // builtin( "ImpInstruction", IR::ImpInstruction::classid(), BOOLEAN, {
-    // BOOLEAN, BOOLEAN, } );
-    builtin( "ConcatInstruction", IR::AddInstruction::classid(), STRING, { STRING, STRING } );
-    builtin( "AddInstruction", IR::AddInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
-    builtin( "SubInstruction", IR::SubInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
-    builtin( "MulInstruction", IR::MulInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
-    builtin( "DivInstruction", IR::DivInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
-    builtin( "ModInstruction", IR::ModInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
-    builtin( "PowInstruction", IR::PowInstruction::classid(), INTEGER, { INTEGER, INTEGER } );
-    builtin( "SizeInstruction", IR::SizeBuiltin::classid(), INTEGER, { OBJECT } );
-    builtin( "SymInstruction", IR::IsSymbolicBuiltin::classid(), BOOLEAN, { OBJECT } );
-    builtin( "EquInstruction", IR::EquInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
-    builtin( "NeqInstruction", IR::NeqInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
-    builtin( "LthInstruction", IR::LthInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
-    builtin( "GthInstruction", IR::GthInstruction::classid(), BOOLEAN, { OBJECT, OBJECT } );
-    builtin( "AsStringInstruction", IR::AsStringBuiltin::classid(), STRING, { OBJECT } );
 }
 
 //
