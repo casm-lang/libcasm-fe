@@ -53,6 +53,7 @@ namespace libcasm_fe
 {
     namespace Ast
     {
+        class TypeDefinition;
         class VariableDefinition;
         using VariableDefinitions = NodeList< VariableDefinition >;
 
@@ -65,7 +66,12 @@ namespace libcasm_fe
 
             const IdentifierPath::Ptr& name( void ) const;
 
+            void setTypeDefinition( const std::shared_ptr< TypeDefinition >& typeDefinition );
+
+            const std::shared_ptr< TypeDefinition >& typeDefinition( void ) const;
+
             void setDelimiterToken( const Token::Ptr& delimiterToken );
+
             const Token::Ptr& delimiterToken( void ) const;
 
             virtual std::string signature( void ) const = 0;
@@ -77,6 +83,7 @@ namespace libcasm_fe
 
           private:
             const IdentifierPath::Ptr m_name;
+            std::shared_ptr< TypeDefinition > m_typeDefinition;
             Token::Ptr m_delimiterToken;
         };
 
@@ -190,6 +197,8 @@ namespace libcasm_fe
 
             const Types::Ptr& subTypes( void ) const;
 
+            void setSubTypes( const Types::Ptr& subTypes );
+
             std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
@@ -197,7 +206,7 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            const Types::Ptr m_subTypes;
+            Types::Ptr m_subTypes;
         };
 
         class RelationType final : public EmbracedType

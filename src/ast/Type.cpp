@@ -49,6 +49,7 @@
 
 #include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/Literal>
 #include <libcasm-fe/ast/Token>
 
 using namespace libcasm_fe;
@@ -65,6 +66,7 @@ static const auto unresolvedIdentifierPath =
 Type::Type( const Node::ID id, const IdentifierPath::Ptr& name )
 : TypedNode( id )
 , m_name( name )
+, m_typeDefinition()
 , m_delimiterToken( Token::unresolved() )
 {
 }
@@ -72,6 +74,16 @@ Type::Type( const Node::ID id, const IdentifierPath::Ptr& name )
 const IdentifierPath::Ptr& Type::name( void ) const
 {
     return m_name;
+}
+
+void Type::setTypeDefinition( const TypeDefinition::Ptr& typeDefinition )
+{
+    m_typeDefinition = typeDefinition;
+}
+
+const TypeDefinition::Ptr& Type::typeDefinition( void ) const
+{
+    return m_typeDefinition;
 }
 
 void Type::setDelimiterToken( const Token::Ptr& delimiterToken )
@@ -103,6 +115,7 @@ IdentifierPath::Ptr Type::signaturePath( void ) const
 void Type::clone( Type& duplicate ) const
 {
     TypedNode::clone( duplicate );
+    duplicate.setTypeDefinition( m_typeDefinition );
     duplicate.setDelimiterToken( delimiterToken() );
 }
 
@@ -118,7 +131,7 @@ UnresolvedType::UnresolvedType( void )
 
 std::string UnresolvedType::signature( void ) const
 {
-    return name()->path();
+    return "?";
 }
 
 void UnresolvedType::accept( Visitor& visitor )
@@ -228,7 +241,7 @@ std::string TupleType::signature( void ) const
     }
 
     stream.seekp( -1, stream.cur );
-    stream << rightBraceToken()->tokenString();
+    stream << " " << rightBraceToken()->tokenString();
 
     return stream.str();
 }
@@ -282,7 +295,7 @@ std::string RecordType::signature( void ) const
     }
 
     stream.seekp( -1, stream.cur );
-    stream << rightBraceToken()->tokenString();
+    stream << " " << rightBraceToken()->tokenString();
 
     return stream.str();
 }
@@ -319,6 +332,11 @@ TemplateType::TemplateType(
 const Types::Ptr& TemplateType::subTypes( void ) const
 {
     return m_subTypes;
+}
+
+void TemplateType::setSubTypes( const Types::Ptr& subTypes )
+{
+    m_subTypes = subTypes;
 }
 
 std::string TemplateType::signature( void ) const
@@ -403,13 +421,12 @@ std::string RelationType::signature( void ) const
 
     for( const auto& subType : *argumentTypes() )
     {
-        stream << subType->signature() << "* ";
+        stream << subType->signature() << " * ";
     }
 
     if( argumentTypes()->size() > 0 )
     {
         stream.seekp( -2, stream.cur );
-        stream << " ";
     }
 
     stream << mapsToken()->tokenString() << " ";
@@ -467,18 +484,26 @@ std::string FixedSizedType::signature( void ) const
 {
     std::stringstream stream;
 
+    const auto& property = *size();
+
     if( not type() )
     {
         stream << name()->path() << markToken()->tokenString();
 
-        if( size()->id() == Node::ID::DIRECT_CALL_EXPRESSION )
+        if( property.id() == Node::ID::DIRECT_CALL_EXPRESSION )
         {
-            const auto& dce = static_cast< const DirectCallExpression& >( *size() );
-            stream << dce.identifier()->path();
+            const auto& directCallExpression =
+                static_cast< const DirectCallExpression& >( property );
+            stream << directCallExpression.identifier()->path();
+        }
+        else if( property.id() == Node::ID::VALUE_LITERAL and property.type()->isInteger() )
+        {
+            const auto& valueLiteral = static_cast< const ValueLiteral& >( property );
+            stream << valueLiteral.toString();
         }
         else
         {
-            stream << "$unresolved$";
+            stream << "?";
         }
     }
     else
