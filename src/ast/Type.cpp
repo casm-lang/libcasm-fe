@@ -159,7 +159,7 @@ BasicType::BasicType( const IdentifierPath::Ptr& identifier )
 
 std::string BasicType::signature( void ) const
 {
-    return name()->path();
+    return name()->baseName();
 }
 
 void BasicType::accept( Visitor& visitor )
@@ -233,7 +233,7 @@ const Types::Ptr& TupleType::subTypes( void ) const
 std::string TupleType::signature( void ) const
 {
     std::stringstream stream;
-    stream << leftBraceToken()->tokenString();
+    stream << "<";
 
     for( const auto& subType : *subTypes() )
     {
@@ -241,7 +241,7 @@ std::string TupleType::signature( void ) const
     }
 
     stream.seekp( -1, stream.cur );
-    stream << " " << rightBraceToken()->tokenString();
+    stream << " >";
 
     return stream.str();
 }
@@ -287,7 +287,7 @@ const VariableDefinitions::Ptr& RecordType::namedSubTypes( void ) const
 std::string RecordType::signature( void ) const
 {
     std::stringstream stream;
-    stream << leftBraceToken()->tokenString();
+    stream << "{";
 
     for( const auto& subType : *namedSubTypes() )
     {
@@ -295,7 +295,7 @@ std::string RecordType::signature( void ) const
     }
 
     stream.seekp( -1, stream.cur );
-    stream << " " << rightBraceToken()->tokenString();
+    stream << " }";
 
     return stream.str();
 }
@@ -342,22 +342,17 @@ void TemplateType::setSubTypes( const Types::Ptr& subTypes )
 std::string TemplateType::signature( void ) const
 {
     std::stringstream stream;
-    stream << name()->path();
-    stream << leftBraceToken()->tokenString();
-    stream << " ";
+    stream << name()->baseName();
+    stream << "<";
 
     for( const auto& subType : *subTypes() )
     {
-        stream << subType->signature() << ", ";
+        stream << " " << subType->signature() << ",";
     }
 
-    if( subTypes()->size() > 0 )
-    {
-        stream.seekp( -2, stream.cur );
-        stream << " ";
-    }
+    stream.seekp( -1, stream.cur );
+    stream << " >";
 
-    stream << rightBraceToken()->tokenString();
     return stream.str();
 }
 
@@ -415,23 +410,20 @@ const Token::Ptr& RelationType::mapsToken( void ) const
 std::string RelationType::signature( void ) const
 {
     std::stringstream stream;
-    stream << name()->path();
-    stream << leftBraceToken()->tokenString();
-    stream << " ";
+    stream << name()->baseName();
+    stream << "<";
 
     for( const auto& subType : *argumentTypes() )
     {
-        stream << subType->signature() << " * ";
+        stream << " " << subType->signature() << " *";
     }
 
     if( argumentTypes()->size() > 0 )
     {
-        stream.seekp( -2, stream.cur );
+        stream.seekp( -1, stream.cur );
     }
 
-    stream << mapsToken()->tokenString() << " ";
-    stream << returnType()->signature() << " ";
-    stream << rightBraceToken()->tokenString();
+    stream << "-> " << returnType()->signature() << " >";
 
     return stream.str();
 }
@@ -488,7 +480,7 @@ std::string FixedSizedType::signature( void ) const
 
     if( not type() )
     {
-        stream << name()->path() << markToken()->tokenString();
+        stream << name()->baseName() << "'";
 
         if( property.id() == Node::ID::DIRECT_CALL_EXPRESSION )
         {
