@@ -47,7 +47,9 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/execute/ExecutionVisitor>
 
+#include <libcasm-fe/Exception.h>
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
+#include <libcasm-fe/execute/Agent>
 #include <libcasm-fe/import/SpecificationMergerPass>
 
 #include <libpass/PassRegistry>
@@ -61,7 +63,10 @@
 
 #include <libtptp/Node>
 
-#include <libcasm-ir/SymbolicExecutionEnvironment>
+#include <libtptp/transform/AstDumpDotPass>
+#include <libtptp/transform/DumpSourcePass>
+
+#include <mutex>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -76,193 +81,6 @@ static libpass::PassRegistration< SymbolicExecutionPass > PASS(
     "ast-symbolic",
     0 );
 
-class SymbolicExecutionVisitor final : public ExecutionVisitor
-{
-  private:
-    libstdhl::Stack< libtptp::Node::Ptr > m_stack;
-
-  public:
-    SymbolicExecutionVisitor(
-        ExecutionLocationRegistry& locationRegistry,
-        const Storage& globalState,
-        UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
-        const IR::Constant& agentId );
-
-    void visit( FunctionDefinition& node ) override;
-
-    void visit( DirectCallExpression& node ) override;
-    void visit( MethodCallExpression& node ) override;
-    void visit( LiteralCallExpression& node ) override;
-    void visit( IndirectCallExpression& node ) override;
-    void visit( UnaryExpression& node ) override;
-    void visit( BinaryExpression& node ) override;
-    void visit( LetExpression& node ) override;
-    void visit( ConditionalExpression& node ) override;
-    void visit( ChooseExpression& node ) override;
-    void visit( UniversalQuantifierExpression& node ) override;
-    void visit( ExistentialQuantifierExpression& node ) override;
-    void visit( CardinalityExpression& node ) override;
-
-    void visit( ConditionalRule& node ) override;
-    void visit( CaseRule& node ) override;
-    void visit( LetRule& node ) override;
-    void visit( ForallRule& node ) override;
-    void visit( ChooseRule& node ) override;
-    void visit( IterateRule& node ) override;
-    void visit( BlockRule& node ) override;
-    void visit( SequenceRule& node ) override;
-    void visit( UpdateRule& node ) override;
-    void visit( CallRule& node ) override;
-    void visit( WhileRule& node ) override;
-
-    void visit( VariableBinding& node ) override;
-
-  private:
-    IR::SymbolicExecutionEnvironment m_environment;
-
-    IR::SymbolicExecutionEnvironment& environment();
-};
-
-SymbolicExecutionVisitor::SymbolicExecutionVisitor(
-    ExecutionLocationRegistry& locationRegistry,
-    const Storage& globalState,
-    UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
-    const IR::Constant& agentId )
-: ExecutionVisitor( locationRegistry, globalState, updateSetManager, agentId )
-, m_environment()
-{
-}
-
-void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
-{
-    // TODO: here insert symbolic constant creation
-}
-
-void SymbolicExecutionVisitor::visit( DirectCallExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( MethodCallExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( LiteralCallExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( IndirectCallExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( UnaryExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( BinaryExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( LetExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( ConditionalExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( ChooseExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( UniversalQuantifierExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( ExistentialQuantifierExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( CardinalityExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( ConditionalRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( CaseRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( LetRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( ForallRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( ChooseRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( IterateRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( BlockRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( SequenceRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( UpdateRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( CallRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( WhileRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( VariableBinding& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-IR::SymbolicExecutionEnvironment& SymbolicExecutionVisitor::environment()
-{
-    return m_environment;
-}
-
 void SymbolicExecutionPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SpecificationMergerPass >();
@@ -273,8 +91,96 @@ u1 SymbolicExecutionPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    //    const auto data = pr.output< SourceToAstPass >();
-    //    const auto specification = data->specification();
+    const auto data = pr.output< SpecificationMergerPass >();
+    const auto specification = data->specification();
+
+    static u1 constantHandlerFlag = false;
+    static std::mutex constantHandlerLock;
+    static auto constantHandlerInitialization = []() {
+        std::lock_guard< std::mutex > guard( constantHandlerLock );
+        if( not constantHandlerFlag )
+        {
+            auto constantHandler = std::make_unique< ConstantHandler >();
+            IR::ConstantHandlerManager::instance().registerConstantHandler(
+                std::move( constantHandler ) );
+            constantHandlerFlag = true;
+        }
+    };
+    constantHandlerInitialization();
+
+    ExecutionLocationRegistry locationRegistry;
+    Storage globalState;
+    IR::SymbolicExecutionEnvironment environment;
+
+    AgentScheduler scheduler( locationRegistry, globalState, true );
+    scheduler.setSymbolicEnvironment( environment );
+    /*scheduler.setDispatchStrategy(
+        libstdhl::Memory::make_unique< ParallelDispatchStrategy >() );*/
+
+    switch( specification->asmType() )
+    {
+        case Specification::AsmType::SYNCHRONOUS:
+        {
+            scheduler.setAgentSelectionStrategy(
+                libstdhl::Memory::make_unique< AllAgentsSelectionStrategy >() );
+            break;
+        }
+        case Specification::AsmType::ASYNCHRONOUS:
+        {
+            scheduler.setAgentSelectionStrategy(
+                libstdhl::Memory::make_unique< SingleRandomAgentSelectionStrategy >() );
+            break;
+        }
+    }
+
+    try
+    {
+        SymbolicStateInitializationVisitor stateInitializationVisitor(
+            locationRegistry, globalState, environment );
+        stateInitializationVisitor.visit( *specification );
+
+        InvariantChecker invariantChecker( locationRegistry, globalState );
+        invariantChecker.check( *specification );
+
+        if( not scheduler.check() )
+        {
+            log.warning(
+                { specification->header()->sourceLocation() },
+                "no init definition found in this specification" );
+        }
+
+        while( not scheduler.done() )
+        {
+            scheduler.step();
+            invariantChecker.check( *specification );
+        }
+
+        if( scheduler.numberOfSteps() == 0 )
+        {
+            log.warning(
+                { specification->header()->sourceLocation() },
+                "Could not perform a single step because no agent was initially available. This "
+                "may happen when no valid initial rule has been specified (see InitRule)." );
+        }
+
+        log.info(
+            "Finished execution after " + std::to_string( scheduler.numberOfSteps() ) + " steps" );
+    }
+    catch( const RuntimeException& e )
+    {
+        log.error( e );
+        return false;
+    }
+
+    auto tptpSpec = std::make_shared< libtptp::SourceToAstPass::Output >( environment.finalize() );
+    libpass::PassResult tptpSpecPR;
+    tptpSpecPR.setOutputData< libtptp::SourceToAstPass >( tptpSpec );
+
+    libtptp::AstDumpDotPass dotPass;
+    dotPass.run( tptpSpecPR );
+
+    libtptp::DumpSourcePass dumpPass;
+    dumpPass.run( tptpSpecPR );
 
     return true;
 }

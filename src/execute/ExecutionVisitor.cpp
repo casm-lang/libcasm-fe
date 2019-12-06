@@ -1540,197 +1540,204 @@ void StateInitializationVisitor::visit( FunctionDefinition& node )
     transaction.merge();
 }
 
-Agent::Agent(
+void InvariantChecker::check( const Specification& specification )
+{
+    UpdateSetManager< ExecutionUpdateSet > updateSetManager;
+    ExecutionVisitor visitor(
+        m_locationRegistry, m_globalState, updateSetManager, ReferenceConstant() );
+
+    for( const auto& definition : *specification.definitions() )
+    {
+        if( definition->id() != Node::ID::INVARIANT_DEFINITION )
+        {
+            continue;
+        }
+
+        visitor.execute( definition );
+    }
+}
+
+SymbolicExecutionVisitor::SymbolicExecutionVisitor(
     ExecutionLocationRegistry& locationRegistry,
     const Storage& globalState,
+    UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
     const IR::Constant& agentId,
-    const ReferenceConstant& rule )
-: m_globalState( globalState )
-, m_locationRegistry( locationRegistry )
-, m_agentId( agentId )
-, m_rule( rule )
-, m_updateSetManager()
+    IR::SymbolicExecutionEnvironment& environment )
+: ExecutionVisitor( locationRegistry, globalState, updateSetManager, agentId )
+, m_environment( environment )
 {
 }
 
-void Agent::run( void )
+void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
 {
-    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
-    ExecutionVisitor executionVisitor(
-        m_locationRegistry, m_globalState, m_updateSetManager, m_agentId );
-    executionVisitor.execute( m_rule );
-    transaction.merge();
-}
-
-ExecutionUpdateSet* Agent::updateSet( void ) const
-{
-    return m_updateSetManager.currentUpdateSet();
-}
-
-void ParallelDispatchStrategy::dispatch( std::vector< Agent >& agents )
-{
-    if( agents.size() == 1 )
+    return ExecutionVisitor::visit( node );
+    if( node.symbolic() )
     {
-        agents.at( 0 ).run();
+        m_environment.addFunctionDeclaration( node.identifier()->name(), *node.type() );
     }
     else
     {
-        std::vector< std::thread > threads;
-        threads.reserve( agents.size() );
-        for( auto& agent : agents )
+        ExecutionVisitor::visit( node );
+    }
+    if( m_evaluateUpdateLocation )
+    {
+        validateArguments(
+            node,
+            node.type()->arguments(),
+            { ValidationFlag::ValueMustBeDefined },
+            Code::FunctionArgumentInvalidValueAtUpdate );
+
+        m_updateLocation = m_locationRegistry.get( &node, m_frameStack.top()->locals() );
+    }
+    else
+    {
+        validateArguments(
+            node,
+            node.type()->arguments(),
+            { ValidationFlag::ValueMustBeDefined },
+            Code::FunctionArgumentInvalidValueAtLookup );
+
+        const auto location = m_locationRegistry.lookup( &node, m_frameStack.top()->locals() );
+        if( location )
         {
-            threads.emplace_back( [&] { agent.run(); } );
+            const auto update = m_updateSetManager.lookup( *location );
+            if( update )
+            {
+                m_evaluationStack.push( update->value );
+                return;
+            }
+
+            const auto function = m_globalState.get( *location );
+            if( function )
+            {
+                m_evaluationStack.push( function.value() );
+                return;
+            }
         }
-        for( auto& thread : threads )
-        {
-            thread.join();
-        }
+
+        node.defined()->expression()->accept( *this );  // return value already on stack
     }
+    // TODO: here insert symbolic constant creation
 }
 
-void SequentialDispatchStrategy::dispatch( std::vector< Agent >& agents )
+void SymbolicExecutionVisitor::visit( DirectCallExpression& node )
 {
-    for( auto& agent : agents )
-    {
-        agent.run();
-    }
+    ExecutionVisitor::visit( node );
 }
 
-void AllAgentsSelectionStrategy::selectAgents( std::vector< Agent >& agents ) const
+void SymbolicExecutionVisitor::visit( MethodCallExpression& node )
 {
+    ExecutionVisitor::visit( node );
 }
 
-void SingleRandomAgentSelectionStrategy::selectAgents( std::vector< Agent >& agents ) const
+void SymbolicExecutionVisitor::visit( LiteralCallExpression& node )
 {
-    if( agents.size() < 2 )
-    {
-        return;
-    }
-
-    const auto randomIndex = libstdhl::Random::uniform< std::size_t >( 0, agents.size() - 1 );
-    auto selectedAgent = std::move( agents[ randomIndex ] );
-    agents.clear();
-    agents.push_back( std::move( selectedAgent ) );
+    ExecutionVisitor::visit( node );
 }
 
-AgentScheduler::AgentScheduler( ExecutionLocationRegistry& locationRegistry, Storage& globalState )
-: m_dispatchStrategy( libstdhl::Memory::make_unique< SequentialDispatchStrategy >() )
-, m_selectionStrategy( nullptr )
-, m_globalState( globalState )
-, m_locationRegistry( locationRegistry )
-, m_collectedUpdates()
-, m_done( false )
-, m_stepCounter( 0 )
+void SymbolicExecutionVisitor::visit( IndirectCallExpression& node )
 {
+    ExecutionVisitor::visit( node );
 }
 
-void AgentScheduler::setDispatchStrategy( std::unique_ptr< DispatchStrategy > dispatchStrategy )
+void SymbolicExecutionVisitor::visit( UnaryExpression& node )
 {
-    m_dispatchStrategy = std::move( dispatchStrategy );
+    ExecutionVisitor::visit( node );
 }
 
-void AgentScheduler::setAgentSelectionStrategy(
-    std::unique_ptr< SelectionStrategy > selectionStrategy )
+void SymbolicExecutionVisitor::visit( BinaryExpression& node )
 {
-    m_selectionStrategy = std::move( selectionStrategy );
+    ExecutionVisitor::visit( node );
 }
 
-void AgentScheduler::step( void )
+void SymbolicExecutionVisitor::visit( LetExpression& node )
 {
-    auto agents = collectAgents();
-    selectAgents( agents );
-
-    if( agents.empty() )
-    {
-        m_done = true;
-        return;
-    }
-
-    dispatch( agents );
-
-    collectUpdates( agents );
-    m_done = m_collectedUpdates.empty();
-    fireUpdates();
-
-    ++m_stepCounter;
+    ExecutionVisitor::visit( node );
 }
 
-bool AgentScheduler::done( void ) const
+void SymbolicExecutionVisitor::visit( ConditionalExpression& node )
 {
-    return m_done;
+    ExecutionVisitor::visit( node );
 }
 
-std::size_t AgentScheduler::numberOfSteps( void ) const
+void SymbolicExecutionVisitor::visit( ChooseExpression& node )
 {
-    return m_stepCounter;
+    ExecutionVisitor::visit( node );
 }
 
-u1 AgentScheduler::check( void )
+void SymbolicExecutionVisitor::visit( UniversalQuantifierExpression& node )
 {
-    u1 foundAtLeastOneDefinedAgent = false;
-
-    const auto& programs = m_globalState.programState();
-    const auto end = programs.end();
-    for( auto it = programs.begin(); it != end; ++it )
-    {
-        const auto& location = it.key();
-        const auto& value = it.value();
-
-        const auto& agentId = location.arguments().at( 0 );
-
-        if( value.defined() )
-        {
-            foundAtLeastOneDefinedAgent = true;
-        }
-    }
-
-    if( not foundAtLeastOneDefinedAgent )
-    {
-        m_done = true;
-    }
-
-    return foundAtLeastOneDefinedAgent;
+    ExecutionVisitor::visit( node );
 }
 
-std::vector< Agent > AgentScheduler::collectAgents( void ) const
+void SymbolicExecutionVisitor::visit( ExistentialQuantifierExpression& node )
 {
-    std::vector< Agent > agents;
-
-    const auto& programs = m_globalState.programState();
-    const auto end = programs.end();
-    for( auto it = programs.begin(); it != end; ++it )
-    {
-        const auto& location = it.key();
-        const auto& value = it.value();
-
-        const auto& agentId = location.arguments().at( 0 );
-
-        assert( IR::isa< ReferenceConstant >( value ) );
-        const auto& rule = static_cast< const ReferenceConstant& >( value );
-
-        if( rule.defined() )
-        {
-            agents.emplace_back( m_locationRegistry, m_globalState, agentId, rule );
-        }
-    }
-
-    return agents;
+    ExecutionVisitor::visit( node );
 }
 
-void AgentScheduler::selectAgents( std::vector< Agent >& agents )
+void SymbolicExecutionVisitor::visit( CardinalityExpression& node )
 {
-    assert( m_selectionStrategy && "agent selection strategy must be set" );
-    m_selectionStrategy->selectAgents( agents );
+    ExecutionVisitor::visit( node );
 }
 
-void AgentScheduler::dispatch( std::vector< Agent >& agents )
+void SymbolicExecutionVisitor::visit( ConditionalRule& node )
 {
-    assert( m_dispatchStrategy );
-    m_dispatchStrategy->dispatch( agents );
+    ExecutionVisitor::visit( node );
 }
 
-void AgentScheduler::collectUpdates( const std::vector< Agent >& agents )
+void SymbolicExecutionVisitor::visit( CaseRule& node )
 {
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( LetRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( ForallRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( ChooseRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( IterateRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( BlockRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( SequenceRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( UpdateRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( CallRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( WhileRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( VariableBinding& node )
+{
+<<<<<<< HEAD
     for( const auto& agent : agents )
     {
         try
@@ -1759,36 +1766,54 @@ void AgentScheduler::collectUpdates( const std::vector< Agent >& agents )
                 libcasm_fe::Code::UpdateSetMergeConflict );
         }
     }
+=======
+    ExecutionVisitor::visit( node );
+>>>>>>> Agent: extraced Agent into separate file for symbolic execution
 }
 
-void AgentScheduler::fireUpdates( void )
+IR::SymbolicExecutionEnvironment& SymbolicExecutionVisitor::environment()
 {
-    m_globalState.fireUpdateSet( &m_collectedUpdates );
-    m_collectedUpdates.clear();
+    return m_environment;
 }
 
-InvariantChecker::InvariantChecker(
-    ExecutionLocationRegistry& locationRegistry, const Storage& globalState )
-: m_globalState( globalState )
+SymbolicStateInitializationVisitor::SymbolicStateInitializationVisitor(
+    ExecutionLocationRegistry& locationRegistry,
+    Storage& globalState,
+    IR::SymbolicExecutionEnvironment& environment )
+: EmptyVisitor()
+, m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
+, m_updateSetManager()
+, m_environment( environment )
 {
 }
 
-void InvariantChecker::check( const Specification& specification )
+void SymbolicStateInitializationVisitor::visit( Specification& node )
 {
-    UpdateSetManager< ExecutionUpdateSet > updateSetManager;
-    ExecutionVisitor visitor(
-        m_locationRegistry, m_globalState, updateSetManager, ReferenceConstant() );
+    m_updateSetManager.fork( Semantics::Sequential, 100 );
 
-    for( const auto& definition : *specification.definitions() )
-    {
-        if( definition->id() != Node::ID::INVARIANT_DEFINITION )
-        {
-            continue;
-        }
+    node.header()->accept( *this );
+    node.definitions()->accept( *this );
 
-        visitor.execute( definition );
-    }
+    auto updateSet = m_updateSetManager.currentUpdateSet();
+    m_globalState.fireUpdateSet( updateSet );
+    m_updateSetManager.clear();
+}
+
+void SymbolicStateInitializationVisitor::visit( InitDefinition& node )
+{
+    assert( node.programFunction() and "checked during frame size determination pass!" );
+    node.programFunction()->accept( *this );
+}
+
+void SymbolicStateInitializationVisitor::visit( FunctionDefinition& node )
+{
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+    m_environment.addFunctionDeclaration( node.identifier()->name(), *node.type() );
+    SymbolicExecutionVisitor executionVisitor(
+        m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant(), m_environment );
+    node.initially()->accept( executionVisitor );
+    transaction.merge();
 }
 
 //

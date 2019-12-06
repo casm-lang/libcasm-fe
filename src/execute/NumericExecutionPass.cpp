@@ -48,6 +48,7 @@
 #include <libcasm-fe/execute/RuntimeException>
 #include <libcasm-fe/execute/UpdateException>
 
+#include <libcasm-fe/execute/Agent>
 #include <libcasm-fe/execute/ExecutionVisitor>
 
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
@@ -122,7 +123,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
     ExecutionLocationRegistry locationRegistry;
     Storage globalState;
 
-    AgentScheduler scheduler( locationRegistry, globalState );
+    AgentScheduler scheduler( locationRegistry, globalState, false );
     /*scheduler.setDispatchStrategy(
         libstdhl::Memory::make_unique< ParallelDispatchStrategy >() );*/
 

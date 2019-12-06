@@ -53,6 +53,8 @@ namespace libcasm_fe
 {
     class Frame
     {
+        static std::size_t id;
+
       public:
         Frame( Ast::CallExpression* call, Ast::Node* callee, std::size_t numberOfLocals );
 
@@ -63,7 +65,10 @@ namespace libcasm_fe
         const libcasm_ir::Constant& local( std::size_t index ) const;
         const std::vector< libcasm_ir::Constant >& locals( void ) const;
 
+        std::size_t frameId() const;
+
       private:
+        const std::size_t m_frameId;
         Ast::CallExpression* m_call;
         Ast::Node* m_callee;
         std::vector< libcasm_ir::Constant > m_locals;

@@ -85,6 +85,7 @@ add_library( ${PROJECT}-cpp OBJECT
   analyze/PropertyResolverPass.cpp
   analyze/PropertyRevisePass.cpp
 
+  execute/Agent.cpp
   execute/ExecutionVisitor.cpp
   execute/NumericExecutionPass.cpp
   execute/HashMapBase.cpp
@@ -190,6 +191,7 @@ ecm_generate_headers( ${PROJECT}_EXECUTE_HEADERS_CPP
   ORIGINAL
     CAMELCASE
   HEADER_NAMES
+    Agent
     ChainedHashMap
     ExecutionVisitor
     Frame

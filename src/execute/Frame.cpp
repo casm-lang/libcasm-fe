@@ -53,10 +53,13 @@ using namespace Ast;
 
 namespace ir = libcasm_ir;
 
+std::size_t Frame::id = 0;
+
 Frame::Frame( CallExpression* call, Node* callee, std::size_t numberOfLocals )
 : m_call( call )
 , m_callee( callee )
 , m_locals( numberOfLocals )
+, m_frameId( id++ )
 {
 }
 

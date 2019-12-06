@@ -240,7 +240,9 @@ namespace libcasm_fe
 
         void visit( Ast::VariableBinding& node ) override;
 
-      private:
+        static std::string updateAsString( const ExecutionUpdateSet::Update& update );
+
+      protected:
         u1 hasEmptyUpdateSet( void ) const;
 
         std::unique_ptr< Frame > makeFrame(
@@ -315,7 +317,7 @@ namespace libcasm_fe
             const IR::Constant& universe,
             const std::function< void() >& subRule ) const;
 
-      private:
+      protected:
         const Storage& m_globalState;
         ExecutionLocationRegistry& m_locationRegistry;
         UpdateSetManager< ExecutionUpdateSet >& m_updateSetManager;
@@ -345,113 +347,6 @@ namespace libcasm_fe
         UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
     };
 
-    class Agent
-    {
-      public:
-        Agent(
-            ExecutionLocationRegistry& locationRegistry,
-            const Storage& globalState,
-            const IR::Constant& agentId,
-            const ReferenceConstant& rule );
-
-        void run( void );
-
-        ExecutionUpdateSet* updateSet( void ) const;
-
-      private:
-        const Storage& m_globalState;
-        ExecutionLocationRegistry& m_locationRegistry;
-        const IR::Constant& m_agentId;
-        const ReferenceConstant& m_rule;
-        UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
-    };
-
-    class DispatchStrategy
-    {
-      public:
-        virtual ~DispatchStrategy() = default;
-
-        virtual void dispatch( std::vector< Agent >& agents ) = 0;
-    };
-
-    class ParallelDispatchStrategy : public DispatchStrategy
-    {
-      public:
-        void dispatch( std::vector< Agent >& agents ) override;
-    };
-
-    class SequentialDispatchStrategy : public DispatchStrategy
-    {
-      public:
-        void dispatch( std::vector< Agent >& agents ) override;
-    };
-
-    class SelectionStrategy
-    {
-      public:
-        virtual ~SelectionStrategy() = default;
-
-        /**
-         * Selects the agents from \a agents which should be executed, by removing
-         * all agents which should not be executed.
-         *
-         * @param agents List of available agents
-         */
-        virtual void selectAgents( std::vector< Agent >& agents ) const = 0;
-    };
-
-    class AllAgentsSelectionStrategy final : public SelectionStrategy
-    {
-      public:
-        void selectAgents( std::vector< Agent >& agents ) const override;
-    };
-
-    class SingleRandomAgentSelectionStrategy final : public SelectionStrategy
-    {
-      public:
-        void selectAgents( std::vector< Agent >& agents ) const override;
-    };
-
-    class AgentScheduler
-    {
-      public:
-        AgentScheduler( ExecutionLocationRegistry& locationRegistry, Storage& globalState );
-
-        void setDispatchStrategy( std::unique_ptr< DispatchStrategy > dispatchStrategy );
-        void setAgentSelectionStrategy( std::unique_ptr< SelectionStrategy > selectionStrategy );
-
-        u1 check( void );
-
-        /**
-         * Performs an ASM step.
-         */
-        void step( void );
-
-        /**
-         * @return A boolean value indicating wheter the ASM has reached an end
-         *         state, meaning that no further steps need to be done.
-         */
-        bool done( void ) const;
-
-        std::size_t numberOfSteps( void ) const;
-
-      private:
-        std::vector< Agent > collectAgents( void ) const;
-        void selectAgents( std::vector< Agent >& agents );
-        void dispatch( std::vector< Agent >& agents );
-        void collectUpdates( const std::vector< Agent >& agents );
-        void fireUpdates( void );
-
-      private:
-        std::unique_ptr< DispatchStrategy > m_dispatchStrategy;
-        std::unique_ptr< SelectionStrategy > m_selectionStrategy;
-        Storage& m_globalState;
-        ExecutionLocationRegistry& m_locationRegistry;
-        ParallelUpdateSet< UpdateSetDetails > m_collectedUpdates;
-        bool m_done;
-        std::size_t m_stepCounter;
-    };
-
     class InvariantChecker
     {
       public:
@@ -462,6 +357,72 @@ namespace libcasm_fe
       private:
         const Storage& m_globalState;
         ExecutionLocationRegistry& m_locationRegistry;
+    };
+    class SymbolicExecutionVisitor final : public ExecutionVisitor
+    {
+      private:
+        Stack< libtptp::Node::Ptr > m_stack;
+
+      public:
+        SymbolicExecutionVisitor(
+            ExecutionLocationRegistry& locationRegistry,
+            const Storage& globalState,
+            UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
+            const IR::Constant& agentId,
+            IR::SymbolicExecutionEnvironment& environment );
+
+        void visit( Ast::FunctionDefinition& node ) override;
+
+        void visit( Ast::DirectCallExpression& node ) override;
+        void visit( Ast::MethodCallExpression& node ) override;
+        void visit( Ast::LiteralCallExpression& node ) override;
+        void visit( Ast::IndirectCallExpression& node ) override;
+        void visit( Ast::UnaryExpression& node ) override;
+        void visit( Ast::BinaryExpression& node ) override;
+        void visit( Ast::LetExpression& node ) override;
+        void visit( Ast::ConditionalExpression& node ) override;
+        void visit( Ast::ChooseExpression& node ) override;
+        void visit( Ast::UniversalQuantifierExpression& node ) override;
+        void visit( Ast::ExistentialQuantifierExpression& node ) override;
+        void visit( Ast::CardinalityExpression& node ) override;
+
+        void visit( Ast::ConditionalRule& node ) override;
+        void visit( Ast::CaseRule& node ) override;
+        void visit( Ast::LetRule& node ) override;
+        void visit( Ast::ForallRule& node ) override;
+        void visit( Ast::ChooseRule& node ) override;
+        void visit( Ast::IterateRule& node ) override;
+        void visit( Ast::BlockRule& node ) override;
+        void visit( Ast::SequenceRule& node ) override;
+        void visit( Ast::UpdateRule& node ) override;
+        void visit( Ast::CallRule& node ) override;
+        void visit( Ast::WhileRule& node ) override;
+
+        void visit( Ast::VariableBinding& node ) override;
+
+      private:
+        IR::SymbolicExecutionEnvironment& m_environment;
+
+        IR::SymbolicExecutionEnvironment& environment();
+    };
+
+    class SymbolicStateInitializationVisitor final : public Ast::EmptyVisitor
+    {
+      public:
+        SymbolicStateInitializationVisitor(
+            ExecutionLocationRegistry& locationRegistry,
+            Storage& globalState,
+            IR::SymbolicExecutionEnvironment& environment );
+
+        void visit( Specification& node );
+        void visit( Ast::InitDefinition& node ) override;
+        void visit( Ast::FunctionDefinition& node ) override;
+
+      private:
+        Storage& m_globalState;
+        ExecutionLocationRegistry& m_locationRegistry;
+        IR::SymbolicExecutionEnvironment& m_environment;
+        UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
     };
 
 }
