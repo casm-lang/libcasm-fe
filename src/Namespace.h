@@ -110,6 +110,10 @@ namespace libcasm_fe
 
         const std::unordered_map< std::string, Linkage >& namespaces( void ) const;
 
+        void registerTypeDefinition( Ast::TypeDefinition& node );
+
+        Ast::TypeDefinition::Ptr findTypeDefinition( const libcasm_ir::Type::ID typeID ) const;
+
         std::string dump( const std::string& indention = "" ) const;
 
       private:
@@ -120,6 +124,9 @@ namespace libcasm_fe
         std::unordered_map< std::string, Ast::Definition::Ptr > m_symbols;
 
         std::unordered_map< std::string, Linkage > m_namespaces;
+
+        std::unordered_map< libcasm_ir::Type::ID, Ast::TypeDefinition::Ptr >
+            m_typeIdToTypeDefinition;
     };
 }
 

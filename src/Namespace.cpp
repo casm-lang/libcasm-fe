@@ -184,6 +184,40 @@ const std::unordered_map< std::string, Namespace::Linkage >& Namespace::namespac
     return m_namespaces;
 }
 
+#include <iostream>
+
+void Namespace::registerTypeDefinition( TypeDefinition& node )
+{
+    if( not node.type() )
+    {
+        throw std::invalid_argument( node.description() + " has no concrete IR type" );
+    }
+
+    const auto result =
+        m_typeIdToTypeDefinition.emplace( node.type()->id(), node.ptr< TypeDefinition >() );
+
+    if( not result.second )
+    {
+        const auto& existingTypeID = result.first->first;
+        const auto& existingNode = result.first->second;
+
+        throw std::domain_error(
+            "already registered " + node.description() + " '" + node.typeDescription() +
+            "' with type ID '" + std::to_string( existingTypeID ) + "'" );
+    }
+}
+
+Ast::TypeDefinition::Ptr Namespace::findTypeDefinition( const libcasm_ir::Type::ID typeID ) const
+{
+    const auto& definitionResult = m_typeIdToTypeDefinition.find( typeID );
+    if( definitionResult == m_typeIdToTypeDefinition.end() )
+    {
+        return nullptr;
+    }
+
+    return definitionResult->second;
+}
+
 std::string Namespace::dump( const std::string& indention ) const
 {
     std::unordered_set< const Namespace* > visited;
@@ -196,7 +230,7 @@ std::string Namespace::dump(
     const auto it = visited.emplace( this );
     if( not it.second )
     {
-        return std::string();
+        return indention + " ...\n";
     }
 
     if( m_symbols.size() == 0 and m_namespaces.size() == 0 )
@@ -212,7 +246,11 @@ std::string Namespace::dump(
         const auto& type = definition->type();
 
         stream << indention << name << " "
-               << libstdhl::Ansi::format< libstdhl::Ansi::Color::CYAN >( definition->description() )
+               << libstdhl::Ansi::format< libstdhl::Ansi::Color::MAGENTA >(
+                      definition->description() )
+               << " "
+               << libstdhl::Ansi::format< libstdhl::Ansi::Color::CYAN >(
+                      definition->typeDescription() )
                << " "
                << libstdhl::Ansi::format< libstdhl::Ansi::Color::BLUE >(
                       type ? type->description() : "$unresolved$" )
@@ -223,7 +261,8 @@ std::string Namespace::dump(
     {
         const auto& name = _namespace.first;
         const auto& space = _namespace.second.first;
-        const auto visibility = ( _namespace.second.second == Visibility::Internal ? "-" : "+" );
+        const auto visibility = libstdhl::Ansi::format< libstdhl::Ansi::Color::MAGENTA >(
+            _namespace.second.second == Visibility::Internal ? "-" : "+" );
         const auto prefix = indention + name + Namespace::delimiter() + visibility;
         stream << space->dump( prefix, visited );
     }
