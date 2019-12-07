@@ -213,11 +213,11 @@ std::string Node::description( void ) const
         }
         case ID::UNARY_EXPRESSION:
         {
-            return "expression";
+            return "unary expression";
         }
         case ID::BINARY_EXPRESSION:
         {
-            return "expression";
+            return "binary expression";
         }
         case ID::LET_EXPRESSION:
         {
