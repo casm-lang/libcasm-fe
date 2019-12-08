@@ -54,8 +54,6 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-static const auto unresolvedToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-
 //
 //
 // Helper
@@ -66,7 +64,7 @@ Helper::Helper(
 : Node( id )
 , m_leftBraceToken( leftBraceToken )
 , m_rightBraceToken( rightBraceToken )
-, m_delimiterToken( unresolvedToken )
+, m_delimiterToken( Token::unresolved() )
 {
 }
 
@@ -156,8 +154,11 @@ Initializer::Initializer(
 , m_value( value )
 , m_updateRule( std::make_shared< UpdateRule >(
       std::make_shared< DirectCallExpression >(
-          IdentifierPath::fromIdentifier( std::make_shared< Identifier >() ), arguments ),
-      unresolvedToken,
+          IdentifierPath::fromIdentifier( std::make_shared< Identifier >() ),
+          Token::unresolved(),
+          arguments,
+          Token::unresolved() ),
+      Token::unresolved(),
       value ) )
 , m_mapsToken( mapsToken )
 {
@@ -192,8 +193,8 @@ void Initializer::setObjectType( const libcasm_ir::Type::Ptr& objectType )
     const auto identifier = Ast::make< Identifier >( sourceLocation(), "this" );
     const auto identifierPath = Ast::make< IdentifierPath >( sourceLocation(), identifier );
     const auto arguments = Ast::make< Expressions >( sourceLocation() );
-    const auto objectCall =
-        Ast::make< DirectCallExpression >( sourceLocation(), identifierPath, arguments );
+    const auto objectCall = Ast::make< DirectCallExpression >(
+        sourceLocation(), identifierPath, Token::unresolved(), arguments, Token::unresolved() );
     objectCall->setType( objectType );
     objectCall->setTargetType( DirectCallExpression::TargetType::THIS );
 
@@ -201,10 +202,10 @@ void Initializer::setObjectType( const libcasm_ir::Type::Ptr& objectType )
         Ast::make< Identifier >( sourceLocation(), functionCall->identifier()->path() );
 
     const auto methodCall = Ast::make< MethodCallExpression >(
-        sourceLocation(), objectCall, unresolvedToken, methodName, functionCall->arguments() );
+        sourceLocation(), objectCall, Token::unresolved(), methodName, functionCall->arguments() );
 
     m_updateRule = Ast::make< UpdateRule >(
-        sourceLocation(), methodCall, unresolvedToken, updateRule()->expression() );
+        sourceLocation(), methodCall, Token::unresolved(), updateRule()->expression() );
 }
 
 void Initializer::accept( Visitor& visitor )
@@ -245,6 +246,11 @@ Initially::Initially(
 const Initializers::Ptr& Initially::initializers( void ) const
 {
     return m_initializers;
+}
+
+void Initially::setInitializers( const Initializers::Ptr& initializers )
+{
+    m_initializers = initializers;
 }
 
 const Token::Ptr& Initially::initiallyToken( void ) const

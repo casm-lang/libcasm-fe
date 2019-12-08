@@ -153,6 +153,8 @@ namespace libcasm_fe
 
             const Initializers::Ptr& initializers( void ) const;
 
+            void setInitializers( const Initializers::Ptr& initializers );
+
             const Token::Ptr& initiallyToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
@@ -160,7 +162,7 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            const Initializers::Ptr m_initializers;
+            Initializers::Ptr m_initializers;
             const Token::Ptr m_initiallyToken;
         };
     }
