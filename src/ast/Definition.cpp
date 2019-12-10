@@ -141,6 +141,11 @@ const Token::Ptr& HeaderDefinition::headerToken( void ) const
     return m_headerToken;
 }
 
+std::string HeaderDefinition::typeDescription( void ) const
+{
+    return "...";
+}
+
 void HeaderDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -176,6 +181,11 @@ const Type::Ptr& VariableDefinition::variableType( void ) const
     return m_variableType;
 }
 
+void VariableDefinition::setVariableType( const Type::Ptr& variableType )
+{
+    m_variableType = variableType;
+}
+
 const Token::Ptr& VariableDefinition::colonToken( void ) const
 {
     return m_colonToken;
@@ -191,14 +201,19 @@ std::size_t VariableDefinition::localIndex( void ) const
     return m_localIndex;
 }
 
-void VariableDefinition::setObjectDefinition( const Definition::Ptr& objectDefinition )
+void VariableDefinition::setObjectDefinition( const TypeDefinition::Ptr& objectDefinition )
 {
     m_objectDefinition = objectDefinition;
 }
 
-const Definition::Ptr& VariableDefinition::objectDefinition( void ) const
+const TypeDefinition::Ptr& VariableDefinition::objectDefinition( void ) const
 {
     return m_objectDefinition;
+}
+
+std::string VariableDefinition::typeDescription( void ) const
+{
+    return identifier()->name() + " : " + variableType()->signature();
 }
 
 void VariableDefinition::accept( Visitor& visitor )
@@ -224,11 +239,16 @@ Node::Ptr VariableDefinition::clone( void ) const
 // TypeDefinition
 //
 
-TypeDefinition::TypeDefinition( const Node::ID id, const Type::Ptr& domainType )
+TypeDefinition::TypeDefinition(
+    const Node::ID id,
+    const Type::Ptr& domainType,
+    const VariableDefinitions::Ptr& templateSymbols )
 : Definition(
       id,
       Ast::make< Identifier >( domainType->name()->sourceLocation(), domainType->name()->path() ) )
 , m_domainType( domainType )
+, m_templateSymbols( templateSymbols )
+, m_templateInstances( std::make_shared< TypeDefinitions >() )
 {
 }
 
@@ -237,49 +257,34 @@ const Type::Ptr& TypeDefinition::domainType( void ) const
     return m_domainType;
 }
 
-void TypeDefinition::clone( TypeDefinition& duplicate ) const
+void TypeDefinition::setDomainType( const Type::Ptr& domainType )
 {
-    Definition::clone( duplicate );
+    m_domainType = domainType;
 }
 
-//
-//
-// TemplateTypeDefinition
-//
-
-TemplateTypeDefinition::TemplateTypeDefinition(
-    const Node::ID id,
-    const Type::Ptr& domainType,
-    const VariableDefinitions::Ptr& templateSymbols )
-: TypeDefinition( id, domainType )
-, m_templateSymbols( templateSymbols )
-, m_templateInstances( std::make_shared< TypeDefinitions >() )
+u1 TypeDefinition::isTemplate( void ) const
 {
+    return templateSymbols()->size() != 0;
 }
 
-const VariableDefinitions::Ptr& TemplateTypeDefinition::templateSymbols( void ) const
+const VariableDefinitions::Ptr& TypeDefinition::templateSymbols( void ) const
 {
     return m_templateSymbols;
 }
 
-void TemplateTypeDefinition::addTemplateInstance(
-    const TypeDefinition::Ptr& templateInstance ) const
+void TypeDefinition::addTemplateInstance( const TypeDefinition::Ptr& templateInstance ) const
 {
     m_templateInstances->add( templateInstance );
 }
 
-const TypeDefinitions::Ptr& TemplateTypeDefinition::templateInstances( void ) const
+const TypeDefinitions::Ptr& TypeDefinition::templateInstances( void ) const
 {
     return m_templateInstances;
 }
 
-void TemplateTypeDefinition::clone( TemplateTypeDefinition& duplicate ) const
+void TypeDefinition::clone( TypeDefinition& duplicate ) const
 {
-    TypeDefinition::clone( duplicate );
-    for( const auto& templateInstance : *templateInstances() )
-    {
-        duplicate.addTemplateInstance( templateInstance );
-    }
+    Definition::clone( duplicate );
 }
 
 //
@@ -419,6 +424,26 @@ const Initially::Ptr& FunctionDefinition::initially( void ) const
     return m_initially;
 }
 
+std::string FunctionDefinition::typeDescription( void ) const
+{
+    std::stringstream stream;
+    stream << ":";
+
+    const auto& innerTypes = argumentTypes();
+    for( const auto& innerType : *innerTypes )
+    {
+        stream << " " << innerType->signature() << "* ";
+    }
+
+    if( innerTypes->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+    }
+
+    stream << " -> " << returnType()->signature() << " ";
+    return stream.str();
+}
+
 void FunctionDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -478,6 +503,11 @@ const Type::Ptr& DerivedDefinition::returnType( void ) const
     return m_returnType;
 }
 
+void DerivedDefinition::setReturnType( const Type::Ptr& returnType )
+{
+    m_returnType = returnType;
+}
+
 const Expression::Ptr& DerivedDefinition::expression( void ) const
 {
     return m_expression;
@@ -518,6 +548,27 @@ void DerivedDefinition::setRightBracketToken( const Token::Ptr& rightBracketToke
 const Token::Ptr& DerivedDefinition::rightBracketToken( void ) const
 {
     return m_rightBracketToken;
+}
+
+std::string DerivedDefinition::typeDescription( void ) const
+{
+    std::stringstream stream;
+    stream << "(";
+
+    const auto& innerDefinitions = arguments();
+    for( const auto& innerDefinition : *innerDefinitions )
+    {
+        stream << " " << innerDefinition->typeDescription() << ", ";
+    }
+
+    if( innerDefinitions->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+        stream << " ";
+    }
+
+    stream << ") -> " << returnType()->signature() << " ";
+    return stream.str();
 }
 
 void DerivedDefinition::accept( Visitor& visitor )
@@ -577,6 +628,11 @@ const Type::Ptr& RuleDefinition::returnType( void ) const
     return m_returnType;
 }
 
+void RuleDefinition::setReturnType( const Type::Ptr& returnType )
+{
+    m_returnType = returnType;
+}
+
 const Rule::Ptr& RuleDefinition::rule( void ) const
 {
     return m_rule;
@@ -619,6 +675,27 @@ const Token::Ptr& RuleDefinition::rightBracketToken( void ) const
     return m_rightBracketToken;
 }
 
+std::string RuleDefinition::typeDescription( void ) const
+{
+    std::stringstream stream;
+    stream << "(";
+
+    const auto& innerDefinitions = arguments();
+    for( const auto& innerDefinition : *innerDefinitions )
+    {
+        stream << " " << innerDefinition->typeDescription() << ", ";
+    }
+
+    if( innerDefinitions->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+        stream << " ";
+    }
+
+    stream << ") -> " << returnType()->signature() << " ";
+    return stream.str();
+}
+
 void RuleDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -653,6 +730,11 @@ EnumeratorDefinition::EnumeratorDefinition( const Identifier::Ptr& identifier )
     setProperty( libcasm_ir::Property::PURE );
 }
 
+std::string EnumeratorDefinition::typeDescription( void ) const
+{
+    return identifier()->name();
+}
+
 void EnumeratorDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -679,7 +761,7 @@ EnumerationDefinition::EnumerationDefinition(
     const Token::Ptr& leftBraceToken,
     const Enumerators::Ptr& enumerators,
     const Token::Ptr& rightBraceToken )
-: TemplateTypeDefinition(
+: TypeDefinition(
       Node::ID::ENUMERATION_DEFINITION,
       Ast::make< BasicType >(
           identifier->sourceLocation(), IdentifierPath::fromIdentifier( identifier ) ),
@@ -719,6 +801,11 @@ const Token::Ptr& EnumerationDefinition::rightBraceToken( void ) const
     return m_rightBraceToken;
 }
 
+std::string EnumerationDefinition::typeDescription( void ) const
+{
+    return domainType()->signature();
+}
+
 void EnumerationDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -734,7 +821,7 @@ Node::Ptr EnumerationDefinition::clone( void ) const
         enumerators()->duplicate< Enumerators >(),
         rightBraceToken() );
 
-    TemplateTypeDefinition::clone( *duplicate );
+    TypeDefinition::clone( *duplicate );
     return duplicate;
 }
 
@@ -747,17 +834,17 @@ UsingDefinition::UsingDefinition(
     const Token::Ptr& usingToken,
     const Identifier::Ptr& identifier,
     const Token::Ptr& assignmentToken,
-    const Type::Ptr& type )
+    const Type::Ptr& aliasType )
 : Definition( Node::ID::USING_DEFINITION, identifier )
-, m_type( type )
+, m_aliasType( aliasType )
 , m_usingToken( usingToken )
 , m_assignmentToken( assignmentToken )
 {
 }
 
-const Type::Ptr& UsingDefinition::type( void ) const
+const Type::Ptr& UsingDefinition::aliasType( void ) const
 {
-    return m_type;
+    return m_aliasType;
 }
 
 const Token::Ptr& UsingDefinition::usingToken( void ) const
@@ -768,6 +855,11 @@ const Token::Ptr& UsingDefinition::usingToken( void ) const
 const Token::Ptr& UsingDefinition::assignmentToken( void ) const
 {
     return m_assignmentToken;
+}
+
+std::string UsingDefinition::typeDescription( void ) const
+{
+    return aliasType()->signature();
 }
 
 void UsingDefinition::accept( Visitor& visitor )
@@ -781,7 +873,7 @@ Node::Ptr UsingDefinition::clone( void ) const
         usingToken(),
         identifier()->duplicate< Identifier >(),
         assignmentToken(),
-        type()->duplicate< Type >() );
+        aliasType()->duplicate< Type >() );
 
     Definition::clone( *duplicate );
     return duplicate;
@@ -839,6 +931,11 @@ const Token::Ptr& UsingPathDefinition::asterixToken( void ) const
     return m_asterixToken;
 }
 
+std::string UsingPathDefinition::typeDescription( void ) const
+{
+    return path()->path();
+}
+
 void UsingPathDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -885,6 +982,11 @@ const Token::Ptr& InvariantDefinition::assignmentToken( void ) const
     return m_assignmentToken;
 }
 
+std::string InvariantDefinition::typeDescription( void ) const
+{
+    return "...";
+}
+
 void InvariantDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -911,7 +1013,7 @@ DomainDefinition::DomainDefinition(
     const Token::Ptr& domainToken,
     const VariableDefinitions::Ptr& templateSymbols,
     const Type::Ptr& domainType )
-: TemplateTypeDefinition( Node::ID::DOMAIN_DEFINITION, domainType, templateSymbols )
+: TypeDefinition( Node::ID::DOMAIN_DEFINITION, domainType, templateSymbols )
 , m_domainToken( domainToken )
 {
 }
@@ -919,6 +1021,11 @@ DomainDefinition::DomainDefinition(
 const Token::Ptr& DomainDefinition::domainToken( void ) const
 {
     return m_domainToken;
+}
+
+std::string DomainDefinition::typeDescription( void ) const
+{
+    return domainType()->signature();
 }
 
 void DomainDefinition::accept( Visitor& visitor )
@@ -933,7 +1040,7 @@ Node::Ptr DomainDefinition::clone( void ) const
         templateSymbols()->duplicate< VariableDefinitions >(),
         domainType()->duplicate< Type >() );
 
-    TemplateTypeDefinition::clone( *duplicate );
+    TypeDefinition::clone( *duplicate );
     return duplicate;
 }
 
@@ -949,7 +1056,7 @@ StructureDefinition::StructureDefinition(
     const Token::Ptr& leftBraceToken,
     const FunctionDefinitions::Ptr& functions,
     const Token::Ptr& rightBraceToken )
-: TemplateTypeDefinition(
+: TypeDefinition(
       Node::ID::STRUCTURE_DEFINITION,
       Ast::make< BasicType >(
           identifier->sourceLocation(), IdentifierPath::fromIdentifier( identifier ) ),
@@ -987,6 +1094,11 @@ const Token::Ptr& StructureDefinition::rightBraceToken( void ) const
     return m_rightBraceToken;
 }
 
+std::string StructureDefinition::typeDescription( void ) const
+{
+    return domainType()->signature();
+}
+
 void StructureDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -1002,7 +1114,7 @@ Node::Ptr StructureDefinition::clone( void ) const
         functions()->duplicate< FunctionDefinitions >(),
         rightBraceToken() );
 
-    TemplateTypeDefinition::clone( *duplicate );
+    TypeDefinition::clone( *duplicate );
     return duplicate;
 }
 
@@ -1019,7 +1131,7 @@ FeatureDefinition::FeatureDefinition(
     const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
     const Token::Ptr& rightBraceToken )
-: TemplateTypeDefinition( Node::ID::FEATURE_DEFINITION, domainType, templateSymbols )
+: TypeDefinition( Node::ID::FEATURE_DEFINITION, domainType, templateSymbols )
 , m_definitions( definitions )
 , m_featureToken( featureToken )
 , m_assignmentToken( assignmentToken )
@@ -1053,6 +1165,11 @@ const Token::Ptr& FeatureDefinition::rightBraceToken( void ) const
     return m_rightBraceToken;
 }
 
+std::string FeatureDefinition::typeDescription( void ) const
+{
+    return domainType()->signature();
+}
+
 void FeatureDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -1069,7 +1186,7 @@ Node::Ptr FeatureDefinition::clone( void ) const
         definitions()->duplicate< Definitions >(),
         rightBraceToken() );
 
-    TemplateTypeDefinition::clone( *duplicate );
+    TypeDefinition::clone( *duplicate );
     return duplicate;
 }
 
@@ -1088,7 +1205,7 @@ ImplementDefinition::ImplementDefinition(
     const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
     const Token::Ptr& rightBraceToken )
-: TemplateTypeDefinition( Node::ID::IMPLEMENT_DEFINITION, domainType, templateSymbols )
+: TypeDefinition( Node::ID::IMPLEMENT_DEFINITION, domainType, templateSymbols )
 , m_featureType( featureType )
 , m_definitions( definitions )
 , m_implementToken( implementToken )
@@ -1160,6 +1277,11 @@ u1 ImplementDefinition::hasFeature( void ) const
     return forToken()->token() != Grammar::Token::UNRESOLVED;
 }
 
+std::string ImplementDefinition::typeDescription( void ) const
+{
+    return domainType()->signature();
+}
+
 void ImplementDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -1178,7 +1300,7 @@ Node::Ptr ImplementDefinition::clone( void ) const
         definitions()->duplicate< Definitions >(),
         rightBraceToken() );
 
-    TemplateTypeDefinition::clone( *duplicate );
+    TypeDefinition::clone( *duplicate );
     return duplicate;
 }
 
@@ -1191,7 +1313,7 @@ BuiltinDefinition::BuiltinDefinition(
     const Token::Ptr& builtinToken,
     const VariableDefinitions::Ptr& templateSymbols,
     const RelationType::Ptr& domainType )
-: TemplateTypeDefinition( Node::ID::BUILTIN_DEFINITION, domainType, templateSymbols )
+: TypeDefinition( Node::ID::BUILTIN_DEFINITION, domainType, templateSymbols )
 , m_builtinToken( builtinToken )
 , m_targetId( libcasm_ir::Value::_SIZE_ )
 {
@@ -1211,13 +1333,23 @@ const RelationType& BuiltinDefinition::relationType( void ) const
 
 libcasm_ir::Value::ID BuiltinDefinition::targetId( void ) const
 {
-    assert( m_targetId != libcasm_ir::Value::_SIZE_ );
+    assert( hasTargetId() );
     return m_targetId;
+}
+
+u1 BuiltinDefinition::hasTargetId( void ) const
+{
+    return m_targetId != libcasm_ir::Value::_SIZE_;
 }
 
 void BuiltinDefinition::setTargetId( const libcasm_ir::Value::ID targetId )
 {
     m_targetId = targetId;
+}
+
+std::string BuiltinDefinition::typeDescription( void ) const
+{
+    return domainType()->signature();
 }
 
 void BuiltinDefinition::accept( Visitor& visitor )
@@ -1232,7 +1364,7 @@ Node::Ptr BuiltinDefinition::clone( void ) const
         templateSymbols()->duplicate< VariableDefinitions >(),
         relationType().duplicate< RelationType >() );
 
-    TemplateTypeDefinition::clone( *duplicate );
+    TypeDefinition::clone( *duplicate );
     return duplicate;
 }
 
@@ -1246,12 +1378,10 @@ InitDefinition::InitDefinition( const Token::Ptr& initToken, const IdentifierPat
       Node::ID::INIT_DEFINITION,
       Ast::make< Identifier >( initToken->sourceLocation(), initToken->tokenString() ) )
 , m_initPath( initPath )
-, m_initializers( std::make_shared< Initializers >() )
+, m_initializers( Ast::make< Initializers >( initToken->sourceLocation() ) )
 , m_initToken( initToken )
 , m_leftBraceToken( Token::unresolved() )
 , m_rightBraceToken( Token::unresolved() )
-, m_programFunction( nullptr )
-, m_agentDefinition( nullptr )
 {
 }
 
@@ -1268,8 +1398,6 @@ InitDefinition::InitDefinition(
 , m_initToken( initToken )
 , m_leftBraceToken( leftBraceToken )
 , m_rightBraceToken( rightBraceToken )
-, m_programFunction( nullptr )
-, m_agentDefinition( nullptr )
 {
 }
 
@@ -1298,30 +1426,14 @@ const Token::Ptr& InitDefinition::rightBraceToken( void ) const
     return m_rightBraceToken;
 }
 
-void InitDefinition::setProgramFunction( const FunctionDefinition::Ptr& programFunction )
-{
-    assert( m_programFunction == nullptr );
-    m_programFunction = programFunction;
-}
-
-const FunctionDefinition::Ptr& InitDefinition::programFunction( void ) const
-{
-    return m_programFunction;
-}
-
-void InitDefinition::setAgentDefinition( const Definition::Ptr& agentDefinition )
-{
-    m_agentDefinition = agentDefinition;
-}
-
-const Definition::Ptr& InitDefinition::agentDefinition( void ) const
-{
-    return m_agentDefinition;
-}
-
 u1 InitDefinition::isSingleAgent( void ) const
 {
     return m_initPath != nullptr;
+}
+
+std::string InitDefinition::typeDescription( void ) const
+{
+    return "...";
 }
 
 void InitDefinition::accept( Visitor& visitor )
@@ -1338,8 +1450,6 @@ Node::Ptr InitDefinition::clone( void ) const
         rightBraceToken() );
 
     Definition::clone( *duplicate );
-    duplicate->setProgramFunction( programFunction() );
-    duplicate->setAgentDefinition( agentDefinition() );
     return duplicate;
 }
 
@@ -1382,6 +1492,11 @@ const Token::Ptr& ImportDefinition::importToken( void ) const
 const Token::Ptr& ImportDefinition::asToken( void ) const
 {
     return m_asToken;
+}
+
+std::string ImportDefinition::typeDescription( void ) const
+{
+    return path()->path();
 }
 
 void ImportDefinition::accept( Visitor& visitor )
