@@ -203,8 +203,12 @@ class DefinitionVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
     void visit( UsingDefinition& node ) override;
     void visit( ImportDefinition& node ) override;
+    void visit( DomainDefinition& node ) override;
+    void visit( BuiltinDefinition& node ) override;
     void visit( StructureDefinition& node ) override;
     void visit( FeatureDefinition& node ) override;
+    void visit( ImplementDefinition& node ) override;
+    void visit( Declaration& node ) override;
 
   private:
     libcasm_fe::Logger& m_log;
@@ -333,6 +337,13 @@ void DefinitionVisitor::visit( RuleDefinition& node )
         {
             node.setExported( true );
         }
+        else
+        {
+            m_log.error(
+                { node.attributes()->sourceLocation() },
+                "unsupported " + node.description() + " attribute '" + name + "' found",
+                Code::Unspecified );
+        }
     }
 }
 
@@ -364,6 +375,13 @@ void DefinitionVisitor::visit( EnumerationDefinition& node )
                 enumerator->setExported( true );
             }
         }
+        else
+        {
+            m_log.error(
+                { node.attributes()->sourceLocation() },
+                "unsupported " + node.description() + " attribute '" + name + "' found",
+                Code::Unspecified );
+        }
     }
 }
 
@@ -380,6 +398,13 @@ void DefinitionVisitor::visit( UsingDefinition& node )
         if( name == EXPORT_ATTRIBUTE )
         {
             node.setExported( true );
+        }
+        else
+        {
+            m_log.error(
+                { node.attributes()->sourceLocation() },
+                "unsupported " + node.description() + " attribute '" + name + "' found",
+                Code::Unspecified );
         }
     }
 }
@@ -398,6 +423,65 @@ void DefinitionVisitor::visit( ImportDefinition& node )
         {
             node.setExported( true );
         }
+        else
+        {
+            m_log.error(
+                { node.attributes()->sourceLocation() },
+                "unsupported " + node.description() + " attribute '" + name + "' found",
+                Code::Unspecified );
+        }
+    }
+}
+
+void DefinitionVisitor::visit( DomainDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    DefinitionAttributionVisitor visitor( m_log, node );
+    node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+    for( const auto& name : attributeNames )
+    {
+        if( name == EXPORT_ATTRIBUTE )
+        {
+            node.setExported( true );
+        }
+        else
+        {
+            m_log.error(
+                { node.attributes()->sourceLocation() },
+                "unsupported " + node.description() + " attribute '" + name + "' found",
+                Code::Unspecified );
+        }
+    }
+}
+
+void DefinitionVisitor::visit( BuiltinDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    DefinitionAttributionVisitor visitor( m_log, node );
+    node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+    for( const auto& name : attributeNames )
+    {
+        if( name == PURE_ATTRIBUTE )
+        {
+            node.setProperty( libcasm_ir::Property::PURE );
+        }
+        else if( name == EXPORT_ATTRIBUTE )
+        {
+            node.setExported( true );
+        }
+        else
+        {
+            m_log.error(
+                { node.attributes()->sourceLocation() },
+                "unsupported " + node.description() + " attribute '" + name + "' found",
+                Code::Unspecified );
+        }
     }
 }
 
@@ -415,6 +499,13 @@ void DefinitionVisitor::visit( StructureDefinition& node )
         {
             node.setExported( true );
         }
+        else
+        {
+            m_log.error(
+                { node.attributes()->sourceLocation() },
+                "unsupported " + node.description() + " attribute '" + name + "' found",
+                Code::Unspecified );
+        }
     }
 }
 
@@ -431,6 +522,54 @@ void DefinitionVisitor::visit( FeatureDefinition& node )
         if( name == EXPORT_ATTRIBUTE )
         {
             node.setExported( true );
+        }
+        else
+        {
+            m_log.error(
+                { node.attributes()->sourceLocation() },
+                "unsupported " + node.description() + " attribute '" + name + "' found",
+                Code::Unspecified );
+        }
+    }
+}
+
+void DefinitionVisitor::visit( ImplementDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    DefinitionAttributionVisitor visitor( m_log, node );
+    node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+    for( const auto& name : attributeNames )
+    {
+        m_log.error(
+            { node.attributes()->sourceLocation() },
+            "unsupported " + node.description() + " attribute '" + name + "' found",
+            Code::Unspecified );
+    }
+}
+
+void DefinitionVisitor::visit( Declaration& node )
+{
+    RecursiveVisitor::visit( node );
+
+    DefinitionAttributionVisitor visitor( m_log, node );
+    node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+    for( const auto& name : attributeNames )
+    {
+        if( name == PURE_ATTRIBUTE )
+        {
+            node.setProperty( libcasm_ir::Property::PURE );
+        }
+        else
+        {
+            m_log.error(
+                { node.attributes()->sourceLocation() },
+                "unsupported " + node.description() + " attribute '" + name + "' found",
+                Code::Unspecified );
         }
     }
 }
