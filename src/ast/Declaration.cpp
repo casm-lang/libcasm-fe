@@ -74,10 +74,18 @@ Declaration::Declaration(
                                                     : Declaration::Kind::RULE )
 {
     assert( kindToken );
-    assert(
-        ( kindToken->token() == Grammar::Token::DERIVED and
-          m_kind == Declaration::Kind::DERIVED ) or
-        ( kindToken->token() == Grammar::Token::RULE and m_kind == Declaration::Kind::RULE ) );
+    if( kindToken->token() == Grammar::Token::DERIVED )
+    {
+        setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    }
+    else if( kindToken->token() == Grammar::Token::RULE )
+    {
+        // OK
+    }
+    else
+    {
+        assert( false and " inconsistent state @ GrammarParser " );
+    }
 }
 
 const Types::Ptr& Declaration::argumentTypes( void ) const
@@ -85,9 +93,19 @@ const Types::Ptr& Declaration::argumentTypes( void ) const
     return m_argumentTypes;
 }
 
+void Declaration::setArgumentTypes( const Types::Ptr& argumentTypes )
+{
+    m_argumentTypes = argumentTypes;
+}
+
 const Type::Ptr& Declaration::returnType( void ) const
 {
     return m_returnType;
+}
+
+void Declaration::setReturnType( const Type::Ptr& returnType )
+{
+    m_returnType = returnType;
 }
 
 Declaration::Kind Declaration::kind( void ) const
@@ -126,6 +144,28 @@ const Token::Ptr& Declaration::colonToken( void ) const
 const Token::Ptr& Declaration::mapsToken( void ) const
 {
     return m_mapsToken;
+}
+
+std::string Declaration::typeDescription( void ) const
+{
+    std::stringstream stream;
+    stream << kindToken()->tokenString() << " " << colonToken()->tokenString() << " ";
+
+    const auto& innerTypes = argumentTypes();
+    for( const auto& innerType : *innerTypes )
+    {
+        stream << innerType->signature() << " * ";
+    }
+
+    if( innerTypes->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+    }
+
+    stream << mapsToken()->tokenString() << " ";
+    stream << returnType()->signature() << " ";
+
+    return stream.str();
 }
 
 void Declaration::accept( Visitor& visitor )
