@@ -125,8 +125,6 @@ namespace libcasm_fe
 
             const UpdateRule::Ptr& updateRule( void ) const;
 
-            void setObjectType( const libcasm_ir::Type::Ptr& objectType );
-
             void accept( Visitor& visitor ) override final;
 
             Node::Ptr clone( void ) const override final;

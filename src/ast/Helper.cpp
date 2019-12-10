@@ -184,30 +184,6 @@ const UpdateRule::Ptr& Initializer::updateRule( void ) const
     return m_updateRule;
 }
 
-void Initializer::setObjectType( const libcasm_ir::Type::Ptr& objectType )
-{
-    const auto& function = updateRule()->function();
-    assert( function and function->id() == Ast::Node::ID::DIRECT_CALL_EXPRESSION );
-    const auto& functionCall = std::static_pointer_cast< DirectCallExpression >( function );
-
-    const auto identifier = Ast::make< Identifier >( sourceLocation(), "this" );
-    const auto identifierPath = Ast::make< IdentifierPath >( sourceLocation(), identifier );
-    const auto arguments = Ast::make< Expressions >( sourceLocation() );
-    const auto objectCall = Ast::make< DirectCallExpression >(
-        sourceLocation(), identifierPath, Token::unresolved(), arguments, Token::unresolved() );
-    objectCall->setType( objectType );
-    objectCall->setTargetType( DirectCallExpression::TargetType::THIS );
-
-    const auto methodName =
-        Ast::make< Identifier >( sourceLocation(), functionCall->identifier()->path() );
-
-    const auto methodCall = Ast::make< MethodCallExpression >(
-        sourceLocation(), objectCall, Token::unresolved(), methodName, functionCall->arguments() );
-
-    m_updateRule = Ast::make< UpdateRule >(
-        sourceLocation(), methodCall, Token::unresolved(), updateRule()->expression() );
-}
-
 void Initializer::accept( Visitor& visitor )
 {
     visitor.visit( *this );
