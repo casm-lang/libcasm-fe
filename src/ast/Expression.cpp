@@ -195,7 +195,6 @@ const Expressions::Ptr& CallExpression::arguments( void ) const
 
 void CallExpression::setLeftBracketToken( const Token::Ptr& leftBracketToken )
 {
-    assert( m_leftBracketToken->token() == Grammar::Token::UNRESOLVED );
     m_leftBracketToken = leftBracketToken;
 }
 
@@ -206,7 +205,6 @@ const Token::Ptr& CallExpression::leftBracketToken( void ) const
 
 void CallExpression::setRightBracketToken( const Token::Ptr& rightBracketToken )
 {
-    assert( m_rightBracketToken->token() == Grammar::Token::UNRESOLVED );
     m_rightBracketToken = rightBracketToken;
 }
 
@@ -230,6 +228,7 @@ void CallExpression::clone( CallExpression& duplicate ) const
 TargetCallExpression::TargetCallExpression( const Node::ID id, const Expressions::Ptr& arguments )
 : CallExpression( id, arguments )
 , m_targetDefinition()
+, m_templateSymbols( std::make_shared< VariableDefinitions >() )
 {
 }
 
@@ -249,10 +248,21 @@ u1 TargetCallExpression::hasTargetDefinition( void ) const
     return m_targetDefinition != nullptr;
 }
 
+void TargetCallExpression::setTemplateSymbols( const VariableDefinitions::Ptr& templateSymbols )
+{
+    m_templateSymbols = templateSymbols;
+}
+
+const VariableDefinitions::Ptr& TargetCallExpression::templateSymbols( void ) const
+{
+    return m_templateSymbols;
+}
+
 void TargetCallExpression::clone( TargetCallExpression& duplicate ) const
 {
     CallExpression::clone( duplicate );
     duplicate.setTargetDefinition( m_targetDefinition );
+    duplicate.setTemplateSymbols( templateSymbols() );
 }
 
 //
@@ -261,10 +271,45 @@ void TargetCallExpression::clone( TargetCallExpression& duplicate ) const
 //
 
 DirectCallExpression::DirectCallExpression(
-    const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
+    const Token::Ptr& templateToken,
+    const std::shared_ptr< VariableDefinitions >& templateSymbols,
+    const IdentifierPath::Ptr& identifier,
+    const Token::Ptr& leftBracketToken,
+    const Expressions::Ptr& arguments,
+    const Token::Ptr& rightBracketToken )
 : TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
+, m_templateToken( templateToken )
 , m_identifier( identifier )
 , m_targetType( TargetType::UNKNOWN )
+{
+    setTemplateSymbols( templateSymbols );
+    setLeftBracketToken( leftBracketToken );
+    setRightBracketToken( rightBracketToken );
+}
+
+DirectCallExpression::DirectCallExpression(
+    const IdentifierPath::Ptr& identifier,
+    const Token::Ptr& leftBracketToken,
+    const Expressions::Ptr& arguments,
+    const Token::Ptr& rightBracketToken )
+: DirectCallExpression(
+      Token::unresolved(),
+      std::make_shared< VariableDefinitions >(),
+      identifier,
+      leftBracketToken,
+      arguments,
+      rightBracketToken )
+{
+}
+
+DirectCallExpression::DirectCallExpression( const IdentifierPath::Ptr& identifier )
+: DirectCallExpression(
+      Token::unresolved(),
+      std::make_shared< VariableDefinitions >(),
+      identifier,
+      Token::unresolved(),
+      std::make_shared< Expressions >(),
+      Token::unresolved() )
 {
 }
 
@@ -325,10 +370,6 @@ std::string DirectCallExpression::targetTypeString( const TargetType targetType 
         {
             return "variable";
         }
-        case TargetType::SELF:
-        {
-            return "self";
-        }
         case TargetType::THIS:
         {
             return "this";
@@ -343,6 +384,11 @@ std::string DirectCallExpression::targetTypeString( const TargetType targetType 
     return std::string();
 }
 
+const Token::Ptr& DirectCallExpression::templateToken( void ) const
+{
+    return m_templateToken;
+}
+
 void DirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -351,7 +397,12 @@ void DirectCallExpression::accept( Visitor& visitor )
 Node::Ptr DirectCallExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< DirectCallExpression >(
-        identifier()->duplicate< IdentifierPath >(), arguments()->duplicate< Expressions >() );
+        templateToken(),
+        templateSymbols()->duplicate< VariableDefinitions >(),
+        identifier()->duplicate< IdentifierPath >(),
+        leftBracketToken(),
+        arguments()->duplicate< Expressions >(),
+        leftBracketToken() );
 
     TargetCallExpression::clone( *duplicate );
     duplicate->setTargetType( targetType() );
@@ -454,20 +505,23 @@ LiteralCallExpression::LiteralCallExpression(
     const Expression::Ptr& object,
     const Token::Ptr& dotToken,
     const std::shared_ptr< Literal >& literal )
-: Expression( Node::ID::LITERAL_CALL_EXPRESSION )
-, m_object( object )
+: TargetCallExpression( Node::ID::LITERAL_CALL_EXPRESSION, std::make_shared< Expressions >() )
 , m_literal( literal )
 , m_dotToken( dotToken )
 {
+    arguments()->add( object );
+    arguments()->add( m_literal );
 }
 
 const Expression::Ptr& LiteralCallExpression::object( void ) const
 {
-    return m_object;
+    assert( arguments()->size() == 2 );
+    return arguments()->front();
 }
 
 const std::shared_ptr< Literal >& LiteralCallExpression::literal( void ) const
 {
+    assert( arguments()->size() == 2 and arguments()->back() == m_literal );
     return m_literal;
 }
 
@@ -486,7 +540,7 @@ Node::Ptr LiteralCallExpression::clone( void ) const
     auto duplicate = std::make_shared< LiteralCallExpression >(
         object()->duplicate< Expression >(), dotToken(), literal()->duplicate< Literal >() );
 
-    Expression::clone( *duplicate );
+    TargetCallExpression::clone( *duplicate );
     return duplicate;
 }
 
@@ -667,7 +721,7 @@ VariableBinding::VariableBinding(
     const VariableDefinition::Ptr& variable,
     const Token::Ptr& equalToken,
     const Expression::Ptr& expression )
-: Node( Node::ID::VARIABLE_BINDING )
+: TypedNode( Node::ID::VARIABLE_BINDING )
 , m_variable( variable )
 , m_expression( expression )
 , m_equalToken( equalToken )
@@ -713,7 +767,7 @@ Node::Ptr VariableBinding::clone( void ) const
         equalToken(),
         expression()->duplicate< Expression >() );
 
-    Node::clone( *duplicate );
+    TypedNode::clone( *duplicate );
     duplicate->setDelimiterToken( delimiterToken() );
     return duplicate;
 }
