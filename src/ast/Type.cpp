@@ -233,7 +233,7 @@ const Types::Ptr& TupleType::subTypes( void ) const
 std::string TupleType::signature( void ) const
 {
     std::stringstream stream;
-    stream << "<";
+    stream << "(";
 
     for( const auto& subType : *subTypes() )
     {
@@ -241,7 +241,7 @@ std::string TupleType::signature( void ) const
     }
 
     stream.seekp( -1, stream.cur );
-    stream << " >";
+    stream << " )";
 
     return stream.str();
 }
@@ -411,16 +411,16 @@ std::string RelationType::signature( void ) const
 {
     std::stringstream stream;
     stream << name()->baseName();
-    stream << "<";
+    stream << "< ";
 
     for( const auto& subType : *argumentTypes() )
     {
-        stream << " " << subType->signature() << " *";
+        stream << subType->signature() << " * ";
     }
 
     if( argumentTypes()->size() > 0 )
     {
-        stream.seekp( -1, stream.cur );
+        stream.seekp( -2, stream.cur );
     }
 
     stream << "-> " << returnType()->signature() << " >";
