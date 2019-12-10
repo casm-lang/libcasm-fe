@@ -68,11 +68,6 @@ namespace libcasm_fe
         bool run( libpass::PassResult& pr ) override;
     };
 
-    //
-    //
-    // SymbolRegistrationVisitor
-    //
-
     class SymbolRegistrationVisitor final : public Ast::RecursiveVisitor
     {
       public:
@@ -94,13 +89,17 @@ namespace libcasm_fe
 
       private:
         void registerSymbol( Ast::Definition& node );
-        void registerSymbol( Namespace& symboltable, Ast::Definition& node );
+        void registerSymbolNamespace(
+            Ast::TypeDefinition& node, const Namespace::Ptr& symbolNamespace );
+        void registerSymbolNamespace(
+            Ast::Definition& node,
+            const std::string& typeName,
+            const Namespace::Ptr& symbolNamespace );
 
       private:
         libcasm_fe::Logger& m_log;
         Namespace& m_symboltable;
     };
-
 }
 
 #endif  // _LIBCASM_FE_SYMBOL_REGISTRATION_PASS_H_
