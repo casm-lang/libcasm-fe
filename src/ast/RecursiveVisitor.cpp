@@ -76,16 +76,6 @@ void RecursiveVisitor::visit( InitDefinition& node )
     node.leftBraceToken()->accept( *this );
     node.initializers()->accept( *this );
     node.rightBraceToken()->accept( *this );
-
-    if( node.agentDefinition() )
-    {
-        node.agentDefinition()->accept( *this );
-    }
-
-    if( node.programFunction() )
-    {
-        node.programFunction()->accept( *this );
-    }
 }
 
 void RecursiveVisitor::visit( Initially& node )
@@ -183,7 +173,7 @@ void RecursiveVisitor::visit( UsingDefinition& node )
     node.usingToken()->accept( *this );
     node.identifier()->accept( *this );
     node.assignmentToken()->accept( *this );
-    node.type()->accept( *this );
+    node.aliasType()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UsingPathDefinition& node )
@@ -368,6 +358,8 @@ void RecursiveVisitor::visit( NamedExpression& node )
 void RecursiveVisitor::visit( DirectCallExpression& node )
 {
     node.delimiterToken()->accept( *this );
+    node.templateToken()->accept( *this );
+    node.templateSymbols()->accept( *this );
     node.identifier()->accept( *this );
     node.leftBracketToken()->accept( *this );
     node.arguments()->accept( *this );
