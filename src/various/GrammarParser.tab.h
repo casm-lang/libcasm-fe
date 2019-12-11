@@ -44,7 +44,7 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 64 "../../obj/src/GrammarParser.y"
+#line 63 "../../obj/src/GrammarParser.y"
 
     namespace libcasm_fe
     {
@@ -57,6 +57,8 @@
     #include <libcasm-fe/ast/Expression>
     #include <libcasm-fe/ast/Rule>
     #include <libcasm-fe/ast/Token>
+    #include <libcasm-fe/Exception>
+    #include <libcasm-fe/Logger>
 
     #include <libstdhl/SourceLocation>
 
@@ -65,7 +67,7 @@
 
     #define YY_NULLPTR nullptr
 
-#line 69 "GrammarParser.tab.h"
+#line 71 "GrammarParser.tab.h"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -181,7 +183,7 @@
 
 #line 50 "../../obj/src/GrammarParser.y"
 namespace libcasm_fe {
-#line 185 "GrammarParser.tab.h"
+#line 187 "GrammarParser.tab.h"
 
 
 
@@ -5496,7 +5498,7 @@ switch (yytype)
 
 #line 50 "../../obj/src/GrammarParser.y"
 } // libcasm_fe
-#line 5500 "GrammarParser.tab.h"
+#line 5502 "GrammarParser.tab.h"
 
 
 
