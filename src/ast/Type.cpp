@@ -493,6 +493,37 @@ std::string FixedSizedType::signature( void ) const
             const auto& valueLiteral = static_cast< const ValueLiteral& >( property );
             stream << valueLiteral.toString();
         }
+        else if( property.id() == Node::ID::RANGE_LITERAL )
+        {
+            const auto& rangeLiteral = static_cast< const RangeLiteral& >( property );
+            stream << "[";
+
+            const auto& lhs = *rangeLiteral.left();
+            if( lhs.id() == Node::ID::VALUE_LITERAL and lhs.type()->isInteger() )
+            {
+                const auto& valueLiteral = static_cast< const ValueLiteral& >( lhs );
+                stream << valueLiteral.toString();
+            }
+            else
+            {
+                stream << "?";
+            }
+
+            stream << "..";
+
+            const auto& rhs = *rangeLiteral.right();
+            if( rhs.id() == Node::ID::VALUE_LITERAL and rhs.type()->isInteger() )
+            {
+                const auto& valueLiteral = static_cast< const ValueLiteral& >( rhs );
+                stream << valueLiteral.toString();
+            }
+            else
+            {
+                stream << "?";
+            }
+
+            stream << "]";
+        }
         else
         {
             stream << "?";
