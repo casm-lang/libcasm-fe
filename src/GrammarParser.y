@@ -49,7 +49,6 @@
 %defines
 %define api.namespace {libcasm_fe}
 %define api.parser.class {Parser}
-
 %define api.token.constructor
 %define api.value.type variant
 %define api.location.type {libstdhl::SourceLocation}
@@ -73,6 +72,8 @@
     #include <libcasm-fe/ast/Expression>
     #include <libcasm-fe/ast/Rule>
     #include <libcasm-fe/ast/Token>
+    #include <libcasm-fe/Exception>
+    #include <libcasm-fe/Logger>
 
     #include <libstdhl/SourceLocation>
 
@@ -88,11 +89,7 @@
 
 %code
 {
-    #include <libcasm-fe/Exception>
-    #include <libcasm-fe/Logger>
-
     #include "../../src/Lexer.h"
-    #include "../../src/various/GrammarToken.h"
 
     #include <libstdhl/Type>
 
@@ -108,7 +105,6 @@
         node->setType( type );
         return node;
     }
-
 }
 
 

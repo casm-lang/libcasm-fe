@@ -45,20 +45,23 @@
 #ifndef _LIBCASM_FE_LEXER_H_
 #define _LIBCASM_FE_LEXER_H_
 
-#include <string>
-
 #include <libcasm-fe/ast/Span>
 
-#include "various/FlexLexer.h"
-#include "various/GrammarParser.tab.h"
-
 #include <libstdhl/SourceLocation>
+
+#define yyFlexLexer libcasm_fe_FlexLexer
+#include <libstdhl/vendor/flex/FlexLexer>
+#undef yyFlexLexer
+
+#include <string>
+
+#include "various/GrammarParser.tab.h"
 
 namespace libcasm_fe
 {
     class Logger;
 
-    class Lexer : public yyFlexLexer
+    class Lexer : public libcasm_fe_FlexLexer
     {
       public:
         Lexer( Logger& log, std::istream& in, std::ostream& out );

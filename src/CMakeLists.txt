@@ -105,7 +105,6 @@ add_library( ${PROJECT}-cpp OBJECT
   transform/SourceToAstPass.cpp
 
   various/GrammarParser.cpp
-  various/GrammarLexer.cpp
   )
 
 

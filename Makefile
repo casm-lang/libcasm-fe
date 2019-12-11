@@ -80,8 +80,7 @@ grammar: $(GRAMMAR)
 src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hpp
 	etc/script.sh generate-lexer "`pwd`/$<" "`pwd`/obj/$< $(filter %.hpp,$^)"
 	$(LX) $(LFLAGS) -o $@ obj/$<
-	sed -i "s/#define yyFlexLexer yyFlexLexer//g" $@
-	sed -i "s/#include <FlexLexer\.h>/#include \"FlexLexer\.h\"/g" $@
+	sed -i "s/#include <FlexLexer\.h>//g" $@
 
 
 %/src/various/GrammarParser.cpp: src/various/GrammarParser.cpp

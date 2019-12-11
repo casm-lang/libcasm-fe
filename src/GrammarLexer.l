@@ -43,8 +43,6 @@
 //  statement from your version.
 //
 
-#include "../../src/Lexer.h"
-
 #include <libcasm-fe/Codes>
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/ast/Span>
@@ -72,14 +70,15 @@ using namespace libcasm_fe;
 
 %}
 
-/* %option debug */
+%option c++
+%option yyclass="Lexer"
+%option prefix="libcasm_fe_"
 %option noyywrap
 %option nodefault
 %option nounput
-%option batch
 %option noinput
-%option yyclass="Lexer"
-%option c++
+%option batch
+/* %option debug */
 
 %x YY_IDENTIFIER
 %x YY_INLINE_COMMENT

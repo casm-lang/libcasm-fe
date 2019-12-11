@@ -48,10 +48,12 @@
 
 #include <libstdhl/Unicode>
 
+#include "various/GrammarLexer.cpp"
+
 using namespace libcasm_fe;
 
 Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
-: yyFlexLexer( in, out )
+: libcasm_fe_FlexLexer( in, out )
 , m_log( log )
 , m_loc()
 , m_strbuf()
