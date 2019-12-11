@@ -335,11 +335,6 @@ void AstToCasmIRVisitor::visit( ReferenceLiteral& node )
             m_log.error( { node.sourceLocation() }, "TODO" );
             break;
         }
-        case ReferenceLiteral::ReferenceType::BUILTIN:
-        {
-            m_log.error( { node.sourceLocation() }, "TODO" );
-            break;
-        }
         case ReferenceLiteral::ReferenceType::RULE:
         {
             assert( node.reference() );
@@ -460,18 +455,6 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::VARIABLE:
         {
             assert( not" unimplemented direct expr call " );
-            break;
-        }
-        case DirectCallExpression::TargetType::SELF:
-        {
-            const auto& type = std::static_pointer_cast< libcasm_ir::EnumerationType >(
-                m_specification->agent()->type().ptr_type() );
-
-            const libcasm_ir::Constant::Ptr constant =
-                libstdhl::Memory::make< libcasm_ir::EnumerationConstant >( type, "$" );
-
-            m_specification->add( constant );
-            m_ast2ir.emplace( &node, constant );
             break;
         }
         case DirectCallExpression::TargetType::THIS:
