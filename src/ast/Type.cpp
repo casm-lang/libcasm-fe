@@ -498,10 +498,19 @@ std::string FixedSizedType::signature( void ) const
             const auto& rangeLiteral = static_cast< const RangeLiteral& >( property );
             stream << "[";
 
-            const auto& lhs = *rangeLiteral.left();
-            if( lhs.id() == Node::ID::VALUE_LITERAL and lhs.type()->isInteger() )
+            auto lhs = rangeLiteral.left();
+            if( lhs->id() == Node::ID::UNARY_EXPRESSION )
             {
-                const auto& valueLiteral = static_cast< const ValueLiteral& >( lhs );
+                const auto& lhsUnaryExpression = static_cast< const UnaryExpression& >( *lhs );
+                lhs = lhsUnaryExpression.expression();
+                if( lhsUnaryExpression.operationToken()->token() == Grammar::Token::MINUS )
+                {
+                    stream << "-";
+                }
+            }
+            if( lhs->id() == Node::ID::VALUE_LITERAL and lhs->type()->isInteger() )
+            {
+                const auto& valueLiteral = static_cast< const ValueLiteral& >( *lhs );
                 stream << valueLiteral.toString();
             }
             else
@@ -511,10 +520,19 @@ std::string FixedSizedType::signature( void ) const
 
             stream << "..";
 
-            const auto& rhs = *rangeLiteral.right();
-            if( rhs.id() == Node::ID::VALUE_LITERAL and rhs.type()->isInteger() )
+            auto rhs = rangeLiteral.right();
+            if( rhs->id() == Node::ID::UNARY_EXPRESSION )
             {
-                const auto& valueLiteral = static_cast< const ValueLiteral& >( rhs );
+                const auto& rhsUnaryExpression = static_cast< const UnaryExpression& >( *rhs );
+                rhs = rhsUnaryExpression.expression();
+                if( rhsUnaryExpression.operationToken()->token() == Grammar::Token::MINUS )
+                {
+                    stream << "-";
+                }
+            }
+            if( rhs->id() == Node::ID::VALUE_LITERAL and rhs->type()->isInteger() )
+            {
+                const auto& valueLiteral = static_cast< const ValueLiteral& >( *rhs );
                 stream << valueLiteral.toString();
             }
             else
