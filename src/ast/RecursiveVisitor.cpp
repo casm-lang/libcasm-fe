@@ -67,12 +67,10 @@ void RecursiveVisitor::visit( InitDefinition& node )
 {
     node.attributes()->accept( *this );
     node.initToken()->accept( *this );
-
     if( node.initPath() )
     {
         node.initPath()->accept( *this );
     }
-
     node.leftBraceToken()->accept( *this );
     node.initializers()->accept( *this );
     node.rightBraceToken()->accept( *this );
