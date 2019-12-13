@@ -419,17 +419,23 @@ MethodCallExpression::MethodCallExpression(
     const Token::Ptr& dotToken,
     const Identifier::Ptr& methodName,
     const Expressions::Ptr& arguments )
-: TargetCallExpression( Node::ID::METHOD_CALL_EXPRESSION, arguments )
+: TargetCallExpression( Node::ID::METHOD_CALL_EXPRESSION, std::make_shared< Expressions >() )
 , m_object( object )
 , m_methodName( methodName )
 , m_dotToken( dotToken )
 , m_methodType( MethodType::UNKNOWN )
 {
+    this->arguments()->add( object );
+    for( const auto& argument : *arguments )
+    {
+        this->arguments()->add( argument );
+    }
 }
 
 const Expression::Ptr& MethodCallExpression::object( void ) const
 {
-    return m_object;
+    assert( arguments()->size() >= 1 );
+    return arguments()->front();
 }
 
 const Identifier::Ptr& MethodCallExpression::methodName( void ) const
