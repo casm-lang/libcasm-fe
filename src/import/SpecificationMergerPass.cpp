@@ -46,7 +46,7 @@
 #include "SpecificationMergerPass.h"
 
 #include <libcasm-fe/Logger>
-#include <libcasm-fe/analyze/TypeCheckPass>
+#include <libcasm-fe/analyze/SymbolResolverPass>
 #include <libcasm-fe/import/LibraryLoaderPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
@@ -64,22 +64,33 @@ static libpass::PassRegistration< SpecificationMergerPass > PASS(
 
 void SpecificationMergerPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< LibraryLoaderPass >();
-    pu.scheduleAfter< TypeCheckPass >();
+    pu.require< SourceToAstPass >();
+    pu.scheduleAfter< SymbolResolverPass >();
 }
 
 u1 SpecificationMergerPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< LibraryLoaderPass >();
-    const auto specificationRepository = data->specificationRepository();
+    const auto& data = pr.output< LibraryLoaderPass >();
+    const auto& specificationRepository = data->specificationRepository();
 
-    const auto definitions = std::make_shared< Definitions >();
+    const auto& definitions = std::make_shared< Definitions >();
     for( const auto& specification : specificationRepository->specifications() )
     {
         for( const auto& definition : *specification->definitions() )
         {
+            if( definition->id() == Node::ID::INIT_DEFINITION )
+            {
+                const auto& initDefinition = static_cast< const InitDefinition& >( *definition );
+                if( initDefinition.external() )
+                {
+                    log.debug(
+                        { definition->sourceLocation() },
+                        "omit init definition in merged specification" );
+                    continue;
+                }
+            }
             definitions->add( definition );
         }
     }
@@ -91,8 +102,8 @@ u1 SpecificationMergerPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    const auto parsedSpecification = pr.output< SourceToAstPass >()->specification();
-    const auto mergedSpecification = std::make_shared< Specification >();
+    const auto& parsedSpecification = pr.output< SourceToAstPass >()->specification();
+    const auto& mergedSpecification = std::make_shared< Specification >();
 
     mergedSpecification->setAsmType( parsedSpecification->asmType() );
     mergedSpecification->setLocation( parsedSpecification->location() );
