@@ -92,7 +92,7 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
 {
     RecursiveVisitor::visit( node );
 
-    Specification::Ptr specification;
+    Specification::Ptr specification = nullptr;
     const auto& path = node.path();
     try
     {
@@ -105,16 +105,17 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
     }
     assert( specification );
 
-    const auto identifier =
-        node.identifier()->empty() ? path->identifiers()->back() : node.identifier();
+    // TODO: FIXME: @ppaulweber: filter loaded *::init definitions!
+
+    const auto& identifierName = node.identifier()->name();
     try
     {
         m_symboltable.registerNamespace(
-            identifier->name(), specification->symboltable(), Namespace::Visibility::External );
+            identifierName, specification->symboltable(), Namespace::Visibility::External );
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { identifier->sourceLocation() }, e.what() );
+        m_log.error( { node.sourceLocation() }, e.what() );
     }
 }
 
@@ -183,13 +184,10 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     LibraryLoaderVisitor visitor( log, *symboltable, loader );
     specification->definitions()->accept( visitor );
 
-#ifndef NDEBUG
-    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
-#endif
-
     const auto errors = log.errors();
     if( errors > 0 )
     {
+        log.debug( "symbol table =\n" + specification->symboltable()->dump() );
         log.debug( "found %lu error(s) during library loading", errors );
         return false;
     }
