@@ -1463,8 +1463,9 @@ ImportDefinition::ImportDefinition( const Token::Ptr& importToken, const Identif
       importToken,
       path,
       Token::unresolved(),
-      Ast::make< Identifier >( path->sourceLocation(), path->path() ) )
+      path->identifiers()->back() )
 {
+    // use the last identifier of the import path as definition symbol
 }
 
 ImportDefinition::ImportDefinition(
@@ -1477,6 +1478,7 @@ ImportDefinition::ImportDefinition(
 , m_importToken( importToken )
 , m_asToken( asToken )
 {
+    // use "as" identifier as definition symbol
 }
 
 const IdentifierPath::Ptr& ImportDefinition::path( void ) const
