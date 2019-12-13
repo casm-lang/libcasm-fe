@@ -75,10 +75,7 @@ void Namespace::registerSymbol( const std::string& name, const Ast::Definition::
     const auto result = m_symbols.emplace( name, definition );
     if( not result.second )
     {
-        const auto& existingDefinition = result.first->second;
-        throw std::domain_error(
-            "symbol '" + name + "' already defined as '" + existingDefinition->description() +
-            "'" );
+        throw std::domain_error( "symbol '" + name + "' already defined" );
     }
 }
 
