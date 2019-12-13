@@ -45,10 +45,10 @@
 
 #include "Definition.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/Literal>
-
-#include "../various/GrammarToken.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -1377,11 +1377,12 @@ InitDefinition::InitDefinition( const Token::Ptr& initToken, const IdentifierPat
 : Definition(
       Node::ID::INIT_DEFINITION,
       Ast::make< Identifier >( initToken->sourceLocation(), initToken->tokenString() ) )
-, m_initPath( initPath )
-, m_initializers( Ast::make< Initializers >( initToken->sourceLocation() ) )
 , m_initToken( initToken )
+, m_initPath( initPath )
 , m_leftBraceToken( Token::unresolved() )
+, m_initializers( Ast::make< Initializers >( initToken->sourceLocation() ) )
 , m_rightBraceToken( Token::unresolved() )
+, m_external( false )
 {
 }
 
@@ -1393,11 +1394,12 @@ InitDefinition::InitDefinition(
 : Definition(
       Node::ID::INIT_DEFINITION,
       Ast::make< Identifier >( initToken->sourceLocation(), initToken->tokenString() ) )
-, m_initPath( nullptr )
-, m_initializers( initializers )
 , m_initToken( initToken )
+, m_initPath( nullptr )
 , m_leftBraceToken( leftBraceToken )
+, m_initializers( initializers )
 , m_rightBraceToken( rightBraceToken )
+, m_external( false )
 {
 }
 
@@ -1431,9 +1433,19 @@ u1 InitDefinition::isSingleAgent( void ) const
     return m_initPath != nullptr;
 }
 
+u1 InitDefinition::external( void ) const
+{
+    return m_external;
+}
+
+void InitDefinition::setExternal( void )
+{
+    m_external = true;
+}
+
 std::string InitDefinition::typeDescription( void ) const
 {
-    return "...";
+    return ( external() ? "external" : "internal" );
 }
 
 void InitDefinition::accept( Visitor& visitor )
@@ -1443,11 +1455,20 @@ void InitDefinition::accept( Visitor& visitor )
 
 Node::Ptr InitDefinition::clone( void ) const
 {
-    auto duplicate = std::make_shared< InitDefinition >(
-        initToken(),
-        leftBraceToken(),
-        initializers()->duplicate< Initializers >(),
-        rightBraceToken() );
+    InitDefinition::Ptr duplicate;
+    if( not isSingleAgent() )
+    {
+        duplicate = std::make_shared< InitDefinition >(
+            initToken(),
+            leftBraceToken(),
+            initializers()->duplicate< Initializers >(),
+            rightBraceToken() );
+    }
+    else
+    {
+        duplicate = std::make_shared< InitDefinition >(
+            initToken(), initPath()->duplicate< IdentifierPath >() );
+    }
 
     Definition::clone( *duplicate );
     return duplicate;
@@ -1459,11 +1480,7 @@ Node::Ptr InitDefinition::clone( void ) const
 //
 
 ImportDefinition::ImportDefinition( const Token::Ptr& importToken, const IdentifierPath::Ptr& path )
-: ImportDefinition(
-      importToken,
-      path,
-      Token::unresolved(),
-      path->identifiers()->back() )
+: ImportDefinition( importToken, path, Token::unresolved(), path->identifiers()->back() )
 {
     // use the last identifier of the import path as definition symbol
 }

@@ -732,6 +732,10 @@ namespace libcasm_fe
 
             u1 isSingleAgent( void ) const;
 
+            u1 external( void ) const;
+
+            void setExternal( void );
+
             std::string typeDescription( void ) const override;
 
             void accept( Visitor& visitor ) override final;
@@ -739,11 +743,12 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            const IdentifierPath::Ptr m_initPath;
-            const Initializers::Ptr m_initializers;
             const Token::Ptr m_initToken;
+            const IdentifierPath::Ptr m_initPath;
             const Token::Ptr m_leftBraceToken;
+            const Initializers::Ptr m_initializers;
             const Token::Ptr m_rightBraceToken;
+            u1 m_external;
         };
 
         class ImportDefinition final : public Definition
