@@ -105,7 +105,14 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
     }
     assert( specification );
 
-    // TODO: FIXME: @ppaulweber: filter loaded *::init definitions!
+    for( const auto& definition : *specification->definitions() )
+    {
+        if( definition->id() == Node::ID::INIT_DEFINITION )
+        {
+            const auto& initDefinition = definition->ptr< InitDefinition >();
+            initDefinition->setExternal();
+        }
+    }
 
     const auto& identifierName = node.identifier()->name();
     try
