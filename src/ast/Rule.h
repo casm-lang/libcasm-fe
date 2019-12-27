@@ -58,6 +58,9 @@ namespace libcasm_fe
         class VariableDefinition;
         using VariableDefinitions = NodeList< VariableDefinition >;
 
+        class FunctionDefinition;
+        using FunctionDefinitions = NodeList< FunctionDefinition >;
+
         class Rule : public Node
         {
           public:
@@ -236,6 +239,33 @@ namespace libcasm_fe
             const VariableBindings::Ptr m_variableBindings;
             const Rule::Ptr m_rule;
             const Token::Ptr m_letToken;
+            const Token::Ptr m_inToken;
+        };
+
+        class LocalRule final : public Rule
+        {
+          public:
+            using Ptr = std::shared_ptr< LocalRule >;
+
+            LocalRule(
+                const Token::Ptr& localToken,
+                const std::shared_ptr< FunctionDefinitions >& localFunctions,
+                const Token::Ptr& inToken,
+                const Rule::Ptr& rule );
+
+            const std::shared_ptr< FunctionDefinitions >& localFunctions( void ) const;
+            const Rule::Ptr& rule( void ) const;
+
+            const Token::Ptr& localToken( void ) const;
+
+            const Token::Ptr& inToken( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const std::shared_ptr< FunctionDefinitions > m_localFunctions;
+            const Rule::Ptr m_rule;
+            const Token::Ptr m_localToken;
             const Token::Ptr m_inToken;
         };
 

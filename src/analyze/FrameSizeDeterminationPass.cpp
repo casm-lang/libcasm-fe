@@ -57,6 +57,7 @@
 #include <libpass/PassUsage>
 
 #include <libstdhl/Math>
+#include <libstdhl/RestoreOnScopeExit>
 
 #include <unordered_map>
 
@@ -90,6 +91,7 @@ class FrameSizeDeterminationVisitor final : public RecursiveVisitor
     void visit( ExistentialQuantifierExpression& node ) override;
 
     void visit( LetRule& node ) override;
+    void visit( LocalRule& node ) override;
     void visit( ForallRule& node ) override;
     void visit( ChooseRule& node ) override;
 
@@ -134,6 +136,8 @@ void FrameSizeDeterminationVisitor::visit( InitDefinition& node )
 
 void FrameSizeDeterminationVisitor::visit( FunctionDefinition& node )
 {
+    libstdhl::RestoreOnScopeExit< std::size_t > restoreMaxNumberOfLocals( m_maxNumberOfLocals );
+
     m_maxNumberOfLocals = node.argumentTypes()->size();
 
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
@@ -209,6 +213,12 @@ void FrameSizeDeterminationVisitor::visit( LetExpression& node )
     node.variableBindings()->accept( *this );  // pushes all variables
     node.expression()->accept( *this );
     popLocals( node.variableBindings()->size() );
+}
+
+void FrameSizeDeterminationVisitor::visit( LocalRule& node )
+{
+    node.localFunctions()->accept( *this );
+    node.rule()->accept( *this );
 }
 
 void FrameSizeDeterminationVisitor::visit( ChooseExpression& node )

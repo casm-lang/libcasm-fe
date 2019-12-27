@@ -186,6 +186,7 @@ Rule ::= SkipRule
        | ConditionalRule
        | CaseRule
        | LetRule
+       | LocalRule
        | ForallRule
        | ChooseRule
        | IterateRule
@@ -255,6 +256,15 @@ LetRule ::= "let" VariableBindings "in" Rule
 #+end_src
 
 #+html: {{page>.:grammar:LetRule&noheader&nofooter}}
+
+
+** LocalRule
+
+#+begin_src
+LocalRule ::= "local" LocalFunctionDefinitions "in" Rule
+#+end_src
+
+#+html: {{page>.:grammar:LocalRule&noheader&nofooter}}
 
 
 ** ForallRule
@@ -909,6 +919,35 @@ VariableBinding ::= AttributedVariable "=" Term
 #+end_src
 
 #+html: {{page>.:grammar:VariableBinding&noheader&nofooter}}
+
+
+** LocalFunctionDefinitions
+
+#+begin_src
+LocalFunctionDefinitions ::= LocalFunctionDefinitions "," AttributedLocalFunctionDefinition
+                           | AttributedLocalFunctionDefinition
+#+end_src
+
+#+html: {{page>.:grammar:LocalFunctionDefinitions&noheader&nofooter}}
+
+
+** AttributedLocalFunctionDefinition
+
+#+begin_src
+AttributedLocalFunctionDefinition ::= Attributes LocalFunctionDefinition
+                                    | LocalFunctionDefinition
+#+end_src
+
+#+html: {{page>.:grammar:AttributedLocalFunctionDefinition&noheader&nofooter}}
+
+
+** LocalFunctionDefinition
+
+#+begin_src
+LocalFunctionDefinition ::= Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially
+#+end_src
+
+#+html: {{page>.:grammar:LocalFunctionDefinition&noheader&nofooter}}
 
 
 ** Attributes

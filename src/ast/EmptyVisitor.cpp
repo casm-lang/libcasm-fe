@@ -211,6 +211,10 @@ void EmptyVisitor::visit( LetRule& )
 {
 }
 
+void EmptyVisitor::visit( LocalRule& )
+{
+}
+
 void EmptyVisitor::visit( ForallRule& )
 {
 }

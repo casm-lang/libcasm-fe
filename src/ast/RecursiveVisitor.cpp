@@ -109,6 +109,7 @@ void RecursiveVisitor::visit( VariableDefinition& node )
 
 void RecursiveVisitor::visit( FunctionDefinition& node )
 {
+    node.delimiterToken()->accept( *this );
     node.attributes()->accept( *this );
     node.functionToken()->accept( *this );
     node.identifier()->accept( *this );
@@ -453,6 +454,14 @@ void RecursiveVisitor::visit( LetRule& node )
 {
     node.letToken()->accept( *this );
     node.variableBindings()->accept( *this );
+    node.inToken()->accept( *this );
+    node.rule()->accept( *this );
+}
+
+void RecursiveVisitor::visit( LocalRule& node )
+{
+    node.localToken()->accept( *this );
+    node.localFunctions()->accept( *this );
     node.inToken()->accept( *this );
     node.rule()->accept( *this );
 }

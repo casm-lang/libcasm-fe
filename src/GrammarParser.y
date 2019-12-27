@@ -176,6 +176,7 @@ END       0 "end of file"
 %type <ConditionalRule::Ptr> ConditionalRule
 %type <CaseRule::Ptr> CaseRule
 %type <LetRule::Ptr> LetRule
+%type <LocalRule::Ptr> LocalRule
 %type <ForallRule::Ptr> ForallRule
 %type <ChooseRule::Ptr> ChooseRule
 %type <IterateRule::Ptr> IterateRule
@@ -216,6 +217,8 @@ END       0 "end of file"
 %type <VariableDefinitions::Ptr> Parameters AttributedVariables
 %type <VariableBinding::Ptr> VariableBinding
 %type <VariableBindings::Ptr> VariableBindings
+%type <FunctionDefinition::Ptr> LocalFunctionDefinition AttributedLocalFunctionDefinition
+%type <FunctionDefinitions::Ptr> LocalFunctionDefinitions
 
 
 %start Specification
@@ -560,6 +563,10 @@ Rule
   {
       $$ = $1;
   }
+| LocalRule
+  {
+      $$ = $1;
+  }
 | ForallRule
   {
       $$ = $1;
@@ -663,6 +670,14 @@ LetRule
 : LET VariableBindings IN Rule
   {
       $$ = Ast::make< LetRule >( @$, $1, $2, $3, $4 );
+  }
+;
+
+
+LocalRule
+: LOCAL LocalFunctionDefinitions IN Rule
+  {
+      $$ = Ast::make< LocalRule >( @$, $1, $2, $3, $4 );
   }
 ;
 
@@ -1661,6 +1676,59 @@ VariableBinding
 : AttributedVariable EQUAL Term
   {
       $$ = Ast::make< VariableBinding >( @$, $1, $2, $3 );
+  }
+;
+
+//
+//
+// LocalFunctionDefinitions
+//
+
+LocalFunctionDefinitions
+: LocalFunctionDefinitions COMMA AttributedLocalFunctionDefinition
+  {
+      auto definitions = $1;
+      $3->setDelimiterToken( $2 );
+      definitions->add( $3 );
+      $$ = definitions;
+  }
+| AttributedLocalFunctionDefinition
+  {
+      auto definitions = Ast::make< FunctionDefinitions >( @$ );
+      definitions->add( $1 );
+      $$ = definitions;
+  }
+;
+
+AttributedLocalFunctionDefinition
+: Attributes LocalFunctionDefinition
+  {
+      auto definition = $2;
+      definition->setAttributes( $1 );
+      $$ = definition;
+  }
+| LocalFunctionDefinition
+  {
+      $$ = $1;
+  }
+| error // error recovery
+  {
+      $$ = nullptr;
+  }
+;
+
+LocalFunctionDefinition
+: Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
+  {
+      $$ = Ast::make< FunctionDefinition >( @$, Token::unresolved(), $1, $2, $3, $4, $5, $6, $7 );
+      $$->setClassification( FunctionDefinition::Classification::LOCAL );
+
+      // apply the name of the function declaration to the initializer functions
+      const auto initially = $$->initially();
+      for( auto& initializer : *initially->initializers() )
+      {
+          initializer->setFunction( $$ );
+      }
   }
 ;
 
