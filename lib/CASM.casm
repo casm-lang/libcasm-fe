@@ -44,25 +44,167 @@
 
 CASM
 
-[ export ]
-rule abort =
-    IR::AbortInstruction
+//
+//
+// Domain Definitions
+//
 
 [ export ]
-rule assert( value : Boolean ) =
-    IR::AssertInstruction( value )
+domain Void
 
 [ export ]
-rule assure( value : Boolean ) =
-    IR::AssureInstruction( value )
+domain Agent
 
 [ export ]
-rule print( text : String ) =
-    IR::PrintInstruction( text )
+domain Object
 
 [ export ]
-rule println( text : String ) =
-    print( text + "\n" )
+domain enumeration
+
+[ export ]
+domain Boolean
+
+[ export ]
+domain Integer
+
+[ export ]
+domain Rational
+
+[ export ]
+domain String
+
+[ export ]
+domain Decimal
+
+[ export ]
+domain< Size > Binary'Size
+
+[ export ]
+domain< Signature > RuleRef< Signature >
+
+[ export ]
+domain< Signature > FuncRef< Signature >
+
+[ export ]
+domain< Type > Tuple< Type >
+
+[ export ]
+domain< Type > Record< Type >
+
+[ export ]
+domain< Type > Range< Type >
+
+[ export ]
+domain< Type > List< Type >
+
+// [ export ]
+// domain< Type > Set< Type >
+
+[ export ]
+domain< Type > Port< Type >
+
+[ export ]
+domain< Type > File< Type >
+
+//
+//
+// Builtin Definitions
+//
+
+[ export ]
+builtin SelfInstruction< -> Agent >
+
+[ export ]
+builtin AbortInstruction< -> Void >
+
+[ export ]
+builtin AssertInstruction< Boolean -> Void >
+
+[ export ]
+builtin AssureInstruction< Boolean -> Void >
+
+[ export ]
+builtin PrintInstruction< String -> Void >
+
+[ export ]
+[ pure ]
+builtin NotInstruction< Boolean -> Boolean >
+
+[ export ]
+[ pure ]
+builtin OrInstruction< Boolean * Boolean -> Boolean >
+
+[ export ]
+[ pure ]
+builtin AddInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin SubInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin MulInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin DivInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin ModInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin PowInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin ConcatInstruction< String * String -> String >
+
+[ export ]
+[ pure ]
+builtin< Type > SizeInstruction< Type -> Integer >
+
+[ export ]
+[ pure ]
+builtin< Type > SymInstruction< Type -> Boolean >
+
+[ export ]
+[ pure ]
+builtin< Type > EquInstruction< Type * Type -> Boolean >
+
+[ export ]
+[ pure ]
+builtin< Type > LthInstruction< Type * Type -> Boolean >
+
+[ export ]
+[ pure ]
+builtin< Type > GthInstruction< Type * Type -> Boolean >
+
+[ export ]
+[ pure ]
+builtin< Type > StrInstruction< Type -> String >
+
+// [ export ]
+// [ pure ]
+// builtin< Type, Size > AsBinaryInstruction< Type -> Binary'Size >
+
+[ export ]
+[ pure ]
+builtin< Type > BinInstruction< Type -> String >
+
+[ export ]
+[ pure ]
+builtin< Type > OctInstruction< Type -> String >
+
+[ export ]
+[ pure ]
+builtin< Type > HexInstruction< Type -> String >
+
+[ export ]
+[ pure ]
+builtin< SequenceType, ElementType > NthInstruction< SequenceType * Integer -> ElementType >
 
 //
 //
@@ -231,10 +373,62 @@ feature Logical = {
 */
 
 [ export ]
-feature TypeCastingString = {
+feature< Domain > TypeCasting< Domain > = {
     [ pure ]
-    derived toString : Object -> String
+    derived to : Object -> Domain
 }
+
+/**
+    Operator 'at' (literal call expression ::= <expr> 'at' <literal>)
+*/
+
+[ export ]
+feature< Element > ElementAccess< Element > = {
+    [ pure ]
+    derived at : Object * Integer -> Element
+}
+
+implement< Type > TypeCasting< String > for Tuple< Type > = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        template< Type : Tuple< Type > > StrInstruction( this )
+}
+
+implement< Type > ElementAccess< Boolean > for Tuple< Type > = {
+    [ pure ]
+    derived at( this, position : Integer ) -> Boolean =
+        template< SequenceType : Tuple< Type >, ElementType : Boolean >
+	    NthInstruction( this, position )
+}
+
+implement< Type > ElementAccess< Integer > for Tuple< Type > = {
+    [ pure ]
+    derived at( this, position : Integer ) -> Integer =
+        template< SequenceType : Tuple< Type >, ElementType : Integer >
+	    NthInstruction( this, position )
+}
+
+implement< Type > ElementAccess< String > for Tuple< Type > = {
+    [ pure ]
+    derived at( this, position : Integer ) -> String =
+        template< SequenceType : Tuple< Type >, ElementType : String >
+	    NthInstruction( this, position )
+}
+
+implement< Type > ElementAccess< Agent > for Tuple< Type > = {
+    [ pure ]
+    derived at( this, position : Integer ) -> Agent =
+        template< SequenceType : Tuple< Type >, ElementType : Agent >
+	    NthInstruction( this, position )
+}
+
+implement< Type > ElementAccess< enumeration > for Tuple< Type > = {
+    [ pure ]
+    derived at( this, position : Integer ) -> enumeration =
+        template< SequenceType : Tuple< Type >, ElementType : enumeration >
+	    NthInstruction( this, position )
+}
+
 
 /**
     Operator '||' (cardinality expression ::= '|' <expr> '|')
@@ -257,28 +451,48 @@ feature Symbolic = {
 }
 
 /**
+    Stringify facility
+*/
+
+[ export ]
+feature Stringify = {
+    [ pure ]
+    derived bin : Object -> String
+
+    [ pure ]
+    derived oct : Object -> String
+
+    [ pure ]
+    derived dec : Object -> String
+
+    [ pure ]
+    derived hex : Object -> String
+}
+
+/**
     Boolean
 */
 
 implement Symbolic for Boolean = {
     [ pure ]
     derived isSymbolic( this ) -> Boolean =
-        IR::SymInstruction( this )
+        template< Type : Boolean > SymInstruction( this )
 }
 
 implement Negation for Boolean = {
     [ pure ]
-    derived negate( this ) -> Boolean = IR::NotInstruction( this )
+    derived negate( this ) -> Boolean =
+        NotInstruction( this )
 }
 
 implement Logical for Boolean = {
     [ pure ]
     derived or_( this, other : Boolean ) -> Boolean =
-        IR::OrInstruction( this, other )
+        OrInstruction( this, other )
 
     [ pure ]
     derived xor_( this, other : Boolean ) -> Boolean =
-	this and (not other)
+	 ( this and ( not other ) ) or ( ( not this ) and other )
 
     [ pure ]
     derived and_( this, other : Boolean ) -> Boolean =
@@ -292,26 +506,53 @@ implement Logical for Boolean = {
 implement Equality for Boolean = {
     [ pure ]
     derived equal( this, other : Boolean ) -> Boolean =
-        IR::EquInstruction( this, other )
+        template< Type : Boolean > EquInstruction( this, other )
 
     [ pure ]
     derived unequal( this, other : Boolean ) -> Boolean =
-        IR::NeqInstruction( this, other )
+        not template< Type : Boolean > EquInstruction( this, other )
 }
 
-implement TypeCastingString for Boolean = {
+implement TypeCasting< String > for Boolean = {
     [ pure ]
-    derived toString( this ) -> String = IR::AsStringInstruction( this )
+    derived convertTo( this ) -> String =
+        if this then "true" else "false"
+}
+
+implement TypeCasting< Boolean > for Boolean = {
+    [ pure ]
+    derived convertTo( this ) -> Boolean =
+        this
+}
+
+implement TypeCasting< Integer > for Boolean = {
+    [ pure ]
+    derived convertTo( this ) -> Integer =
+        if this then 1 else 0
+}
+
+/**
+    Agent
+*/
+
+implement TypeCasting< String > for Agent = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        template< Type : Agent > StrInstruction( this )
 }
 
 /**
     Integer
 */
 
+implement Integer = {
+    derived funky -> String = "foobarbaz"
+}
+
 implement Symbolic for Integer = {
     [ pure ]
     derived isSymbolic( this ) -> Boolean =
-        IR::SymInstruction( this )
+        template< Type : Integer > SymInstruction( this )
 }
 
 implement Positive for Integer = {
@@ -327,57 +568,57 @@ implement Inversion for Integer = {
 implement Addition for Integer = {
     [ pure ]
     derived add( this, other : Integer ) -> Integer =
-        IR::AddInstruction( this, other )
+        AddInstruction( this, other )
 }
 
 implement Subtraction for Integer = {
     [ pure ]
     derived subtract( this, other : Integer ) -> Integer =
-        IR::SubInstruction( this, other )
+        SubInstruction( this, other )
 }
 
 implement Multiplication for Integer  = {
     [ pure ]
     derived multiply( this, other : Integer ) -> Integer =
-        IR::MulInstruction( this, other )
+        MulInstruction( this, other )
 }
 
 implement Division for Integer = {
     [ pure ]
     derived divide( this, other : Integer ) -> Integer =
-        IR::DivInstruction( this, other )
+        DivInstruction( this, other )
 }
 
 implement Modulus for Integer = {
     [ pure ]
     derived modulo( this, other : Integer ) -> Integer =
-        IR::ModInstruction( this, other )
+        ModInstruction( this, other )
 }
 
 implement Exponentiation for Integer = {
     [ pure ]
     derived power( this, other : Integer ) -> Integer =
-        IR::PowInstruction( this, other )
+        PowInstruction( this, other )
 }
 
 implement Equality for Integer = {
     [ pure ]
     derived equal( this, other : Integer ) -> Boolean =
-        IR::EquInstruction( this, other )
+        template< Type : Integer > EquInstruction( this, other )
 
     [ pure ]
     derived unequal( this, other : Integer ) -> Boolean =
-        IR::NeqInstruction( this, other )
+        not template< Type : Integer > EquInstruction( this, other )
 }
 
 implement PartialOrder for Integer = {
     [ pure ]
     derived lessThan( this, other : Integer ) -> Boolean =
-        IR::LthInstruction( this, other )
+        template< Type : Integer > LthInstruction( this, other )
 
     [ pure ]
     derived greaterThan( this, other : Integer) -> Boolean =
-        IR::GthInstruction( this, other )
+        template< Type : Integer > GthInstruction( this, other )
 }
 
 implement TotalOrder for Integer = {
@@ -390,13 +631,147 @@ implement TotalOrder for Integer = {
         (this > other) or (this = other)
 }
 
-implement TypeCastingString for Integer = {
+implement TypeCasting< String > for Integer = {
     [ pure ]
-    derived toString( this ) -> String =
-        IR::AsStringInstruction( this )
+    derived convertTo( this ) -> String =
+        template< Type : Integer > StrInstruction( this )
 }
 
+implement TypeCasting< Boolean > for Integer = {
+    [ pure ]
+    derived convertTo( this ) -> Boolean =
+        if this != 0 then true else false
+}
+
+implement TypeCasting< Integer > for Integer = {
+    [ pure ]
+    derived convertTo( this ) -> Integer =
+        this
+}
+
+// TODO: FIXME: @ppaulweber
+// implement< N : Integer > TypeCasting< Binary'N > for Integer = {
+//     [ pure ]
+//     derived toBinary( this ) -> Binary =
+//         AsBinaryInstruction( this )
+// }
+
 implement Cardinality for Integer = {
+    [ pure ]
+    derived size( this ) -> Integer = 1
+}
+
+implement Stringify for Integer = {
+    [ pure ]
+    derived bin( this ) -> String =
+        template< Type : Integer > BinInstruction( this )
+
+    [ pure ]
+    derived oct( this ) -> String =
+        template< Type : Integer > OctInstruction( this )
+
+    [ pure ]
+    derived dec( this ) -> String =
+        this as String
+
+    [ pure ]
+    derived hex( this ) -> String =
+        template< Type : Integer > HexInstruction( this )
+}
+
+/**
+    Rational
+*/
+
+implement Symbolic for Rational = {
+    [ pure ]
+    derived isSymbolic( this ) -> Boolean =
+        template< Type : Rational > SymInstruction( this )
+}
+
+implement Positive for Rational = {
+    [ pure ]
+    derived sign( this ) -> Rational = this
+}
+
+// implement Inversion for Rational = {
+//     [ pure ]
+//     derived invert( this ) -> Rational = 0r0/1 - this
+// }
+
+// implement Addition for Rational = {
+//     [ pure ]
+//     derived add( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+// implement Subtraction for Rational = {
+//     [ pure ]
+//     derived subtract( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+// implement Multiplication for Rational  = {
+//     [ pure ]
+//     derived multiply( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+// implement Division for Rational = {
+//     [ pure ]
+//     derived divide( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+// implement Modulus for Rational = {
+//     [ pure ]
+//     derived modulo( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+// implement Exponentiation for Rational = {
+//     [ pure ]
+//     derived power( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+implement Equality for Rational = {
+    [ pure ]
+    derived equal( this, other : Rational ) -> Boolean =
+        template< Type : Rational > EquInstruction( this, other )
+
+    [ pure ]
+    derived unequal( this, other : Rational ) -> Boolean =
+        not template< Type : Rational > EquInstruction( this, other )
+}
+
+implement PartialOrder for Rational = {
+    [ pure ]
+    derived lessThan( this, other : Rational ) -> Boolean =
+        template< Type : Rational > LthInstruction( this, other )
+
+    [ pure ]
+    derived greaterThan( this, other : Rational ) -> Boolean =
+        template< Type : Rational > GthInstruction( this, other )
+}
+
+implement TotalOrder for Rational = {
+    [ pure ]
+    derived lessThanOrEqual( this, other : Rational ) -> Boolean =
+        (this < other) or (this = other)
+
+    [ pure ]
+    derived greaterThanOrEqual( this, other : Rational ) -> Boolean =
+        (this > other) or (this = other)
+}
+
+implement TypeCasting< String > for Rational = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        template< Type : Rational > StrInstruction( this )
+}
+
+implement Cardinality for Rational = {
     [ pure ]
     derived size( this ) -> Integer = 1
 }
@@ -408,28 +783,28 @@ implement Cardinality for Integer = {
 implement Symbolic for String = {
     [ pure ]
     derived isSymbolic( this ) -> Boolean =
-        IR::SymInstruction( this )
+        template< Type : String > SymInstruction( this )
 }
 
 implement Addition for String = {
     [ pure ]
     derived add( this, other : String ) -> String =
-        IR::ConcatInstruction( this, other )
+        ConcatInstruction( this, other )
 }
 
 implement Equality for String = {
     [ pure ]
     derived equal( this, other : String ) -> Boolean =
-        IR::EquInstruction( this, other )
+        template< Type : String > EquInstruction( this, other )
 
     [ pure ]
     derived unequal( this, other : String ) -> Boolean =
-        IR::NeqInstruction( this, other )
+        not template< Type : String > EquInstruction( this, other )
 }
 
-implement TypeCastingString for String = {
+implement TypeCasting< String > for String = {
     [ pure ]
-    derived toString( this ) -> String = this
+    derived convertTo( this ) -> String = this
 }
 
 /**
@@ -439,27 +814,204 @@ implement TypeCastingString for String = {
 implement Symbolic for enumeration = {
     [ pure ]
     derived isSymbolic( this ) -> Boolean =
-        IR::SymInstruction( this )
+        template< Type : enumeration > SymInstruction( this )
 }
 
 implement Equality for enumeration = {
     [ pure ]
-    derived equal( this, other : Object ) -> Boolean =
-        IR::EquInstruction( this, other )
+    derived equal( this, other : enumeration ) -> Boolean =
+        template< Type : enumeration > EquInstruction( this, other )
 
     [ pure ]
-    derived unequal( this, other : Object ) -> Boolean =
-        IR::NeqInstruction( this, other )
+    derived unequal( this, other : enumeration ) -> Boolean =
+        not template< Type : enumeration > EquInstruction( this, other )
 }
 
 implement Cardinality for enumeration = {
     [ pure ]
     derived size( this ) -> Integer =
-        IR::SizeInstruction( this )
+        template< Type : enumeration > SizeInstruction( this )
 }
 
-implement TypeCastingString for enumeration = {
+implement TypeCasting< String > for enumeration = {
     [ pure ]
-    derived toString( this ) -> String =
-        IR::AsStringInstruction( this )
+    derived convertTo( this ) -> String =
+        template< Type : enumeration > StrInstruction( this )
+}
+
+implement TypeCasting< enumeration > for enumeration = {
+    [ pure ]
+    derived convertTo( this ) -> enumeration =
+        this
+}
+
+// /**
+//     Binary features for all definitions
+// */
+
+// implement< N > Symbolic for Binary'N = {
+//     [ pure ]
+//     derived isSymbolic( this ) -> Boolean =
+//         SymInstruction( this )
+// }
+
+// implement< N > Equality for Binary'N = {
+//     [ pure ]
+//     derived equal( this, other : Binary'N ) -> Boolean =
+//         template< Type : Binary'N > EquInstruction( this, other )
+
+//     [ pure ]
+//     derived unequal( this, other : Binary'N ) -> Boolean =
+//         not template< Type : Binary'N > EquInstruction( this, other )
+// }
+
+// implement< N > Cardinality for Binary'N = {
+//     [ pure ]
+//     derived size( this ) -> Integer =
+//         SizeInstruction( this )
+// }
+
+// implement< N > TypeCasting< String > for Binary'N = {
+//     [ pure ]
+//     derived convertTo( this ) -> String =
+//         StrInstruction( this )
+// }
+
+//
+//
+// RuleRef features for all type domains ('RuleRef' '<' <type-relation> '>')
+//
+
+implement< Signature > Equality for RuleRef< Signature > = {
+    [ pure ]
+    derived equal( this, other : RuleRef< Signature > ) -> Boolean =
+        template< Type : RuleRef< Signature > > EquInstruction( this, other )
+
+    [ pure ]
+    derived unequal( this, other : RuleRef< Signature > ) -> Boolean =
+        not template< Type : RuleRef< Signature > > EquInstruction( this, other )
+}
+
+implement< Signature > TypeCasting< String > for RuleRef< Signature > = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        template< Type : RuleRef< Signature > > StrInstruction( this )
+}
+
+//
+//
+// FuncRef features for all type domains ('FuncRef' '<' <type-relation> '>')
+//
+
+implement< Signature > Equality for FuncRef< Signature > = {
+    [ pure ]
+    derived equal( this, other : FuncRef< Signature > ) -> Boolean =
+        template< Type : FuncRef< Signature > > EquInstruction( this, other )
+
+    [ pure ]
+    derived unequal( this, other : FuncRef< Signature > ) -> Boolean =
+        not template< Type : FuncRef< Signature > > EquInstruction( this, other )
+}
+
+implement< Signature > TypeCasting< String > for FuncRef< Signature > = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        template< Type : FuncRef< Signature > > StrInstruction( this )
+}
+
+//
+//
+// Range< Type >
+//
+
+implement< Type > Cardinality for Range< Type > = {
+    [ pure ]
+    derived size( this ) -> Integer =
+        template< Type : Range< Type > > SizeInstruction( this )
+}
+
+//
+//
+// Agent
+//
+
+implement Equality for Agent = {
+    [ pure ]
+    derived equal( this, other : Agent ) -> Boolean =
+        template< Type : Agent > EquInstruction( this, other )
+
+    [ pure ]
+    derived unequal( this, other : Agent ) -> Boolean =
+        not template< Type : Agent > EquInstruction( this, other )
+}
+
+//
+//
+// Prelude Specification
+//
+
+[ export ]
+function program : Agent -> RuleRef< -> Void >
+
+[ export ]
+derived self -> Agent =
+    SelfInstruction
+
+[ export ]
+rule abort =
+    AbortInstruction
+
+[ export ]
+rule assert( value : Boolean ) =
+    AssertInstruction( value )
+
+[ export ]
+rule assure( value : Boolean ) =
+    AssureInstruction( value )
+
+[ export ]
+rule print( text : String ) =
+    PrintInstruction( text )
+
+[ export ]
+rule println( text : String ) =
+    print( text + "\n" )
+
+//
+//
+// Greeting Specification
+//
+
+//using Agent = Integer init { (123) -> @greeting }
+//init { (123) -> @greeting } using Agent = Integer
+init greeting
+
+function x : -> ( String, Integer ) initially { ( "asdf", 123 ) }
+
+function a : -> Integer initially { 0 }
+
+// function c : -> Integer'[1..10]
+
+// derived b( x : Integer'[-5..5] ) -> Integer = x*10
+
+enumeration Lala = { Foo, Bar, Baz, Qux }
+
+rule greeting = {
+    if self = self then skip
+
+    print( "Hello World!\n" )
+
+    println( "x.1 = " + x.1 )
+
+    println( "x.2 = " + x.2 as String )
+
+    assert( x.1 = "asdf" )
+    assert( x.2 = 123 )
+
+    assert( a.isSymbolic.isSymbolic = false )
+
+    let y : Integer = undef in
+        assert( y.add( 20 ) = undef )
+
+    //let x = undef in skip
 }
