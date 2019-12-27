@@ -240,8 +240,7 @@ void SymbolRegistrationVisitor::visit( InitDefinition& node )
     const auto programFunctionInitializers = programFunction->initially()->initializers();
     for( auto& programFunctionInitializer : *programFunctionInitializers )
     {
-        programFunctionInitializer->updateRule()->function()->setIdentifier(
-            IdentifierPath::fromIdentifier( programFunction->identifier() ) );
+        programFunctionInitializer->setFunction( programFunction );
     }
 
     registerSymbol( *node.programFunction() );

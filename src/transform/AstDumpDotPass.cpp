@@ -252,12 +252,7 @@ void AstDumpDotVisitor::visit( Initializer& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "Initializer" );
-    node.delimiterToken()->accept( *this );
-    node.leftBraceToken()->accept( *this );
-    node.arguments()->accept( *this );
-    node.rightBraceToken()->accept( *this );
-    node.mapsToken()->accept( *this );
-    node.value()->accept( *this );
+    RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( VariableDefinition& node )

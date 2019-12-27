@@ -47,13 +47,14 @@
 
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/Node>
-#include <libcasm-fe/ast/Rule>
 #include <libcasm-fe/ast/Token>
 
 namespace libcasm_fe
 {
     namespace Ast
     {
+        class FunctionDefinition;
+
         class Helper : public Node
         {
           public:
@@ -113,7 +114,8 @@ namespace libcasm_fe
 
             const Expression::Ptr& value( void ) const;
 
-            const UpdateRule::Ptr& updateRule( void ) const;
+            const std::shared_ptr< FunctionDefinition >& function( void ) const;
+            void setFunction( const std::shared_ptr< FunctionDefinition >& function );
 
             const Token::Ptr& mapsToken( void ) const;
 
@@ -122,8 +124,8 @@ namespace libcasm_fe
           private:
             const Expressions::Ptr m_arguments;
             const Expression::Ptr m_value;
-            const UpdateRule::Ptr m_updateRule;
             const Token::Ptr m_mapsToken;
+            std::shared_ptr< FunctionDefinition > m_function;
         };
 
         using Initializers = NodeList< Initializer >;
