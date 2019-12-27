@@ -109,6 +109,7 @@ void RecursiveVisitor::visit( VariableDefinition& node )
 
 void RecursiveVisitor::visit( FunctionDefinition& node )
 {
+    node.delimiterToken()->accept( *this );
     node.attributes()->accept( *this );
     node.functionToken()->accept( *this );
     node.identifier()->accept( *this );
