@@ -129,16 +129,16 @@ CASM:
 TEST( libcasm_fe_project, import_from_configuration )
 {
     // GIVEN
-    const auto projectPath = TEST_NAME + "/project/";
-    const auto projectPathSrc = projectPath + "src/";
-    const auto projectConfig = projectPath + ".casm.yml";
-    const auto projectFileFoo = projectPath + "Foo.casm";
-    const auto projectFileBar = projectPathSrc + "Bar.casm";
-    const auto projectFileQux = projectPathSrc + "Qux.casm";
+    const auto projectPath = TEST_NAME + "/project";
+    const auto projectPathSrc = projectPath + "/src";
+    const auto projectConfig = projectPath + "/.casm.yml";
+    const auto projectFileFoo = projectPath + "/Foo.casm";
+    const auto projectFileBar = projectPathSrc + "/Bar.casm";
+    const auto projectFileQux = projectPathSrc + "/Qux.casm";
 
-    const auto libraryPath = TEST_NAME + "/library/";
-    const auto libraryConfig = libraryPath + ".casm.yml";
-    const auto libraryFileBaz = libraryPath + "Baz.casm";
+    const auto libraryPath = TEST_NAME + "/library";
+    const auto libraryConfig = libraryPath + "/.casm.yml";
+    const auto libraryFileBaz = libraryPath + "/Baz.casm";
 
     TEST_PATH_CREATE( TEST_NAME );
 
