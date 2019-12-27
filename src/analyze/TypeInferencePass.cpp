@@ -73,6 +73,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
   public:
     TypeInferenceVisitor( libcasm_fe::Logger& log, const Namespace& symboltable );
 
+    void visit( Initializer& node ) override;
+
     void visit( InitDefinition& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
@@ -163,6 +165,76 @@ TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log, const Names
 : m_log( log )
 , m_symboltable( symboltable )
 {
+}
+
+void TypeInferenceVisitor::visit( Initializer& node )
+{
+    auto& value = *node.value();
+    auto& arguments = *node.arguments();
+    auto& function = *node.function();
+
+    function.accept( *this );
+    if( not function.type() )
+    {
+        return;
+    }
+
+    const auto& resultType = function.type()->ptr_result();
+    const auto& argumentTypes = function.type()->arguments().data();
+
+    if( arguments.size() != argumentTypes.size() )
+    {
+        m_log.error(
+            { arguments.sourceLocation() },
+            "invalid number of arguments: function '" + function.identifier()->name() +
+                "' expects " + std::to_string( argumentTypes.size() ) + " arguments but " +
+                std::to_string( arguments.size() ) + " were given",
+            Code::SymbolArgumentSizeMismatch );
+        return;
+    }
+
+    m_typeIDs[&value ].emplace( resultType->id() );
+    for( std::size_t i = 0; i < arguments.size(); i++ )
+    {
+        m_typeIDs[ arguments.at( i ).get() ].emplace( argumentTypes.at( i )->id() );
+    }
+
+    value.accept( *this );
+    assignment(
+        *function.returnType(),
+        value,
+        "updated function",
+        "updating expression",
+        Code::TypeInferenceUpdateRuleTypesMismatch );
+
+    arguments.accept( *this );
+    for( std::size_t pos = 0; pos < arguments.size(); pos++ )
+    {
+        const auto& argument = arguments.at( pos );
+        if( not argument->type() )
+        {
+            continue;
+        }
+
+        const auto exprArgType = argument->type();
+        const auto callArgType = argumentTypes.at( pos );
+
+        if( *callArgType != *exprArgType )
+        {
+            if( callArgType->isInteger() and exprArgType->isInteger() )
+            {
+                argument->setType( callArgType );
+                continue;
+            }
+
+            m_log.error(
+                { argument->sourceLocation() },
+                "type mismatch: function argument type at position " + std::to_string( pos + 1 ) +
+                    " was '" + exprArgType->description() + "', function definition expects '" +
+                    callArgType->description() + "'",
+                Code::TypeInferenceFunctionArgumentTypeMismatch );
+        }
+    }
 }
 
 void TypeInferenceVisitor::visit( InitDefinition& node )

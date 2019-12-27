@@ -46,6 +46,8 @@
 
 #include "../various/GrammarToken.h"
 
+#include <libcasm-fe/ast/Definition>
+
 #include <cassert>
 
 using namespace libcasm_fe;
@@ -133,11 +135,8 @@ Initializer::Initializer(
 : Helper( Node::ID::INITIALIZER, leftBraceToken, rightBraceToken )
 , m_arguments( arguments )
 , m_value( value )
-, m_updateRule( std::make_shared< UpdateRule >(
-      std::make_shared< DirectCallExpression >(
-          IdentifierPath::fromIdentifier( std::make_shared< Identifier >() ), arguments ),
-      value ) )
 , m_mapsToken( mapsToken )
+, m_function( nullptr )
 {
 }
 
@@ -151,9 +150,14 @@ const Expression::Ptr& Initializer::value( void ) const
     return m_value;
 }
 
-const UpdateRule::Ptr& Initializer::updateRule( void ) const
+const FunctionDefinition::Ptr& Initializer::function( void ) const
 {
-    return m_updateRule;
+    return m_function;
+}
+
+void Initializer::setFunction( const FunctionDefinition::Ptr& function )
+{
+    m_function = function;
 }
 
 const Token::Ptr& Initializer::mapsToken( void ) const

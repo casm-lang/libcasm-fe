@@ -81,6 +81,8 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
     void visit( Specification& node );
 
+    void visit( Initializer& node ) override;
+
     void visit( InitDefinition& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
@@ -129,12 +131,10 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
   private:
     libcasm_fe::Logger& m_log;
-    u1 m_functionInitially;
 };
 
 ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
 : m_log( log )
-, m_functionInitially( false )
 {
 }
 
@@ -142,6 +142,21 @@ void ConsistencyCheckVisitor::visit( Specification& node )
 {
     node.header()->accept( *this );
     node.definitions()->accept( *this );
+}
+
+void ConsistencyCheckVisitor::visit( Initializer& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto& function = *node.function();
+    if( function.classification() == FunctionDefinition::Classification::IN )
+    {
+        m_log.error(
+            { function.sourceLocation() },
+            "initializing function '" + function.identifier()->name() +
+                "' is not allowed, it is classified as '" + function.classificationName() + "' ",
+            Code::UpdateRuleInvalidClassifier );
+    }
 }
 
 void ConsistencyCheckVisitor::visit( InitDefinition& node )
@@ -158,16 +173,7 @@ void ConsistencyCheckVisitor::visit( VariableDefinition& node )
 
 void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 {
-    m_functionInitially = true;
-    node.initially()->accept( *this );
-    m_functionInitially = false;
-
-    node.identifier()->accept( *this );
-    node.argumentTypes()->accept( *this );
-    node.returnType()->accept( *this );
-    node.defined()->accept( *this );
-    node.attributes()->accept( *this );
-
+    RecursiveVisitor::visit( node );
     verifyHasTypeOfKind( node, IR::Type::Kind::RELATION );
 }
 
@@ -404,15 +410,10 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     bool updatesAllowed;
     switch( def->classification() )
     {
-        case FunctionDefinition::Classification::IN:
-        {
-            updatesAllowed = false;
-            break;
-        }
+        case FunctionDefinition::Classification::IN:  // [fallthrough]
         case FunctionDefinition::Classification::STATIC:
         {
-            // static function updates are only allowed during initialisation
-            updatesAllowed = m_functionInitially;
+            updatesAllowed = false;
             break;
         }
         default:

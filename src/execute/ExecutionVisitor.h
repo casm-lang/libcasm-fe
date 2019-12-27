@@ -93,10 +93,10 @@ namespace libcasm_fe
      */
     struct Update
     {
-        IR::Constant value;        /**< The value of the update */
-        Ast::UpdateRule* producer; /**< The update producer */
-        IR::Constant agent;        /**< The contributing agent */
-                                   // TODO maybe a list of agents (multi-agent case)?
+        IR::Constant value;  /**< The value of the update */
+        Ast::Node* producer; /**< The update producer */
+        IR::Constant agent;  /**< The contributing agent */
+                             // TODO maybe a list of agents (multi-agent case)?
     };
 
     struct UpdateEquals : public std::binary_function< const Update&, const Update&, bool >

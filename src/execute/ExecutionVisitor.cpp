@@ -195,8 +195,80 @@ void ExecutionVisitor::visit( Initially& node )
 
 void ExecutionVisitor::visit( Initializer& node )
 {
-    // just evaluate the encapsulated update rule
-    node.updateRule()->accept( *this );
+    const auto& value = node.value();
+    const auto& arguments = node.arguments();
+    const auto& function = node.function();
+
+    // evaluate arguments
+    std::vector< IR::Constant > argumentValues;
+    argumentValues.reserve( arguments->size() );
+    for( const auto& argument : *arguments )
+    {
+        argument->accept( *this );
+        const auto argumentValue = m_evaluationStack.pop();
+
+        try
+        {
+            validateValue(
+                argumentValue, *argument->type(), { ValidationFlag::ValueMustBeDefined } );
+        }
+        catch( const IR::ValidationException& e )
+        {
+            throw RuntimeException(
+                { argument->sourceLocation() },
+                e.what(),
+                m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                Code::FunctionArgumentInvalidValueAtUpdate );
+        }
+
+        argumentValues.push_back( argumentValue );
+    }
+
+    const auto location = m_locationRegistry.get( function.get(), argumentValues );
+    assert( location.isValid() );
+
+    // evaluate update value
+    value->accept( *this );
+    const auto updateValue = m_evaluationStack.pop();
+    try
+    {
+        validateValue( updateValue, function->type()->result() );
+    }
+    catch( const IR::ValidationException& e )
+    {
+        throw RuntimeException(
+            { value->sourceLocation() },
+            e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::FunctionUpdateInvalidValueAtUpdate );
+    }
+
+    try
+    {
+        const Update update{ updateValue, &node, m_agentId };
+        m_updateSetManager.add( location, update );
+    }
+    catch( const ExecutionUpdateSet::Conflict& conflict )
+    {
+        // existing
+        const auto& updateA = conflict.existingUpdate();
+        const auto updateStrA = updateAsString( conflict.existingUpdate() );
+        const auto& sourceLocationA = updateA.value.producer->sourceLocation();
+
+        // conflicting
+        const auto& updateB = conflict.conflictingUpdate();
+        const auto updateStrB = updateAsString( updateB );
+        const auto& sourceLocationB = node.sourceLocation();
+
+        const auto info = "Conflict while initializing function " + function->identifier()->name() +
+                          " in agent " + m_agentId.name() + ". Update '" + updateStrA +
+                          "' clashed with update '" + updateStrB + "'";
+        throw RuntimeException(
+            { sourceLocationA, sourceLocationB },
+            info,
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            libcasm_fe::Code::UpdateSetClash );
+    }
 }
 
 void ExecutionVisitor::visit( VariableDefinition& node )

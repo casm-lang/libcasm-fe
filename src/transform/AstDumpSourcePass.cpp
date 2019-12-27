@@ -78,7 +78,6 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
   public:
     explicit AstDumpSourceVisitor( std::ostream& stream );
 
-    void visit( Initializer& node ) override;
     void visit( RuleDefinition& node ) override;
     void visit( EmbracedExpression& node ) override;
     void visit( UndefLiteral& node ) override;
@@ -96,16 +95,6 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
 AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 : m_stream( stream )
 {
-}
-
-void AstDumpSourceVisitor::visit( Initializer& node )
-{
-    node.delimiterToken()->accept( *this );
-    node.leftBraceToken()->accept( *this );
-    node.arguments()->accept( *this );
-    node.rightBraceToken()->accept( *this );
-    node.mapsToken()->accept( *this );
-    node.value()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( RuleDefinition& node )
