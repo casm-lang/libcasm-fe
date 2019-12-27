@@ -55,6 +55,8 @@
 #include <libcasm-ir/Exception>
 #include <libcasm-ir/Operation>
 
+#include <libstdhl/RestoreOnScopeExit>
+
 #include <mutex>
 #include <stdexcept>
 #include <thread>
@@ -63,6 +65,17 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 namespace IR = libcasm_ir;
+
+template < typename T >
+class ScopedOverwrite : public libstdhl::RestoreOnScopeExit< T >
+{
+  public:
+    ScopedOverwrite( T& target, const T& value )
+    : RestoreOnScopeExit< T >( target )
+    {
+        target = value;
+    }
+};
 
 static std::string updateAsString( const ExecutionUpdateSet::Update& update )
 {
@@ -502,11 +515,8 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::RULE:
         {
             const auto& definition = node.targetDefinition();
-            const auto evaluateUpdateLocation = m_evaluateUpdateLocation;
-            m_evaluateUpdateLocation = false;
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-            m_evaluateUpdateLocation = evaluateUpdateLocation;
             definition->accept( *this );
             m_frameStack.pop();
             break;
@@ -1122,9 +1132,10 @@ void ExecutionVisitor::visit( UpdateRule& node )
             Code::FunctionUpdateInvalidValueAtUpdate );
     }
 
-    m_evaluateUpdateLocation = true;
-    function->accept( *this );
-    m_evaluateUpdateLocation = false;
+    {
+        ScopedOverwrite< bool > withLocationEvaluation( m_evaluateUpdateLocation, true );
+        function->accept( *this );
+    }
     assert( m_updateLocation.isValid() );
 
     try
@@ -1231,6 +1242,8 @@ void ExecutionVisitor::visit( VariableBinding& node )
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
     CallExpression* call, Node* callee, std::size_t numberOfLocals )
 {
+    ScopedOverwrite< bool > withoutLocationEvaluation( m_evaluateUpdateLocation, false );
+
     auto frame = libstdhl::Memory::make_unique< Frame >( call, callee, numberOfLocals );
 
     if( call != nullptr )
@@ -1253,6 +1266,8 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
 std::unique_ptr< Frame > ExecutionVisitor::makeObjectFrame(
     const IR::Constant& object, CallExpression* call, Node* callee, std::size_t numberOfLocals )
 {
+    ScopedOverwrite< bool > withoutLocationEvaluation( m_evaluateUpdateLocation, false );
+
     auto frame = libstdhl::Memory::make_unique< Frame >(
         call, callee, numberOfLocals + 1 );  // TODO move the +1 to the frame size determination
 
