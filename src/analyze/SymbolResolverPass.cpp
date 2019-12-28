@@ -523,12 +523,7 @@ void SymbolResolveVisitor::visit( LetRule& node )
 
 void SymbolResolveVisitor::visit( LocalRule& node )
 {
-    for( const auto& function : *node.localFunctions() )
-    {
-        pushSymbol( function );
-        function->accept( *this );
-        popSymbol( function );
-    }
+    node.localFunctions()->accept( *this );
 
     pushSymbols< FunctionDefinition >( node.localFunctions() );
     node.rule()->accept( *this );
