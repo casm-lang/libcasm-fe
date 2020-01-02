@@ -154,7 +154,7 @@ TEST( libcasm_fe_project, import_from_configuration )
     TEST_FILE_CREATE( libraryFileBaz, specificationBaz );
 
     // WHEN & THEN
-    TEST_PASS( ConsistencyCheckPass, projectPath, true, );
+    TEST_PASS( ConsistencyCheckPass, projectConfig, true, );
 
     // CLEANUP
     TEST_FILE_REMOVE( libraryFileBaz );
