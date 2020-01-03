@@ -55,7 +55,7 @@
 #include <libcasm-fe/analyze/PropertyRevisePass>
 #include <libcasm-fe/import/SpecificationMergerPass>
 
-#include <libcasm-ir/Builtin>
+#include <libcasm-ir/Type>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
@@ -73,6 +73,7 @@ char ConsistencyCheckPass::id = 0;
 static libpass::PassRegistration< ConsistencyCheckPass > PASS(
     "ASTConsistencyCheckPass", "checks the consistency of the AST representation", "ast-check", 0 );
 
+//
 //
 // ConsistencyCheckVisitor
 //
@@ -93,6 +94,10 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( UsingDefinition& node ) override;
     void visit( InvariantDefinition& node ) override;
     void visit( DomainDefinition& node ) override;
+    void visit( StructureDefinition& node ) override;
+    void visit( BehaviorDefinition& node ) override;
+    void visit( ImplementDefinition& node ) override;
+    void visit( BuiltinDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
@@ -195,8 +200,70 @@ void ConsistencyCheckVisitor::visit( InvariantDefinition& node )
 
 void ConsistencyCheckVisitor::visit( DomainDefinition& node )
 {
+    if( node.templateSymbols()->size() > 0 )
+    {
+        node.templateInstances()->accept( *this );
+        return;
+    }
+
     RecursiveVisitor::visit( node );
     verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( StructureDefinition& node )
+{
+    if( node.templateSymbols()->size() > 0 )
+    {
+        node.templateInstances()->accept( *this );
+        return;
+    }
+
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( BehaviorDefinition& node )
+{
+    if( node.templateSymbols()->size() > 0 )
+    {
+        node.templateInstances()->accept( *this );
+        return;
+    }
+
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( ImplementDefinition& node )
+{
+    if( node.templateSymbols()->size() > 0 )
+    {
+        node.templateInstances()->accept( *this );
+        return;
+    }
+
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( BuiltinDefinition& node )
+{
+    if( node.templateSymbols()->size() > 0 )
+    {
+        node.templateInstances()->accept( *this );
+        return;
+    }
+
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+
+    if( not node.hasTargetId() )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            node.description() + " '" + node.typeDescription() + "' has no target id",
+            Code::Unspecified );
+    }
 }
 
 void ConsistencyCheckVisitor::visit( UndefLiteral& node )
@@ -345,11 +412,10 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 {
-    assert( node.targetType() != DirectCallExpression::TargetType::UNKNOWN );
-
     RecursiveVisitor::visit( node );
     verifyHasType( node );
 
+    assert( node.targetType() != DirectCallExpression::TargetType::UNKNOWN );
     if( node.targetType() == DirectCallExpression::TargetType::FUNCTION )
     {
         const auto& function = node.targetDefinition()->ptr< FunctionDefinition >();
@@ -458,45 +524,31 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
 
 void ConsistencyCheckVisitor::visit( BasicType& node )
 {
-    RecursiveVisitor::visit( node );
     verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( TupleType& node )
 {
-    RecursiveVisitor::visit( node );
     verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( RecordType& node )
 {
-    RecursiveVisitor::visit( node );
     verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( TemplateType& node )
 {
-    RecursiveVisitor::visit( node );
-
-    if( node.leftBraceToken()->token() == Grammar::Token::UNRESOLVED and
-        node.rightBraceToken()->token() == Grammar::Token::UNRESOLVED )
-    {
-        // internal created template type
-        return;
-    }
-
     verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( FixedSizedType& node )
 {
-    RecursiveVisitor::visit( node );
     verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( RelationType& node )
 {
-    RecursiveVisitor::visit( node );
     verifyHasType( node );
 }
 
@@ -527,6 +579,7 @@ void ConsistencyCheckVisitor::verifyHasTypeOfKind(
 }
 
 //
+//
 // ConsistencyCheckPass
 //
 
@@ -549,6 +602,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
     const auto errors = log.errors();
     if( errors > 0 )
     {
+        log.debug( "symbol table =\n" + specification->symboltable()->dump() );
         log.debug( "found %lu error(s) during consistency checking", errors );
         return false;
     }

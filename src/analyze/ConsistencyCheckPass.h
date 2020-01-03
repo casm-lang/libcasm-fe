@@ -51,7 +51,7 @@
 namespace libcasm_fe
 {
     /**
-     * @brief checks the consistency and certain properties of the parsed AST
+       @brief checks the consistency and certain properties of the parsed AST
      */
     class ConsistencyCheckPass final : public libpass::Pass
     {
