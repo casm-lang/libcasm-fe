@@ -51,8 +51,8 @@
 namespace libcasm_fe
 {
     /**
-     * Determines the minimum size of call frames required during execution:
-     * - The minimum stack size to hold the locals
+       Determines the minimum size of call frames required during execution:
+       - The minimum stack size to hold the locals
      */
     class FrameSizeDeterminationPass final : public libpass::Pass
     {
