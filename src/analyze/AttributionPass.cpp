@@ -206,7 +206,7 @@ class DefinitionVisitor final : public RecursiveVisitor
     void visit( DomainDefinition& node ) override;
     void visit( BuiltinDefinition& node ) override;
     void visit( StructureDefinition& node ) override;
-    void visit( FeatureDefinition& node ) override;
+    void visit( BehaviorDefinition& node ) override;
     void visit( ImplementDefinition& node ) override;
     void visit( Declaration& node ) override;
 
@@ -509,7 +509,7 @@ void DefinitionVisitor::visit( StructureDefinition& node )
     }
 }
 
-void DefinitionVisitor::visit( FeatureDefinition& node )
+void DefinitionVisitor::visit( BehaviorDefinition& node )
 {
     RecursiveVisitor::visit( node );
 
