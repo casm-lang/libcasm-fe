@@ -58,11 +58,6 @@ namespace libcasm_fe
         RuntimeException(
             const std::vector< libstdhl::SourceLocation >& locations,
             const std::string& message,
-            Code errorCode );
-
-        RuntimeException(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
             const std::vector< std::string >& backtrace,
             Code errorCode );
 

@@ -1754,6 +1754,7 @@ void AgentScheduler::collectUpdates( const std::vector< Agent >& agents )
                 "Conflict while collection updates from agents. Update '" + updateStrA +
                     "' produced by agent " + agentStrA + " clashed with update '" + updateStrB +
                     "' produced by agent " + agentStrB,
+                {},
                 { updateAsUpdateInfo( updateA ), updateAsUpdateInfo( updateB ) },
                 libcasm_fe::Code::UpdateSetMergeConflict );
         }

@@ -68,12 +68,6 @@ namespace libcasm_fe
         UpdateException(
             const std::vector< libstdhl::SourceLocation >& locations,
             const std::string& message,
-            const std::vector< UpdateInfo >& updateInfos,
-            Code errorCode );
-
-        UpdateException(
-            const std::vector< libstdhl::SourceLocation >& locations,
-            const std::string& message,
             const std::vector< std::string >& backtrace,
             const std::vector< UpdateInfo >& updateInfos,
             Code errorCode );

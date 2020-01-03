@@ -49,14 +49,6 @@ using namespace libcasm_fe;
 RuntimeException::RuntimeException(
     const std::vector< libstdhl::SourceLocation >& locations,
     const std::string& message,
-    Code errorCode )
-: RuntimeException( locations, message, {}, errorCode )
-{
-}
-
-RuntimeException::RuntimeException(
-    const std::vector< libstdhl::SourceLocation >& locations,
-    const std::string& message,
     const std::vector< std::string >& backtrace,
     Code errorCode )
 : Exception( locations, message, errorCode )
