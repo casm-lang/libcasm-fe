@@ -220,72 +220,8 @@ void ExecutionVisitor::visit( Initially& node )
 
 void ExecutionVisitor::visit( Initializer& node )
 {
-    const auto& value = node.value();
-    const auto& arguments = node.arguments();
-    const auto& function = node.function();
-
-    // evaluate arguments
-    std::vector< IR::Constant > argumentValues;
-    argumentValues.reserve( arguments->size() );
-    for( const auto& argument : *arguments )
-    {
-        argument->accept( *this );
-        const auto argumentValue = m_evaluationStack.pop();
-
-        try
-        {
-            validateValue(
-                argumentValue, *argument->type(), { ValidationFlag::ValueMustBeDefined } );
-        }
-        catch( const IR::ValidationException& e )
-        {
-            throw RuntimeException(
-                { argument->sourceLocation() },
-                e.what(),
-                m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-                Code::FunctionArgumentInvalidValueAtUpdate );
-        }
-
-        argumentValues.push_back( argumentValue );
-    }
-
-    const auto location = m_locationRegistry.get( function.get(), argumentValues );
-    assert( location.isValid() );
-
-    // evaluate update value
-    value->accept( *this );
-    const auto updateValue = m_evaluationStack.pop();
-    try
-    {
-        validateValue( updateValue, function->type()->result() );
-    }
-    catch( const IR::ValidationException& e )
-    {
-        throw RuntimeException(
-            { value->sourceLocation() },
-            e.what(),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::FunctionUpdateInvalidValueAtUpdate );
-    }
-
-    try
-    {
-        const Update update{ updateValue, &node, m_agentId };
-        m_updateSetManager.add( location, update );
-    }
-    catch( const ExecutionUpdateSet::Conflict& conflict )
-    {
-        throw UpdateException(
-            { node.sourceLocation() },
-            "Conflict while initializing function " + function->identifier()->name() +
-                " in agent " + m_agentId.name() + ". Update '" +
-                updateAsString( conflict.conflictingUpdate() ) + "' clashed with update '" +
-                updateAsString( conflict.existingUpdate() ) + "'",
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            { updateAsUpdateInfo( conflict.existingUpdate() ),
-              updateAsUpdateInfo( conflict.conflictingUpdate() ) },
-            libcasm_fe::Code::UpdateSetClash );
-    }
+    // just evaluate the encapsulated update rule
+    node.updateRule()->accept( *this );
 }
 
 void ExecutionVisitor::visit( VariableDefinition& node )
@@ -431,7 +367,7 @@ void ExecutionVisitor::visit( BuiltinDefinition& node )
         IR::Constant returnValue;
 
         IR::Operation::execute(
-            node.targetBuiltinId(), type, returnValue, arguments.data(), arguments.size() );
+            node.targetId(), type, returnValue, arguments.data(), arguments.size() );
 
         const auto& returnType = type->result();
         if( not returnType.isVoid() )
@@ -441,11 +377,11 @@ void ExecutionVisitor::visit( BuiltinDefinition& node )
     }
     catch( const std::exception& e )
     {
-        throw RuntimeException(
-            node.sourceLocation(),
-            "builtin has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::RuntimeException );
+        // throw RuntimeException(
+        //     node.sourceLocation(),
+        //     "builtin has thrown an exception: " + std::string( e.what() ),
+        //     m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+        //     Code::RuntimeException );
     }
 }
 
@@ -591,11 +527,6 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             node.targetDefinition()->accept( *this );
             break;
         }
-        case DirectCallExpression::TargetType::SELF:
-        {
-            m_evaluationStack.push( m_agentId );
-            break;
-        }
         case DirectCallExpression::TargetType::THIS:
         {
             assert( !"unimplemented THIS" );
@@ -672,27 +603,10 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
 
 void ExecutionVisitor::visit( LiteralCallExpression& node )
 {
-    node.object()->accept( *this );
-    const auto object = m_evaluationStack.pop();
-    node.literal()->accept( *this );
-    const auto literal = m_evaluationStack.pop();
-    assert( literal.defined() );  // constrain from parser
-
-    if( not object.defined() )
-    {
-        m_evaluationStack.push( IR::Constant::undef( node.type() ) );
-        return;
-    }
-
-    assert( object.typeId().kind() == IR::Type::Kind::TUPLE );
-    assert( literal.typeId().kind() == IR::Type::Kind::INTEGER );
-
-    const auto* tuple = static_cast< const IR::TupleConstant& >( object ).value();
-    assert( tuple != nullptr );
-    const auto& index = static_cast< const IR::IntegerConstant& >( literal ).value();
-    const auto& element = tuple->elements()[ index.value() - 1 ];
-
-    m_evaluationStack.push( element );
+    const auto& definition = node.targetDefinition();
+    m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+    definition->accept( *this );
+    m_frameStack.pop();
 }
 
 void ExecutionVisitor::visit( IndirectCallExpression& node )
@@ -711,7 +625,6 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     const auto& literal = value.value();
     switch( literal->referenceType() )
     {
-        case ReferenceLiteral::ReferenceType::BUILTIN:   // [[fallthrough]]
         case ReferenceLiteral::ReferenceType::FUNCTION:  // [[fallthrough]]
         case ReferenceLiteral::ReferenceType::DERIVED:
         {
@@ -1473,12 +1386,6 @@ void StateInitializationVisitor::visit( Specification& node )
     auto updateSet = m_updateSetManager.currentUpdateSet();
     m_globalState.fireUpdateSet( updateSet );
     m_updateSetManager.clear();
-}
-
-void StateInitializationVisitor::visit( InitDefinition& node )
-{
-    assert( node.programFunction() and "checked during frame size determination pass!" );
-    node.programFunction()->accept( *this );
 }
 
 void StateInitializationVisitor::visit( FunctionDefinition& node )

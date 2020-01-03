@@ -387,6 +387,18 @@ void LetRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr LetRule::clone( void ) const
+{
+    auto duplicate = std::make_shared< LetRule >(
+        letToken(),
+        variableBindings()->duplicate< VariableBindings >(),
+        inToken(),
+        rule()->duplicate< Rule >() );
+
+    Rule::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // LocalRule
@@ -430,11 +442,11 @@ void LocalRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-Node::Ptr LetRule::clone( void ) const
+Node::Ptr LocalRule::clone( void ) const
 {
-    auto duplicate = std::make_shared< LetRule >(
-        letToken(),
-        variableBindings()->duplicate< VariableBindings >(),
+    auto duplicate = std::make_shared< LocalRule >(
+        localToken(),
+        localFunctions()->duplicate< FunctionDefinitions >(),
         inToken(),
         rule()->duplicate< Rule >() );
 

@@ -84,9 +84,6 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
     void visit( Specification& node );
 
-    void visit( Initializer& node ) override;
-
-    void visit( InitDefinition& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -148,27 +145,6 @@ void ConsistencyCheckVisitor::visit( Specification& node )
     node.definitions()->accept( *this );
 }
 
-void ConsistencyCheckVisitor::visit( Initializer& node )
-{
-    RecursiveVisitor::visit( node );
-
-    const auto& function = *node.function();
-    if( function.classification() == FunctionDefinition::Classification::IN )
-    {
-        m_log.error(
-            { function.sourceLocation() },
-            "initializing function '" + function.identifier()->name() +
-                "' is not allowed, it is classified as '" + function.classificationName() + "' ",
-            Code::UpdateRuleInvalidClassifier );
-    }
-}
-
-void ConsistencyCheckVisitor::visit( InitDefinition& node )
-{
-    RecursiveVisitor::visit( node );
-    node.programFunction()->accept( *this );
-}
-
 void ConsistencyCheckVisitor::visit( VariableDefinition& node )
 {
     RecursiveVisitor::visit( node );
@@ -220,13 +196,6 @@ void ConsistencyCheckVisitor::visit( InvariantDefinition& node )
 void ConsistencyCheckVisitor::visit( DomainDefinition& node )
 {
     RecursiveVisitor::visit( node );
-
-    if( node.typeNode()->id() == Node::ID::TEMPLATE_TYPE )
-    {
-        // internal template type definition
-        return;
-    }
-
     verifyHasType( node );
 }
 
@@ -424,7 +393,7 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
                 { function->sourceLocation() },
                 "updating " + directCall->targetTypeName() + " '" + name +
                     "' is not allowed, only function symbols are allowed",
-                Code::UpdateRuleFunctionSymbolIsInvalid );
+                Code::SymbolIsInvalid );
             return;
         }
 

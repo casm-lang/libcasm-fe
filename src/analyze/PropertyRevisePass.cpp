@@ -77,8 +77,6 @@ class PropertyReviseVisitor final : public RecursiveVisitor
 
     void visit( Specification& node );
 
-    void visit( Initializer& node ) override;
-
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( InvariantDefinition& node ) override;
@@ -122,29 +120,6 @@ void PropertyReviseVisitor::visit( Specification& node )
 {
     node.header()->accept( *this );
     node.definitions()->accept( *this );
-}
-
-void PropertyReviseVisitor::visit( Initializer& node )
-{
-    RecursiveVisitor::visit( node );
-
-    for( const auto& argument : *node.arguments() )
-    {
-        checkIfPropertiesHold(
-            *argument,
-            { Property::SIDE_EFFECT_FREE },
-            "function argument",
-            Code::UpdateRuleFunctionArgumentInvalidProperty );
-    }
-
-    if( not node.function()->isLocal() )
-    {
-        checkIfPropertiesHold(
-            *node.value(),
-            { Property::SIDE_EFFECT_FREE },
-            "update expression",
-            Code::UpdateRuleUpdateExpressionInvalidProperty );
-    }
 }
 
 void PropertyReviseVisitor::visit( FunctionDefinition& node )

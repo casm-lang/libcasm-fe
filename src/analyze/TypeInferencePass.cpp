@@ -78,9 +78,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
   public:
     TypeInferenceVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
-    void visit( Initializer& node ) override;
-
-    void visit( InitDefinition& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -173,82 +170,6 @@ TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log, Namespace& 
 : m_log( log )
 , m_symboltable( symboltable )
 {
-}
-
-void TypeInferenceVisitor::visit( Initializer& node )
-{
-    auto& value = *node.value();
-    auto& arguments = *node.arguments();
-    auto& function = *node.function();
-
-    function.accept( *this );
-    if( not function.type() )
-    {
-        return;
-    }
-
-    const auto& resultType = function.type()->ptr_result();
-    const auto& argumentTypes = function.type()->arguments().data();
-
-    if( arguments.size() != argumentTypes.size() )
-    {
-        m_log.error(
-            { arguments.sourceLocation() },
-            "invalid number of arguments: function '" + function.identifier()->name() +
-                "' expects " + std::to_string( argumentTypes.size() ) + " arguments but " +
-                std::to_string( arguments.size() ) + " were given",
-            Code::SymbolArgumentSizeMismatch );
-        return;
-    }
-
-    m_typeIDs[&value ].emplace( resultType->id() );
-    for( std::size_t i = 0; i < arguments.size(); i++ )
-    {
-        m_typeIDs[ arguments.at( i ).get() ].emplace( argumentTypes.at( i )->id() );
-    }
-
-    value.accept( *this );
-    assignment(
-        *function.returnType(),
-        value,
-        "updated function",
-        "updating expression",
-        Code::TypeInferenceUpdateRuleTypesMismatch );
-
-    arguments.accept( *this );
-    for( std::size_t pos = 0; pos < arguments.size(); pos++ )
-    {
-        const auto& argument = arguments.at( pos );
-        if( not argument->type() )
-        {
-            continue;
-        }
-
-        const auto exprArgType = argument->type();
-        const auto callArgType = argumentTypes.at( pos );
-
-        if( *callArgType != *exprArgType )
-        {
-            if( callArgType->isInteger() and exprArgType->isInteger() )
-            {
-                argument->setType( callArgType );
-                continue;
-            }
-
-            m_log.error(
-                { argument->sourceLocation() },
-                "type mismatch: function argument type at position " + std::to_string( pos + 1 ) +
-                    " was '" + exprArgType->description() + "', function definition expects '" +
-                    callArgType->description() + "'",
-                Code::TypeInferenceFunctionArgumentTypeMismatch );
-        }
-    }
-}
-
-void TypeInferenceVisitor::visit( InitDefinition& node )
-{
-    RecursiveVisitor::visit( node );
-    node.programFunction()->accept( *this );
 }
 
 void TypeInferenceVisitor::visit( VariableDefinition& node )
@@ -470,56 +391,6 @@ void TypeInferenceVisitor::visit( ReferenceLiteral& node )
             node.setType( type );
             break;
         }
-        case ReferenceLiteral::ReferenceType::BUILTIN:
-        {
-            libcasm_ir::Annotation const* annotation = nullptr;
-            try
-            {
-                annotation = &libcasm_ir::Annotation::find( node.builtinId() );
-            }
-            catch( const std::domain_error& e )
-            {
-                assert( !"reference should have been resolved" );
-                return;
-            }
-            assert( annotation );
-
-            if( node.type() )
-            {
-                // type has been inferred -> check if relation type is valid
-                assert( node.type()->isReference() );
-                const auto& referenceType =
-                    std::static_pointer_cast< libcasm_ir::ReferenceType >( node.type() );
-                const auto relationType = referenceType->dereference();
-
-                if( not annotation->valid( *relationType ) )
-                {
-                    m_log.error(
-                        { node.sourceLocation() },
-                        "built-in '" + node.identifier()->path() + "' has no type relation '" +
-                            relationType->description() + "'",
-                        Code::TypeInferenceBuiltinRelationTypeInvalid );
-                }
-            }
-            else if( annotation->relations().size() == 1 )
-            {
-                // only unambiguous annotations can be used for type resolving
-                const auto& relation = annotation->relations().at( 0 );
-
-                std::vector< libcasm_ir::Type::Ptr > argumentTypes;
-                for( const auto& argumentId : relation.argument )
-                {
-                    argumentTypes.emplace_back( libcasm_ir::Type::fromID( argumentId ) );
-                }
-
-                const auto& returnType = libcasm_ir::Type::fromID( relation.result );
-
-                const auto type = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
-                    returnType, argumentTypes );
-                node.setType( type );
-            }
-            break;
-        }
         case ReferenceLiteral::ReferenceType::RULE:
         {
             // make sure that the reference has been typed
@@ -593,7 +464,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
         case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
         case DirectCallExpression::TargetType::RULE:      // [[fallthrough]]
-        case DirectCallExpression::TargetType::SELF:      // [[fallthrough]]
         case DirectCallExpression::TargetType::THIS:      // [[fallthrough]]
         case DirectCallExpression::TargetType::CONSTANT:  // [[fallthrough]]
         case DirectCallExpression::TargetType::DOMAIN:

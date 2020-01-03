@@ -329,7 +329,6 @@ namespace libcasm_fe
             ExecutionLocationRegistry& locationRegistry, Storage& globalState );
 
         void visit( Specification& node );
-        void visit( Ast::InitDefinition& node ) override;
         void visit( Ast::FunctionDefinition& node ) override;
 
       private:

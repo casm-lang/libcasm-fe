@@ -1001,9 +1001,9 @@ rule println( text : String ) =
 //init { (123) -> @greeting } using Agent = Integer
 init greeting
 
-function x : -> ( String, Integer ) initially { ( "asdf", 123 ) }
+function x : -> ( String, Integer ) = { ( "asdf", 123 ) }
 
-function a : -> Integer initially { 0 }
+function a : -> Integer = { 0 }
 
 // function c : -> Integer'[1..10]
 

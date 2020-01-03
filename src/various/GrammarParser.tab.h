@@ -59,6 +59,7 @@
     #include <libcasm-fe/ast/Rule>
     #include <libcasm-fe/ast/Token>
     #include <libcasm-fe/Exception>
+    #include <libcasm-fe/TypeInfo>
     #include <libcasm-fe/Logger>
 
     #include <libstdhl/SourceLocation>
@@ -68,7 +69,7 @@
 
     #define YY_NULLPTR nullptr
 
-#line 72 "GrammarParser.tab.h"
+#line 73 "GrammarParser.tab.h"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -203,7 +204,7 @@
 
 #line 51 "../../obj/src/GrammarParser.y"
 namespace libcasm_fe {
-#line 207 "GrammarParser.tab.h"
+#line 208 "GrammarParser.tab.h"
 
 
 
@@ -6416,7 +6417,7 @@ switch (yykind)
 
 #line 51 "../../obj/src/GrammarParser.y"
 } // libcasm_fe
-#line 6420 "GrammarParser.tab.h"
+#line 6421 "GrammarParser.tab.h"
 
 
 

@@ -74,6 +74,7 @@
     #include <libcasm-fe/ast/Rule>
     #include <libcasm-fe/ast/Token>
     #include <libcasm-fe/Exception>
+    #include <libcasm-fe/TypeInfo>
     #include <libcasm-fe/Logger>
 
     #include <libstdhl/SourceLocation>
@@ -2055,13 +2056,6 @@ LocalFunctionDefinition
   {
       $$ = Ast::make< FunctionDefinition >( @$, Token::unresolved(), $1, $2, $3, $4, $5, $6, $7 );
       $$->setClassification( FunctionDefinition::Classification::LOCAL );
-
-      // apply the name of the function declaration to the initializer functions
-      const auto initially = $$->initially();
-      for( auto& initializer : *initially->initializers() )
-      {
-          initializer->setFunction( $$ );
-      }
   }
 ;
 

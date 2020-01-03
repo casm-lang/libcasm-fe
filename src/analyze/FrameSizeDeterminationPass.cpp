@@ -80,7 +80,6 @@ class FrameSizeDeterminationVisitor final : public RecursiveVisitor
 
     void visit( Specification& node );
 
-    void visit( InitDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -128,11 +127,6 @@ void FrameSizeDeterminationVisitor::visit( Specification& node )
 {
     node.header()->accept( *this );
     node.definitions()->accept( *this );
-}
-
-void FrameSizeDeterminationVisitor::visit( InitDefinition& node )
-{
-    node.programFunction()->accept( *this );
 }
 
 void FrameSizeDeterminationVisitor::visit( FunctionDefinition& node )
@@ -211,7 +205,7 @@ void FrameSizeDeterminationVisitor::visit( InvariantDefinition& node )
 
 void FrameSizeDeterminationVisitor::visit( BuiltinDefinition& node )
 {
-    node.setMaximumNumberOfLocals( node.targetBuiltinType()->arguments().size() );
+    node.setMaximumNumberOfLocals( node.relationType().argumentTypes()->size() );
 
 #ifndef NDEBUG
     m_log.debug(

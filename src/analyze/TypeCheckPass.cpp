@@ -73,11 +73,9 @@ class TypeCheckVisitor final : public RecursiveVisitor
   public:
     TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
-    void visit( InitDefinition& node ) override;
-    void visit( Initializer& node ) override;
     void visit( UsingDefinition& node ) override;
     void visit( StructureDefinition& node ) override;
-    void visit( FeatureDefinition& node ) override;
+    void visit( BehaviorDefinition& node ) override;
     void visit( ImplementDefinition& node ) override;
 
     void visit( BasicType& node ) override;
@@ -100,26 +98,10 @@ TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symbolta
 {
 }
 
-void TypeCheckVisitor::visit( InitDefinition& node )
-{
-    RecursiveVisitor::visit( node );
-    node.programFunction()->accept( *this );
-}
-
-void TypeCheckVisitor::visit( Initializer& node )
-{
-    if( m_objectType )
-    {
-        node.setObjectType( m_objectType );
-    }
-
-    node.updateRule()->accept( *this );
-}
-
 void TypeCheckVisitor::visit( UsingDefinition& node )
 {
     RecursiveVisitor::visit( node );
-    node.setType( node.type()->type() );  // TODO top-sort using definitions
+    node.setType( node.aliasType()->type() );  // TODO top-sort using definitions
 }
 
 void TypeCheckVisitor::visit( StructureDefinition& node )
@@ -135,7 +117,7 @@ void TypeCheckVisitor::visit( StructureDefinition& node )
     m_objectType = nullptr;
 }
 
-void TypeCheckVisitor::visit( FeatureDefinition& node )
+void TypeCheckVisitor::visit( BehaviorDefinition& node )
 {
     const auto& name = node.identifier()->name();
     m_log.debug( "creating IR object type for " + node.description() + " '" + name + "'" );
@@ -207,7 +189,7 @@ void TypeCheckVisitor::visit( BasicType& node )
             {
                 const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
                 const auto domainDefinitionType =
-                    static_cast< const Ast::Type* >( domainDefinition.typeNode().get() );
+                    static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
                 if( node.id() != domainDefinitionType->id() )
                 {
                     m_log.error(
@@ -222,7 +204,7 @@ void TypeCheckVisitor::visit( BasicType& node )
             case Node::ID::USING_DEFINITION:        // [[fallthrough]]
             case Node::ID::ENUMERATION_DEFINITION:  // [[fallthrough]]
             case Node::ID::STRUCTURE_DEFINITION:    // [[fallthrough]]
-            case Node::ID::FEATURE_DEFINITION:
+            case Node::ID::BEHAVIOR_DEFINITION:
             {
                 break;
             }
@@ -352,7 +334,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
             {
                 const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
                 const auto domainDefinitionType =
-                    static_cast< const Ast::Type* >( domainDefinition.typeNode().get() );
+                    static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
                 if( node.id() != domainDefinitionType->id() )
                 {
                     m_log.error(
@@ -364,7 +346,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
                 }
 
                 const auto domainDefinitionTemplateType =
-                    static_cast< const TemplateType& >( *domainDefinition.typeNode() );
+                    static_cast< const TemplateType& >( *domainDefinition.domainType() );
                 const auto domainTypeArgumentSize = domainDefinitionTemplateType.subTypes()->size();
                 const auto templateTypeArgumentSize = subTypeList.size();
                 if( domainTypeArgumentSize != templateTypeArgumentSize )
@@ -402,7 +384,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
                         assert( subTypeList.size() == 1 );
                         type = libstdhl::Memory::make< libcasm_ir::ListType >( subTypeList[ 0 ] );
                     }
-                    // TODO: FIXME: @ppaulweber: feature/set
+                    // TODO: FIXME: @ppaulweber: behavior/set
                     // else if( name == TypeInfo::TYPE_NAME_SET )
                     // {
                     //     assert( subTypeList.size() == 1 );

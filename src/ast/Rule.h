@@ -281,6 +281,8 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const std::shared_ptr< FunctionDefinitions > m_localFunctions;
             const Rule::Ptr m_rule;
