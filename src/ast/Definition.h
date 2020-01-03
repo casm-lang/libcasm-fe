@@ -147,7 +147,7 @@ namespace libcasm_fe
             void setLocalIndex( std::size_t localIndex );
             std::size_t localIndex( void ) const;
 
-            // used in SymbolResolver to point to the correct Feature/Implement Definition
+            // used in SymbolResolver to point to the correct Behavior/Implement Definition
             void setObjectDefinition( const std::shared_ptr< TypeDefinition >& objectDefinition );
             const std::shared_ptr< TypeDefinition >& objectDefinition( void ) const;
 
@@ -581,13 +581,13 @@ namespace libcasm_fe
             const Token::Ptr m_rightBraceToken;
         };
 
-        class FeatureDefinition final : public TypeDefinition
+        class BehaviorDefinition final : public TypeDefinition
         {
           public:
-            using Ptr = std::shared_ptr< FeatureDefinition >;
+            using Ptr = std::shared_ptr< BehaviorDefinition >;
 
-            FeatureDefinition(
-                const Token::Ptr& featureToken,
+            BehaviorDefinition(
+                const Token::Ptr& behaviorToken,
                 const VariableDefinitions::Ptr& templateSymbols,
                 const Type::Ptr& domainType,
                 const Token::Ptr& assignmentToken,
@@ -597,7 +597,7 @@ namespace libcasm_fe
 
             const Definitions::Ptr& definitions( void ) const;
 
-            const Token::Ptr& featureToken( void ) const;
+            const Token::Ptr& behaviorToken( void ) const;
 
             const Token::Ptr& assignmentToken( void ) const;
 
@@ -613,7 +613,7 @@ namespace libcasm_fe
 
           private:
             const Definitions::Ptr m_definitions;
-            const Token::Ptr m_featureToken;
+            const Token::Ptr m_behaviorToken;
             const Token::Ptr m_assignmentToken;
             const Token::Ptr m_leftBraceToken;
             const Token::Ptr m_rightBraceToken;
@@ -627,7 +627,7 @@ namespace libcasm_fe
             ImplementDefinition(
                 const Token::Ptr& implementToken,
                 const VariableDefinitions::Ptr& templateSymbols,
-                const Type::Ptr& featureType,
+                const Type::Ptr& behaviorType,
                 const Token::Ptr& forToken,
                 const Type::Ptr& domainType,
                 const Token::Ptr& assignmentToken,
@@ -644,7 +644,7 @@ namespace libcasm_fe
                 const Definitions::Ptr& definitions,
                 const Token::Ptr& rightBraceToken );
 
-            const Type::Ptr& featureType( void ) const;
+            const Type::Ptr& behaviorType( void ) const;
 
             const Definitions::Ptr& definitions( void ) const;
 
@@ -658,7 +658,7 @@ namespace libcasm_fe
 
             const Token::Ptr& rightBraceToken( void ) const;
 
-            u1 hasFeature( void ) const;
+            u1 hasBehavior( void ) const;
 
             std::string typeDescription( void ) const override;
 
@@ -667,7 +667,7 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            const Type::Ptr m_featureType;
+            const Type::Ptr m_behaviorType;
             const Definitions::Ptr m_definitions;
             const Token::Ptr m_implementToken;
             const Token::Ptr m_forToken;

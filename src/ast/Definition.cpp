@@ -1120,65 +1120,65 @@ Node::Ptr StructureDefinition::clone( void ) const
 
 //
 //
-// FeatureDefinition
+// BehaviorDefinition
 //
 
-FeatureDefinition::FeatureDefinition(
-    const Token::Ptr& featureToken,
+BehaviorDefinition::BehaviorDefinition(
+    const Token::Ptr& behaviorToken,
     const VariableDefinitions::Ptr& templateSymbols,
     const Type::Ptr& domainType,
     const Token::Ptr& assignmentToken,
     const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
     const Token::Ptr& rightBraceToken )
-: TypeDefinition( Node::ID::FEATURE_DEFINITION, domainType, templateSymbols )
+: TypeDefinition( Node::ID::BEHAVIOR_DEFINITION, domainType, templateSymbols )
 , m_definitions( definitions )
-, m_featureToken( featureToken )
+, m_behaviorToken( behaviorToken )
 , m_assignmentToken( assignmentToken )
 , m_leftBraceToken( leftBraceToken )
 , m_rightBraceToken( rightBraceToken )
 {
 }
 
-const Definitions::Ptr& FeatureDefinition::definitions( void ) const
+const Definitions::Ptr& BehaviorDefinition::definitions( void ) const
 {
     return m_definitions;
 }
 
-const Token::Ptr& FeatureDefinition::featureToken( void ) const
+const Token::Ptr& BehaviorDefinition::behaviorToken( void ) const
 {
-    return m_featureToken;
+    return m_behaviorToken;
 }
 
-const Token::Ptr& FeatureDefinition::assignmentToken( void ) const
+const Token::Ptr& BehaviorDefinition::assignmentToken( void ) const
 {
     return m_assignmentToken;
 }
 
-const Token::Ptr& FeatureDefinition::leftBraceToken( void ) const
+const Token::Ptr& BehaviorDefinition::leftBraceToken( void ) const
 {
     return m_leftBraceToken;
 }
 
-const Token::Ptr& FeatureDefinition::rightBraceToken( void ) const
+const Token::Ptr& BehaviorDefinition::rightBraceToken( void ) const
 {
     return m_rightBraceToken;
 }
 
-std::string FeatureDefinition::typeDescription( void ) const
+std::string BehaviorDefinition::typeDescription( void ) const
 {
     return domainType()->signature();
 }
 
-void FeatureDefinition::accept( Visitor& visitor )
+void BehaviorDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
-Node::Ptr FeatureDefinition::clone( void ) const
+Node::Ptr BehaviorDefinition::clone( void ) const
 {
-    auto duplicate = std::make_shared< FeatureDefinition >(
-        featureToken(),
+    auto duplicate = std::make_shared< BehaviorDefinition >(
+        behaviorToken(),
         templateSymbols()->duplicate< VariableDefinitions >(),
         domainType()->duplicate< Type >(),
         assignmentToken(),
@@ -1198,7 +1198,7 @@ Node::Ptr FeatureDefinition::clone( void ) const
 ImplementDefinition::ImplementDefinition(
     const Token::Ptr& implementToken,
     const VariableDefinitions::Ptr& templateSymbols,
-    const Type::Ptr& featureType,
+    const Type::Ptr& behaviorType,
     const Token::Ptr& forToken,
     const Type::Ptr& domainType,
     const Token::Ptr& assignmentToken,
@@ -1206,7 +1206,7 @@ ImplementDefinition::ImplementDefinition(
     const Definitions::Ptr& definitions,
     const Token::Ptr& rightBraceToken )
 : TypeDefinition( Node::ID::IMPLEMENT_DEFINITION, domainType, templateSymbols )
-, m_featureType( featureType )
+, m_behaviorType( behaviorType )
 , m_definitions( definitions )
 , m_implementToken( implementToken )
 , m_forToken( forToken )
@@ -1227,7 +1227,7 @@ ImplementDefinition::ImplementDefinition(
 : ImplementDefinition(
       implementToken,
       templateSymbols,
-      domainType,  // domainType is featureType
+      domainType,  // domainType is behaviorType
       Token::unresolved(),
       domainType,
       assignmentToken,
@@ -1237,9 +1237,9 @@ ImplementDefinition::ImplementDefinition(
 {
 }
 
-const Type::Ptr& ImplementDefinition::featureType( void ) const
+const Type::Ptr& ImplementDefinition::behaviorType( void ) const
 {
-    return m_featureType;
+    return m_behaviorType;
 }
 
 const Definitions::Ptr& ImplementDefinition::definitions( void ) const
@@ -1272,7 +1272,7 @@ const Token::Ptr& ImplementDefinition::rightBraceToken( void ) const
     return m_rightBraceToken;
 }
 
-u1 ImplementDefinition::hasFeature( void ) const
+u1 ImplementDefinition::hasBehavior( void ) const
 {
     return forToken()->token() != Grammar::Token::UNRESOLVED;
 }
@@ -1292,7 +1292,7 @@ Node::Ptr ImplementDefinition::clone( void ) const
     auto duplicate = std::make_shared< ImplementDefinition >(
         implementToken(),
         templateSymbols()->duplicate< VariableDefinitions >(),
-        featureType()->duplicate< Type >(),
+        behaviorType()->duplicate< Type >(),
         forToken(),
         domainType()->duplicate< Type >(),
         assignmentToken(),

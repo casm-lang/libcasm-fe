@@ -81,7 +81,7 @@ namespace libcasm_fe
                 IMPORT_DEFINITION,
                 DOMAIN_DEFINITION,
                 STRUCTURE_DEFINITION,
-                FEATURE_DEFINITION,
+                BEHAVIOR_DEFINITION,
                 IMPLEMENT_DEFINITION,
                 BUILTIN_DEFINITION,
                 DECLARATION,

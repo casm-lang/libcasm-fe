@@ -226,10 +226,10 @@ void RecursiveVisitor::visit( StructureDefinition& node )
     node.templateInstances()->accept( *this );
 }
 
-void RecursiveVisitor::visit( FeatureDefinition& node )
+void RecursiveVisitor::visit( BehaviorDefinition& node )
 {
     node.attributes()->accept( *this );
-    node.featureToken()->accept( *this );
+    node.behaviorToken()->accept( *this );
     node.templateSymbols()->accept( *this );
     node.domainType()->accept( *this );
     node.assignmentToken()->accept( *this );
@@ -244,7 +244,7 @@ void RecursiveVisitor::visit( ImplementDefinition& node )
     node.attributes()->accept( *this );
     node.implementToken()->accept( *this );
     node.templateSymbols()->accept( *this );
-    node.featureType()->accept( *this );
+    node.behaviorType()->accept( *this );
     node.forToken()->accept( *this );
     node.domainType()->accept( *this );
     node.assignmentToken()->accept( *this );

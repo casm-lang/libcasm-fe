@@ -116,7 +116,7 @@ void EmptyVisitor::visit( StructureDefinition& )
 {
 }
 
-void EmptyVisitor::visit( FeatureDefinition& )
+void EmptyVisitor::visit( BehaviorDefinition& )
 {
 }
 
