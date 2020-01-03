@@ -146,9 +146,9 @@ END       0 "end of file"
 %type <StructureDefinition::Ptr> StructureDefinition
 %type <FunctionDefinition::Ptr> StructureDefinitionElement
 %type <FunctionDefinitions::Ptr> StructureDefinitionList
-%type <FeatureDefinition::Ptr> FeatureDefinition
-%type <Definition::Ptr> FeatureDefinitionElement
-%type <Definitions::Ptr> FeatureDefinitionList
+%type <BehaviorDefinition::Ptr> BehaviorDefinition
+%type <Definition::Ptr> BehaviorDefinitionElement
+%type <Definitions::Ptr> BehaviorDefinitionList
 %type <ImplementDefinition::Ptr> ImplementDefinition
 %type <Definition::Ptr> ImplementDefinitionElement
 %type <Definitions::Ptr> ImplementDefinitionList
@@ -374,7 +374,7 @@ Definition
   {
       $$ = $1;
   }
-| FeatureDefinition
+| BehaviorDefinition
   {
       $$ = $1;
   }
@@ -611,18 +611,18 @@ StructureDefinitionElement
 
 //
 //
-// FeatureDefinition
+// BehaviorDefinition
 //
 
-FeatureDefinition
-: FEATURE TemplateSymbols Type EQUAL LCURPAREN FeatureDefinitionList RCURPAREN
+BehaviorDefinition
+: BEHAVIOR TemplateSymbols Type EQUAL LCURPAREN BehaviorDefinitionList RCURPAREN
   {
-      $$ = Ast::make< FeatureDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
+      $$ = Ast::make< BehaviorDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
   }
 ;
 
 
-FeatureDefinitionElement
+BehaviorDefinitionElement
 : Attributes Declaration
   {
       auto definition = $2;
@@ -656,14 +656,14 @@ FeatureDefinitionElement
 ;
 
 
-FeatureDefinitionList
-: FeatureDefinitionList FeatureDefinitionElement
+BehaviorDefinitionList
+: BehaviorDefinitionList BehaviorDefinitionElement
   {
       auto definitions = $1;
       definitions->add( $2 );
       $$ = definitions;
   }
-| FeatureDefinitionElement
+| BehaviorDefinitionElement
   {
       auto definitions = Ast::make< Definitions >( @$ );
       definitions->add( $1 );
