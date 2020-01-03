@@ -208,7 +208,7 @@ builtin< SequenceType, ElementType > NthInstruction< SequenceType * Integer -> E
 
 //
 //
-// Unary Operator Features
+// Unary Operator Behaviors
 //
 
 /**
@@ -216,7 +216,7 @@ builtin< SequenceType, ElementType > NthInstruction< SequenceType * Integer -> E
 */
 
 [ export ]
-feature Positive = {
+behavior Positive = {
     [ pure ]
     derived sign : Object -> Object
 }
@@ -226,7 +226,7 @@ feature Positive = {
 */
 
 [ export ]
-feature Inversion = {
+behavior Inversion = {
     [ pure ]
     derived invert : Object -> Object
 }
@@ -236,14 +236,14 @@ feature Inversion = {
 */
 
 [ export ]
-feature Negation = {
+behavior Negation = {
     [ pure ]
     derived negate : Object -> Object
 }
 
 //
 //
-// Binary Operator Features
+// Binary Operator Behaviors
 //
 
 /**
@@ -251,7 +251,7 @@ feature Negation = {
 */
 
 [ export ]
-feature Addition = {
+behavior Addition = {
     [ pure ]
     derived add : Object * Object -> Object
 }
@@ -261,7 +261,7 @@ feature Addition = {
 */
 
 [ export ]
-feature Subtraction = {
+behavior Subtraction = {
     [ pure ]
     derived subtract : Object * Object -> Object
 }
@@ -271,7 +271,7 @@ feature Subtraction = {
 */
 
 [ export ]
-feature Multiplication  = {
+behavior Multiplication  = {
     [ pure ]
     derived multiply : Object * Object -> Object
 }
@@ -281,7 +281,7 @@ feature Multiplication  = {
 */
 
 [ export ]
-feature Division = {
+behavior Division = {
     [ pure ]
     derived divide : Object * Object -> Object
 }
@@ -291,7 +291,7 @@ feature Division = {
 */
 
 [ export ]
-feature Modulus = {
+behavior Modulus = {
     [ pure ]
     derived modulo : Object * Object -> Object
 }
@@ -301,7 +301,7 @@ feature Modulus = {
 */
 
 [ export ]
-feature Exponentiation = {
+behavior Exponentiation = {
     [ pure ]
     derived power : Object * Object -> Object
 }
@@ -311,7 +311,7 @@ feature Exponentiation = {
 */
 
 [ export ]
-feature Equality = {
+behavior Equality = {
     [ pure ]
     derived
     equal : Object * Object -> Boolean
@@ -328,7 +328,7 @@ feature Equality = {
 */
 
 [ export ]
-feature PartialOrder = {
+behavior PartialOrder = {
     [ pure ]
     derived less : Equality * Equality -> Boolean
 
@@ -341,7 +341,7 @@ feature PartialOrder = {
 */
 
 [ export ]
-feature TotalOrder = {
+behavior TotalOrder = {
     [ pure ]
     derived lessOrEqual : PartialOrder * PartialOrder -> Boolean
 
@@ -354,7 +354,7 @@ feature TotalOrder = {
 */
 
 [ export ]
-feature Logical = {
+behavior Logical = {
     [ pure ]
     derived or_ : Object * Object -> Boolean
 
@@ -373,7 +373,7 @@ feature Logical = {
 */
 
 [ export ]
-feature< Domain > TypeCasting< Domain > = {
+behavior< Domain > TypeCasting< Domain > = {
     [ pure ]
     derived to : Object -> Domain
 }
@@ -383,7 +383,7 @@ feature< Domain > TypeCasting< Domain > = {
 */
 
 [ export ]
-feature< Element > ElementAccess< Element > = {
+behavior< Element > ElementAccess< Element > = {
     [ pure ]
     derived at : Object * Integer -> Element
 }
@@ -435,7 +435,7 @@ implement< Type > ElementAccess< enumeration > for Tuple< Type > = {
 */
 
 [ export ]
-feature Cardinality = {
+behavior Cardinality = {
     [ pure ]
     derived size : Object -> Integer
 }
@@ -445,7 +445,7 @@ feature Cardinality = {
 */
 
 [ export ]
-feature Symbolic = {
+behavior Symbolic = {
     [ pure ]
     derived isSymbolic : Object -> Boolean
 }
@@ -455,7 +455,7 @@ feature Symbolic = {
 */
 
 [ export ]
-feature Stringify = {
+behavior Stringify = {
     [ pure ]
     derived bin : Object -> String
 
@@ -516,7 +516,12 @@ implement Equality for Boolean = {
 implement TypeCasting< String > for Boolean = {
     [ pure ]
     derived convertTo( this ) -> String =
-        if this then "true" else "false"
+        if this = undef then
+	    "undef"
+	else if this then
+	    "true"
+	else
+	    "false"
 }
 
 implement TypeCasting< Boolean > for Boolean = {
@@ -528,7 +533,12 @@ implement TypeCasting< Boolean > for Boolean = {
 implement TypeCasting< Integer > for Boolean = {
     [ pure ]
     derived convertTo( this ) -> Integer =
-        if this then 1 else 0
+        if this = undef then
+	    undef
+	else if this then
+	    1
+	else
+	    0
 }
 
 /**
@@ -640,7 +650,12 @@ implement TypeCasting< String > for Integer = {
 implement TypeCasting< Boolean > for Integer = {
     [ pure ]
     derived convertTo( this ) -> Boolean =
-        if this != 0 then true else false
+        if this = undef then
+	    undef
+	else if this != 0 then
+	    true
+	else
+	    false
 }
 
 implement TypeCasting< Integer > for Integer = {
@@ -808,7 +823,7 @@ implement TypeCasting< String > for String = {
 }
 
 /**
-    enumeration features for all definitions
+    enumeration behaviors for all definitions
 */
 
 implement Symbolic for enumeration = {
@@ -846,7 +861,7 @@ implement TypeCasting< enumeration > for enumeration = {
 }
 
 // /**
-//     Binary features for all definitions
+//     Binary behaviors for all definitions
 // */
 
 // implement< N > Symbolic for Binary'N = {
@@ -879,7 +894,7 @@ implement TypeCasting< enumeration > for enumeration = {
 
 //
 //
-// RuleRef features for all type domains ('RuleRef' '<' <type-relation> '>')
+// RuleRef behaviors for all type domains ('RuleRef' '<' <type-relation> '>')
 //
 
 implement< Signature > Equality for RuleRef< Signature > = {
@@ -900,7 +915,7 @@ implement< Signature > TypeCasting< String > for RuleRef< Signature > = {
 
 //
 //
-// FuncRef features for all type domains ('FuncRef' '<' <type-relation> '>')
+// FuncRef behaviors for all type domains ('FuncRef' '<' <type-relation> '>')
 //
 
 implement< Signature > Equality for FuncRef< Signature > = {
