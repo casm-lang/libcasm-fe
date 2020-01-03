@@ -514,14 +514,31 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
     switch( node.targetType() )
     {
         case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
-        case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
-        case DirectCallExpression::TargetType::RULE:
+        case DirectCallExpression::TargetType::DERIVED:
         {
             const auto& definition = node.targetDefinition();
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
+            break;
+        }
+        case DirectCallExpression::TargetType::RULE:
+        {
+            Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+            const auto& definition = node.targetDefinition();
+            m_frameStack.push(
+                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
+            m_frameStack.pop();
+            try
+            {
+                transaction.merge();
+            }
+            catch( const ExecutionUpdateSet::Conflict& conflict )
+            {
+                handleMergeConflict( node, conflict );
+            }
             break;
         }
         case DirectCallExpression::TargetType::BUILTIN:
@@ -563,8 +580,7 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
     switch( node.methodType() )
     {
         case MethodCallExpression::MethodType::FUNCTION:  // [[fallthrough]]
-        case MethodCallExpression::MethodType::DERIVED:   // [[fallthrough]]
-        case MethodCallExpression::MethodType::RULE:
+        case MethodCallExpression::MethodType::DERIVED:
         {
             if( not object.defined() )
             {
@@ -580,6 +596,33 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
                 object, &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
+            break;
+        }
+        case MethodCallExpression::MethodType::RULE:
+        {
+            if( not object.defined() )
+            {
+                throw RuntimeException(
+                    node.object()->sourceLocation(),
+                    "cannot call a method of an undefined object",
+                    m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                    Code::Unspecified );
+            }
+
+            Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+            const auto& definition = node.targetDefinition();
+            m_frameStack.push( makeObjectFrame(
+                object, &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
+            m_frameStack.pop();
+            try
+            {
+                transaction.merge();
+            }
+            catch( const ExecutionUpdateSet::Conflict& conflict )
+            {
+                handleMergeConflict( node, conflict );
+            }
             break;
         }
         case MethodCallExpression::MethodType::BUILTIN:
@@ -640,14 +683,31 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     switch( literal->referenceType() )
     {
         case ReferenceLiteral::ReferenceType::FUNCTION:  // [[fallthrough]]
-        case ReferenceLiteral::ReferenceType::DERIVED:   // [[fallthrough]]
-        case ReferenceLiteral::ReferenceType::RULE:
+        case ReferenceLiteral::ReferenceType::DERIVED:
         {
             const auto& definition = std::static_pointer_cast< Definition >( literal->reference() );
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
+            break;
+        }
+        case ReferenceLiteral::ReferenceType::RULE:
+        {
+            Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+            const auto& definition = std::static_pointer_cast< Definition >( literal->reference() );
+            m_frameStack.push(
+                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
+            m_frameStack.pop();
+            try
+            {
+                transaction.merge();
+            }
+            catch( const ExecutionUpdateSet::Conflict& conflict )
+            {
+                handleMergeConflict( node, conflict );
+            }
             break;
         }
         case ReferenceLiteral::ReferenceType::BUILTIN:
