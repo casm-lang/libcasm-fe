@@ -44,12 +44,12 @@
 
 #include "ExecutionVisitor.h"
 
-#include <libcasm-fe/Exception>
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/RecursiveVisitor>
 #include <libcasm-fe/ast/Rule>
+#include <libcasm-fe/execute/RuntimeException>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Exception>
@@ -396,7 +396,7 @@ void ExecutionVisitor::visit( InvariantDefinition& node )
     if( not result.defined() )
     {
         throw RuntimeException(
-            node.expression()->sourceLocation(),
+            { node.expression()->sourceLocation() },
             "result must be true or false but was undefined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::InvariantDefinitionInvalidExpression );
@@ -404,7 +404,7 @@ void ExecutionVisitor::visit( InvariantDefinition& node )
     else if( result.value() == false )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "invariant '" + node.identifier()->name() + "' violated",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::InvariantDefinitionInvariantViolated );
@@ -585,7 +585,7 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
             if( not object.defined() )
             {
                 throw RuntimeException(
-                    node.object()->sourceLocation(),
+                    { node.object()->sourceLocation() },
                     "cannot call a method of an undefined object",
                     m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
                     Code::Unspecified );
@@ -603,7 +603,7 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
             if( not object.defined() )
             {
                 throw RuntimeException(
-                    node.object()->sourceLocation(),
+                    { node.object()->sourceLocation() },
                     "cannot call a method of an undefined object",
                     m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
                     Code::Unspecified );
@@ -673,7 +673,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     if( not value.defined() )
     {
         throw RuntimeException(
-            node.expression()->sourceLocation(),
+            { node.expression()->sourceLocation() },
             "cannot call an undefined target",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
@@ -768,7 +768,7 @@ void ExecutionVisitor::visit( UnaryExpression& node )
     catch( const std::exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "unary expression has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
@@ -790,7 +790,7 @@ void ExecutionVisitor::visit( BinaryExpression& node )
     catch( const IR::Exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "binary expression has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
@@ -811,7 +811,7 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
     if( not condition.defined() )
     {
         throw RuntimeException(
-            node.condition()->sourceLocation(),
+            { node.condition()->sourceLocation() },
             "condition must be true or false but was undefined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalExpressionInvalidCondition );
@@ -834,7 +834,7 @@ void ExecutionVisitor::visit( ChooseExpression& node )
     if( not universe.defined() )
     {
         throw RuntimeException(
-            node.universe()->sourceLocation(),
+            { node.universe()->sourceLocation() },
             "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseExpressionInvalidUniverse );
@@ -862,7 +862,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     if( not universe.defined() )
     {
         throw RuntimeException(
-            node.universe()->sourceLocation(),
+            { node.universe()->sourceLocation() },
             "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
@@ -911,7 +911,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     if( not universe.defined() )
     {
         throw RuntimeException(
-            node.universe()->sourceLocation(),
+            { node.universe()->sourceLocation() },
             "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
@@ -969,7 +969,7 @@ void ExecutionVisitor::visit( ConditionalRule& node )
     if( not condition.defined() )
     {
         throw RuntimeException(
-            node.condition()->sourceLocation(),
+            { node.condition()->sourceLocation() },
             "condition must be true or false but was undefined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalRuleInvalidCondition );
@@ -1098,7 +1098,7 @@ void ExecutionVisitor::visit( ForallRule& node )
     if( not universe.defined() )
     {
         throw RuntimeException(
-            node.universe()->sourceLocation(),
+            { node.universe()->sourceLocation() },
             "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ForallRuleInvalidUniverse );
@@ -1112,7 +1112,7 @@ void ExecutionVisitor::visit( ForallRule& node )
         if( not condition.defined() )
         {
             throw RuntimeException(
-                node.condition()->sourceLocation(),
+                { node.condition()->sourceLocation() },
                 "condition must be true or false but was undefined",
                 m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
                 Code::ForallRuleInvalidCondition );
@@ -1141,7 +1141,7 @@ void ExecutionVisitor::visit( ChooseRule& node )
     if( not universe.defined() )
     {
         throw RuntimeException(
-            node.universe()->sourceLocation(),
+            { node.universe()->sourceLocation() },
             "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseRuleInvalidUniverse );
@@ -1289,7 +1289,7 @@ void ExecutionVisitor::visit( WhileRule& node )
         if( not condition.defined() )
         {
             throw RuntimeException(
-                node.condition()->sourceLocation(),
+                { node.condition()->sourceLocation() },
                 "condition must be true or false but was undefined",
                 m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
                 Code::WhileRuleInvalidCondition );
@@ -1410,7 +1410,7 @@ void ExecutionVisitor::invokeBuiltin(
     catch( const std::exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "builtin has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::RuntimeException );

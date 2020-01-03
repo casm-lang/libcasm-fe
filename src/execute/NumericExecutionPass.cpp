@@ -43,8 +43,9 @@
 //
 
 #include "NumericExecutionPass.h"
-#include <libcasm-fe/Exception>
+
 #include <libcasm-fe/Logger>
+#include <libcasm-fe/execute/RuntimeException>
 
 #include <libcasm-fe/execute/ExecutionVisitor>
 
@@ -54,6 +55,8 @@
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
+
+#include <libstdhl/String>
 
 #include <mutex>
 
@@ -150,6 +153,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
     catch( const RuntimeException& e )
     {
         log.error( e );
+        log.info( "Backtrace:\n" + libstdhl::String::join( e.backtrace(), "\n" ) );
         return false;
     }
 

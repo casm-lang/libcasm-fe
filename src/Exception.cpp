@@ -46,60 +46,32 @@
 
 using namespace libcasm_fe;
 
-ErrorCodeException::ErrorCodeException( const std::string& message, Code errorCode )
-: ErrorCodeException( libstdhl::SourceLocation(), message, errorCode )
+Exception::Exception( const std::string& message )
+: libcasm_fe::Exception( message, Code::Unspecified )
 {
 }
 
-ErrorCodeException::ErrorCodeException(
-    const libstdhl::SourceLocation& location, const std::string& message, Code errorCode )
-: ErrorCodeException( location, message, {}, errorCode )
+Exception::Exception( const std::string& message, Code errorCode )
+: libcasm_fe::Exception( {}, message, errorCode )
 {
 }
 
-ErrorCodeException::ErrorCodeException(
-    const libstdhl::SourceLocation& location,
-    const std::string& message,
-    const std::vector< std::string >& backtrace,
-    Code errorCode )
-: Exception( message )
-, m_locations( { location } )
-, m_backtrace( backtrace )
-, m_errorCode( errorCode )
-{
-}
-
-ErrorCodeException::ErrorCodeException(
+Exception::Exception(
     const std::vector< libstdhl::SourceLocation >& locations,
     const std::string& message,
     Code errorCode )
-: ErrorCodeException( locations, message, {}, errorCode )
-{
-}
-
-ErrorCodeException::ErrorCodeException(
-    const std::vector< libstdhl::SourceLocation >& locations,
-    const std::string& message,
-    const std::vector< std::string >& backtrace,
-    Code errorCode )
-: Exception( message )
+: libstdhl::Exception( message )
 , m_locations( locations )
-, m_backtrace( backtrace )
 , m_errorCode( errorCode )
 {
 }
 
-const std::vector< libstdhl::SourceLocation >& ErrorCodeException::locations( void ) const noexcept
+const std::vector< libstdhl::SourceLocation >& Exception::locations( void ) const noexcept
 {
     return m_locations;
 }
 
-const std::vector< std::string >& ErrorCodeException::backtrace( void ) const noexcept
-{
-    return m_backtrace;
-}
-
-Code ErrorCodeException::errorCode( void ) const noexcept
+Code Exception::errorCode( void ) const noexcept
 {
     return m_errorCode;
 }
