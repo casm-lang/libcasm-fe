@@ -55,6 +55,7 @@
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Exception>
+#include <libcasm-ir/Instruction>
 #include <libcasm-ir/Operation>
 
 #include <libstdhl/RestoreOnScopeExit>
@@ -291,7 +292,7 @@ void ExecutionVisitor::visit( DerivedDefinition& node )
     catch( const IR::ValidationException& e )
     {
         throw RuntimeException(
-            { node.expression()->sourceLocation() },
+            { node.sourceLocation() },
             e.what(),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::DerivedReturnValueInvalid );
@@ -361,18 +362,23 @@ void ExecutionVisitor::visit( BuiltinDefinition& node )
     const auto& type = node.type();
     validateArguments( node, type->arguments(), {}, Code::BuiltinArgumentValueInvalid );
 
+    if( node.targetId() == IR::SelfInstruction::classid() )
+    {
+        m_evaluationStack.push( m_agentId );
+        return;
+    }
+
     try
     {
         const auto& arguments = m_frameStack.top()->locals();
-        IR::Constant returnValue;
+        IR::Constant result;
 
-        IR::Operation::execute(
-            node.targetId(), type, returnValue, arguments.data(), arguments.size() );
+        IR::Operation::execute( node.targetId(), type, result, arguments.data(), arguments.size() );
 
         const auto& returnType = type->result();
         if( not returnType.isVoid() )
         {
-            m_evaluationStack.push( returnValue );
+            m_evaluationStack.push( result );
         }
     }
     catch( const std::exception& e )
@@ -504,7 +510,21 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             const auto& definition = node.targetDefinition();
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-            definition->accept( *this );
+            m_evaluateUpdateLocation = evaluateUpdateLocation;
+
+            try
+            {
+                definition->accept( *this );
+            }
+            catch( const std::exception& e )
+            {
+                throw RuntimeException(
+                    node.sourceLocation(),
+                    std::string( e.what() ),
+                    m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                    Code::RuntimeException );
+            }
+
             m_frameStack.pop();
             try
             {
@@ -529,7 +549,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case DirectCallExpression::TargetType::THIS:
         {
-            assert( !"unimplemented THIS" );
+            node.targetDefinition()->accept( *this );
             break;
         }
         case DirectCallExpression::TargetType::UNKNOWN:
@@ -568,19 +588,19 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
         }
         case MethodCallExpression::MethodType::RULE:
         {
-            if( not object.defined() )
-            {
-                throw RuntimeException(
-                    { node.object()->sourceLocation() },
-                    "cannot call a method of an undefined object",
-                    m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-                    Code::Unspecified );
-            }
+            // if( not object.defined() )
+            // {
+            //     throw RuntimeException(
+            //         node.object()->sourceLocation(),
+            //         "cannot call a method of an undefined object",
+            //         m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            //         Code::RuntimeException );
+            // }
 
             Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
             const auto& definition = node.targetDefinition();
-            m_frameStack.push( makeObjectFrame(
-                object, &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            m_frameStack.push(
+                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
             try
@@ -605,7 +625,20 @@ void ExecutionVisitor::visit( LiteralCallExpression& node )
 {
     const auto& definition = node.targetDefinition();
     m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-    definition->accept( *this );
+
+    try
+    {
+        definition->accept( *this );
+    }
+    catch( const std::exception& e )
+    {
+        throw RuntimeException(
+            node.sourceLocation(),
+            node.description() + " expression has thrown an exception: " + std::string( e.what() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::RuntimeException );
+    }
+
     m_frameStack.pop();
 }
 
@@ -619,7 +652,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             { node.expression()->sourceLocation() },
             "cannot call an undefined target",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::Unspecified );
+            Code::RuntimeException );
     }
 
     const auto& literal = value.value();
@@ -665,7 +698,20 @@ void ExecutionVisitor::visit( TypeCastingExpression& node )
 {
     const auto& definition = node.targetDefinition();
     m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-    definition->accept( *this );
+
+    try
+    {
+        definition->accept( *this );
+    }
+    catch( const std::exception& e )
+    {
+        throw RuntimeException(
+            node.sourceLocation(),
+            "type casting expression has thrown an exception: " + std::string( e.what() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::RuntimeException );
+    }
+
     m_frameStack.pop();
 }
 
@@ -673,7 +719,20 @@ void ExecutionVisitor::visit( UnaryExpression& node )
 {
     const auto& definition = node.targetDefinition();
     m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-    definition->accept( *this );
+
+    try
+    {
+        definition->accept( *this );
+    }
+    catch( const std::exception& e )
+    {
+        throw RuntimeException(
+            node.sourceLocation(),
+            "unary expression has thrown an exception: " + std::string( e.what() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::RuntimeException );
+    }
+
     m_frameStack.pop();
 }
 
@@ -681,7 +740,20 @@ void ExecutionVisitor::visit( BinaryExpression& node )
 {
     const auto& definition = node.targetDefinition();
     m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-    definition->accept( *this );
+
+    try
+    {
+        definition->accept( *this );
+    }
+    catch( const std::exception& e )
+    {
+        throw RuntimeException(
+            node.sourceLocation(),
+            "binary expression has thrown an exception: " + std::string( e.what() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::RuntimeException );
+    }
+
     m_frameStack.pop();
 }
 
@@ -841,7 +913,20 @@ void ExecutionVisitor::visit( CardinalityExpression& node )
 {
     const auto& definition = node.targetDefinition();
     m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-    definition->accept( *this );
+
+    try
+    {
+        definition->accept( *this );
+    }
+    catch( const std::exception& e )
+    {
+        throw RuntimeException(
+            node.sourceLocation(),
+            "cardinality expression has thrown an exception: " + std::string( e.what() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::Unspecified );
+    }
+
     m_frameStack.pop();
 }
 
@@ -1226,33 +1311,6 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
         assert( numberOfLocals >= call->arguments()->size() );
 
         std::size_t localIndex = 0;
-        for( const auto& argument : *call->arguments() )
-        {
-            argument->accept( *this );
-            const auto value = m_evaluationStack.pop();
-            frame->setLocal( localIndex, value );
-            ++localIndex;
-        }
-    }
-
-    return frame;
-}
-
-std::unique_ptr< Frame > ExecutionVisitor::makeObjectFrame(
-    const IR::Constant& object, CallExpression* call, Node* callee, std::size_t numberOfLocals )
-{
-    ScopedOverwrite< bool > withoutLocationEvaluation( m_evaluateUpdateLocation, false );
-
-    auto frame = libstdhl::Memory::make_unique< Frame >(
-        call, callee, numberOfLocals + 1 );  // TODO move the +1 to the frame size determination
-
-    frame->setLocal( 0, object );
-
-    if( call != nullptr )
-    {
-        assert( numberOfLocals >= call->arguments()->size() );
-
-        std::size_t localIndex = 1;
         for( const auto& argument : *call->arguments() )
         {
             argument->accept( *this );
