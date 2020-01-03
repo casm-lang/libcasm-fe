@@ -90,6 +90,8 @@ add_library( ${PROJECT}-cpp OBJECT
   execute/HashMapBase.cpp
   execute/ReferenceConstant.cpp
   execute/Frame.cpp
+  execute/RuntimeException.cpp
+  execute/UpdateException.cpp
 
   import/FileLoadingStrategy.cpp
   import/PathLoadingStrategy.cpp
@@ -199,6 +201,8 @@ ecm_generate_headers( ${PROJECT}_EXECUTE_HEADERS_CPP
     RobinHoodHashMap
     Stack
     UpdateSet
+    RuntimeException
+    UpdateException
   PREFIX
     ${PROJECT}/execute
   RELATIVE

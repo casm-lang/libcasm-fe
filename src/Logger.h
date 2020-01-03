@@ -56,7 +56,7 @@
 
 namespace libcasm_fe
 {
-    class ErrorCodeException;
+    class Exception;
 
     class Logger : public libpass::PassLogger
     {
@@ -68,7 +68,7 @@ namespace libcasm_fe
             const std::vector< libstdhl::SourceLocation >& locations,
             const std::string& message,
             Code errorCode = Code::Unspecified );
-        void error( const ErrorCodeException& exception );
+        void error( const Exception& exception );
 
         using libpass::PassLogger::warning;
         void warning(

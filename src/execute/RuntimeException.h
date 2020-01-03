@@ -42,54 +42,33 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_EXCEPTION_H_
-#define _LIBCASM_FE_EXCEPTION_H_
+#ifndef _LIBCASM_FE_RUNTIME_EXCEPTION_H_
+#define _LIBCASM_FE_RUNTIME_EXCEPTION_H_
 
-#include <libcasm-fe/CasmFE>
-#include <libcasm-fe/Codes>
-
-#include <libstdhl/Exception>
-#include <libstdhl/SourceLocation>
+#include <libcasm-fe/Exception>
 
 #include <string>
 #include <vector>
 
 namespace libcasm_fe
 {
-    class Exception : public libstdhl::Exception
+    class RuntimeException : public libcasm_fe::Exception
     {
       public:
-        Exception( const std::string& message );
-
-        Exception( const std::string& message, Code errorCode );
-
-        Exception(
+        RuntimeException(
             const std::vector< libstdhl::SourceLocation >& locations,
             const std::string& message,
+            const std::vector< std::string >& backtrace,
             Code errorCode );
 
-        const std::vector< libstdhl::SourceLocation >& locations( void ) const noexcept;
-
-        Code errorCode( void ) const noexcept;
+        const std::vector< std::string >& backtrace( void ) const noexcept;
 
       private:
-        const std::vector< libstdhl::SourceLocation > m_locations;
-        const Code m_errorCode;
-    };
-
-    class CompiletimeException : public Exception
-    {
-        using Exception::Exception;
-    };
-
-    class ConfigurationException : public Exception
-    {
-      public:
-        using Exception::Exception;
+        const std::vector< std::string > m_backtrace;
     };
 }
 
-#endif  // _LIBCASM_FE_EXCEPTION_H_
+#endif  // _LIBCASM_FE_RUNTIME_EXCEPTION_H_
 
 //
 //  Local variables:

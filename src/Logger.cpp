@@ -112,10 +112,9 @@ void libcasm_fe::Logger::error(
     }
 }
 
-void libcasm_fe::Logger::error( const ErrorCodeException& exception )
+void libcasm_fe::Logger::error( const Exception& exception )
 {
     error( exception.locations(), exception.what(), exception.errorCode() );
-    info( "Backtrace:\n" + libstdhl::String::join( exception.backtrace(), "\n" ) );
 }
 
 void libcasm_fe::Logger::warning(

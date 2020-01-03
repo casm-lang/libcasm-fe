@@ -44,12 +44,13 @@
 
 #include "ExecutionVisitor.h"
 
-#include <libcasm-fe/Exception>
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/RecursiveVisitor>
 #include <libcasm-fe/ast/Rule>
+#include <libcasm-fe/execute/RuntimeException>
+#include <libcasm-fe/execute/UpdateException>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Exception>
@@ -101,6 +102,14 @@ static std::string updateAsString( const ExecutionUpdateSet::Update& update )
     }
 
     return locationStr + " := " + value.value.name();
+}
+
+static UpdateException::UpdateInfo updateAsUpdateInfo( const ExecutionUpdateSet::Update& update )
+{
+    return { update.value.producer->ptr< Node >(),
+             update.location.function()->ptr< FunctionDefinition >(),
+             update.location.arguments(),
+             update.value.value };
 }
 
 Storage::Storage( void )
@@ -263,23 +272,15 @@ void ExecutionVisitor::visit( Initializer& node )
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
-        // existing
-        const auto& updateA = conflict.existingUpdate();
-        const auto updateStrA = updateAsString( conflict.existingUpdate() );
-        const auto& sourceLocationA = updateA.value.producer->sourceLocation();
-
-        // conflicting
-        const auto& updateB = conflict.conflictingUpdate();
-        const auto updateStrB = updateAsString( updateB );
-        const auto& sourceLocationB = node.sourceLocation();
-
-        const auto info = "Conflict while initializing function " + function->identifier()->name() +
-                          " in agent " + m_agentId.name() + ". Update '" + updateStrA +
-                          "' clashed with update '" + updateStrB + "'";
-        throw RuntimeException(
-            { sourceLocationA, sourceLocationB },
-            info,
+        throw UpdateException(
+            { node.sourceLocation() },
+            "Conflict while initializing function " + function->identifier()->name() +
+                " in agent " + m_agentId.name() + ". Update '" +
+                updateAsString( conflict.conflictingUpdate() ) + "' clashed with update '" +
+                updateAsString( conflict.existingUpdate() ) + "'",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            { updateAsUpdateInfo( conflict.existingUpdate() ),
+              updateAsUpdateInfo( conflict.conflictingUpdate() ) },
             libcasm_fe::Code::UpdateSetClash );
     }
 }
@@ -396,7 +397,7 @@ void ExecutionVisitor::visit( InvariantDefinition& node )
     if( not result.defined() )
     {
         throw RuntimeException(
-            node.expression()->sourceLocation(),
+            { node.expression()->sourceLocation() },
             "result must be true or false but was undefined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::InvariantDefinitionInvalidExpression );
@@ -404,7 +405,7 @@ void ExecutionVisitor::visit( InvariantDefinition& node )
     else if( result.value() == false )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "invariant '" + node.identifier()->name() + "' violated",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::InvariantDefinitionInvariantViolated );
@@ -514,14 +515,31 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
     switch( node.targetType() )
     {
         case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
-        case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
-        case DirectCallExpression::TargetType::RULE:
+        case DirectCallExpression::TargetType::DERIVED:
         {
             const auto& definition = node.targetDefinition();
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
+            break;
+        }
+        case DirectCallExpression::TargetType::RULE:
+        {
+            Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+            const auto& definition = node.targetDefinition();
+            m_frameStack.push(
+                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
+            m_frameStack.pop();
+            try
+            {
+                transaction.merge();
+            }
+            catch( const ExecutionUpdateSet::Conflict& conflict )
+            {
+                handleMergeConflict( node, conflict );
+            }
             break;
         }
         case DirectCallExpression::TargetType::BUILTIN:
@@ -563,13 +581,12 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
     switch( node.methodType() )
     {
         case MethodCallExpression::MethodType::FUNCTION:  // [[fallthrough]]
-        case MethodCallExpression::MethodType::DERIVED:   // [[fallthrough]]
-        case MethodCallExpression::MethodType::RULE:
+        case MethodCallExpression::MethodType::DERIVED:
         {
             if( not object.defined() )
             {
                 throw RuntimeException(
-                    node.object()->sourceLocation(),
+                    { node.object()->sourceLocation() },
                     "cannot call a method of an undefined object",
                     m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
                     Code::Unspecified );
@@ -580,6 +597,33 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
                 object, &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
+            break;
+        }
+        case MethodCallExpression::MethodType::RULE:
+        {
+            if( not object.defined() )
+            {
+                throw RuntimeException(
+                    { node.object()->sourceLocation() },
+                    "cannot call a method of an undefined object",
+                    m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                    Code::Unspecified );
+            }
+
+            Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+            const auto& definition = node.targetDefinition();
+            m_frameStack.push( makeObjectFrame(
+                object, &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
+            m_frameStack.pop();
+            try
+            {
+                transaction.merge();
+            }
+            catch( const ExecutionUpdateSet::Conflict& conflict )
+            {
+                handleMergeConflict( node, conflict );
+            }
             break;
         }
         case MethodCallExpression::MethodType::BUILTIN:
@@ -630,7 +674,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     if( not value.defined() )
     {
         throw RuntimeException(
-            node.expression()->sourceLocation(),
+            { node.expression()->sourceLocation() },
             "cannot call an undefined target",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
@@ -640,14 +684,31 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     switch( literal->referenceType() )
     {
         case ReferenceLiteral::ReferenceType::FUNCTION:  // [[fallthrough]]
-        case ReferenceLiteral::ReferenceType::DERIVED:   // [[fallthrough]]
-        case ReferenceLiteral::ReferenceType::RULE:
+        case ReferenceLiteral::ReferenceType::DERIVED:
         {
             const auto& definition = std::static_pointer_cast< Definition >( literal->reference() );
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
+            break;
+        }
+        case ReferenceLiteral::ReferenceType::RULE:
+        {
+            Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+            const auto& definition = std::static_pointer_cast< Definition >( literal->reference() );
+            m_frameStack.push(
+                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
+            m_frameStack.pop();
+            try
+            {
+                transaction.merge();
+            }
+            catch( const ExecutionUpdateSet::Conflict& conflict )
+            {
+                handleMergeConflict( node, conflict );
+            }
             break;
         }
         case ReferenceLiteral::ReferenceType::BUILTIN:
@@ -708,7 +769,7 @@ void ExecutionVisitor::visit( UnaryExpression& node )
     catch( const std::exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "unary expression has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
@@ -730,7 +791,7 @@ void ExecutionVisitor::visit( BinaryExpression& node )
     catch( const IR::Exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "binary expression has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
@@ -751,7 +812,7 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
     if( not condition.defined() )
     {
         throw RuntimeException(
-            node.condition()->sourceLocation(),
+            { node.condition()->sourceLocation() },
             "condition must be true or false but was undefined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalExpressionInvalidCondition );
@@ -774,7 +835,7 @@ void ExecutionVisitor::visit( ChooseExpression& node )
     if( not universe.defined() )
     {
         throw RuntimeException(
-            node.universe()->sourceLocation(),
+            { node.universe()->sourceLocation() },
             "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseExpressionInvalidUniverse );
@@ -802,7 +863,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     if( not universe.defined() )
     {
         throw RuntimeException(
-            node.universe()->sourceLocation(),
+            { node.universe()->sourceLocation() },
             "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
@@ -851,7 +912,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     if( not universe.defined() )
     {
         throw RuntimeException(
-            node.universe()->sourceLocation(),
+            { node.universe()->sourceLocation() },
             "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
@@ -909,7 +970,7 @@ void ExecutionVisitor::visit( ConditionalRule& node )
     if( not condition.defined() )
     {
         throw RuntimeException(
-            node.condition()->sourceLocation(),
+            { node.condition()->sourceLocation() },
             "condition must be true or false but was undefined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalRuleInvalidCondition );
@@ -1038,7 +1099,7 @@ void ExecutionVisitor::visit( ForallRule& node )
     if( not universe.defined() )
     {
         throw RuntimeException(
-            node.universe()->sourceLocation(),
+            { node.universe()->sourceLocation() },
             "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ForallRuleInvalidUniverse );
@@ -1052,7 +1113,7 @@ void ExecutionVisitor::visit( ForallRule& node )
         if( not condition.defined() )
         {
             throw RuntimeException(
-                node.condition()->sourceLocation(),
+                { node.condition()->sourceLocation() },
                 "condition must be true or false but was undefined",
                 m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
                 Code::ForallRuleInvalidCondition );
@@ -1081,7 +1142,7 @@ void ExecutionVisitor::visit( ChooseRule& node )
     if( not universe.defined() )
     {
         throw RuntimeException(
-            node.universe()->sourceLocation(),
+            { node.universe()->sourceLocation() },
             "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseRuleInvalidUniverse );
@@ -1184,22 +1245,14 @@ void ExecutionVisitor::visit( UpdateRule& node )
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
-        // existing
-        const auto& updateA = conflict.existingUpdate();
-        const auto updateStrA = updateAsString( conflict.existingUpdate() );
-        const auto& sourceLocationA = updateA.value.producer->sourceLocation();
-
-        // conflicting
-        const auto& updateB = conflict.conflictingUpdate();
-        const auto updateStrB = updateAsString( updateB );
-        const auto& sourceLocationB = node.sourceLocation();
-
-        const auto info = "Conflict while adding an update in agent " + m_agentId.name() +
-                          ". Update '" + updateStrA + "' clashed with update '" + updateStrB + "'";
-        throw RuntimeException(
-            { sourceLocationA, sourceLocationB },
-            info,
+        throw UpdateException(
+            { node.sourceLocation() },
+            "Conflict while adding an update in agent " + m_agentId.name() + ". Update '" +
+                updateAsString( conflict.conflictingUpdate() ) + "' clashed with update '" +
+                updateAsString( conflict.existingUpdate() ) + "'",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            { updateAsUpdateInfo( conflict.existingUpdate() ),
+              updateAsUpdateInfo( conflict.conflictingUpdate() ) },
             libcasm_fe::Code::UpdateSetClash );
     }
 }
@@ -1229,7 +1282,7 @@ void ExecutionVisitor::visit( WhileRule& node )
         if( not condition.defined() )
         {
             throw RuntimeException(
-                node.condition()->sourceLocation(),
+                { node.condition()->sourceLocation() },
                 "condition must be true or false but was undefined",
                 m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
                 Code::WhileRuleInvalidCondition );
@@ -1350,7 +1403,7 @@ void ExecutionVisitor::invokeBuiltin(
     catch( const std::exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "builtin has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::RuntimeException );
@@ -1400,22 +1453,14 @@ void ExecutionVisitor::validateArguments(
 void ExecutionVisitor::handleMergeConflict(
     const Node& node, const ExecutionUpdateSet::Conflict& conflict ) const
 {
-    // existing
-    const auto& updateA = conflict.existingUpdate();
-    const auto updateStrA = updateAsString( updateA );
-    const auto& sourceLocationA = updateA.value.producer->sourceLocation();
-
-    // conflicting
-    const auto& updateB = conflict.conflictingUpdate();
-    const auto updateStrB = updateAsString( updateB );
-    const auto& sourceLocationB = updateB.value.producer->sourceLocation();
-
-    const auto info = "Conflict while merging update sets in agent " + m_agentId.name() +
-                      ". Update '" + updateStrA + "' clashed with update '" + updateStrB + "'";
-    throw RuntimeException(
-        { sourceLocationA, sourceLocationB },
-        info,
+    throw UpdateException(
+        { node.sourceLocation() },
+        "Conflict while merging update sets in agent " + m_agentId.name() + ". Update '" +
+            updateAsString( conflict.conflictingUpdate() ) + "' clashed with update '" +
+            updateAsString( conflict.existingUpdate() ) + "'",
         m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+        { updateAsUpdateInfo( conflict.existingUpdate() ),
+          updateAsUpdateInfo( conflict.conflictingUpdate() ) },
         libcasm_fe::Code::UpdateSetMergeConflict );
 }
 
@@ -1698,21 +1743,19 @@ void AgentScheduler::collectUpdates( const std::vector< Agent >& agents )
             const auto& updateA = conflict.existingUpdate();
             const auto updateStrA = updateAsString( updateA );
             const auto agentStrA = updateA.value.agent.name();
-            const auto& sourceLocationA = updateA.value.producer->sourceLocation();
 
             // conflicting
             const auto& updateB = conflict.conflictingUpdate();
             const auto updateStrB = updateAsString( updateB );
             const auto agentStrB = updateB.value.agent.name();
-            const auto& sourceLocationB = updateB.value.producer->sourceLocation();
 
-            const auto info = "Conflict while collection updates from agent " + agentStrB +
-                              ". Update '" + updateStrA + "' produced by agent " + agentStrA +
-                              " clashed with update '" + updateStrB + "' produced by agent " +
-                              agentStrB;
-            throw RuntimeException(
-                { sourceLocationA, sourceLocationB },
-                info,
+            throw UpdateException(
+                {},
+                "Conflict while collection updates from agents. Update '" + updateStrA +
+                    "' produced by agent " + agentStrA + " clashed with update '" + updateStrB +
+                    "' produced by agent " + agentStrB,
+                {},
+                { updateAsUpdateInfo( updateA ), updateAsUpdateInfo( updateB ) },
                 libcasm_fe::Code::UpdateSetMergeConflict );
         }
     }

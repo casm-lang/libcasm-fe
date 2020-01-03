@@ -42,54 +42,44 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_EXCEPTION_H_
-#define _LIBCASM_FE_EXCEPTION_H_
+#ifndef _LIBCASM_FE_UPDATE_EXCEPTION_H_
+#define _LIBCASM_FE_UPDATE_EXCEPTION_H_
 
-#include <libcasm-fe/CasmFE>
-#include <libcasm-fe/Codes>
+#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/Node>
+#include <libcasm-fe/execute/RuntimeException>
 
-#include <libstdhl/Exception>
-#include <libstdhl/SourceLocation>
-
-#include <string>
-#include <vector>
+#include <libcasm-ir/Constant>
 
 namespace libcasm_fe
 {
-    class Exception : public libstdhl::Exception
+    class UpdateException : public libcasm_fe::RuntimeException
     {
       public:
-        Exception( const std::string& message );
+        struct UpdateInfo
+        {
+            Ast::Node::Ptr producer;
+            Ast::FunctionDefinition::Ptr function;
+            std::vector< libcasm_ir::Constant > arguments;
+            libcasm_ir::Constant value;
+        };
 
-        Exception( const std::string& message, Code errorCode );
-
-        Exception(
+      public:
+        UpdateException(
             const std::vector< libstdhl::SourceLocation >& locations,
             const std::string& message,
+            const std::vector< std::string >& backtrace,
+            const std::vector< UpdateInfo >& updateInfos,
             Code errorCode );
 
-        const std::vector< libstdhl::SourceLocation >& locations( void ) const noexcept;
-
-        Code errorCode( void ) const noexcept;
+        const std::vector< UpdateInfo >& updateInfos( void ) const noexcept;
 
       private:
-        const std::vector< libstdhl::SourceLocation > m_locations;
-        const Code m_errorCode;
-    };
-
-    class CompiletimeException : public Exception
-    {
-        using Exception::Exception;
-    };
-
-    class ConfigurationException : public Exception
-    {
-      public:
-        using Exception::Exception;
+        const std::vector< UpdateInfo > m_updateInfos;
     };
 }
 
-#endif  // _LIBCASM_FE_EXCEPTION_H_
+#endif  // _LIBCASM_FE_UPDATE_EXCEPTION_H_
 
 //
 //  Local variables:
