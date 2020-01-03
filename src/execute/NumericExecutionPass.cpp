@@ -46,6 +46,7 @@
 
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/execute/RuntimeException>
+#include <libcasm-fe/execute/UpdateException>
 
 #include <libcasm-fe/execute/ExecutionVisitor>
 
@@ -72,6 +73,29 @@ void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SpecificationMergerPass >();
     pu.scheduleAfter< FrameSizeDeterminationPass >();
+}
+
+static std::string updateInfoToString( const UpdateException::UpdateInfo& updateInfo )
+{
+    auto locationStr = updateInfo.function->identifier()->name();
+
+    if( not updateInfo.arguments.empty() )
+    {
+        locationStr += "(";
+        bool isFirst = true;
+        for( const auto& arg : updateInfo.arguments )
+        {
+            if( not isFirst )
+            {
+                locationStr += ", ";
+            }
+            locationStr += arg.name();
+            isFirst = false;
+        }
+        locationStr += ")";
+    }
+
+    return locationStr + " := " + updateInfo.value.name();
 }
 
 u1 NumericExecutionPass::run( libpass::PassResult& pr )
@@ -149,6 +173,18 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
 
         log.info(
             "Finished execution after " + std::to_string( scheduler.numberOfSteps() ) + " steps" );
+    }
+    catch( const UpdateException& e )
+    {
+        log.error( e );
+        log.info( "Backtrace:\n" + libstdhl::String::join( e.backtrace(), "\n" ) );
+        for( const auto& update : e.updateInfos() )
+        {
+            log.info(
+                { update.producer->sourceLocation() },
+                "Produced update '" + updateInfoToString( update ) + "'" );
+        }
+        return false;
     }
     catch( const RuntimeException& e )
     {
