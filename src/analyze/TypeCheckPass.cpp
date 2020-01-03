@@ -45,13 +45,11 @@
 
 #include "TypeCheckPass.h"
 
-#include <libcasm-fe/Logger>
-#include <libcasm-fe/Namespace>
-#include <libcasm-fe/Specification>
-#include <libcasm-fe/TypeInfo>
-#include <libcasm-fe/ast/RecursiveVisitor>
+#include "../various/GrammarToken.h"
 
+#include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/analyze/SymbolResolverPass>
+#include <libcasm-fe/import/SpecificationMergerPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
@@ -66,95 +64,463 @@ using namespace Ast;
 char TypeCheckPass::id = 0;
 
 static libpass::PassRegistration< TypeCheckPass > PASS(
-    "ASTTypeCheckPass", "type check of all types in the AST representation", "ast-type-chk", 0 );
+    "Type Check Pass", "type check of all types in the AST representation", "ast-type-chk", 0 );
 
-class TypeCheckVisitor final : public RecursiveVisitor
-{
-  public:
-    TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
-
-    void visit( UsingDefinition& node ) override;
-    void visit( StructureDefinition& node ) override;
-    void visit( BehaviorDefinition& node ) override;
-    void visit( ImplementDefinition& node ) override;
-
-    void visit( BasicType& node ) override;
-    void visit( TupleType& node ) override;
-    void visit( RecordType& node ) override;
-    void visit( TemplateType& node ) override;
-    void visit( RelationType& node ) override;
-    void visit( FixedSizedType& node ) override;
-
-  private:
-    libcasm_fe::Logger& m_log;
-    Namespace& m_symboltable;
-    libcasm_ir::Type::Ptr m_objectType;
-};
+//
+//
+// TypeCheckVisitor
+//
 
 TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
-, m_objectType()
 {
+}
+
+void TypeCheckVisitor::resolveRelationType(
+    Definition& node, VariableDefinitions& argumentTypes, Ast::Type& returnType )
+{
+    u1 valid = true;
+    std::size_t position = 0;
+    std::vector< libcasm_ir::Type::Ptr > argumentTypeList;
+    argumentTypeList.reserve( argumentTypes.size() );
+    for( const auto& argument : argumentTypes )
+    {
+        const auto& argumentType = *argument;
+        position++;
+        if( not argumentType.type() )
+        {
+            m_log.error(
+                { argumentType.sourceLocation() },
+                "unable to resolve argument type of " + argumentType.description() +
+                    " at position " + std::to_string( position ),
+                Code::Unspecified );
+            valid = false;
+            continue;
+        }
+
+        argumentTypeList.emplace_back( argumentType.type() );
+    }
+
+    if( not returnType.type() )
+    {
+        m_log.error(
+            { returnType.sourceLocation() },
+            "unable to resolve return type of '" + returnType.description() + "'",
+            Code::Unspecified );
+        valid = false;
+    }
+
+    if( not valid )
+    {
+        return;
+    }
+
+    const auto type =
+        libstdhl::Memory::make< libcasm_ir::RelationType >( returnType.type(), argumentTypeList );
+    node.setType( type );
+}
+
+void TypeCheckVisitor::resolveRelationType(
+    Definition& node, Types& argumentTypes, Ast::Type& returnType )
+{
+    u1 valid = true;
+    std::size_t position = 0;
+    std::vector< libcasm_ir::Type::Ptr > argumentTypeList;
+    argumentTypeList.reserve( argumentTypes.size() );
+    for( const auto& argument : argumentTypes )
+    {
+        const auto& argumentType = *argument;
+        position++;
+        if( not argumentType.type() )
+        {
+            m_log.error(
+                { argumentType.sourceLocation() },
+                "unable to resolve argument type of " + argumentType.description() +
+                    " at position " + std::to_string( position ),
+                Code::Unspecified );
+            valid = false;
+            continue;
+        }
+
+        argumentTypeList.emplace_back( argumentType.type() );
+    }
+
+    if( not returnType.type() )
+    {
+        m_log.error(
+            { returnType.sourceLocation() },
+            "unable to resolve return type of '" + returnType.description() + "'",
+            Code::Unspecified );
+        valid = false;
+    }
+
+    if( not valid )
+    {
+        return;
+    }
+
+    const auto type =
+        libstdhl::Memory::make< libcasm_ir::RelationType >( returnType.type(), argumentTypeList );
+    node.setType( type );
+}
+
+void TypeCheckVisitor::visit( DerivedDefinition& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& argumentTypes = node.arguments();
+    const auto& returnType = node.returnType();
+
+    pushSymbols( node.arguments() );
+
+    argumentTypes->accept( *this );
+    returnType->accept( *this );
+
+    popSymbols( node.arguments() );
+
+    resolveRelationType( node, *argumentTypes, *returnType );
+
+    node.expression()->accept( *this );
+}
+
+void TypeCheckVisitor::visit( FunctionDefinition& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& argumentTypes = node.argumentTypes();
+    const auto& returnType = node.returnType();
+
+    argumentTypes->accept( *this );
+    returnType->accept( *this );
+
+    resolveRelationType( node, *argumentTypes, *returnType );
+
+    node.defined()->accept( *this );
+    node.initially()->accept( *this );
+}
+
+void TypeCheckVisitor::visit( RuleDefinition& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& argumentTypes = node.arguments();
+    const auto& returnType = node.returnType();
+
+    pushSymbols( node.arguments() );
+
+    argumentTypes->accept( *this );
+    returnType->accept( *this );
+
+    popSymbols( node.arguments() );
+
+    resolveRelationType( node, *argumentTypes, *returnType );
+
+    node.rule()->accept( *this );
+}
+
+void TypeCheckVisitor::visit( DomainDefinition& node )
+{
+    for( const auto& templateInstance : *node.templateInstances() )
+    {
+        if( templateInstance->id() == Node::ID::DOMAIN_DEFINITION )
+        {
+            const auto& templateDefinition = templateInstance->ptr< DomainDefinition >();
+            templateDefinition->accept( *this );
+        }
+        else
+        {
+            assert( templateInstance->id() == Node::ID::ENUMERATION_DEFINITION );
+            const auto& templateDefinition = templateInstance->ptr< EnumerationDefinition >();
+            templateDefinition->accept( *this );
+        }
+    }
+
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& domainType = node.domainType();
+
+    pushSymbols( node.templateSymbols() );
+
+    domainType->accept( *this );
+
+    popSymbols( node.templateSymbols() );
+
+    node.setType( domainType->type() );
+
+    if( node.type() )
+    {
+        try
+        {
+            m_symboltable.registerTypeDefinition( node );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.debug( { node.sourceLocation() }, e.what() );
+        }
+    }
+}
+
+void TypeCheckVisitor::visit( EnumerationDefinition& node )
+{
+    for( const auto& templateInstance : *node.templateInstances() )
+    {
+        assert( templateInstance->id() == Node::ID::ENUMERATION_DEFINITION );
+        const auto& templateDefinition = templateInstance->ptr< EnumerationDefinition >();
+        templateDefinition->accept( *this );
+    }
+
+    if( node.type() and node.domainType()->type() )
+    {
+        return;
+    }
+
+    const auto& typeName = node.domainType()->signature();
+    m_log.debug( "creating IR enumeration type '" + typeName + "'" );
+    const auto kind = std::make_shared< libcasm_ir::Enumeration >( typeName );
+    for( const auto& enumerator : *node.enumerators() )
+    {
+        try
+        {
+            kind->add( enumerator->identifier()->name() );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.debug( { enumerator->sourceLocation() }, e.what() );
+        }
+    }
+
+    const auto type = std::make_shared< libcasm_ir::EnumerationType >( kind );
+    node.setType( type );
+    node.domainType()->setType( type );
+
+    for( const auto& enumerator : *node.enumerators() )
+    {
+        enumerator->setType( type );
+    }
+
+    m_symboltable.registerTypeDefinition( node );
+}
+
+void TypeCheckVisitor::visit( BuiltinDefinition& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& argumentTypes = node.relationType().argumentTypes();
+    const auto& returnType = node.relationType().returnType();
+
+    pushSymbols( node.templateSymbols() );
+
+    argumentTypes->accept( *this );
+    returnType->accept( *this );
+
+    popSymbols( node.templateSymbols() );
+
+    resolveRelationType( node, *argumentTypes, *returnType );
+    node.domainType()->setType( node.type() );
 }
 
 void TypeCheckVisitor::visit( UsingDefinition& node )
 {
-    RecursiveVisitor::visit( node );
-    node.setType( node.aliasType()->type() );  // TODO top-sort using definitions
-}
-
-void TypeCheckVisitor::visit( StructureDefinition& node )
-{
-    const auto& name = node.identifier()->name();
-    m_log.debug( "creating IR object type for " + node.description() + " '" + name + "'" );
-    const auto type = std::make_shared< libcasm_ir::ObjectType >( name );
-    node.setType( type );
-    m_objectType = node.type();
+    if( node.type() )
+    {
+        return;
+    }
 
     RecursiveVisitor::visit( node );
 
-    m_objectType = nullptr;
-}
+    const auto& aliasType = node.aliasType();
 
-void TypeCheckVisitor::visit( BehaviorDefinition& node )
-{
-    const auto& name = node.identifier()->name();
-    m_log.debug( "creating IR object type for " + node.description() + " '" + name + "'" );
-    const auto type = std::make_shared< libcasm_ir::ObjectType >( name );
-    node.setType( type );
-    m_objectType = node.type();
-
-    RecursiveVisitor::visit( node );
-
-    m_objectType = nullptr;
-}
-
-void TypeCheckVisitor::visit( ImplementDefinition& node )
-{
-    const auto& name = node.identifier()->name();
-    const auto implementSymbol = m_symboltable.findSymbol( name );
-    assert( implementSymbol and " inconsistent state, checked during symbol registration " );
-    if( implementSymbol->id() != Node::ID::ENUMERATION_DEFINITION and
-        implementSymbol->id() != Node::ID::STRUCTURE_DEFINITION and
-        implementSymbol->id() != Node::ID::DOMAIN_DEFINITION )
+    if( not aliasType->type() )
     {
         m_log.error(
-            { node.sourceLocation() },
-            "implement not allowed on '" + implementSymbol->description() + "' ",
+            { aliasType->sourceLocation() },
+            "unable to resolve using '" + node.identifier()->name() + "' with alias type '" +
+                aliasType->description() + "'",
             Code::Unspecified );
         return;
     }
 
-    node.setType( implementSymbol->type() );
-    m_objectType = node.type();
+    node.setType( aliasType->type() );
+}
+
+void TypeCheckVisitor::visit( StructureDefinition& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& typeName = node.domainType()->signature();
+    m_log.debug( "creating IR object type '" + typeName + "' for " + node.description() );
+    const auto type = std::make_shared< libcasm_ir::ObjectType >( typeName );
+    node.setType( type );
+
+    pushSymbols( node.templateSymbols() );
+
+    node.domainType()->accept( *this );
+    node.functions()->accept( *this );
+
+    popSymbols( node.templateSymbols() );
+
+    m_symboltable.registerTypeDefinition( node );
+}
+
+void TypeCheckVisitor::visit( BehaviorDefinition& node )
+{
+    for( const auto& templateInstance : *node.templateInstances() )
+    {
+        assert( templateInstance->id() == Node::ID::BEHAVIOR_DEFINITION );
+        const auto& templateDefinition = templateInstance->ptr< BehaviorDefinition >();
+        templateDefinition->accept( *this );
+    }
+
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& typeName = node.domainType()->signature();
+    m_log.debug( "creating IR object type '" + typeName + "' for " + node.description() );
+    const auto type = std::make_shared< libcasm_ir::ObjectType >( typeName );
+    node.setType( type );
+
+    pushSymbols( node.templateSymbols() );
+
+    node.domainType()->accept( *this );
+    node.definitions()->accept( *this );
+
+    popSymbols( node.templateSymbols() );
+
+    try
+    {
+        m_symboltable.registerTypeDefinition( node );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.debug( { node.sourceLocation() }, e.what() );
+    }
+}
+
+void TypeCheckVisitor::visit( ImplementDefinition& node )
+{
+    for( const auto& templateInstance : *node.templateInstances() )
+    {
+        if( templateInstance->id() == Node::ID::IMPLEMENT_DEFINITION )
+        {
+            const auto& templateDefinition = templateInstance->ptr< ImplementDefinition >();
+            templateDefinition->accept( *this );
+        }
+        else
+        {
+            assert( templateInstance->id() == Node::ID::BUILTIN_DEFINITION );
+        }
+    }
+
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& symbol = node.domainType()->typeDefinition();
+    assert( symbol and " inconsistent state @ SymbolResolverPass " );
+    symbol->accept( *this );
+    assert( symbol->type() and " inconsistent state " );
+
+    if( symbol->id() != Node::ID::ENUMERATION_DEFINITION and
+        symbol->id() != Node::ID::STRUCTURE_DEFINITION and
+        symbol->id() != Node::ID::DOMAIN_DEFINITION )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "implement not allowed on '" + symbol->description() + "' ",
+            Code::Unspecified );
+        return;
+    }
+
+    pushSymbols( node.templateSymbols() );
+
+    for( const auto& templateInstance : *node.templateInstances() )
+    {
+        if( templateInstance->id() == Node::ID::BUILTIN_DEFINITION )
+        {
+            const auto& templateDefinition = templateInstance->ptr< BuiltinDefinition >();
+            templateDefinition->accept( *this );
+        }
+        else
+        {
+            assert( templateInstance->id() == Node::ID::IMPLEMENT_DEFINITION );
+        }
+    }
+
+    node.behaviorType()->accept( *this );
+    node.domainType()->accept( *this );
+    node.definitions()->accept( *this );
+
+    popSymbols( node.templateSymbols() );
+
+    node.setType( node.domainType()->type() );
+}
+
+void TypeCheckVisitor::visit( VariableDefinition& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
 
     RecursiveVisitor::visit( node );
 
-    m_objectType = nullptr;
+    if( node.variableType()->type() )
+    {
+        node.setType( node.variableType()->type() );
+    }
+    else if( node.objectDefinition() )
+    {
+        const auto& symbol = node.objectDefinition()->domainType()->typeDefinition();
+        assert( symbol and " inconsistent state @ SymbolResolverPass " );
+        symbol->accept( *this );
+        assert( symbol->type() and " inconsistent state " );
+        node.setType( symbol->type() );
+    }
+    else
+    {
+        node.setType( TypeInfo::instance().getType( TypeInfo::TYPE_NAME_OBJECT ) );
+    }
 }
 
-void TypeCheckVisitor::visit( BasicType& node )
+void TypeCheckVisitor::visit( Declaration& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& argumentTypes = node.argumentTypes();
+    const auto& returnType = node.returnType();
+
+    argumentTypes->accept( *this );
+    returnType->accept( *this );
+
+    resolveRelationType( node, *argumentTypes, *returnType );
+}
+
+void TypeCheckVisitor::visit( DirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
@@ -163,464 +529,796 @@ void TypeCheckVisitor::visit( BasicType& node )
         return;
     }
 
-    const auto& name = node.name()->path();
+    const auto& symbolPath = node.identifier();
+    const auto& symbolName = symbolPath->path();
 
-    const auto maybeSymbol = m_symboltable.findSymbol( *node.name() );
-    const auto symbol = maybeSymbol.first;
-    const auto accessible = maybeSymbol.second;
-
-    if( symbol and not accessible )
+    switch( node.targetType() )
     {
-        m_log.error(
-            { node.sourceLocation() },
-            symbol->description() + " '" + name + "' is not accessible",
-            Code::SymbolIsInaccessible );
-        m_log.warning(
-            { symbol->sourceLocation() },
-            "'" + symbol->identifier()->name() + "' has not been exported" );
-        return;
-    }
-
-    if( symbol )
-    {
-        switch( symbol->id() )
+        case DirectCallExpression::TargetType::RULE:      // [[fallthrough]]
+        case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
+        case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
+        case DirectCallExpression::TargetType::BUILTIN:
         {
-            case Node::ID::DOMAIN_DEFINITION:
-            {
-                const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
-                const auto domainDefinitionType =
-                    static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
-                if( node.id() != domainDefinitionType->id() )
-                {
-                    m_log.error(
-                        { node.sourceLocation() },
-                        node.description() + "  '" + name + "' is not a" +
-                            domainDefinitionType->description(),
-                        Code::TypeAnnotationInvalidBasicTypeName );
-                    return;
-                }
-                break;
-            }
-            case Node::ID::USING_DEFINITION:        // [[fallthrough]]
-            case Node::ID::ENUMERATION_DEFINITION:  // [[fallthrough]]
-            case Node::ID::STRUCTURE_DEFINITION:    // [[fallthrough]]
-            case Node::ID::BEHAVIOR_DEFINITION:
-            {
-                break;
-            }
-            default:
-            {
-                m_log.error(
-                    { node.sourceLocation() },
-                    "cannot use " + symbol->description() + " '" + name + "' as type",
-                    Code::TypeAnnotationInvalidBasicTypeName );
-                return;
-            }
+            const auto& symbol = node.targetDefinition();
+            assert( symbol and " inconsistent state @ SymbolResolverPass " );
+            symbol->accept( *this );
+            assert( symbol->type() and " inconsistent state " );
+            node.setType( symbol->type()->ptr_result() );
+            return;
         }
-
-        const auto& type = symbol->type();
-        node.setType( type );
-        return;
+        case DirectCallExpression::TargetType::THIS:      // [[fallthrough]]
+        case DirectCallExpression::TargetType::CONSTANT:  // [[fallthrough]]
+        case DirectCallExpression::TargetType::VARIABLE:
+        {
+            // resolved at type inference
+            return;
+        }
+        case DirectCallExpression::TargetType::DOMAIN:
+        {
+            const auto& symbol = node.targetDefinition();
+            assert( symbol and " inconsistent state @ SymbolResolverPass " );
+            symbol->accept( *this );
+            assert( symbol->type() and " inconsistent state " );
+            node.setType( symbol->type() );
+            return;
+        }
+        case DirectCallExpression::TargetType::UNKNOWN:
+        {
+            break;
+        }
     }
 
     m_log.error(
         { node.sourceLocation() },
-        "unknown type '" + name + "' found",
+        "unknown " + node.description() + " symbol '" + symbolName + "' found" );
+}
+
+void TypeCheckVisitor::visit( BasicType& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    RecursiveVisitor::visit( node );
+
+    const auto& typeName = node.signature();
+    const auto& symbolName = node.signaturePath();
+
+    const auto symbolResult = m_symbols.find( typeName );
+    if( symbolResult != m_symbols.cend() )
+    {
+        const auto& symbol = symbolResult->second;
+        symbol->accept( *this );
+        const auto& symbolType = symbol->type();
+        assert( symbolType and " inconsistent state " );
+        node.setType( symbolType );
+        return;
+    }
+
+    auto symbol = node.typeDefinition();
+    assert( symbol and " inconsistent state @ SymbolResolverPass " );
+    switch( symbol->id() )
+    {
+        case Node::ID::ENUMERATION_DEFINITION:  // [fallthrough]
+        case Node::ID::STRUCTURE_DEFINITION:    // [fallthrough]
+        case Node::ID::BEHAVIOR_DEFINITION:     // [fallthrough]
+        case Node::ID::USING_DEFINITION:
+        {
+            symbol->accept( *this );
+            const auto& type = symbol->type();
+            if( type )
+            {
+                node.setType( type );
+                return;
+            }
+            break;
+        }
+        case Node::ID::DOMAIN_DEFINITION:
+        {
+            const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
+            const auto domainDefinitionType =
+                static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
+
+            if( node.id() != domainDefinitionType->id() )
+            {
+                const auto msg = node.description() + "  '" + typeName + "' is not a " +
+                                 domainDefinitionType->description();
+                m_log.error(
+                    { node.sourceLocation() }, msg, Code::TypeAnnotationInvalidBasicTypeName );
+                m_log.info( { domainDefinitionType->sourceLocation() }, msg );
+                return;
+            }
+
+            const auto& type = symbol->type();
+            if( type )
+            {
+                node.setType( type );
+                return;
+            }
+
+            const auto domainName = node.name()->path();
+            if( TypeInfo::instance().hasType( domainName ) )
+            {
+                const auto& type = TypeInfo::instance().getType( domainName );
+                m_log.debug(
+                    "reusing IR primitive type '" + domainName + "' for " + node.description() );
+                node.setType( type );
+                return;
+            }
+            else
+            {
+                const auto type = std::make_shared< libcasm_ir::ObjectType >( typeName );
+                m_log.debug(
+                    "creating IR object type '" + typeName + "' for " + node.description() );
+                node.setType( type );
+                return;
+            }
+            break;
+        }
+        default:
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "cannot use " + symbol->description() + " '" + typeName + "' as " +
+                    node.description(),
+                Code::TypeAnnotationInvalidBasicTypeName );
+            return;
+        }
+    }
+
+    m_log.error(
+        { node.sourceLocation() },
+        "unknown " + node.description() + " '" + typeName + "' found",
         Code::TypeAnnotationInvalidBasicTypeName );
 }
 
 void TypeCheckVisitor::visit( TupleType& node )
 {
-    RecursiveVisitor::visit( node );
-
     if( node.type() )
     {
         return;
     }
 
+    RecursiveVisitor::visit( node );
+
+    u1 valid = true;
+    std::size_t position = 0;
     libcasm_ir::Types subTypeList;
-    for( auto subType : *node.subTypes() )
+    for( auto argument : *node.subTypes() )
     {
-        if( not subType->type() )
+        position++;
+        if( not argument->type() )
         {
-            // early return, due to partial sub-types
-            return;
+            m_log.error(
+                { argument->sourceLocation() },
+                "unable to resolve tuple argument type '" + argument->description() +
+                    "' at position " + std::to_string( position ),
+                Code::Unspecified );
+            valid = false;
+            continue;
         }
 
-        subTypeList.add( subType->type() );
+        subTypeList.add( argument->type() );
     }
 
-    assert( subTypeList.size() >= 2 );  // constrain from parser
+    if( not valid )
+    {
+        return;
+    }
 
-    const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
+    assert( subTypeList.size() >= 2 and " inconsistent state @ GrammarParser " );
+
+    const auto& typeName = node.signature();
+    m_log.debug(
+        "creating IR " + node.description() + " type '" + typeName + "' for " +
+        node.description() );
+    const auto type = std::make_shared< libcasm_ir::TupleType >( subTypeList );
     node.setType( type );
 }
 
 void TypeCheckVisitor::visit( RecordType& node )
 {
-    RecursiveVisitor::visit( node );
-
     if( node.type() )
     {
         return;
     }
 
-    libcasm_ir::Types subTypeList;
-    std::vector< std::string > recordIdentifiers;
-    for( const auto& namedSubType : *node.namedSubTypes() )
+    RecursiveVisitor::visit( node );
+
+    u1 valid = true;
+    std::size_t position = 0;
+    libcasm_ir::Types argumentTypeList;
+    std::vector< std::string > argumentNameList;
+    for( auto argument : *node.namedSubTypes() )
     {
-        if( not namedSubType->variableType()->type() )
+        position++;
+        if( not argument->type() )
         {
-            // early return, due to partial sub-types
-            return;
+            m_log.error(
+                { argument->sourceLocation() },
+                "unable to resolve " + node.description() + " argument type '" +
+                    argument->description() + "' at position " + std::to_string( position ),
+                Code::Unspecified );
+            valid = false;
+            continue;
         }
 
-        subTypeList.add( namedSubType->variableType()->type() );
-        recordIdentifiers.emplace_back( namedSubType->identifier()->name() );
+        argumentTypeList.add( argument->variableType()->type() );
+        argumentNameList.emplace_back( argument->identifier()->name() );
     }
 
-    assert( subTypeList.size() >= 2 );  // constrain from parser
+    if( not valid )
+    {
+        return;
+    }
 
+    assert( argumentTypeList.size() >= 1 and " inconsistent state @ GrammarParser " );
+
+    const auto& typeName = node.signature();
+    m_log.debug(
+        "creating IR " + node.description() + " type '" + typeName + "' for " +
+        node.description() );
     const auto type =
-        libstdhl::Memory::make< libcasm_ir::RecordType >( subTypeList, recordIdentifiers );
+        std::make_shared< libcasm_ir::RecordType >( argumentTypeList, argumentNameList );
+    node.setType( type );
+}
+
+void TypeCheckVisitor::visit( FixedSizedType& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    RecursiveVisitor::visit( node );
+
+    const auto& typeName = node.signature();
+
+    const auto& expression = node.size();
+    if( not expression->type() )
+    {
+        if( expression->id() == Node::ID::DIRECT_CALL_EXPRESSION )
+        {
+            const auto& type = libstdhl::Memory::get< libcasm_ir::ObjectType >( typeName );
+            node.setType( type );
+            return;
+        }
+        else if(
+            expression->id() != Node::ID::VALUE_LITERAL and
+            expression->id() != Node::ID::RANGE_LITERAL )
+        {
+            m_log.error(
+                { expression->sourceLocation() },
+                "unable to resolve " + node.description() + " expression type of " +
+                    expression->description(),
+                Code::Unspecified );
+            return;
+        }
+    }
+
+    const auto& symbol = node.typeDefinition();
+    assert( symbol and " inconsistent state @ SymbolResolverPass " );
+
+    switch( symbol->id() )
+    {
+        case Node::ID::DOMAIN_DEFINITION:
+        {
+            const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
+            const auto domainDefinitionType =
+                static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
+            if( node.id() != domainDefinitionType->id() )
+            {
+                m_log.error(
+                    { node.sourceLocation() },
+                    node.description() + "  '" + typeName + "' is not a" +
+                        domainDefinitionType->description(),
+                    Code::Unspecified );
+                return;
+            }
+
+            const auto& type = symbol->type();
+            if( type )
+            {
+                node.setType( type );
+                return;
+            }
+
+            const auto typeKind = node.name()->path();
+            if( typeKind == TypeInfo::TYPE_NAME_BINARY )
+            {
+                if( expression->id() == Node::ID::VALUE_LITERAL and
+                    expression->type()->isInteger() )
+                {
+                    const auto& literal = static_cast< const ValueLiteral& >( *expression );
+                    const auto value =
+                        std::static_pointer_cast< libcasm_ir::IntegerConstant >( literal.value() );
+
+                    libcasm_ir::Type::Ptr type = nullptr;
+                    try
+                    {
+                        type = libstdhl::Memory::get< libcasm_ir::BinaryType >( value );
+                    }
+                    catch( const std::domain_error& e )
+                    {
+                        m_log.error(
+                            { expression->sourceLocation() },
+                            e.what(),
+                            Code::TypeBinarySizeIsInvalid );
+                        return;
+                    }
+
+                    node.setType( type );
+                    return;
+                }
+                else if( expression->id() == Node::ID::DIRECT_CALL_EXPRESSION )
+                {
+                    const auto& type = libstdhl::Memory::get< libcasm_ir::ObjectType >( typeName );
+                    node.setType( type );
+                    return;
+                }
+                else
+                {
+                    m_log.error(
+                        { node.sourceLocation() },
+                        "invalid expression for " + node.description() + " '" + typeName +
+                            "' found",
+                        Code ::TypeAnnotationInvalidFixedSizeExpression );
+                    return;
+                }
+            }
+            else if( typeKind == TypeInfo::TYPE_NAME_INTEGER )
+            {
+                if( expression->id() == Node::ID::RANGE_LITERAL )
+                {
+                    const auto& literal = static_cast< const RangeLiteral& >( *expression );
+
+                    u1 valid = true;
+                    u1 lhsNegative = false;
+                    u1 rhsNegative = false;
+
+                    auto lhs = literal.left();
+                    if( lhs->id() == Node::ID::UNARY_EXPRESSION )
+                    {
+                        const auto& lhsUnaryExpression =
+                            static_cast< const UnaryExpression& >( *lhs );
+                        lhs = lhsUnaryExpression.expression();
+                        if( lhsUnaryExpression.operationToken()->token() == Grammar::Token::MINUS )
+                        {
+                            lhsNegative = true;
+                        }
+                    }
+
+                    if( not( lhs->id() == Node::ID::VALUE_LITERAL and lhs->type()->isInteger() ) )
+                    {
+                        valid = false;
+                        m_log.error(
+                            { lhs->sourceLocation() },
+                            "unsupported left-hand side expression '" + lhs->description() +
+                                "', Integer literal constant expected",
+                            Code::TypeAnnotationInvalidFixedSizeExpression );
+                    }
+
+                    auto rhs = literal.right();
+                    if( rhs->id() == Node::ID::UNARY_EXPRESSION )
+                    {
+                        const auto& rhsUnaryExpression =
+                            static_cast< const UnaryExpression& >( *rhs );
+                        rhs = rhsUnaryExpression.expression();
+                        if( rhsUnaryExpression.operationToken()->token() == Grammar::Token::MINUS )
+                        {
+                            rhsNegative = true;
+                        }
+                    }
+
+                    if( not( rhs->id() == Node::ID::VALUE_LITERAL and rhs->type()->isInteger() ) )
+                    {
+                        valid = false;
+                        m_log.error(
+                            { rhs->sourceLocation() },
+                            "unsupported right-hand side expression '" + rhs->description() +
+                                "', Integer literal constant expected",
+                            Code::TypeAnnotationInvalidFixedSizeExpression );
+                    }
+
+                    if( not valid )
+                    {
+                        return;
+                    }
+
+                    auto lhsValue = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
+                        static_cast< const ValueLiteral& >( *lhs ).value() );
+                    if( lhsNegative )
+                    {
+                        lhsValue =
+                            std::make_shared< libcasm_ir::IntegerConstant >( -lhsValue->value() );
+                    }
+
+                    auto rhsValue = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
+                        static_cast< const ValueLiteral& >( *rhs ).value() );
+                    if( rhsNegative )
+                    {
+                        rhsValue =
+                            std::make_shared< libcasm_ir::IntegerConstant >( -rhsValue->value() );
+                    }
+
+                    const auto& range =
+                        libstdhl::Memory::make< libcasm_ir::Range >( lhsValue, rhsValue );
+                    const auto& rangeType = libstdhl::Memory::get< libcasm_ir::RangeType >( range );
+                    assert( not expression->type() and " inconsistent state " );
+                    expression->setType( rangeType );
+
+                    try
+                    {
+                        const auto& type =
+                            libstdhl::Memory::get< libcasm_ir::IntegerType >( rangeType );
+                        node.setType( type );
+                    }
+                    catch( const std::domain_error& e )
+                    {
+                        m_log.error( { expression->sourceLocation() }, e.what() );
+                    }
+                    return;
+                }
+                else
+                {
+                    m_log.error(
+                        { node.sourceLocation() },
+                        "invalid expression for " + node.description() + " '" + typeName +
+                            "' found",
+                        Code ::TypeAnnotationInvalidFixedSizeExpression );
+                    return;
+                }
+            }
+            break;
+        }
+        default:
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "cannot use " + symbol->description() + " '" + typeName + "' as " +
+                    node.description(),
+                Code::TypeAnnotationInvalidFixedSizeTypeName );
+            return;
+        }
+    }
+
+    const auto& type = libstdhl::Memory::make< libcasm_ir::ObjectType >( node.signature() );
     node.setType( type );
 }
 
 void TypeCheckVisitor::visit( TemplateType& node )
 {
-    RecursiveVisitor::visit( node );
-
     if( node.type() )
     {
         return;
     }
 
-    const auto& name = node.name()->path();
+    const auto& typeName = node.signature();
 
-    libcasm_ir::Types subTypeList;
-    for( auto subType : *node.subTypes() )
+    const auto& symbol = node.typeDefinition();
+    assert( symbol and " inconsistent state @ SymbolResolverPass " );
+
+    switch( symbol->id() )
     {
-        if( not subType->type() )
+        case Node::ID::BEHAVIOR_DEFINITION:  // [fallthrough]
+        case Node::ID::IMPLEMENT_DEFINITION:
         {
-            m_log.info(
-                { subType->sourceLocation() }, "TODO: '" + name + "' has a non-typed sub-type" );
-            return;
-        }
-
-        subTypeList.add( subType->type() );
-    }
-
-    const auto maybeSymbol = m_symboltable.findSymbol( *node.name() );
-    const auto symbol = maybeSymbol.first;
-    const auto accessible = maybeSymbol.second;
-
-    if( symbol and not accessible )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            symbol->description() + " '" + name + "' is not accessible",
-            Code::SymbolIsInaccessible );
-        m_log.warning(
-            { symbol->sourceLocation() },
-            "'" + symbol->identifier()->name() + "' has not been exported" );
-        return;
-    }
-
-    if( symbol )
-    {
-        switch( symbol->id() )
-        {
-            case Node::ID::DOMAIN_DEFINITION:
-            {
-                const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
-                const auto domainDefinitionType =
-                    static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
-                if( node.id() != domainDefinitionType->id() )
-                {
-                    m_log.error(
-                        { node.sourceLocation() },
-                        node.description() + "  '" + name + "' is not a" +
-                            domainDefinitionType->description(),
-                        Code::TypeAnnotationInvalidTemplateTypeName );
-                    return;
-                }
-
-                const auto domainDefinitionTemplateType =
-                    static_cast< const TemplateType& >( *domainDefinition.domainType() );
-                const auto domainTypeArgumentSize = domainDefinitionTemplateType.subTypes()->size();
-                const auto templateTypeArgumentSize = subTypeList.size();
-                if( domainTypeArgumentSize != templateTypeArgumentSize )
-                {
-                    m_log.error(
-                        { node.sourceLocation() },
-                        symbol->description() + "  '" + name +
-                            "' template type argument size mismatch, given " +
-                            std::to_string( templateTypeArgumentSize ) + ", needs " +
-                            std::to_string( domainTypeArgumentSize ),
-                        Code::TypeAnnotationInvalidTemplateTypeName );
-                    return;
-                }
-
-                const auto domainNamespace = m_symboltable.findNamespace( *node.name() );
-                assert( domainNamespace );
-
-                const auto domainSymbolName = node.signature();
-                const auto domainSymbol = domainNamespace->findSymbol( domainSymbolName );
-                if( domainSymbol )
-                {
-                    node.setType( domainSymbol->type() );
-                }
-                else
-                {
-                    libcasm_ir::Type::Ptr type = nullptr;
-
-                    if( name == TypeInfo::TYPE_NAME_RANGE )
-                    {
-                        assert( subTypeList.size() == 1 );
-                        type = libstdhl::Memory::make< libcasm_ir::RangeType >( subTypeList[ 0 ] );
-                    }
-                    else if( name == TypeInfo::TYPE_NAME_LIST )
-                    {
-                        assert( subTypeList.size() == 1 );
-                        type = libstdhl::Memory::make< libcasm_ir::ListType >( subTypeList[ 0 ] );
-                    }
-                    // TODO: FIXME: @ppaulweber: behavior/set
-                    // else if( name == TypeInfo::TYPE_NAME_SET )
-                    // {
-                    //     assert( subTypeList.size() == 1 );
-                    //     type = libstdhl::Memory::make< libcasm_ir::SetType >( subTypeList[ 0 ] );
-                    // }
-                    else if( name == TypeInfo::TYPE_NAME_FILE )
-                    {
-                        assert( subTypeList.size() == 1 );
-                        m_log.info(
-                            { node.sourceLocation() },
-                            node.description() + " '" + name + "' is experimental" );
-                        type = libstdhl::Memory::make< libcasm_ir::FileType >( subTypeList[ 0 ] );
-                    }
-                    else if( name == TypeInfo::TYPE_NAME_PORT )
-                    {
-                        assert( subTypeList.size() == 1 );
-                        m_log.info(
-                            { node.sourceLocation() },
-                            node.description() + " '" + name + "' is experimental" );
-                        type = libstdhl::Memory::make< libcasm_ir::PortType >( subTypeList[ 0 ] );
-                    }
-
-                    if( type )
-                    {
-                        const auto domainDefinitionTemplateTypeInstance =
-                            std::make_shared< DomainDefinition >( domainDefinition );
-                        domainDefinitionTemplateTypeInstance->setType( type );
-                        domainNamespace->registerSymbol(
-                            domainSymbolName, node.ptr< Definition >() );
-                        node.setType( type );
-                    }
-                }
-                break;
-            }
-            default:
+            const auto& behaviorDefinition = static_cast< const BehaviorDefinition& >( *symbol );
+            const auto domainDefinitionType =
+                static_cast< const Ast::Type* >( behaviorDefinition.domainType().get() );
+            if( node.id() != domainDefinitionType->id() )
             {
                 m_log.error(
                     { node.sourceLocation() },
-                    "cannot use " + symbol->description() + " '" + name + "' as type",
+                    node.description() + "  '" + typeName + "' is not a" +
+                        domainDefinitionType->description(),
                     Code::TypeAnnotationInvalidTemplateTypeName );
                 return;
             }
-        }
 
-        if( not node.type() )
+            symbol->accept( *this );
+            const auto& type = symbol->type();
+            if( type )
+            {
+                node.setType( type );
+                return;
+            }
+
+            break;
+        }
+        case Node::ID::DOMAIN_DEFINITION:
         {
-            // add check of type size etc.
-            m_log.warning( { node.sourceLocation() }, "unimplemented!" );
-        }
+            const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
+            const auto domainDefinitionType =
+                static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
+            if( node.id() != domainDefinitionType->id() )
+            {
+                m_log.error(
+                    { node.sourceLocation() },
+                    node.description() + "  '" + typeName + "' is not a" +
+                        domainDefinitionType->description(),
+                    Code::TypeAnnotationInvalidTemplateTypeName );
+                return;
+            }
 
-        return;
+            const auto& type = symbol->type();
+            if( type )
+            {
+                node.setType( type );
+                return;
+            }
+
+            const auto typeKind = node.name()->path();
+
+            assert( node.subTypes()->size() >= 1 and " inconsistent state @ SymbolResolverPass " );
+            if( node.subTypes()->size() == 1 )
+            {
+                const auto& subNode = node.subTypes()->front();
+                subNode->accept( *this );
+                const auto& subType = subNode->type();
+                assert( subType and " inconsistent state " );
+
+                if( not subType->isObject() )
+                {
+                    if( typeKind == TypeInfo::TYPE_NAME_RANGE )
+                    {
+                        const auto& type =
+                            libstdhl::Memory::make< libcasm_ir::RangeType >( subType );
+                        node.setType( type );
+                        return;
+                    }
+                    // else if( typeKind == TypeInfo::TYPE_NAME_SET )
+                    // {
+                    //     const auto& type =
+                    //         libstdhl::Memory::make< libcasm_ir::SetType >( subType );
+                    //     node.setType( type );
+                    //     return;
+                    // }
+                    else if( typeKind == TypeInfo::TYPE_NAME_FILE )
+                    {
+                        m_log.debug(
+                            { node.sourceLocation() },
+                            node.description() + " '" + typeName + "' is experimental" );
+                        const auto& type =
+                            libstdhl::Memory::make< libcasm_ir::FileType >( subType );
+                        node.setType( type );
+                        return;
+                    }
+                    else if( typeKind == TypeInfo::TYPE_NAME_PORT )
+                    {
+                        m_log.debug(
+                            { node.sourceLocation() },
+                            node.description() + " '" + typeName + "' is experimental" );
+                        const auto& type =
+                            libstdhl::Memory::make< libcasm_ir::PortType >( subType );
+                        node.setType( type );
+                        return;
+                    }
+                }
+            }
+            break;
+        }
+        default:
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "cannot use " + symbol->description() + " '" + typeName + "' as " +
+                    node.description(),
+                Code::TypeAnnotationInvalidTemplateTypeName );
+            return;
+        }
     }
 
-    m_log.error(
-        { node.sourceLocation() },
-        "unknown template type '" + name + "' found",
-        Code::TypeAnnotationInvalidTemplateTypeName );
+    const auto& type = libstdhl::Memory::make< libcasm_ir::ObjectType >( node.signature() );
+    node.setType( type );
 }
 
 void TypeCheckVisitor::visit( RelationType& node )
 {
-    RecursiveVisitor::visit( node );
-
     if( node.type() )
     {
         return;
     }
 
-    const auto& name = node.name()->path();
+    RecursiveVisitor::visit( node );
 
-    std::vector< libcasm_ir::Type::Ptr > argTypeList;
-    for( auto argumentType : *node.argumentTypes() )
+    const auto& typeName = node.signature();
+
+    u1 valid = true;
+    std::size_t position = 0;
+    libcasm_ir::Types argumentTypeList;
+    for( auto argument : *node.argumentTypes() )
     {
-        if( not argumentType->type() )
+        position++;
+        if( not argument->type() )
         {
-            m_log.info(
-                { argumentType->sourceLocation() },
-                "TODO: '" + name + "' has a non-typed argument(s)" );
-            return;
+            m_log.error(
+                { argument->sourceLocation() },
+                "unable to resolve relation argument type '" + argument->description() +
+                    "' at position " + std::to_string( position ),
+                Code::Unspecified );
+            valid = false;
+            continue;
         }
 
-        argTypeList.emplace_back( argumentType->type() );
+        argumentTypeList.add( argument->type() );
     }
 
-    if( name == TypeInfo::TYPE_NAME_RULEREF )
-    {
-        if( node.returnType()->type() )
-        {
-            const auto type = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
-                node.returnType()->type(), argTypeList );
-            node.setType( type );
-        }
-    }
-    else if( name == TypeInfo::TYPE_NAME_FUNCREF )
-    {
-        if( node.returnType()->type() )
-        {
-            const auto type = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
-                node.returnType()->type(), argTypeList );
-            node.setType( type );
-        }
-    }
-    else
+    const auto& returnType = *node.returnType();
+    if( not returnType.type() )
     {
         m_log.error(
-            { node.sourceLocation() },
-            "unknown relation type '" + name + "' found",
-            Code::TypeAnnotationInvalidRelationTypeName );
+            { returnType.sourceLocation() },
+            "unable to resolve relation return type of '" + returnType.description() + "'",
+            Code::Unspecified );
+        valid = false;
     }
+
+    if( not valid )
+    {
+        return;
+    }
+
+    const auto& symbol = node.typeDefinition();
+    assert( symbol and " inconsistent state @ SymbolResolverPass " );
+
+    switch( symbol->id() )
+    {
+        case Node::ID::DOMAIN_DEFINITION:
+        {
+            const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
+            const auto domainDefinitionType =
+                static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
+            if( node.id() != domainDefinitionType->id() )
+            {
+                m_log.error(
+                    { node.sourceLocation() },
+                    node.description() + "  '" + typeName + "' is not a" +
+                        domainDefinitionType->description(),
+                    Code::TypeAnnotationInvalidTemplateTypeName );
+                return;
+            }
+
+            if( not symbol->type() )
+            {
+                libcasm_ir::Type::Ptr type = nullptr;
+                const auto typeKind = node.name()->path();
+
+                if( typeKind == TypeInfo::TYPE_NAME_RULEREF )
+                {
+                    type = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
+                        libstdhl::Memory::make< libcasm_ir::RelationType >(
+                            returnType.type(), argumentTypeList ) );
+                }
+                else if( typeKind == TypeInfo::TYPE_NAME_FUNCREF )
+                {
+                    type = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
+                        libstdhl::Memory::make< libcasm_ir::RelationType >(
+                            returnType.type(), argumentTypeList ) );
+                }
+
+                symbol->setType( type );
+            }
+
+            const auto& type = symbol->type();
+            if( type )
+            {
+                node.setType( type );
+                return;
+            }
+
+            break;
+        }
+        case Node::ID::BUILTIN_DEFINITION:
+        {
+            symbol->accept( *this );
+            const auto& type = symbol->type();
+            if( symbol->type() )
+            {
+                node.setType( type );
+                return;
+            }
+            break;
+        }
+        default:
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "cannot use " + symbol->description() + " '" + typeName + "' as " +
+                    node.description(),
+                Code::TypeAnnotationInvalidRelationTypeName );
+            return;
+        }
+    }
+
+    m_log.error(
+        { node.sourceLocation() },
+        "unknown " + node.description() + " '" + typeName + "' found",
+        Code ::TypeAnnotationInvalidRelationTypeName );
 }
 
-void TypeCheckVisitor::visit( FixedSizedType& node )
+void TypeCheckVisitor::pushSymbol( const VariableDefinition::Ptr& symbol )
 {
-    RecursiveVisitor::visit( node );
+    const auto& name = symbol->identifier()->name();
 
-    if( node.type() )
-    {
-        return;
-    }
-
-    const auto& name = node.name()->path();
-    auto& expr = *node.size();
-
-    if( name == TypeInfo::TYPE_NAME_BINARY )
-    {
-        if( not( expr.id() == Node::ID::VALUE_LITERAL and expr.type()->isInteger() ) )
-        {
-            m_log.error(
-                { expr.sourceLocation() },
-                "unsupported expr for 'Binary' type, constant Integer value "
-                "expected" );
-            return;
-        }
-
-        const auto& literal = static_cast< const ValueLiteral& >( expr );
-        const auto value =
-            std::static_pointer_cast< libcasm_ir::IntegerConstant >( literal.value() );
-
-        try
-        {
-            auto type = libstdhl::Memory::get< libcasm_ir::BinaryType >( value );
-            node.setType( type );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error( { expr.sourceLocation() }, e.what(), Code::TypeBinarySizeIsInvalid );
-        }
-    }
-    else if( name == TypeInfo::TYPE_NAME_INTEGER )
-    {
-        if( expr.id() != Node::ID::RANGE_LITERAL )
-        {
-            m_log.error(
-                { expr.sourceLocation() },
-                "unsupported expr for 'Integer' type, only range "
-                "expressions are allowed, e.g. `Integer'[5..10]`" );
-
-            return;
-        }
-
-        const auto& rangeExpr = static_cast< const RangeLiteral& >( expr );
-
-        const auto& lhs = *rangeExpr.left();
-        if( not( lhs.id() == Node::ID::VALUE_LITERAL and lhs.type()->isInteger() ) )
-        {
-            m_log.error(
-                { rangeExpr.left()->sourceLocation() },
-                "unsupported expr for ranged expression, constant Integer value "
-                "expected",
-                Code::TypeAnnotationInvalidFixedSizeExpression );
-            return;
-        }
-
-        const auto& rhs = *rangeExpr.right();
-        if( not( rhs.id() == Node::ID::VALUE_LITERAL and rhs.type()->isInteger() ) )
-        {
-            m_log.error(
-                { rangeExpr.right()->sourceLocation() },
-                "unsupported expr for ranged expression, constant Integer value "
-                "expected",
-                Code::TypeAnnotationInvalidFixedSizeExpression );
-            return;
-        }
-
-        const auto lhsValue = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
-            static_cast< const ValueLiteral& >( lhs ).value() );
-        const auto rhsValue = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
-            static_cast< const ValueLiteral& >( rhs ).value() );
-        auto range = libstdhl::Memory::make< libcasm_ir::Range >( lhsValue, rhsValue );
-
-        auto rangeType = libstdhl::Memory::get< libcasm_ir::RangeType >( range );
-        assert( not expr.type() );
-        expr.setType( rangeType );
-
-        try
-        {
-            auto type = libstdhl::Memory::get< libcasm_ir::IntegerType >( rangeType );
-            node.setType( type );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error( { expr.sourceLocation() }, e.what() );
-        }
-    }
-    else
+    const auto result = m_symbols.emplace( name, symbol );
+    if( not result.second )
     {
         m_log.error(
-            { node.sourceLocation() },
-            "unknown type '" + name + "' found",
-            Code::TypeAnnotationInvalidFixedSizeTypeName );
+            { symbol->sourceLocation() },
+            "redefinition of symbol '" + name + "'",
+            Code::SymbolAlreadyDefined );
+
+        const auto& existingTemplateSymbol = result.first->second;
+        m_log.info(
+            { existingTemplateSymbol->sourceLocation() },
+            "previous definition of '" + name + "' is here" );
     }
 }
+
+void TypeCheckVisitor::pushSymbols( const VariableDefinitions::Ptr& symbols )
+{
+    for( const auto& symbol : *symbols )
+    {
+        pushSymbol( symbol );
+    }
+}
+
+void TypeCheckVisitor::popSymbol( const VariableDefinition::Ptr& symbol )
+{
+    const auto& name = symbol->identifier()->name();
+    m_symbols.erase( name );
+}
+
+void TypeCheckVisitor::popSymbols( const VariableDefinitions::Ptr& symbols )
+{
+    for( const auto& symbol : *symbols )
+    {
+        popSymbol( symbol );
+    }
+}
+
+void TypeCheckVisitor::pushVariableBindings( const VariableBindings::Ptr& variableBindings )
+{
+    for( const auto& variableBinding : *variableBindings )
+    {
+        pushSymbol( variableBinding->variable() );
+    }
+}
+
+void TypeCheckVisitor::popVariableBindings( const VariableBindings::Ptr& variableBindings )
+{
+    for( const auto& variableBinding : *variableBindings )
+    {
+        popSymbol( variableBinding->variable() );
+    }
+}
+
+//
+//
+// TypeCheckPass
+//
 
 void TypeCheckPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
-    pu.scheduleAfter< SymbolResolverPass >();
+    pu.require< SpecificationMergerPass >();
 }
 
 u1 TypeCheckPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
+    const auto data = pr.output< SpecificationMergerPass >();
     const auto specification = data->specification();
 
     TypeCheckVisitor visitor( log, *specification->symboltable() );
     specification->definitions()->accept( visitor );
 
-#ifndef NDEBUG
-    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
-#endif
-
     const auto errors = log.errors();
     if( errors > 0 )
     {
+        log.debug( "symbol table =\n" + specification->symboltable()->dump() );
         log.debug( "found %lu error(s) during type checking", errors );
         return false;
     }
