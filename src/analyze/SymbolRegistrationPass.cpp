@@ -135,11 +135,13 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 
 void SymbolRegistrationVisitor::visit( UsingDefinition& node )
 {
+    const auto& name = node.identifier()->name();
+    if( name == TypeInfo::TYPE_NAME_AGENT )
+    {
+        return;
+    }
+
     registerSymbol( node );
-
-    const auto symbolNamespace = std::make_shared< Namespace >();
-
-    registerSymbolNamespace( node, node.identifier()->name(), symbolNamespace );
 }
 
 void SymbolRegistrationVisitor::visit( DomainDefinition& node )
@@ -162,7 +164,7 @@ void SymbolRegistrationVisitor::visit( StructureDefinition& node )
     registerSymbolNamespace( node, symbolNamespace );
 }
 
-void SymbolRegistrationVisitor::visit( FeatureDefinition& node )
+void SymbolRegistrationVisitor::visit( BehaviorDefinition& node )
 {
     registerSymbol( node );
 
@@ -193,22 +195,22 @@ void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
     auto implementDomainName = implementDomainDefinition->identifier()->name();
     auto implementTypeName = implementDomainDefinition->domainType()->signature();
 
-    if( node.hasFeature() )
+    if( node.hasBehavior() )
     {
-        const auto& featureType = node.featureType();
-        const auto& featureTypeName = featureType->signature();
-        const auto& featureTypePath = featureType->signaturePath();
-        const auto& featureTypeSymbolResult = m_symboltable.findSymbol( *featureTypePath );
-        const auto& featureTypeSymbol = featureTypeSymbolResult.first;
-        if( not featureTypeSymbol )
+        const auto& behaviorType = node.behaviorType();
+        const auto& behaviorTypeName = behaviorType->signature();
+        const auto& behaviorTypePath = behaviorType->signaturePath();
+        const auto& behaviorTypeSymbolResult = m_symboltable.findSymbol( *behaviorTypePath );
+        const auto& behaviorTypeSymbol = behaviorTypeSymbolResult.first;
+        if( not behaviorTypeSymbol )
         {
-            // feature type not found, delay to SymbolResolverPass
+            // behavior type not found, delay to SymbolResolverPass
             return;
         }
 
-        implementDomainDefinition = featureTypeSymbol->ptr< TypeDefinition >();
-        implementDomainName = featureType->signature();
-        implementTypeName = featureType->signature();
+        implementDomainDefinition = behaviorTypeSymbol->ptr< TypeDefinition >();
+        implementDomainName = behaviorType->signature();
+        implementTypeName = behaviorType->signature();
     }
 
     try
@@ -221,6 +223,7 @@ void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
         const auto& symbol = m_symboltable.findSymbol( implementDomainName );
         m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
         m_log.info( { symbol->sourceLocation() }, e.what() );
+        return;
     }
 
     try
@@ -230,7 +233,7 @@ void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { node.sourceLocation() }, e.what() );
+        m_log.debug( { node.sourceLocation() }, e.what() );
     }
 
     try
@@ -243,6 +246,7 @@ void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
         const auto& symbol = m_symboltable.findSymbol( implementDomainName );
         m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
         m_log.info( { symbol->sourceLocation() }, e.what() );
+        return;
     }
 
     // Domain::Type::Domain::Type::*
@@ -257,7 +261,7 @@ void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { node.sourceLocation() }, e.what() );
+        m_log.debug( { node.sourceLocation() }, e.what() );
     }
 }
 
@@ -294,8 +298,8 @@ void SymbolRegistrationVisitor::registerSymbol( Definition& node )
               symbol->id() == Node::ID::DOMAIN_DEFINITION ) or
             ( node.id() == Node::ID::BUILTIN_DEFINITION and
               symbol->id() == Node::ID::BUILTIN_DEFINITION ) or
-            ( node.id() == Node::ID::FEATURE_DEFINITION and
-              symbol->id() == Node::ID::FEATURE_DEFINITION ) or
+            ( node.id() == Node::ID::BEHAVIOR_DEFINITION and
+              symbol->id() == Node::ID::BEHAVIOR_DEFINITION ) or
             ( node.id() == Node::ID::STRUCTURE_DEFINITION and
               symbol->id() == Node::ID::STRUCTURE_DEFINITION ) )
         {
@@ -306,6 +310,20 @@ void SymbolRegistrationVisitor::registerSymbol( Definition& node )
                 symbolTTD.templateSymbols()->size() != 0 )
             {
                 // already registered domain template of domain instance
+                return;
+            }
+
+            if( nodeTTD.domainType()->id() == Node::ID::TEMPLATE_TYPE and
+                symbolTTD.domainType()->id() == Node::ID::TEMPLATE_TYPE )
+            {
+                // already registered domain of template type instance
+                return;
+            }
+
+            if( nodeTTD.domainType()->id() == Node::ID::FIXED_SIZED_TYPE and
+                symbolTTD.domainType()->id() == Node::ID::BASIC_TYPE )
+            {
+                // already registered domain of fixed sized type instance
                 return;
             }
         }
@@ -339,9 +357,8 @@ void SymbolRegistrationVisitor::registerSymbolNamespace(
         }
         catch( const std::domain_error& e )
         {
-            m_log.error(
-                { node.sourceLocation() },
-                "registerSymbolNamespace@Namespace:" + std::string( e.what() ) );
+            m_log.error( { node.sourceLocation() }, e.what() );
+            return;
         }
     }
 
@@ -352,16 +369,24 @@ void SymbolRegistrationVisitor::registerSymbolNamespace(
     catch( const std::domain_error& e )
     {
         const auto& symbol = domainNamespace->findSymbol( typeName );
-        m_log.error(
-            { node.sourceLocation() },
-            "registerSymbolNamespace@Symbol:" + std::string( e.what() ),
-            Code::IdentifierIsAlreadyUsed );
-        m_log.info( { symbol->sourceLocation() }, e.what() );
+        m_log.debug( { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
+        return;
+    }
+
+    auto typeNamespace = symbolNamespace;
+    if( node.id() == Node::ID::DOMAIN_DEFINITION and domainName == TypeInfo::TYPE_NAME_INTEGER )
+    {
+        const auto& typeDefinition = static_cast< const TypeDefinition& >( node );
+        if( typeDefinition.domainType()->id() == Node::ID::FIXED_SIZED_TYPE )
+        {
+            typeNamespace = domainNamespace->findNamespace( domainName );
+            assert( typeNamespace and " inconsistent state " );
+        }
     }
 
     try
     {
-        domainNamespace->registerNamespace( typeName, symbolNamespace );
+        domainNamespace->registerNamespace( typeName, typeNamespace );
     }
     catch( const std::domain_error& e )
     {

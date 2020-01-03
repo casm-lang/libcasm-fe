@@ -82,7 +82,7 @@ namespace libcasm_fe
         void visit( Ast::UsingDefinition& node ) override;
         void visit( Ast::DomainDefinition& node ) override;
         void visit( Ast::StructureDefinition& node ) override;
-        void visit( Ast::FeatureDefinition& node ) override;
+        void visit( Ast::BehaviorDefinition& node ) override;
         void visit( Ast::ImplementDefinition& node ) override;
         void visit( Ast::BuiltinDefinition& node ) override;
         void visit( Ast::Declaration& node ) override;
