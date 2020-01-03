@@ -57,7 +57,7 @@ Definition ::= InitDefinition
              | InvariantDefinition
              | ImportDefinition
              | StructureDefinition
-             | FeatureDefinition
+             | BehaviorDefinition
              | ImplementDefinition
              | DomainDefinition
              | BuiltinDefinition
@@ -206,37 +206,37 @@ StructureDefinitionElement ::= Attributes FunctionDefinition
 #+html: {{page>.:grammar:StructureDefinitionElement&noheader&nofooter}}
 
 
-** FeatureDefinition
+** BehaviorDefinition
 
 #+begin_src
-FeatureDefinition ::= "feature" Identifier "=" "{" FeatureDefinitionList "}"
+BehaviorDefinition ::= "behavior" TemplateSymbols Type "=" "{" BehaviorDefinitionList "}"
 #+end_src
 
-#+html: {{page>.:grammar:FeatureDefinition&noheader&nofooter}}
+#+html: {{page>.:grammar:BehaviorDefinition&noheader&nofooter}}
 
 
-** FeatureDefinitionElement
+** BehaviorDefinitionElement
 
 #+begin_src
-FeatureDefinitionElement ::= Attributes Declaration
-                           | Declaration
-                           | Attributes DerivedDefinition
-                           | DerivedDefinition
-                           | Attributes RuleDefinition
-                           | RuleDefinition
+BehaviorDefinitionElement ::= Attributes Declaration
+                            | Declaration
+                            | Attributes DerivedDefinition
+                            | DerivedDefinition
+                            | Attributes RuleDefinition
+                            | RuleDefinition
 #+end_src
 
-#+html: {{page>.:grammar:FeatureDefinitionElement&noheader&nofooter}}
+#+html: {{page>.:grammar:BehaviorDefinitionElement&noheader&nofooter}}
 
 
-** FeatureDefinitionList
+** BehaviorDefinitionList
 
 #+begin_src
-FeatureDefinitionList ::= FeatureDefinitionList FeatureDefinitionElement
-                        | FeatureDefinitionElement
+BehaviorDefinitionList ::= BehaviorDefinitionList BehaviorDefinitionElement
+                         | BehaviorDefinitionElement
 #+end_src
 
-#+html: {{page>.:grammar:FeatureDefinitionList&noheader&nofooter}}
+#+html: {{page>.:grammar:BehaviorDefinitionList&noheader&nofooter}}
 
 
 ** TemplateSymbols
@@ -253,7 +253,7 @@ TemplateSymbols ::= "<" TemplateVariables ">"
 
 #+begin_src
 ImplementDefinition ::= "implement" TemplateSymbols Type "=" "{" ImplementDefinitionList "}"
-                      | "implement" TemplateSymbols IdentifierPath "for" Type "=" "{" ImplementDefinitionList "}"
+                      | "implement" TemplateSymbols Type "for" Type "=" "{" ImplementDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:ImplementDefinition&noheader&nofooter}}
@@ -564,11 +564,11 @@ CallExpression ::= DirectCallExpression
 ** DirectCallExpression
 
 #+begin_src
-DirectCallExpression ::= "self"
-                       | "this"
+DirectCallExpression ::= "this"
                        | IdentifierPath
                        | IdentifierPath "(" ")"
                        | IdentifierPath "(" Terms ")"
+                       | "template" TemplateSymbols IdentifierPath "(" Terms ")"
 #+end_src
 
 #+html: {{page>.:grammar:DirectCallExpression&noheader&nofooter}}
@@ -862,7 +862,7 @@ TupleType ::= "(" Types "," Type ")"
 ** RecordType
 
 #+begin_src
-RecordType ::= "(" TypedVariables "," TypedVariable ")"
+RecordType ::= "{" TypedVariables "," TypedVariable "}"
 #+end_src
 
 #+html: {{page>.:grammar:RecordType&noheader&nofooter}}
@@ -982,6 +982,7 @@ Initializer ::= Term
 Identifier ::= "([a-ZA-Z_]|UTF8){([a-zA-Z_0-9]|UTF8)}*"
              | "in"
              | "CASM"
+             | "self"
              | "enumeration"
 #+end_src
 
