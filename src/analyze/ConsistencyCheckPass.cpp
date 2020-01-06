@@ -200,7 +200,7 @@ void ConsistencyCheckVisitor::visit( InvariantDefinition& node )
 
 void ConsistencyCheckVisitor::visit( DomainDefinition& node )
 {
-    if( node.templateSymbols()->size() > 0 )
+    if( node.isTemplate() )
     {
         node.templateInstances()->accept( *this );
         return;
@@ -212,7 +212,7 @@ void ConsistencyCheckVisitor::visit( DomainDefinition& node )
 
 void ConsistencyCheckVisitor::visit( StructureDefinition& node )
 {
-    if( node.templateSymbols()->size() > 0 )
+    if( node.isTemplate() )
     {
         node.templateInstances()->accept( *this );
         return;
@@ -224,7 +224,7 @@ void ConsistencyCheckVisitor::visit( StructureDefinition& node )
 
 void ConsistencyCheckVisitor::visit( BehaviorDefinition& node )
 {
-    if( node.templateSymbols()->size() > 0 )
+    if( node.isTemplate() )
     {
         node.templateInstances()->accept( *this );
         return;
@@ -236,7 +236,7 @@ void ConsistencyCheckVisitor::visit( BehaviorDefinition& node )
 
 void ConsistencyCheckVisitor::visit( ImplementDefinition& node )
 {
-    if( node.templateSymbols()->size() > 0 )
+    if( node.isTemplate() )
     {
         node.templateInstances()->accept( *this );
         return;
@@ -248,7 +248,7 @@ void ConsistencyCheckVisitor::visit( ImplementDefinition& node )
 
 void ConsistencyCheckVisitor::visit( BuiltinDefinition& node )
 {
-    if( node.templateSymbols()->size() > 0 )
+    if( node.isTemplate() )
     {
         node.templateInstances()->accept( *this );
         return;
