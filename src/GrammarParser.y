@@ -131,7 +131,7 @@ END       0 "end of file"
 %type <HeaderDefinition::Ptr> Header
 %type <InitDefinition::Ptr> InitDefinition
 %type <VariableDefinition::Ptr> Variable TypedVariable TemplateVariable AttributedVariable TypedAttributedVariable
-%type <VariableDefinitions::Ptr> TypedVariables TemplateVariables TemplateSymbols
+%type <VariableDefinitions::Ptr> TypedVariables TemplateVariables
 %type <DomainDefinition::Ptr> DomainDefinition
 %type <BuiltinDefinition::Ptr> BuiltinDefinition
 %type <FunctionDefinition::Ptr> FunctionDefinition
@@ -145,14 +145,14 @@ END       0 "end of file"
 %type <InvariantDefinition::Ptr> InvariantDefinition
 %type <ImportDefinition::Ptr> ImportDefinition
 %type <StructureDefinition::Ptr> StructureDefinition
-%type <FunctionDefinition::Ptr> StructureDefinitionElement
 %type <FunctionDefinitions::Ptr> StructureDefinitionList
+%type <FunctionDefinition::Ptr> StructureDefinitionElement
 %type <BehaviorDefinition::Ptr> BehaviorDefinition
-%type <Definition::Ptr> BehaviorDefinitionElement
 %type <Definitions::Ptr> BehaviorDefinitionList
+%type <Definition::Ptr> BehaviorDefinitionElement
 %type <ImplementDefinition::Ptr> ImplementDefinition
-%type <Definition::Ptr> ImplementDefinitionElement
 %type <Definitions::Ptr> ImplementDefinitionList
+%type <Definition::Ptr> ImplementDefinitionElement ImplementDefinitionAttributedElement
 %type <Declaration::Ptr> Declaration
 
 // literals
@@ -225,6 +225,7 @@ END       0 "end of file"
 %type <Initializer::Ptr> Initializer
 %type <Initializers::Ptr> Initializers
 %type <Defined::Ptr> MaybeDefined
+%type <Template::Ptr> Template MaybeTemplate
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <VariableDefinitions::Ptr> Parameters AttributedVariables
 %type <VariableDefinitions::Ptr> MethodParameters
@@ -576,9 +577,9 @@ ImportDefinition
 //
 
 StructureDefinition
-: STRUCTURE Identifier EQUAL LCURPAREN StructureDefinitionList RCURPAREN
+: MaybeTemplate STRUCTURE Identifier EQUAL LCURPAREN StructureDefinitionList RCURPAREN
   {
-      $$ = Ast::make< StructureDefinition >( @$, $1, $2, $3, $4, $5, $6 );
+      $$ = Ast::make< StructureDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
   }
 ;
 
@@ -616,7 +617,7 @@ StructureDefinitionElement
 //
 
 BehaviorDefinition
-: BEHAVIOR TemplateSymbols Type EQUAL LCURPAREN BehaviorDefinitionList RCURPAREN
+: MaybeTemplate BEHAVIOR Type EQUAL LCURPAREN BehaviorDefinitionList RCURPAREN
   {
       $$ = Ast::make< BehaviorDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
   }
@@ -672,16 +673,22 @@ BehaviorDefinitionList
   }
 ;
 
-
-TemplateSymbols
-: LESSER TemplateVariables GREATER
+Template
+: TEMPLATE LESSER TemplateVariables GREATER
   {
-      $$ = $2;
-      // TODO: FIXME: @ppaulweber: handle token $1 and $3
+      $$ = Ast::make< Template >( @$, $1, $2, $3, $4 );
+  }
+;
+
+MaybeTemplate
+: Template
+  {
+      $$ = $1;
   }
 | %empty
   {
-      $$ = Ast::make< VariableDefinitions >( @$ );
+      const auto& templateSymbols = Ast::make< VariableDefinitions >( @$ );
+      $$ = Ast::make< Template >( @$, Token::unresolved(), Token::unresolved(), templateSymbols, Token::unresolved() );
   }
 ;
 
@@ -692,40 +699,15 @@ TemplateSymbols
 //
 
 ImplementDefinition
-: IMPLEMENT TemplateSymbols Type EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
+: MaybeTemplate IMPLEMENT Type EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
   {
       $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
   }
-| IMPLEMENT TemplateSymbols Type FOR Type EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
+| MaybeTemplate IMPLEMENT Type FOR Type EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
   {
       $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6, $7, $8, $9 );
   }
 ;
-
-
-ImplementDefinitionElement
-: Attributes DerivedDefinition
-  {
-      auto definition = $2;
-      definition->setAttributes( $1 );
-      $$ = definition;
-  }
-| DerivedDefinition
-  {
-      $$ = $1;
-  }
-| Attributes RuleDefinition
-  {
-      auto definition = $2;
-      definition->setAttributes( $1 );
-      $$ = definition;
-  }
-| RuleDefinition
-  {
-      $$ = $1;
-  }
-;
-
 
 ImplementDefinitionList
 : ImplementDefinitionList ImplementDefinitionElement
@@ -742,13 +724,37 @@ ImplementDefinitionList
   }
 ;
 
+ImplementDefinitionElement
+: Attributes ImplementDefinitionAttributedElement
+  {
+      const auto& definition = $2;
+      definition->setAttributes( $1 );
+      $$ = definition;
+  }
+| ImplementDefinitionAttributedElement
+  {
+      $$ = $1;
+  }
+;
+
+ImplementDefinitionAttributedElement
+: DerivedDefinition
+  {
+      $$ = $1;
+  }
+| RuleDefinition
+  {
+      $$ = $1;
+  }
+;
+
 //
 //
 // DomainDefinition
 //
 
 DomainDefinition
-: DOMAIN TemplateSymbols Type
+: MaybeTemplate DOMAIN Type
   {
       $$ = Ast::make< DomainDefinition >( @$, $1, $2, $3 );
   }
@@ -760,7 +766,7 @@ DomainDefinition
 //
 
 BuiltinDefinition
-: BUILTIN TemplateSymbols RelationType
+: MaybeTemplate BUILTIN RelationType
   {
       $$ = Ast::make< BuiltinDefinition >( @$, $1, $2, $3 );
   }
@@ -1248,9 +1254,9 @@ DirectCallExpression
   {
       $$ = Ast::make< DirectCallExpression >( @$, $1, $2, $3, $4 );
   }
-| TEMPLATE TemplateSymbols IdentifierPath  LPAREN Terms RPAREN
+| Template IdentifierPath LPAREN Terms RPAREN
   {
-      $$ = Ast::make< DirectCallExpression >( @$, $1, $2, $3, $4, $5, $6 );
+      $$ = Ast::make< DirectCallExpression >( @$, $1, $2, $3, $4, $5 );
   }
 | IdentifierPath LPAREN error RPAREN // error recovery
   {
