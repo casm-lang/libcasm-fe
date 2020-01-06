@@ -77,34 +77,44 @@ domain String
 domain Decimal
 
 [ export ]
-domain< Size > Binary'Size
+template< Size >
+domain Binary'Size
 
 [ export ]
-domain< Signature > RuleRef< Signature >
+template< Signature >
+domain RuleRef< Signature >
 
 [ export ]
-domain< Signature > FuncRef< Signature >
+template< Signature >
+domain FuncRef< Signature >
 
 [ export ]
-domain< Type > Tuple< Type >
+template< Type >
+domain Tuple< Type >
 
 [ export ]
-domain< Type > Record< Type >
+template< Type >
+domain Record< Type >
 
 [ export ]
-domain< Type > Range< Type >
+template< Type >
+domain Range< Type >
 
 [ export ]
-domain< Type > List< Type >
+template< Type >
+domain List< Type >
 
 // [ export ]
-// domain< Type > Set< Type >
+// template< Type >
+// domain Set< Type >
 
 [ export ]
-domain< Type > Port< Type >
+template< Type >
+domain Port< Type >
 
 [ export ]
-domain< Type > File< Type >
+template< Type >
+domain File< Type >
 
 //
 //
@@ -164,47 +174,58 @@ builtin ConcatInstruction< String * String -> String >
 
 [ export ]
 [ pure ]
-builtin< Type > SizeInstruction< Type -> Integer >
+template< Type >
+builtin SizeInstruction< Type -> Integer >
 
 [ export ]
 [ pure ]
-builtin< Type > SymInstruction< Type -> Boolean >
+template< Type >
+builtin SymInstruction< Type -> Boolean >
 
 [ export ]
 [ pure ]
-builtin< Type > EquInstruction< Type * Type -> Boolean >
+template< Type >
+builtin EquInstruction< Type * Type -> Boolean >
 
 [ export ]
 [ pure ]
-builtin< Type > LthInstruction< Type * Type -> Boolean >
+template< Type >
+builtin LthInstruction< Type * Type -> Boolean >
 
 [ export ]
 [ pure ]
-builtin< Type > GthInstruction< Type * Type -> Boolean >
+template< Type >
+builtin GthInstruction< Type * Type -> Boolean >
 
 [ export ]
 [ pure ]
-builtin< Type > StrInstruction< Type -> String >
+template< Type >
+builtin StrInstruction< Type -> String >
 
 // [ export ]
 // [ pure ]
-// builtin< Type, Size > AsBinaryInstruction< Type -> Binary'Size >
+// template< Type, Size >
+// builtin AsBinaryInstruction< Type -> Binary'Size >
 
 [ export ]
 [ pure ]
-builtin< Type > BinInstruction< Type -> String >
+template< Type >
+builtin BinInstruction< Type -> String >
 
 [ export ]
 [ pure ]
-builtin< Type > OctInstruction< Type -> String >
+template< Type >
+builtin OctInstruction< Type -> String >
 
 [ export ]
 [ pure ]
-builtin< Type > HexInstruction< Type -> String >
+template< Type >
+builtin HexInstruction< Type -> String >
 
 [ export ]
 [ pure ]
-builtin< SequenceType, ElementType > NthInstruction< SequenceType * Integer -> ElementType >
+template< SequenceType, ElementType >
+builtin NthInstruction< SequenceType * Integer -> ElementType >
 
 //
 //
@@ -372,7 +393,8 @@ behavior Logical = {
 */
 
 [ export ]
-behavior< Domain > TypeCasting< Domain > = {
+template< Domain >
+behavior TypeCasting< Domain > = {
     [ pure ]
     derived to : Object -> Domain
 }
@@ -382,46 +404,53 @@ behavior< Domain > TypeCasting< Domain > = {
 */
 
 [ export ]
-behavior< Element > ElementAccess< Element > = {
+template< Element >
+behavior ElementAccess< Element > = {
     [ pure ]
     derived at : Object * Integer -> Element
 }
 
-implement< Type > TypeCasting< String > for Tuple< Type > = {
+template< Type >
+implement TypeCasting< String > for Tuple< Type > = {
     [ pure ]
     derived convertTo( this ) -> String =
         template< Type : Tuple< Type > > StrInstruction( this )
 }
 
-implement< Type > ElementAccess< Boolean > for Tuple< Type > = {
+template< Type >
+implement ElementAccess< Boolean > for Tuple< Type > = {
     [ pure ]
     derived at( this, position : Integer ) -> Boolean =
         template< SequenceType : Tuple< Type >, ElementType : Boolean >
 	    NthInstruction( this, position )
 }
 
-implement< Type > ElementAccess< Integer > for Tuple< Type > = {
+template< Type >
+implement ElementAccess< Integer > for Tuple< Type > = {
     [ pure ]
     derived at( this, position : Integer ) -> Integer =
         template< SequenceType : Tuple< Type >, ElementType : Integer >
 	    NthInstruction( this, position )
 }
 
-implement< Type > ElementAccess< String > for Tuple< Type > = {
+template< Type >
+implement ElementAccess< String > for Tuple< Type > = {
     [ pure ]
     derived at( this, position : Integer ) -> String =
         template< SequenceType : Tuple< Type >, ElementType : String >
 	    NthInstruction( this, position )
 }
 
-implement< Type > ElementAccess< Agent > for Tuple< Type > = {
+template< Type >
+implement ElementAccess< Agent > for Tuple< Type > = {
     [ pure ]
     derived at( this, position : Integer ) -> Agent =
         template< SequenceType : Tuple< Type >, ElementType : Agent >
 	    NthInstruction( this, position )
 }
 
-implement< Type > ElementAccess< enumeration > for Tuple< Type > = {
+template< Type >
+implement ElementAccess< enumeration > for Tuple< Type > = {
     [ pure ]
     derived at( this, position : Integer ) -> enumeration =
         template< SequenceType : Tuple< Type >, ElementType : enumeration >
@@ -664,7 +693,8 @@ implement TypeCasting< Integer > for Integer = {
 }
 
 // TODO: FIXME: @ppaulweber
-// implement< N : Integer > TypeCasting< Binary'N > for Integer = {
+// template< N : Integer >
+// implement TypeCasting< Binary'N > for Integer = {
 //     [ pure ]
 //     derived toBinary( this ) -> Binary =
 //         AsBinaryInstruction( this )
@@ -863,13 +893,15 @@ implement TypeCasting< enumeration > for enumeration = {
 //     Binary behaviors for all definitions
 // */
 
-// implement< N > Symbolic for Binary'N = {
+// template< N : Integer >
+// implement Symbolic for Binary'N = {
 //     [ pure ]
 //     derived isSymbolic( this ) -> Boolean =
 //         SymInstruction( this )
 // }
 
-// implement< N > Equality for Binary'N = {
+// template< N : Integer >
+// implement Equality for Binary'N = {
 //     [ pure ]
 //     derived equal( this, other : Binary'N ) -> Boolean =
 //         template< Type : Binary'N > EquInstruction( this, other )
@@ -879,13 +911,15 @@ implement TypeCasting< enumeration > for enumeration = {
 //         not template< Type : Binary'N > EquInstruction( this, other )
 // }
 
-// implement< N > Cardinality for Binary'N = {
+// template< N : Integer >
+// implement Cardinality for Binary'N = {
 //     [ pure ]
 //     derived size( this ) -> Integer =
 //         SizeInstruction( this )
 // }
 
-// implement< N > TypeCasting< String > for Binary'N = {
+// template< N : Integer >
+// implement TypeCasting< String > for Binary'N = {
 //     [ pure ]
 //     derived convertTo( this ) -> String =
 //         StrInstruction( this )
@@ -896,7 +930,8 @@ implement TypeCasting< enumeration > for enumeration = {
 // RuleRef behaviors for all type domains ('RuleRef' '<' <type-relation> '>')
 //
 
-implement< Signature > Equality for RuleRef< Signature > = {
+template< Signature >
+implement Equality for RuleRef< Signature > = {
     [ pure ]
     derived equal( this, other : RuleRef< Signature > ) -> Boolean =
         template< Type : RuleRef< Signature > > EquInstruction( this, other )
@@ -906,7 +941,8 @@ implement< Signature > Equality for RuleRef< Signature > = {
         not template< Type : RuleRef< Signature > > EquInstruction( this, other )
 }
 
-implement< Signature > TypeCasting< String > for RuleRef< Signature > = {
+template< Signature >
+implement TypeCasting< String > for RuleRef< Signature > = {
     [ pure ]
     derived convertTo( this ) -> String =
         template< Type : RuleRef< Signature > > StrInstruction( this )
@@ -917,7 +953,8 @@ implement< Signature > TypeCasting< String > for RuleRef< Signature > = {
 // FuncRef behaviors for all type domains ('FuncRef' '<' <type-relation> '>')
 //
 
-implement< Signature > Equality for FuncRef< Signature > = {
+template< Signature >
+implement Equality for FuncRef< Signature > = {
     [ pure ]
     derived equal( this, other : FuncRef< Signature > ) -> Boolean =
         template< Type : FuncRef< Signature > > EquInstruction( this, other )
@@ -927,7 +964,8 @@ implement< Signature > Equality for FuncRef< Signature > = {
         not template< Type : FuncRef< Signature > > EquInstruction( this, other )
 }
 
-implement< Signature > TypeCasting< String > for FuncRef< Signature > = {
+template< Signature >
+implement TypeCasting< String > for FuncRef< Signature > = {
     [ pure ]
     derived convertTo( this ) -> String =
         template< Type : FuncRef< Signature > > StrInstruction( this )
@@ -938,7 +976,8 @@ implement< Signature > TypeCasting< String > for FuncRef< Signature > = {
 // Range< Type >
 //
 
-implement< Type > Cardinality for Range< Type > = {
+template< Type >
+implement Cardinality for Range< Type > = {
     [ pure ]
     derived size( this ) -> Integer =
         template< Type : Range< Type > > SizeInstruction( this )
