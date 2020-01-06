@@ -306,8 +306,8 @@ void SymbolRegistrationVisitor::registerSymbol( Definition& node )
             const auto& nodeTTD = static_cast< const TypeDefinition& >( node );
             const auto& symbolTTD = static_cast< const TypeDefinition& >( *symbol );
 
-            if( nodeTTD.templateSymbols()->size() == 0 and
-                symbolTTD.templateSymbols()->size() != 0 )
+            if( nodeTTD.templateNode()->symbols()->size() == 0 and
+                symbolTTD.templateNode()->symbols()->size() != 0 )
             {
                 // already registered domain template of domain instance
                 return;
