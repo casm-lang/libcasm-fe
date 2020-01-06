@@ -313,8 +313,7 @@ behavior Exponentiation = {
 [ export ]
 behavior Equality = {
     [ pure ]
-    derived
-    equal : Object * Object -> Boolean
+    derived equal : Object * Object -> Boolean
 
     [ pure ]
     derived unequal : Object * Object -> Boolean
