@@ -336,6 +336,10 @@ std::string Node::description( void ) const
         {
             return "defined";
         }
+        case ID::TEMPLATE:
+        {
+            return "template";
+        }
         case ID::INITIALIZER:
         {
             return "initializer";

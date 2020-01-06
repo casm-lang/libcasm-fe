@@ -140,6 +140,49 @@ Node::Ptr Defined::clone( void ) const
 
 //
 //
+// Template
+//
+
+Template::Template(
+    const Token::Ptr& templateToken,
+    const Token::Ptr& leftBraceToken,
+    const VariableDefinitions::Ptr& symbols,
+    const Token::Ptr& rightBraceToken )
+: Helper( Node::ID::TEMPLATE, leftBraceToken, rightBraceToken )
+, m_symbols( symbols )
+, m_templateToken( templateToken )
+{
+}
+
+const VariableDefinitions::Ptr& Template::symbols( void ) const
+{
+    return m_symbols;
+}
+
+const Token::Ptr& Template::templateToken( void ) const
+{
+    return m_templateToken;
+}
+
+void Template::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr Template::clone( void ) const
+{
+    auto duplicate = std::make_shared< Template >(
+        templateToken(),
+        leftBraceToken(),
+        symbols()->duplicate< VariableDefinitions >(),
+        rightBraceToken() );
+
+    Helper::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//
 // Initializer
 //
 

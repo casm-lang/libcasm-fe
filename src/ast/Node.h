@@ -142,6 +142,7 @@ namespace libcasm_fe
 
                 // helper
                 DEFINED,
+                TEMPLATE,
                 INITIALIZER,
 
                 // other

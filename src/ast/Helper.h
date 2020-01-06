@@ -46,7 +46,6 @@
 #ifndef _LIBCASM_FE_HELPER_H_
 #define _LIBCASM_FE_HELPER_H_
 
-#include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/Node>
 #include <libcasm-fe/ast/Rule>
 #include <libcasm-fe/ast/Token>
@@ -55,7 +54,8 @@ namespace libcasm_fe
 {
     namespace Ast
     {
-        class FunctionDefinition;
+        class VariableDefinition;
+        using VariableDefinitions = NodeList< VariableDefinition >;
 
         class Helper : public Node
         {
@@ -103,6 +103,30 @@ namespace libcasm_fe
           private:
             const Expression::Ptr m_expression;
             const Token::Ptr m_definedToken;
+        };
+
+        class Template final : public Helper
+        {
+          public:
+            using Ptr = std::shared_ptr< Template >;
+
+            Template(
+                const Token::Ptr& templateToken,
+                const Token::Ptr& leftBraceToken,
+                const std::shared_ptr< VariableDefinitions >& symbols,
+                const Token::Ptr& rightBraceToken );
+
+            const std::shared_ptr< VariableDefinitions >& symbols( void ) const;
+
+            const Token::Ptr& templateToken( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+
+          private:
+            const std::shared_ptr< VariableDefinitions > m_symbols;
+            const Token::Ptr m_templateToken;
         };
 
         class Initializer final : public Helper
