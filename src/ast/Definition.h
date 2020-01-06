@@ -172,9 +172,7 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< TypeDefinition >;
 
             TypeDefinition(
-                const Node::ID id,
-                const Type::Ptr& domainType,
-                const VariableDefinitions::Ptr& templateSymbols );
+                const Node::ID id, const Type::Ptr& domainType, const Template::Ptr& templateNode );
 
             const Type::Ptr& domainType( void ) const;
 
@@ -182,7 +180,7 @@ namespace libcasm_fe
 
             u1 isTemplate( void ) const;
 
-            const VariableDefinitions::Ptr& templateSymbols( void ) const;
+            const Template::Ptr& templateNode( void ) const;
 
             void addTemplateInstance( const TypeDefinition::Ptr& templateInstance ) const;
 
@@ -193,7 +191,7 @@ namespace libcasm_fe
 
           private:
             Type::Ptr m_domainType;
-            const VariableDefinitions::Ptr m_templateSymbols;
+            const Template::Ptr m_templateNode;
             const NodeList< TypeDefinition >::Ptr m_templateInstances;
         };
 
@@ -528,8 +526,8 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< DomainDefinition >;
 
             DomainDefinition(
+                const Template::Ptr& templateNode,
                 const Token::Ptr& domainToken,
-                const VariableDefinitions::Ptr& templateSymbols,
                 const Type::Ptr& domainType );
 
             const Token::Ptr& domainToken( void ) const;
@@ -550,6 +548,7 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< StructureDefinition >;
 
             StructureDefinition(
+                const Template::Ptr& templateNode,
                 const Token::Ptr& structureToken,
                 const Identifier::Ptr& identifier,
                 const Token::Ptr& assignmentToken,
@@ -587,8 +586,8 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< BehaviorDefinition >;
 
             BehaviorDefinition(
+                const Template::Ptr& templateNode,
                 const Token::Ptr& behaviorToken,
-                const VariableDefinitions::Ptr& templateSymbols,
                 const Type::Ptr& domainType,
                 const Token::Ptr& assignmentToken,
                 const Token::Ptr& leftBraceToken,
@@ -625,8 +624,8 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< ImplementDefinition >;
 
             ImplementDefinition(
+                const Template::Ptr& templateNode,
                 const Token::Ptr& implementToken,
-                const VariableDefinitions::Ptr& templateSymbols,
                 const Type::Ptr& behaviorType,
                 const Token::Ptr& forToken,
                 const Type::Ptr& domainType,
@@ -636,8 +635,8 @@ namespace libcasm_fe
                 const Token::Ptr& rightBraceToken );
 
             ImplementDefinition(
+                const Template::Ptr& templateNode,
                 const Token::Ptr& implementToken,
-                const VariableDefinitions::Ptr& templateSymbols,
                 const Type::Ptr& domainType,
                 const Token::Ptr& assignmentToken,
                 const Token::Ptr& leftBraceToken,
@@ -682,8 +681,8 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< BuiltinDefinition >;
 
             BuiltinDefinition(
+                const Template::Ptr& templateNode,
                 const Token::Ptr& builtinToken,
-                const VariableDefinitions::Ptr& templateSymbols,
                 const RelationType::Ptr& relationType );
 
             const Token::Ptr& builtinToken( void ) const;

@@ -240,14 +240,12 @@ Node::Ptr VariableDefinition::clone( void ) const
 //
 
 TypeDefinition::TypeDefinition(
-    const Node::ID id,
-    const Type::Ptr& domainType,
-    const VariableDefinitions::Ptr& templateSymbols )
+    const Node::ID id, const Type::Ptr& domainType, const Template::Ptr& templateNode )
 : Definition(
       id,
       Ast::make< Identifier >( domainType->name()->sourceLocation(), domainType->name()->path() ) )
 , m_domainType( domainType )
-, m_templateSymbols( templateSymbols )
+, m_templateNode( templateNode )
 , m_templateInstances( std::make_shared< TypeDefinitions >() )
 {
 }
@@ -264,12 +262,12 @@ void TypeDefinition::setDomainType( const Type::Ptr& domainType )
 
 u1 TypeDefinition::isTemplate( void ) const
 {
-    return templateSymbols()->size() != 0;
+    return templateNode()->symbols()->size() != 0;
 }
 
-const VariableDefinitions::Ptr& TypeDefinition::templateSymbols( void ) const
+const Template::Ptr& TypeDefinition::templateNode( void ) const
 {
-    return m_templateSymbols;
+    return m_templateNode;
 }
 
 void TypeDefinition::addTemplateInstance( const TypeDefinition::Ptr& templateInstance ) const
@@ -765,7 +763,12 @@ EnumerationDefinition::EnumerationDefinition(
       Node::ID::ENUMERATION_DEFINITION,
       Ast::make< BasicType >(
           identifier->sourceLocation(), IdentifierPath::fromIdentifier( identifier ) ),
-      Ast::make< VariableDefinitions >( identifier->sourceLocation() ) )
+      Ast::make< Template >(
+          identifier->sourceLocation(),
+          Token::unresolved(),
+          Token::unresolved(),
+          Ast::make< VariableDefinitions >( identifier->sourceLocation() ),
+          Token::unresolved() ) )
 , m_enumerators( enumerators )
 , m_enumerationToken( enumerationToken )
 , m_assignmentToken( assignmentToken )
@@ -1010,10 +1013,8 @@ Node::Ptr InvariantDefinition::clone( void ) const
 //
 
 DomainDefinition::DomainDefinition(
-    const Token::Ptr& domainToken,
-    const VariableDefinitions::Ptr& templateSymbols,
-    const Type::Ptr& domainType )
-: TypeDefinition( Node::ID::DOMAIN_DEFINITION, domainType, templateSymbols )
+    const Template::Ptr& templateNode, const Token::Ptr& domainToken, const Type::Ptr& domainType )
+: TypeDefinition( Node::ID::DOMAIN_DEFINITION, domainType, templateNode )
 , m_domainToken( domainToken )
 {
 }
@@ -1036,9 +1037,7 @@ void DomainDefinition::accept( Visitor& visitor )
 Node::Ptr DomainDefinition::clone( void ) const
 {
     auto duplicate = std::make_shared< DomainDefinition >(
-        domainToken(),
-        templateSymbols()->duplicate< VariableDefinitions >(),
-        domainType()->duplicate< Type >() );
+        templateNode()->duplicate< Template >(), domainToken(), domainType()->duplicate< Type >() );
 
     TypeDefinition::clone( *duplicate );
     return duplicate;
@@ -1050,6 +1049,7 @@ Node::Ptr DomainDefinition::clone( void ) const
 //
 
 StructureDefinition::StructureDefinition(
+    const Template::Ptr& templateNode,
     const Token::Ptr& structureToken,
     const Identifier::Ptr& identifier,
     const Token::Ptr& assignmentToken,
@@ -1060,7 +1060,7 @@ StructureDefinition::StructureDefinition(
       Node::ID::STRUCTURE_DEFINITION,
       Ast::make< BasicType >(
           identifier->sourceLocation(), IdentifierPath::fromIdentifier( identifier ) ),
-      std::make_shared< VariableDefinitions >() )
+      templateNode )
 , m_functions( functions )
 , m_structureToken( structureToken )
 , m_assignmentToken( assignmentToken )
@@ -1107,6 +1107,7 @@ void StructureDefinition::accept( Visitor& visitor )
 Node::Ptr StructureDefinition::clone( void ) const
 {
     auto duplicate = std::make_shared< StructureDefinition >(
+        templateNode()->duplicate< Template >(),
         structureToken(),
         identifier()->duplicate< Identifier >(),
         assignmentToken(),
@@ -1124,14 +1125,14 @@ Node::Ptr StructureDefinition::clone( void ) const
 //
 
 BehaviorDefinition::BehaviorDefinition(
+    const Template::Ptr& templateNode,
     const Token::Ptr& behaviorToken,
-    const VariableDefinitions::Ptr& templateSymbols,
     const Type::Ptr& domainType,
     const Token::Ptr& assignmentToken,
     const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
     const Token::Ptr& rightBraceToken )
-: TypeDefinition( Node::ID::BEHAVIOR_DEFINITION, domainType, templateSymbols )
+: TypeDefinition( Node::ID::BEHAVIOR_DEFINITION, domainType, templateNode )
 , m_definitions( definitions )
 , m_behaviorToken( behaviorToken )
 , m_assignmentToken( assignmentToken )
@@ -1178,8 +1179,8 @@ void BehaviorDefinition::accept( Visitor& visitor )
 Node::Ptr BehaviorDefinition::clone( void ) const
 {
     auto duplicate = std::make_shared< BehaviorDefinition >(
+        templateNode()->duplicate< Template >(),
         behaviorToken(),
-        templateSymbols()->duplicate< VariableDefinitions >(),
         domainType()->duplicate< Type >(),
         assignmentToken(),
         leftBraceToken(),
@@ -1196,8 +1197,8 @@ Node::Ptr BehaviorDefinition::clone( void ) const
 //
 
 ImplementDefinition::ImplementDefinition(
+    const Template::Ptr& templateNode,
     const Token::Ptr& implementToken,
-    const VariableDefinitions::Ptr& templateSymbols,
     const Type::Ptr& behaviorType,
     const Token::Ptr& forToken,
     const Type::Ptr& domainType,
@@ -1205,7 +1206,7 @@ ImplementDefinition::ImplementDefinition(
     const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
     const Token::Ptr& rightBraceToken )
-: TypeDefinition( Node::ID::IMPLEMENT_DEFINITION, domainType, templateSymbols )
+: TypeDefinition( Node::ID::IMPLEMENT_DEFINITION, domainType, templateNode )
 , m_behaviorType( behaviorType )
 , m_definitions( definitions )
 , m_implementToken( implementToken )
@@ -1217,16 +1218,16 @@ ImplementDefinition::ImplementDefinition(
 }
 
 ImplementDefinition::ImplementDefinition(
+    const Template::Ptr& templateNode,
     const Token::Ptr& implementToken,
-    const VariableDefinitions::Ptr& templateSymbols,
     const Type::Ptr& domainType,
     const Token::Ptr& assignmentToken,
     const Token::Ptr& leftBraceToken,
     const Definitions::Ptr& definitions,
     const Token::Ptr& rightBraceToken )
 : ImplementDefinition(
+      templateNode,
       implementToken,
-      templateSymbols,
       domainType,  // domainType is behaviorType
       Token::unresolved(),
       domainType,
@@ -1290,8 +1291,8 @@ void ImplementDefinition::accept( Visitor& visitor )
 Node::Ptr ImplementDefinition::clone( void ) const
 {
     auto duplicate = std::make_shared< ImplementDefinition >(
+        templateNode()->duplicate< Template >(),
         implementToken(),
-        templateSymbols()->duplicate< VariableDefinitions >(),
         behaviorType()->duplicate< Type >(),
         forToken(),
         domainType()->duplicate< Type >(),
@@ -1310,10 +1311,10 @@ Node::Ptr ImplementDefinition::clone( void ) const
 //
 
 BuiltinDefinition::BuiltinDefinition(
+    const Template::Ptr& templateNode,
     const Token::Ptr& builtinToken,
-    const VariableDefinitions::Ptr& templateSymbols,
     const RelationType::Ptr& domainType )
-: TypeDefinition( Node::ID::BUILTIN_DEFINITION, domainType, templateSymbols )
+: TypeDefinition( Node::ID::BUILTIN_DEFINITION, domainType, templateNode )
 , m_builtinToken( builtinToken )
 , m_targetId( libcasm_ir::Value::_SIZE_ )
 {
@@ -1360,8 +1361,8 @@ void BuiltinDefinition::accept( Visitor& visitor )
 Node::Ptr BuiltinDefinition::clone( void ) const
 {
     auto duplicate = std::make_shared< BuiltinDefinition >(
+        templateNode()->duplicate< Template >(),
         builtinToken(),
-        templateSymbols()->duplicate< VariableDefinitions >(),
         relationType().duplicate< RelationType >() );
 
     TypeDefinition::clone( *duplicate );
