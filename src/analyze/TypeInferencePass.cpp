@@ -227,6 +227,7 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
 
     // infer type of expression
     expression->accept( *this );
+    node.initially()->accept( *this );
 
     if( expression->type() and expression->type() != returnType->type() )
     {
@@ -245,8 +246,6 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
             Code::TypeInferenceFunctionDefaultValueTypeMismatch );
         m_log.info( { returnType->sourceLocation() }, msg );
     }
-
-    node.initially()->accept( *this );
 }
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
@@ -1273,7 +1272,7 @@ void TypeInferenceVisitor::visit( RangeLiteral& node )
         " inconsistent state " );
 
     const auto& duplicateDomainDefinition = domainSymbol->duplicate< DomainDefinition >();
-    for( auto const& templateSymbol : *domainDefinition->templateSymbols() )
+    for( auto const& templateSymbol : *domainDefinition->templateNode()->symbols() )
     {
         const auto& fromBasicType = Ast::make< BasicType >(
             templateSymbol->sourceLocation(),
@@ -1283,7 +1282,7 @@ void TypeInferenceVisitor::visit( RangeLiteral& node )
         duplicateDomainDefinition->domainType()->accept( replaceTypeVisitor );
         m_log.warning( "'" + fromBasicType->signature() + "' ==> '" + subType->signature() + "'" );
     }
-    duplicateDomainDefinition->templateSymbols()->clear();
+    duplicateDomainDefinition->templateNode()->symbols()->clear();
 
     SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, m_symboltable );
     duplicateDomainDefinition->accept( symbolRegistrationVisitor );
