@@ -57,6 +57,7 @@ namespace libcasm_fe
         class Type;
         class Literal;
         class Definition;
+        class Template;
         class VariableDefinition;
         using VariableDefinitions = NodeList< VariableDefinition >;
 
@@ -162,7 +163,16 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< TargetCallExpression >;
 
+            TargetCallExpression(
+                const Node::ID id,
+                const Expressions::Ptr& arguments,
+                const std::shared_ptr< Template >& templateNode );
+
             TargetCallExpression( const Node::ID id, const Expressions::Ptr& arguments );
+
+            TargetCallExpression( const Node::ID id );
+
+            const std::shared_ptr< Template >& templateNode( void ) const;
 
             void setTargetDefinition( const std::shared_ptr< Definition >& definition );
 
@@ -170,17 +180,12 @@ namespace libcasm_fe
 
             u1 hasTargetDefinition( void ) const;
 
-            void setTemplateSymbols(
-                const std::shared_ptr< VariableDefinitions >& templateSymbols );
-
-            const std::shared_ptr< VariableDefinitions >& templateSymbols( void ) const;
-
           protected:
             void clone( TargetCallExpression& duplicate ) const;
 
           private:
+            const std::shared_ptr< Template > m_templateNode;
             std::shared_ptr< Definition > m_targetDefinition;
-            std::shared_ptr< VariableDefinitions > m_templateSymbols;
         };
 
         class DirectCallExpression final : public TargetCallExpression
@@ -202,8 +207,7 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< DirectCallExpression >;
 
             DirectCallExpression(
-                const Token::Ptr& templateToken,
-                const std::shared_ptr< VariableDefinitions >& templateSymbols,
+                const std::shared_ptr< Template >& templateNode,
                 const IdentifierPath::Ptr& identifier,
                 const Token::Ptr& leftBracketToken,
                 const Expressions::Ptr& arguments,
@@ -227,8 +231,6 @@ namespace libcasm_fe
 
             std::string targetTypeName( void ) const;
 
-            const Token::Ptr& templateToken( void ) const;
-
             void accept( Visitor& visitor ) override;
 
             Node::Ptr clone( void ) const override final;
@@ -236,7 +238,6 @@ namespace libcasm_fe
             static std::string targetTypeString( const TargetType targetType );
 
           private:
-            const Token::Ptr m_templateToken;
             IdentifierPath::Ptr m_identifier;
             TargetType m_targetType;
         };

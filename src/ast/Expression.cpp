@@ -225,11 +225,34 @@ void CallExpression::clone( CallExpression& duplicate ) const
 // TargetCallExpression
 //
 
-TargetCallExpression::TargetCallExpression( const Node::ID id, const Expressions::Ptr& arguments )
+TargetCallExpression::TargetCallExpression(
+    const Node::ID id, const Expressions::Ptr& arguments, const Template::Ptr& templateNode )
 : CallExpression( id, arguments )
 , m_targetDefinition()
-, m_templateSymbols( std::make_shared< VariableDefinitions >() )
+, m_templateNode( templateNode )
 {
+}
+
+TargetCallExpression::TargetCallExpression( const Node::ID id, const Expressions::Ptr& arguments )
+: TargetCallExpression(
+      id,
+      arguments,
+      std::make_shared< Template >(
+          Token::unresolved(),
+          Token::unresolved(),
+          std::make_shared< VariableDefinitions >(),
+          Token::unresolved() ) )
+{
+}
+
+TargetCallExpression::TargetCallExpression( const Node::ID id )
+: TargetCallExpression( id, std::make_shared< Expressions >() )
+{
+}
+
+const Template::Ptr& TargetCallExpression::templateNode( void ) const
+{
+    return m_templateNode;
 }
 
 void TargetCallExpression::setTargetDefinition( const Definition::Ptr& definition )
@@ -248,21 +271,10 @@ u1 TargetCallExpression::hasTargetDefinition( void ) const
     return m_targetDefinition != nullptr;
 }
 
-void TargetCallExpression::setTemplateSymbols( const VariableDefinitions::Ptr& templateSymbols )
-{
-    m_templateSymbols = templateSymbols;
-}
-
-const VariableDefinitions::Ptr& TargetCallExpression::templateSymbols( void ) const
-{
-    return m_templateSymbols;
-}
-
 void TargetCallExpression::clone( TargetCallExpression& duplicate ) const
 {
     CallExpression::clone( duplicate );
     duplicate.setTargetDefinition( m_targetDefinition );
-    duplicate.setTemplateSymbols( templateSymbols() );
 }
 
 //
@@ -271,18 +283,15 @@ void TargetCallExpression::clone( TargetCallExpression& duplicate ) const
 //
 
 DirectCallExpression::DirectCallExpression(
-    const Token::Ptr& templateToken,
-    const std::shared_ptr< VariableDefinitions >& templateSymbols,
+    const Template::Ptr& templateNode,
     const IdentifierPath::Ptr& identifier,
     const Token::Ptr& leftBracketToken,
     const Expressions::Ptr& arguments,
     const Token::Ptr& rightBracketToken )
-: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
-, m_templateToken( templateToken )
+: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments, templateNode )
 , m_identifier( identifier )
 , m_targetType( TargetType::UNKNOWN )
 {
-    setTemplateSymbols( templateSymbols );
     setLeftBracketToken( leftBracketToken );
     setRightBracketToken( rightBracketToken );
 }
@@ -292,24 +301,18 @@ DirectCallExpression::DirectCallExpression(
     const Token::Ptr& leftBracketToken,
     const Expressions::Ptr& arguments,
     const Token::Ptr& rightBracketToken )
-: DirectCallExpression(
-      Token::unresolved(),
-      std::make_shared< VariableDefinitions >(),
-      identifier,
-      leftBracketToken,
-      arguments,
-      rightBracketToken )
+: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
+, m_identifier( identifier )
+, m_targetType( TargetType::UNKNOWN )
 {
+    setLeftBracketToken( leftBracketToken );
+    setRightBracketToken( rightBracketToken );
 }
 
 DirectCallExpression::DirectCallExpression( const IdentifierPath::Ptr& identifier )
-: DirectCallExpression(
-      Token::unresolved(),
-      std::make_shared< VariableDefinitions >(),
-      identifier,
-      Token::unresolved(),
-      std::make_shared< Expressions >(),
-      Token::unresolved() )
+: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION )
+, m_identifier( identifier )
+, m_targetType( TargetType::UNKNOWN )
 {
 }
 
@@ -384,11 +387,6 @@ std::string DirectCallExpression::targetTypeString( const TargetType targetType 
     return std::string();
 }
 
-const Token::Ptr& DirectCallExpression::templateToken( void ) const
-{
-    return m_templateToken;
-}
-
 void DirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -397,8 +395,7 @@ void DirectCallExpression::accept( Visitor& visitor )
 Node::Ptr DirectCallExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< DirectCallExpression >(
-        templateToken(),
-        templateSymbols()->duplicate< VariableDefinitions >(),
+        templateNode()->duplicate< Template >(),
         identifier()->duplicate< IdentifierPath >(),
         leftBracketToken(),
         arguments()->duplicate< Expressions >(),
