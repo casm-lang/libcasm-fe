@@ -312,6 +312,10 @@ void EmptyVisitor::visit( Defined& )
 {
 }
 
+void EmptyVisitor::visit( Template& )
+{
+}
+
 void EmptyVisitor::visit( Identifier& )
 {
 }

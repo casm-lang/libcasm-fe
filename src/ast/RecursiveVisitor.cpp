@@ -155,8 +155,8 @@ void RecursiveVisitor::visit( EnumeratorDefinition& node )
 void RecursiveVisitor::visit( EnumerationDefinition& node )
 {
     node.attributes()->accept( *this );
+    node.templateNode()->accept( *this );
     node.enumerationToken()->accept( *this );
-    node.templateSymbols()->accept( *this );
     node.domainType()->accept( *this );
     node.assignmentToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
@@ -207,8 +207,8 @@ void RecursiveVisitor::visit( ImportDefinition& node )
 void RecursiveVisitor::visit( DomainDefinition& node )
 {
     node.attributes()->accept( *this );
+    node.templateNode()->accept( *this );
     node.domainToken()->accept( *this );
-    node.templateSymbols()->accept( *this );
     node.domainType()->accept( *this );
     node.templateInstances()->accept( *this );
 }
@@ -216,8 +216,8 @@ void RecursiveVisitor::visit( DomainDefinition& node )
 void RecursiveVisitor::visit( StructureDefinition& node )
 {
     node.attributes()->accept( *this );
+    node.templateNode()->accept( *this );
     node.structureToken()->accept( *this );
-    node.templateSymbols()->accept( *this );
     node.domainType()->accept( *this );
     node.assignmentToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
@@ -229,21 +229,20 @@ void RecursiveVisitor::visit( StructureDefinition& node )
 void RecursiveVisitor::visit( BehaviorDefinition& node )
 {
     node.attributes()->accept( *this );
+    node.templateNode()->accept( *this );
     node.behaviorToken()->accept( *this );
-    node.templateSymbols()->accept( *this );
     node.domainType()->accept( *this );
     node.assignmentToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
     node.definitions()->accept( *this );
     node.rightBraceToken()->accept( *this );
-    node.templateInstances()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ImplementDefinition& node )
 {
     node.attributes()->accept( *this );
+    node.templateNode()->accept( *this );
     node.implementToken()->accept( *this );
-    node.templateSymbols()->accept( *this );
     node.behaviorType()->accept( *this );
     node.forToken()->accept( *this );
     node.domainType()->accept( *this );
@@ -257,8 +256,8 @@ void RecursiveVisitor::visit( ImplementDefinition& node )
 void RecursiveVisitor::visit( BuiltinDefinition& node )
 {
     node.attributes()->accept( *this );
+    node.templateNode()->accept( *this );
     node.builtinToken()->accept( *this );
-    node.templateSymbols()->accept( *this );
     node.domainType()->accept( *this );
     node.templateInstances()->accept( *this );
 }
@@ -356,8 +355,7 @@ void RecursiveVisitor::visit( NamedExpression& node )
 void RecursiveVisitor::visit( DirectCallExpression& node )
 {
     node.delimiterToken()->accept( *this );
-    node.templateToken()->accept( *this );
-    node.templateSymbols()->accept( *this );
+    node.templateNode()->accept( *this );
     node.identifier()->accept( *this );
     node.leftBracketToken()->accept( *this );
     node.arguments()->accept( *this );
@@ -692,6 +690,14 @@ void RecursiveVisitor::visit( Defined& node )
     node.definedToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
     node.expression()->accept( *this );
+    node.rightBraceToken()->accept( *this );
+}
+
+void RecursiveVisitor::visit( Template& node )
+{
+    node.templateToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.symbols()->accept( *this );
     node.rightBraceToken()->accept( *this );
 }
 

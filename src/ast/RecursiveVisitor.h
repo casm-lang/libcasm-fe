@@ -126,6 +126,7 @@ namespace libcasm_fe
             void visit( ExpressionAttribute& node ) override;
 
             void visit( Defined& node ) override;
+            void visit( Template& node ) override;
 
             void visit( Identifier& node ) override;
             void visit( IdentifierPath& node ) override;

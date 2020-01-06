@@ -121,6 +121,7 @@ namespace libcasm_fe
         class ExpressionAttribute;
 
         class Defined;
+        class Template;
 
         class Identifier;
         class IdentifierPath;
@@ -209,6 +210,7 @@ namespace libcasm_fe
             virtual void visit( ExpressionAttribute& node ) = 0;
 
             virtual void visit( Defined& node ) = 0;
+            virtual void visit( Template& node ) = 0;
 
             virtual void visit( Identifier& node ) = 0;
             virtual void visit( IdentifierPath& node ) = 0;
