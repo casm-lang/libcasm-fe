@@ -180,7 +180,7 @@ ImportDefinition ::= "import" IdentifierPath
 ** StructureDefinition
 
 #+begin_src
-StructureDefinition ::= "structure" Identifier "=" "{" StructureDefinitionList "}"
+StructureDefinition ::= MaybeTemplate "structure" Identifier "=" "{" StructureDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:StructureDefinition&noheader&nofooter}}
@@ -209,7 +209,7 @@ StructureDefinitionElement ::= Attributes FunctionDefinition
 ** BehaviorDefinition
 
 #+begin_src
-BehaviorDefinition ::= "behavior" TemplateSymbols Type "=" "{" BehaviorDefinitionList "}"
+BehaviorDefinition ::= MaybeTemplate "behavior" Type "=" "{" BehaviorDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:BehaviorDefinition&noheader&nofooter}}
@@ -239,36 +239,33 @@ BehaviorDefinitionList ::= BehaviorDefinitionList BehaviorDefinitionElement
 #+html: {{page>.:grammar:BehaviorDefinitionList&noheader&nofooter}}
 
 
-** TemplateSymbols
+** Template
 
 #+begin_src
-TemplateSymbols ::= "<" TemplateVariables ">"
-                  | null
+Template ::= "template" "<" TemplateVariables ">"
 #+end_src
 
-#+html: {{page>.:grammar:TemplateSymbols&noheader&nofooter}}
+#+html: {{page>.:grammar:Template&noheader&nofooter}}
+
+
+** MaybeTemplate
+
+#+begin_src
+MaybeTemplate ::= Template
+                | null
+#+end_src
+
+#+html: {{page>.:grammar:MaybeTemplate&noheader&nofooter}}
 
 
 ** ImplementDefinition
 
 #+begin_src
-ImplementDefinition ::= "implement" TemplateSymbols Type "=" "{" ImplementDefinitionList "}"
-                      | "implement" TemplateSymbols Type "for" Type "=" "{" ImplementDefinitionList "}"
+ImplementDefinition ::= MaybeTemplate "implement" Type "=" "{" ImplementDefinitionList "}"
+                      | MaybeTemplate "implement" Type "for" Type "=" "{" ImplementDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:ImplementDefinition&noheader&nofooter}}
-
-
-** ImplementDefinitionElement
-
-#+begin_src
-ImplementDefinitionElement ::= Attributes DerivedDefinition
-                             | DerivedDefinition
-                             | Attributes RuleDefinition
-                             | RuleDefinition
-#+end_src
-
-#+html: {{page>.:grammar:ImplementDefinitionElement&noheader&nofooter}}
 
 
 ** ImplementDefinitionList
@@ -281,10 +278,30 @@ ImplementDefinitionList ::= ImplementDefinitionList ImplementDefinitionElement
 #+html: {{page>.:grammar:ImplementDefinitionList&noheader&nofooter}}
 
 
+** ImplementDefinitionElement
+
+#+begin_src
+ImplementDefinitionElement ::= Attributes ImplementDefinitionAttributedElement
+                             | ImplementDefinitionAttributedElement
+#+end_src
+
+#+html: {{page>.:grammar:ImplementDefinitionElement&noheader&nofooter}}
+
+
+** ImplementDefinitionAttributedElement
+
+#+begin_src
+ImplementDefinitionAttributedElement ::= DerivedDefinition
+                                       | RuleDefinition
+#+end_src
+
+#+html: {{page>.:grammar:ImplementDefinitionAttributedElement&noheader&nofooter}}
+
+
 ** DomainDefinition
 
 #+begin_src
-DomainDefinition ::= "domain" TemplateSymbols Type
+DomainDefinition ::= MaybeTemplate "domain" Type
 #+end_src
 
 #+html: {{page>.:grammar:DomainDefinition&noheader&nofooter}}
@@ -293,7 +310,7 @@ DomainDefinition ::= "domain" TemplateSymbols Type
 ** BuiltinDefinition
 
 #+begin_src
-BuiltinDefinition ::= "builtin" TemplateSymbols RelationType
+BuiltinDefinition ::= MaybeTemplate "builtin" RelationType
 #+end_src
 
 #+html: {{page>.:grammar:BuiltinDefinition&noheader&nofooter}}
@@ -568,7 +585,7 @@ DirectCallExpression ::= "this"
                        | IdentifierPath
                        | IdentifierPath "(" ")"
                        | IdentifierPath "(" Terms ")"
-                       | "template" TemplateSymbols IdentifierPath "(" Terms ")"
+                       | Template IdentifierPath "(" Terms ")"
 #+end_src
 
 #+html: {{page>.:grammar:DirectCallExpression&noheader&nofooter}}
