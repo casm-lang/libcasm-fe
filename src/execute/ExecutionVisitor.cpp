@@ -510,21 +510,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             const auto& definition = node.targetDefinition();
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-            m_evaluateUpdateLocation = evaluateUpdateLocation;
-
-            try
-            {
-                definition->accept( *this );
-            }
-            catch( const std::exception& e )
-            {
-                throw RuntimeException(
-                    node.sourceLocation(),
-                    std::string( e.what() ),
-                    m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-                    Code::RuntimeException );
-            }
-
+            definition->accept( *this );
             m_frameStack.pop();
             try
             {
@@ -570,18 +556,18 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
         case MethodCallExpression::MethodType::FUNCTION:  // [[fallthrough]]
         case MethodCallExpression::MethodType::DERIVED:
         {
-            if( not object.defined() )
-            {
-                throw RuntimeException(
-                    { node.object()->sourceLocation() },
-                    "cannot call a method of an undefined object",
-                    m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-                    Code::Unspecified );
-            }
+            // if( not object.defined() )
+            // {
+            //     throw RuntimeException(
+            //         { node.object()->sourceLocation() },
+            //         "cannot call a method of an undefined object",
+            //         m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            //         Code::Unspecified );
+            // }
 
             const auto& definition = node.targetDefinition();
-            m_frameStack.push( makeObjectFrame(
-                object, &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            m_frameStack.push(
+                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
             break;
@@ -633,7 +619,7 @@ void ExecutionVisitor::visit( LiteralCallExpression& node )
     catch( const std::exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             node.description() + " expression has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::RuntimeException );
@@ -706,7 +692,7 @@ void ExecutionVisitor::visit( TypeCastingExpression& node )
     catch( const std::exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "type casting expression has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::RuntimeException );
@@ -727,7 +713,7 @@ void ExecutionVisitor::visit( UnaryExpression& node )
     catch( const std::exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "unary expression has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::RuntimeException );
@@ -748,7 +734,7 @@ void ExecutionVisitor::visit( BinaryExpression& node )
     catch( const std::exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "binary expression has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::RuntimeException );
@@ -921,7 +907,7 @@ void ExecutionVisitor::visit( CardinalityExpression& node )
     catch( const std::exception& e )
     {
         throw RuntimeException(
-            node.sourceLocation(),
+            { node.sourceLocation() },
             "cardinality expression has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );

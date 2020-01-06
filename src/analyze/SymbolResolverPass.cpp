@@ -519,14 +519,14 @@ void SymbolResolveVisitor::visit( FunctionDefinition& node )
 void SymbolResolveVisitor::visit( DerivedDefinition& node )
 {
     pushSymbols< VariableDefinition >( node.arguments() );
-    node.expression()->accept( *this );
+    RecursiveVisitor::visit( node );
     popSymbols< VariableDefinition >( node.arguments() );
 }
 
 void SymbolResolveVisitor::visit( RuleDefinition& node )
 {
     pushSymbols< VariableDefinition >( node.arguments() );
-    node.rule()->accept( *this );
+    RecursiveVisitor::visit( node );
     popSymbols< VariableDefinition >( node.arguments() );
 }
 
@@ -1304,6 +1304,7 @@ void SymbolResolveVisitor::pushVariableBindings( const VariableBindings::Ptr& va
 {
     for( const auto& variableBinding : *variableBindings )
     {
+        variableBinding->expression()->accept( *this );
         pushSymbol( variableBinding->variable() );
     }
 }

@@ -86,12 +86,7 @@ void RecursiveVisitor::visit( Initially& node )
 
 void RecursiveVisitor::visit( Initializer& node )
 {
-    node.delimiterToken()->accept( *this );
-    node.leftBraceToken()->accept( *this );
-    node.arguments()->accept( *this );
-    node.rightBraceToken()->accept( *this );
-    node.mapsToken()->accept( *this );
-    node.value()->accept( *this );
+    node.updateRule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( VariableDefinition& node )

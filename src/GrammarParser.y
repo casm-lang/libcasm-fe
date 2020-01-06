@@ -1814,12 +1814,16 @@ Initializer
   {
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< Initializer >( @$, Token::unresolved(), arguments, Token::unresolved(), Token::unresolved(), $1 );
+      $$->updateRule()->setSourceLocation( @$ );
+      $$->updateRule()->function()->setSourceLocation( @$ );
   }
 | LPAREN Term RPAREN MAPS Term
   {
       auto arguments = Ast::make< Expressions >( @$ );
       arguments->add( $2 );
       $$ = Ast::make< Initializer >( @$, $1, arguments, $3, $4, $5 );
+      $$->updateRule()->setSourceLocation( @$ );
+      $$->updateRule()->function()->setSourceLocation( @$ );
   }
 | TupleLiteral MAPS Term
   {
@@ -1827,6 +1831,8 @@ Initializer
       const auto lbToken = $1->leftBracket();
       const auto rbToken = $1->rightBracket();
       $$ = Ast::make< Initializer >( @$, lbToken, arguments, rbToken, $2, $3 );
+      $$->updateRule()->setSourceLocation( @$ );
+      $$->updateRule()->function()->setSourceLocation( @$ );
   }
 ;
 
