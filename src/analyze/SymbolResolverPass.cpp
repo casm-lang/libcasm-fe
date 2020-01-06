@@ -535,11 +535,11 @@ void SymbolResolveVisitor::visit( EnumerationDefinition& node )
     const auto& objectSymbol = node.ptr< TypeDefinition >();
     const auto temporaryObjectDefinition = m_objectDefinition;
     m_objectDefinition = objectSymbol;
-    pushSymbols< VariableDefinition >( node.templateSymbols() );
+    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
 
     node.domainType()->accept( *this );
 
-    popSymbols< VariableDefinition >( node.templateSymbols() );
+    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
     m_objectDefinition = temporaryObjectDefinition;
 
     // Domain::Type::
@@ -681,12 +681,12 @@ void SymbolResolveVisitor::visit( StructureDefinition& node )
     const auto temporaryBehaviorDefinition = m_behaviorDefinition;
     m_behaviorDefinition = nullptr;
 
-    pushSymbols< VariableDefinition >( node.templateSymbols() );
+    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
 
     node.domainType()->accept( *this );
     node.functions()->accept( *this );
 
-    popSymbols< VariableDefinition >( node.templateSymbols() );
+    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
 
     m_behaviorDefinition = temporaryBehaviorDefinition;
     m_objectDefinition = temporaryObjectDefinition;
@@ -702,12 +702,12 @@ void SymbolResolveVisitor::visit( BehaviorDefinition& node )
     const auto temporaryBehaviorDefinition = m_behaviorDefinition;
     m_behaviorDefinition = nullptr;
 
-    pushSymbols< VariableDefinition >( node.templateSymbols() );
+    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
 
     node.domainType()->accept( *this );
     node.definitions()->accept( *this );
 
-    popSymbols< VariableDefinition >( node.templateSymbols() );
+    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
 
     m_behaviorDefinition = temporaryBehaviorDefinition;
     m_objectDefinition = temporaryObjectDefinition;
@@ -794,7 +794,7 @@ void SymbolResolveVisitor::visit( ImplementDefinition& node )
         node.accept( symbolRegistrationVisitor );
     }
 
-    pushSymbols< VariableDefinition >( node.templateSymbols() );
+    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
 
     node.behaviorType()->accept( *this );
     node.domainType()->accept( *this );
@@ -817,7 +817,7 @@ void SymbolResolveVisitor::visit( ImplementDefinition& node )
     m_behaviorDefinition = temporaryBehaviorDefinition;
     m_objectDefinition = temporaryObjectDefinition;
 
-    popSymbols< VariableDefinition >( node.templateSymbols() );
+    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
 }
 
 void SymbolResolveVisitor::visit( DomainDefinition& node )
@@ -826,11 +826,11 @@ void SymbolResolveVisitor::visit( DomainDefinition& node )
 
     const auto temporaryObjectDefinition = m_objectDefinition;
     m_objectDefinition = objectSymbol;
-    pushSymbols< VariableDefinition >( node.templateSymbols() );
+    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
 
     node.domainType()->accept( *this );
 
-    popSymbols< VariableDefinition >( node.templateSymbols() );
+    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
     m_objectDefinition = temporaryObjectDefinition;
 }
 
@@ -889,12 +889,12 @@ void SymbolResolveVisitor::visit( BuiltinDefinition& node )
     auto symbol = m_symboltable.findSymbol( name );
     assert( symbol and " inconsistent state, checked during symbol registration " );
 
-    pushSymbols< VariableDefinition >( node.templateSymbols() );
+    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
 
     node.relationType().argumentTypes()->accept( *this );
     node.relationType().returnType()->accept( *this );
 
-    popSymbols< VariableDefinition >( node.templateSymbols() );
+    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
 
     if( node.hasTargetId() )
     {
@@ -1446,20 +1446,22 @@ void SymbolResolveVisitor::resolveBehaviorInstance( Ast::Type& node )
     assert( behaviorSymbol and " inconsistent state @ SymbolRegistrationPass " );
     assert( behaviorSymbol->id() == Node::ID::BEHAVIOR_DEFINITION and " inconsistent state " );
     const auto& behaviorDefinition = behaviorSymbol->ptr< BehaviorDefinition >();
-    // assert( behaviorDefinition->templateSymbols()->size() > 0 and " inconsistent state " );
-    if( behaviorDefinition->templateSymbols()->size() == 0 )
+    // assert( behaviorDefinition->templateNode()->symbols()->size() > 0 and " inconsistent state "
+    // );
+    if( behaviorDefinition->templateNode()->symbols()->size() == 0 )
     {
         return;
     }
 
-    if( templateTypeNode.subTypes()->size() != behaviorDefinition->templateSymbols()->size() )
+    if( templateTypeNode.subTypes()->size() !=
+        behaviorDefinition->templateNode()->symbols()->size() )
     {
         m_log.error(
             { templateTypeNode.sourceLocation(), behaviorDefinition->sourceLocation() },
             templateTypeNode.description() + " has parameter size " +
                 std::to_string( templateTypeNode.subTypes()->size() ) + ", but template " +
                 behaviorDefinition->description() + " definition needs parameter size " +
-                std::to_string( behaviorDefinition->templateSymbols()->size() ),
+                std::to_string( behaviorDefinition->templateNode()->symbols()->size() ),
             Code::Unspecified );
         // assert( false );
         return;
@@ -1470,7 +1472,7 @@ void SymbolResolveVisitor::resolveBehaviorInstance( Ast::Type& node )
 
     for( std::size_t position = 0; position < templateTypeNode.subTypes()->size(); position++ )
     {
-        const auto& from = ( *behaviorDefinition->templateSymbols() )[ position ];
+        const auto& from = ( *behaviorDefinition->templateNode()->symbols() )[ position ];
         const auto& to = ( *templateTypeNode.subTypes() )[ position ];
 
         // TODO: FIXME: @ppaulweber: check if template parameter variable is concrete type
@@ -1483,7 +1485,7 @@ void SymbolResolveVisitor::resolveBehaviorInstance( Ast::Type& node )
     }
 
     // clear the replaced template symbols
-    duplicateBehaviorDefinition->templateSymbols()->clear();
+    duplicateBehaviorDefinition->templateNode()->symbols()->clear();
 
     // Domain::InstanceSymbol + Domain::InstanceType::
     SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, m_symboltable );
@@ -1494,8 +1496,8 @@ void SymbolResolveVisitor::resolveBehaviorInstance( Ast::Type& node )
 
     const auto& duplicateImplementDefinition = Ast::make< ImplementDefinition >(
         implementDefinition->sourceLocation(),
+        implementDefinition->templateNode(),
         implementDefinition->implementToken(),
-        implementDefinition->templateSymbols(),
         duplicateBehaviorDefinition->domainType(),
         implementDefinition->forToken(),
         implementDefinition->domainType(),
@@ -1583,7 +1585,7 @@ void SymbolResolveVisitor::resolveTypeInstance( Ast::Type& node )
 
     const auto& duplicateDomainDefinition = domainDefinition->duplicate< DomainDefinition >();
     duplicateDomainDefinition->accept( replaceTypeVisitor );
-    duplicateDomainDefinition->templateSymbols()->clear();
+    duplicateDomainDefinition->templateNode()->symbols()->clear();
     node.setTypeDefinition( duplicateDomainDefinition );
 
     // Domain::InstanceSymbol + Domain::InstanceType::
@@ -1629,7 +1631,7 @@ void SymbolResolveVisitor::resolveTypeInstance( Ast::Type& node )
             behaviorDefinition->duplicate< BehaviorDefinition >();
         duplicateBehaviorDefinition->templateInstances()->clear();
         duplicateBehaviorDefinition->accept( replaceTypeVisitor );
-        duplicateBehaviorDefinition->templateSymbols()->clear();
+        duplicateBehaviorDefinition->templateNode()->symbols()->clear();
 
         // adding instance to behavior definition
         behaviorDefinition->addTemplateInstance( duplicateBehaviorDefinition );
@@ -1648,8 +1650,12 @@ void SymbolResolveVisitor::resolveTypeInstance( Ast::Type& node )
 
         const auto& duplicateImplementDefinition = Ast::make< ImplementDefinition >(
             implementDefinition->sourceLocation(),
+            std::make_shared< Template >(
+                Token::unresolved(),
+                Token::unresolved(),
+                std::make_shared< VariableDefinitions >(),
+                Token::unresolved() ),
             implementDefinition->implementToken(),
-            std::make_shared< VariableDefinitions >(),
             duplicateBehaviorDefinition->domainType(),
             implementDefinition->forToken(),
             duplicateDomainDefinition->domainType(),
@@ -1682,7 +1688,7 @@ void SymbolResolveVisitor::resolveTypeInstance( Ast::Type& node )
 Definition::Ptr SymbolResolveVisitor::resolveBuiltinCall(
     TargetCallExpression& node, const BuiltinDefinition::Ptr& builtinDefinition )
 {
-    if( builtinDefinition->templateSymbols()->size() > 0 )
+    if( builtinDefinition->templateNode()->symbols()->size() > 0 )
     {
         const auto& domainInstanceTypeName = builtinDefinition->relationType().signature();
         const auto& domainInstanceTypePath = builtinDefinition->relationType().signaturePath();
@@ -1693,27 +1699,28 @@ Definition::Ptr SymbolResolveVisitor::resolveBuiltinCall(
             builtinDefinition->duplicate< BuiltinDefinition >();
         duplicateBuiltinDefinition->templateInstances()->clear();
 
-        if( node.templateSymbols()->size() != builtinDefinition->templateSymbols()->size() )
+        if( node.templateNode()->symbols()->size() !=
+            builtinDefinition->templateNode()->symbols()->size() )
         {
-            if( node.templateSymbols()->size() == 0 )
+            if( node.templateNode()->symbols()->size() == 0 )
             {
                 m_log.error(
                     { node.sourceLocation(),
-                      builtinDefinition->templateSymbols()->sourceLocation() },
+                      builtinDefinition->templateNode()->symbols()->sourceLocation() },
                     "builtin call is missing 'template< ... >' parameters, because "
                     "template builtin definition needs parameter size of " +
-                        std::to_string( builtinDefinition->templateSymbols()->size() ),
+                        std::to_string( builtinDefinition->templateNode()->symbols()->size() ),
                     Code::Unspecified );
             }
             else
             {
                 m_log.error(
-                    { node.templateSymbols()->sourceLocation(),
-                      builtinDefinition->templateSymbols()->sourceLocation() },
+                    { node.templateNode()->symbols()->sourceLocation(),
+                      builtinDefinition->templateNode()->symbols()->sourceLocation() },
                     "template builtin call has parameter size " +
-                        std::to_string( node.templateSymbols()->size() ) +
+                        std::to_string( node.templateNode()->symbols()->size() ) +
                         ", but template builtin definition needs parameter size " +
-                        std::to_string( builtinDefinition->templateSymbols()->size() ),
+                        std::to_string( builtinDefinition->templateNode()->symbols()->size() ),
                     Code::Unspecified );
             }
             return nullptr;
@@ -1723,10 +1730,11 @@ Definition::Ptr SymbolResolveVisitor::resolveBuiltinCall(
         SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, m_symboltable );
 
         u1 valid = true;
-        for( std::size_t position = 0; position < node.templateSymbols()->size(); position++ )
+        for( std::size_t position = 0; position < node.templateNode()->symbols()->size();
+             position++ )
         {
-            const auto& from = ( *builtinDefinition->templateSymbols() )[ position ];
-            const auto& to = ( *node.templateSymbols() )[ position ];
+            const auto& from = ( *builtinDefinition->templateNode()->symbols() )[ position ];
+            const auto& to = ( *node.templateNode()->symbols() )[ position ];
 
             if( from->identifier()->name() != to->identifier()->name() )
             {
@@ -1746,7 +1754,7 @@ Definition::Ptr SymbolResolveVisitor::resolveBuiltinCall(
         }
 
         // clear the replaced template symbols
-        duplicateBuiltinDefinition->templateSymbols()->clear();
+        duplicateBuiltinDefinition->templateNode()->symbols()->clear();
 
         if( not valid )
         {
