@@ -252,11 +252,11 @@ void TypeCheckVisitor::visit( DomainDefinition& node )
 
     const auto& domainType = node.domainType();
 
-    pushSymbols( node.templateSymbols() );
+    pushSymbols( node.templateNode()->symbols() );
 
     domainType->accept( *this );
 
-    popSymbols( node.templateSymbols() );
+    popSymbols( node.templateNode()->symbols() );
 
     node.setType( domainType->type() );
 
@@ -324,12 +324,12 @@ void TypeCheckVisitor::visit( BuiltinDefinition& node )
     const auto& argumentTypes = node.relationType().argumentTypes();
     const auto& returnType = node.relationType().returnType();
 
-    pushSymbols( node.templateSymbols() );
+    pushSymbols( node.templateNode()->symbols() );
 
     argumentTypes->accept( *this );
     returnType->accept( *this );
 
-    popSymbols( node.templateSymbols() );
+    popSymbols( node.templateNode()->symbols() );
 
     resolveRelationType( node, *argumentTypes, *returnType );
     node.domainType()->setType( node.type() );
@@ -371,12 +371,12 @@ void TypeCheckVisitor::visit( StructureDefinition& node )
     const auto type = std::make_shared< libcasm_ir::ObjectType >( typeName );
     node.setType( type );
 
-    pushSymbols( node.templateSymbols() );
+    pushSymbols( node.templateNode()->symbols() );
 
     node.domainType()->accept( *this );
     node.functions()->accept( *this );
 
-    popSymbols( node.templateSymbols() );
+    popSymbols( node.templateNode()->symbols() );
 
     m_symboltable.registerTypeDefinition( node );
 }
@@ -400,12 +400,12 @@ void TypeCheckVisitor::visit( BehaviorDefinition& node )
     const auto type = std::make_shared< libcasm_ir::ObjectType >( typeName );
     node.setType( type );
 
-    pushSymbols( node.templateSymbols() );
+    pushSymbols( node.templateNode()->symbols() );
 
     node.domainType()->accept( *this );
     node.definitions()->accept( *this );
 
-    popSymbols( node.templateSymbols() );
+    popSymbols( node.templateNode()->symbols() );
 
     try
     {
@@ -453,7 +453,7 @@ void TypeCheckVisitor::visit( ImplementDefinition& node )
         return;
     }
 
-    pushSymbols( node.templateSymbols() );
+    pushSymbols( node.templateNode()->symbols() );
 
     for( const auto& templateInstance : *node.templateInstances() )
     {
@@ -472,7 +472,7 @@ void TypeCheckVisitor::visit( ImplementDefinition& node )
     node.domainType()->accept( *this );
     node.definitions()->accept( *this );
 
-    popSymbols( node.templateSymbols() );
+    popSymbols( node.templateNode()->symbols() );
 
     node.setType( node.domainType()->type() );
 }
