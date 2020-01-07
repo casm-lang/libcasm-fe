@@ -48,7 +48,7 @@
 #include "../various/GrammarToken.h"
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 //
 //
@@ -57,7 +57,7 @@ using namespace Ast;
 
 const Token::Ptr& Token::unresolved( void )
 {
-    static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+    static const auto uToken = std::make_shared< AST::Token >( Grammar::Token::UNRESOLVED );
     return uToken;
 }
 

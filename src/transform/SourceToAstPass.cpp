@@ -105,16 +105,16 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
     else
     {
         const auto& sourceLocation = specification->header()->sourceLocation();
-        const auto casmImport = Ast::make< ImportDefinition >(
+        const auto casmImport = AST::make< ImportDefinition >(
             sourceLocation,
             Token::unresolved(),
-            IdentifierPath::fromIdentifier( Ast::make< Identifier >( sourceLocation, "CASM" ) ) );
+            IdentifierPath::fromIdentifier( AST::make< Identifier >( sourceLocation, "CASM" ) ) );
         specification->definitions()->add( casmImport );
 
-        const auto casmUsing = Ast::make< UsingPathDefinition >(
+        const auto casmUsing = AST::make< UsingPathDefinition >(
             sourceLocation,
             Token::unresolved(),
-            IdentifierPath::fromIdentifier( Ast::make< Identifier >( sourceLocation, "CASM" ) ),
+            IdentifierPath::fromIdentifier( AST::make< Identifier >( sourceLocation, "CASM" ) ),
             std::make_shared< Token >( Grammar::Token::DOUBLECOLON ),
             std::make_shared< Token >( Grammar::Token::ASTERIX ) );
         specification->definitions()->add( casmUsing );

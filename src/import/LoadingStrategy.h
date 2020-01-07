@@ -64,7 +64,7 @@ namespace libcasm_fe
         virtual ~LoadingStrategy( void ) = default;
 
         virtual libstdhl::Standard::RFC3986::URI toURI(
-            const Ast::IdentifierPath::Ptr& identifierPath ) const = 0;
+            const AST::IdentifierPath::Ptr& identifierPath ) const = 0;
 
         /**
          Loads a CASM specification from a given \a URI location.

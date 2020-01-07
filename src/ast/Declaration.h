@@ -49,7 +49,7 @@
 
 namespace libcasm_fe
 {
-    namespace Ast
+    namespace AST
     {
         class Declaration final : public Definition
         {

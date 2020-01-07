@@ -58,13 +58,13 @@ namespace libcasm_fe
         std::string basePath( void ) const;
 
         libstdhl::Standard::RFC3986::URI toURI(
-            const Ast::IdentifierPath::Ptr& identifierPath ) const override;
+            const AST::IdentifierPath::Ptr& identifierPath ) const override;
 
         libpass::LoadFilePass::Input::Ptr loadSource(
             const libstdhl::Standard::RFC3986::URI& location ) const override;
 
       private:
-        std::string toFileSystemPath( const Ast::IdentifierPath::Ptr& identifierPath ) const;
+        std::string toFileSystemPath( const AST::IdentifierPath::Ptr& identifierPath ) const;
 
       private:
         const std::string m_basePath;

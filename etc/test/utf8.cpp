@@ -47,7 +47,7 @@
 #include "pass.h"
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 TEST( libcasm_fe_utf8, identifier_with_emoticons )
 {

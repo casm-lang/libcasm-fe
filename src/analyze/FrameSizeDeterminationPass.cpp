@@ -63,7 +63,7 @@
 #include <unordered_map>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char FrameSizeDeterminationPass::id = 0;
 

@@ -84,17 +84,17 @@ namespace libcasm_fe
 
         const std::string& name( void ) const;
 
-        void setHeader( const Ast::HeaderDefinition::Ptr& header );
+        void setHeader( const AST::HeaderDefinition::Ptr& header );
 
-        const Ast::HeaderDefinition::Ptr& header( void ) const;
+        const AST::HeaderDefinition::Ptr& header( void ) const;
 
-        void setDefinitions( const Ast::Definitions::Ptr& definitions );
+        void setDefinitions( const AST::Definitions::Ptr& definitions );
 
-        const Ast::Definitions::Ptr& definitions( void ) const;
+        const AST::Definitions::Ptr& definitions( void ) const;
 
-        void setSpans( const Ast::Spans::Ptr& spans );
+        void setSpans( const AST::Spans::Ptr& spans );
 
-        const Ast::Spans::Ptr& spans( void ) const;
+        const AST::Spans::Ptr& spans( void ) const;
 
         void setSymboltable( const Namespace::Ptr& symboltable );
 
@@ -104,9 +104,9 @@ namespace libcasm_fe
         AsmType m_asmType;
         std::string m_name;
         libstdhl::Standard::RFC3986::URI::Ptr m_location;
-        Ast::HeaderDefinition::Ptr m_header;
-        Ast::Definitions::Ptr m_definitions;
-        Ast::Spans::Ptr m_spans;
+        AST::HeaderDefinition::Ptr m_header;
+        AST::Definitions::Ptr m_definitions;
+        AST::Spans::Ptr m_spans;
         Namespace::Ptr m_symboltable;
     };
 }

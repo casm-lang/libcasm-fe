@@ -63,7 +63,7 @@
 #include "CASM.casm.h"
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 SpecificationLoader::SpecificationLoader(
     libstdhl::Log::Stream& logStream, const LoadingStrategy::Ptr& loadingStrategy )

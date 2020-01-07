@@ -57,8 +57,8 @@ TEST(
     // GIVEN
     FileLoadingStrategy loadingStrategy( "." );
 
-    const auto importPath = Ast::IdentifierPath::fromIdentifier(
-        std::make_shared< Ast::Identifier >( "NonExistingLib" ) );
+    const auto importPath = AST::IdentifierPath::fromIdentifier(
+        std::make_shared< AST::Identifier >( "NonExistingLib" ) );
     const auto importPathURI = loadingStrategy.toURI( importPath );
 
     // WHEN
@@ -79,7 +79,7 @@ TEST( libcasm_fe_import_FileLoadingStrategyTest, shouldReturnSourceOfIdentifier 
 
     const std::string fileName( "./" + TEST_NAME + ".casm" );
     const auto importPath =
-        Ast::IdentifierPath::fromIdentifier( std::make_shared< Ast::Identifier >( TEST_NAME ) );
+        AST::IdentifierPath::fromIdentifier( std::make_shared< AST::Identifier >( TEST_NAME ) );
     const auto importPathURI = loadingStrategy.toURI( importPath );
 
     auto file = libstdhl::File::open( fileName, std::fstream::out );
@@ -104,10 +104,10 @@ TEST( libcasm_fe_import_FileLoadingStrategyTest, shouldReturnSourceInFolderOfIde
 
     const std::string filePath( TEST_CASE );
     const std::string fileName( "./" + filePath + "/" + TEST_UNIT + ".casm" );
-    const auto identifiers = std::make_shared< Ast::Identifiers >();
-    identifiers->add( std::make_shared< Ast::Identifier >( filePath ) );
-    identifiers->add( std::make_shared< Ast::Identifier >( TEST_UNIT ) );
-    const auto importPath = std::make_shared< Ast::IdentifierPath >( identifiers );
+    const auto identifiers = std::make_shared< AST::Identifiers >();
+    identifiers->add( std::make_shared< AST::Identifier >( filePath ) );
+    identifiers->add( std::make_shared< AST::Identifier >( TEST_UNIT ) );
+    const auto importPath = std::make_shared< AST::IdentifierPath >( identifiers );
     const auto importPathURI = loadingStrategy.toURI( importPath );
 
     libstdhl::File::Path::create( filePath );

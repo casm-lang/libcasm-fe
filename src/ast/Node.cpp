@@ -50,7 +50,7 @@
 #include <cassert>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 Node::Node( Node::ID id )
 : m_id( id )

@@ -52,10 +52,10 @@
 
 namespace libcasm_fe
 {
-    class ReferenceConstant final : public libcasm_ir::ReferenceConstant< Ast::ReferenceLiteral >
+    class ReferenceConstant final : public libcasm_ir::ReferenceConstant< AST::ReferenceLiteral >
     {
       public:
-        explicit ReferenceConstant( const Ast::ReferenceLiteral* literal );
+        explicit ReferenceConstant( const AST::ReferenceLiteral* literal );
 
         explicit ReferenceConstant( void );
 

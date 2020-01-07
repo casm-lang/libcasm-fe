@@ -56,13 +56,13 @@ static const auto VOID = libstdhl::Memory::get< libcasm_ir::VoidType >();
 // ReferenceConstant
 //
 
-ReferenceConstant::ReferenceConstant( const Ast::ReferenceLiteral* literal )
-: libcasm_ir::ReferenceConstant< Ast::ReferenceLiteral >( VOID, literal, classid() )
+ReferenceConstant::ReferenceConstant( const AST::ReferenceLiteral* literal )
+: libcasm_ir::ReferenceConstant< AST::ReferenceLiteral >( VOID, literal, classid() )
 {
 }
 
 ReferenceConstant::ReferenceConstant( void )
-: libcasm_ir::ReferenceConstant< Ast::ReferenceLiteral >( VOID, classid() )
+: libcasm_ir::ReferenceConstant< AST::ReferenceLiteral >( VOID, classid() )
 {
 }
 
@@ -82,7 +82,7 @@ std::size_t ReferenceConstant::hash( void ) const
 {
     if( defined() )
     {
-        return std::hash< Ast::TypedNode* >()( value()->reference().get() );
+        return std::hash< AST::TypedNode* >()( value()->reference().get() );
     }
     else
     {

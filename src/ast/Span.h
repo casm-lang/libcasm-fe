@@ -62,7 +62,7 @@ namespace libcasm_fe
         };
     }
 
-    namespace Ast
+    namespace AST
     {
         class Span : public Node
         {

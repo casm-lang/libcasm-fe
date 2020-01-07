@@ -65,7 +65,7 @@
 #include "../various/GrammarToken.h"
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char AstDumpDotPass::id = 0;
 

@@ -68,51 +68,51 @@ namespace libcasm_fe
         bool run( libpass::PassResult& pr ) override;
     };
 
-    class TypeCheckVisitor final : public Ast::RecursiveVisitor
+    class TypeCheckVisitor final : public AST::RecursiveVisitor
     {
       public:
         TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
-        void visit( Ast::DerivedDefinition& node ) override;
-        void visit( Ast::FunctionDefinition& node ) override;
-        void visit( Ast::RuleDefinition& node ) override;
-        void visit( Ast::EnumerationDefinition& node ) override;
-        void visit( Ast::DomainDefinition& node ) override;
-        void visit( Ast::BuiltinDefinition& node ) override;
-        void visit( Ast::UsingDefinition& node ) override;
-        void visit( Ast::StructureDefinition& node ) override;
-        void visit( Ast::BehaviorDefinition& node ) override;
-        void visit( Ast::ImplementDefinition& node ) override;
-        void visit( Ast::VariableDefinition& node ) override;
-        void visit( Ast::Declaration& node ) override;
+        void visit( AST::DerivedDefinition& node ) override;
+        void visit( AST::FunctionDefinition& node ) override;
+        void visit( AST::RuleDefinition& node ) override;
+        void visit( AST::EnumerationDefinition& node ) override;
+        void visit( AST::DomainDefinition& node ) override;
+        void visit( AST::BuiltinDefinition& node ) override;
+        void visit( AST::UsingDefinition& node ) override;
+        void visit( AST::StructureDefinition& node ) override;
+        void visit( AST::BehaviorDefinition& node ) override;
+        void visit( AST::ImplementDefinition& node ) override;
+        void visit( AST::VariableDefinition& node ) override;
+        void visit( AST::Declaration& node ) override;
 
-        void visit( Ast::DirectCallExpression& node ) override;
+        void visit( AST::DirectCallExpression& node ) override;
 
-        void visit( Ast::BasicType& node ) override;
-        void visit( Ast::TupleType& node ) override;
-        void visit( Ast::RecordType& node ) override;
-        void visit( Ast::FixedSizedType& node ) override;
-        void visit( Ast::RelationType& node ) override;
-        void visit( Ast::TemplateType& node ) override;
+        void visit( AST::BasicType& node ) override;
+        void visit( AST::TupleType& node ) override;
+        void visit( AST::RecordType& node ) override;
+        void visit( AST::FixedSizedType& node ) override;
+        void visit( AST::RelationType& node ) override;
+        void visit( AST::TemplateType& node ) override;
 
       private:
         void resolveRelationType(
-            Ast::Definition& node, Ast::VariableDefinitions& argumentTypes, Ast::Type& returnType );
+            AST::Definition& node, AST::VariableDefinitions& argumentTypes, AST::Type& returnType );
         void resolveRelationType(
-            Ast::Definition& node, Ast::Types& argumentTypes, Ast::Type& returnType );
+            AST::Definition& node, AST::Types& argumentTypes, AST::Type& returnType );
 
-        void pushSymbol( const Ast::VariableDefinition::Ptr& symbol );
-        void pushSymbols( const Ast::VariableDefinitions::Ptr& symbols );
-        void popSymbol( const Ast::VariableDefinition::Ptr& symbol );
-        void popSymbols( const Ast::VariableDefinitions::Ptr& symbols );
+        void pushSymbol( const AST::VariableDefinition::Ptr& symbol );
+        void pushSymbols( const AST::VariableDefinitions::Ptr& symbols );
+        void popSymbol( const AST::VariableDefinition::Ptr& symbol );
+        void popSymbols( const AST::VariableDefinitions::Ptr& symbols );
 
-        void pushVariableBindings( const Ast::VariableBindings::Ptr& variableBindings );
-        void popVariableBindings( const Ast::VariableBindings::Ptr& variableBindings );
+        void pushVariableBindings( const AST::VariableBindings::Ptr& variableBindings );
+        void popVariableBindings( const AST::VariableBindings::Ptr& variableBindings );
 
         libcasm_fe::Logger& m_log;
         Namespace& m_symboltable;
 
-        std::unordered_map< std::string, Ast::VariableDefinition::Ptr > m_symbols;
+        std::unordered_map< std::string, AST::VariableDefinition::Ptr > m_symbols;
     };
 }
 

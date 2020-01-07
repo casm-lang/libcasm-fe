@@ -51,9 +51,9 @@
 #include <memory>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
-TEST( AstSpan, Space )
+TEST( ASTSpan, Space )
 {
     auto span = std::make_shared< Span >( Grammar::Span::SPACE, 10 );
     EXPECT_EQ( span->kind(), Grammar::Span::SPACE );
@@ -61,7 +61,7 @@ TEST( AstSpan, Space )
     EXPECT_STREQ( span->toString().c_str(), "          " );
 }
 
-TEST( AstSpan, Newline )
+TEST( ASTSpan, Newline )
 {
     auto span = std::make_shared< Span >( Grammar::Span::NEWLINE, 5 );
     EXPECT_EQ( span->kind(), Grammar::Span::NEWLINE );
@@ -69,7 +69,7 @@ TEST( AstSpan, Newline )
     EXPECT_STREQ( span->toString().c_str(), "\n\n\n\n\n" );
 }
 
-TEST( AstSpan, Tabulator )
+TEST( ASTSpan, Tabulator )
 {
     auto span = std::make_shared< Span >( Grammar::Span::TABULATOR, 3 );
     EXPECT_EQ( span->kind(), Grammar::Span::TABULATOR );
@@ -77,7 +77,7 @@ TEST( AstSpan, Tabulator )
     EXPECT_STREQ( span->toString().c_str(), "\t\t\t" );
 }
 
-TEST( AstSpan, LineComment_single )
+TEST( ASTSpan, LineComment_single )
 {
     const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
 
@@ -99,7 +99,7 @@ TEST( AstSpan, LineComment_single )
     libstdhl::File::remove( *filename );
 }
 
-TEST( AstSpan, LineComment_compound )
+TEST( ASTSpan, LineComment_compound )
 {
     const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
 
@@ -121,7 +121,7 @@ TEST( AstSpan, LineComment_compound )
     libstdhl::File::remove( *filename );
 }
 
-TEST( AstSpan, BlockComment )
+TEST( ASTSpan, BlockComment )
 {
     const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
     auto file = libstdhl::File::open( *filename, std::fstream::out );
@@ -142,7 +142,7 @@ TEST( AstSpan, BlockComment )
     libstdhl::File::remove( *filename );
 }
 
-TEST( AstSpan, BlockCommentOneLine )
+TEST( ASTSpan, BlockCommentOneLine )
 {
     const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
     auto file = libstdhl::File::open( *filename, std::fstream::out );

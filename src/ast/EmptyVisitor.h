@@ -50,7 +50,7 @@
 
 namespace libcasm_fe
 {
-    namespace Ast
+    namespace AST
     {
         class EmptyVisitor : public Visitor
         {

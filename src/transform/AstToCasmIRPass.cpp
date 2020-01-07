@@ -61,7 +61,7 @@
 #include <libpass/PassUsage>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char AstToCasmIRPass::id = 0;
 

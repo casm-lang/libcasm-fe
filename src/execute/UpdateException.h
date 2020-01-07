@@ -59,8 +59,8 @@ namespace libcasm_fe
       public:
         struct UpdateInfo
         {
-            Ast::Node::Ptr producer;
-            Ast::FunctionDefinition::Ptr function;
+            AST::Node::Ptr producer;
+            AST::FunctionDefinition::Ptr function;
             std::vector< libcasm_ir::Constant > arguments;
             libcasm_ir::Constant value;
         };

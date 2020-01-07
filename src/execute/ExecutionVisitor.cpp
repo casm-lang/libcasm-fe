@@ -66,7 +66,7 @@
 #include <thread>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 namespace IR = libcasm_ir;
 
@@ -1011,7 +1011,7 @@ void ExecutionVisitor::visit( LocalRule& node )
 {
     Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
 
-    std::unordered_set< Ast::FunctionDefinition* > localFunctions;
+    std::unordered_set< AST::FunctionDefinition* > localFunctions;
 
     {
         Transaction initTransaction( &m_updateSetManager, Semantics::Parallel, 100 );

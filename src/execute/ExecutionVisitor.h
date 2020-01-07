@@ -96,7 +96,7 @@ namespace libcasm_fe
     struct Update
     {
         IR::Constant value;  /**< The value of the update */
-        Ast::Node* producer; /**< The update producer */
+        AST::Node* producer; /**< The update producer */
         IR::Constant agent;  /**< The contributing agent */
                              // TODO maybe a list of agents (multi-agent case)?
     };
@@ -111,7 +111,7 @@ namespace libcasm_fe
 
     struct LocationRegistryDetails
     {
-        using Function = Ast::FunctionDefinition*;
+        using Function = AST::FunctionDefinition*;
         using FunctionHash = std::hash< Function >;
         using FunctionEquals = std::equal_to< Function >;
         using Arguments = std::vector< IR::Constant >;
@@ -170,7 +170,7 @@ namespace libcasm_fe
         ExecutionFunctionState m_functionState;
     };
 
-    class ExecutionVisitor : public Ast::EmptyVisitor
+    class ExecutionVisitor : public AST::EmptyVisitor
     {
       public:
         ExecutionVisitor(
@@ -189,60 +189,60 @@ namespace libcasm_fe
          */
         void execute( const ReferenceConstant& value );
 
-        void execute( const Ast::Definition::Ptr& definition );
+        void execute( const AST::Definition::Ptr& definition );
 
-        void visit( Ast::Initially& node ) override;
+        void visit( AST::Initially& node ) override;
 
-        void visit( Ast::Initializer& node ) override;
-        void visit( Ast::VariableDefinition& node ) override;
-        void visit( Ast::FunctionDefinition& node ) override;
-        void visit( Ast::DerivedDefinition& node ) override;
-        void visit( Ast::RuleDefinition& node ) override;
-        void visit( Ast::EnumeratorDefinition& node ) override;
-        void visit( Ast::InvariantDefinition& node ) override;
-        void visit( Ast::StructureDefinition& node ) override;
-        void visit( Ast::BuiltinDefinition& node ) override;
+        void visit( AST::Initializer& node ) override;
+        void visit( AST::VariableDefinition& node ) override;
+        void visit( AST::FunctionDefinition& node ) override;
+        void visit( AST::DerivedDefinition& node ) override;
+        void visit( AST::RuleDefinition& node ) override;
+        void visit( AST::EnumeratorDefinition& node ) override;
+        void visit( AST::InvariantDefinition& node ) override;
+        void visit( AST::StructureDefinition& node ) override;
+        void visit( AST::BuiltinDefinition& node ) override;
 
-        void visit( Ast::UndefLiteral& node ) override;
-        void visit( Ast::ValueLiteral& node ) override;
-        void visit( Ast::ReferenceLiteral& node ) override;
-        void visit( Ast::ListLiteral& node ) override;
-        void visit( Ast::RangeLiteral& node ) override;
-        void visit( Ast::TupleLiteral& node ) override;
-        void visit( Ast::RecordLiteral& node ) override;
+        void visit( AST::UndefLiteral& node ) override;
+        void visit( AST::ValueLiteral& node ) override;
+        void visit( AST::ReferenceLiteral& node ) override;
+        void visit( AST::ListLiteral& node ) override;
+        void visit( AST::RangeLiteral& node ) override;
+        void visit( AST::TupleLiteral& node ) override;
+        void visit( AST::RecordLiteral& node ) override;
 
-        void visit( Ast::BasicType& node ) override;
+        void visit( AST::BasicType& node ) override;
 
-        void visit( Ast::EmbracedExpression& node ) override;
-        void visit( Ast::NamedExpression& node ) override;
-        void visit( Ast::DirectCallExpression& node ) override;
-        void visit( Ast::MethodCallExpression& node ) override;
-        void visit( Ast::LiteralCallExpression& node ) override;
-        void visit( Ast::IndirectCallExpression& node ) override;
-        void visit( Ast::TypeCastingExpression& node ) override;
-        void visit( Ast::UnaryExpression& node ) override;
-        void visit( Ast::BinaryExpression& node ) override;
-        void visit( Ast::LetExpression& node ) override;
-        void visit( Ast::ConditionalExpression& node ) override;
-        void visit( Ast::ChooseExpression& node ) override;
-        void visit( Ast::UniversalQuantifierExpression& node ) override;
-        void visit( Ast::ExistentialQuantifierExpression& node ) override;
-        void visit( Ast::CardinalityExpression& node ) override;
+        void visit( AST::EmbracedExpression& node ) override;
+        void visit( AST::NamedExpression& node ) override;
+        void visit( AST::DirectCallExpression& node ) override;
+        void visit( AST::MethodCallExpression& node ) override;
+        void visit( AST::LiteralCallExpression& node ) override;
+        void visit( AST::IndirectCallExpression& node ) override;
+        void visit( AST::TypeCastingExpression& node ) override;
+        void visit( AST::UnaryExpression& node ) override;
+        void visit( AST::BinaryExpression& node ) override;
+        void visit( AST::LetExpression& node ) override;
+        void visit( AST::ConditionalExpression& node ) override;
+        void visit( AST::ChooseExpression& node ) override;
+        void visit( AST::UniversalQuantifierExpression& node ) override;
+        void visit( AST::ExistentialQuantifierExpression& node ) override;
+        void visit( AST::CardinalityExpression& node ) override;
 
-        void visit( Ast::ConditionalRule& node ) override;
-        void visit( Ast::CaseRule& node ) override;
-        void visit( Ast::LetRule& node ) override;
-        void visit( Ast::LocalRule& node ) override;
-        void visit( Ast::ForallRule& node ) override;
-        void visit( Ast::ChooseRule& node ) override;
-        void visit( Ast::IterateRule& node ) override;
-        void visit( Ast::BlockRule& node ) override;
-        void visit( Ast::SequenceRule& node ) override;
-        void visit( Ast::UpdateRule& node ) override;
-        void visit( Ast::CallRule& node ) override;
-        void visit( Ast::WhileRule& node ) override;
+        void visit( AST::ConditionalRule& node ) override;
+        void visit( AST::CaseRule& node ) override;
+        void visit( AST::LetRule& node ) override;
+        void visit( AST::LocalRule& node ) override;
+        void visit( AST::ForallRule& node ) override;
+        void visit( AST::ChooseRule& node ) override;
+        void visit( AST::IterateRule& node ) override;
+        void visit( AST::BlockRule& node ) override;
+        void visit( AST::SequenceRule& node ) override;
+        void visit( AST::UpdateRule& node ) override;
+        void visit( AST::CallRule& node ) override;
+        void visit( AST::WhileRule& node ) override;
 
-        void visit( Ast::VariableBinding& node ) override;
+        void visit( AST::VariableBinding& node ) override;
 
         static std::string updateAsString( const ExecutionUpdateSet::Update& update );
         static UpdateException::UpdateInfo updateAsUpdateInfo( const ExecutionUpdateSet::Update& update );
@@ -251,12 +251,12 @@ namespace libcasm_fe
         u1 hasEmptyUpdateSet( void ) const;
 
         std::unique_ptr< Frame > makeFrame(
-            Ast::CallExpression* call, Ast::Node* callee, std::size_t numberOfLocals );
+            AST::CallExpression* call, AST::Node* callee, std::size_t numberOfLocals );
 
         std::unique_ptr< Frame > makeObjectFrame(
             const IR::Constant& object,
-            Ast::CallExpression* call,
-            Ast::Node* callee,
+            AST::CallExpression* call,
+            AST::Node* callee,
             std::size_t numberOfLocals );
 
         enum class ValidationFlag
@@ -295,16 +295,16 @@ namespace libcasm_fe
          *                          error and location information
          */
         void validateArguments(
-            const Ast::Node& node,
+            const AST::Node& node,
             const IR::Types& argumentTypes,
             ValidationFlags flags,
             Code errorCode ) const;
 
         void handleMergeConflict(
-            const Ast::Node& node, const ExecutionUpdateSet::Conflict& conflict ) const;
+            const AST::Node& node, const ExecutionUpdateSet::Conflict& conflict ) const;
 
         void foreachInUniverse(
-            const Ast::VariableDefinitions& variables,
+            const AST::VariableDefinitions& variables,
             const IR::Constant& universe,
             const std::function< void() >& subRule ) const;
 
@@ -322,14 +322,14 @@ namespace libcasm_fe
         ExecutionLocationRegistry::Location m_updateLocation;
     };
 
-    class StateInitializationVisitor final : public Ast::EmptyVisitor
+    class StateInitializationVisitor final : public AST::EmptyVisitor
     {
       public:
         StateInitializationVisitor(
             ExecutionLocationRegistry& locationRegistry, Storage& globalState );
 
         void visit( Specification& node );
-        void visit( Ast::FunctionDefinition& node ) override;
+        void visit( AST::FunctionDefinition& node ) override;
 
       private:
         Storage& m_globalState;

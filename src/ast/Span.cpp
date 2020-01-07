@@ -48,7 +48,7 @@
 #include <libstdhl/SourceLocation>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 //
 //

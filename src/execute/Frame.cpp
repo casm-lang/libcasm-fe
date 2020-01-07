@@ -52,7 +52,7 @@
 #include <libstdhl/String>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 namespace ir = libcasm_ir;
 

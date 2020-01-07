@@ -53,7 +53,7 @@
 #include <cassert>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 //
 //
@@ -131,7 +131,7 @@ Node::Ptr Identifier::clone( void ) const
 
 IdentifierPath::IdentifierPath( const Identifier::Ptr& identifier, Type type )
 : Node( Node::ID::IDENTIFIER_PATH )
-, m_identifiers( Ast::make< Identifiers >( identifier->sourceLocation() ) )
+, m_identifiers( AST::make< Identifiers >( identifier->sourceLocation() ) )
 , m_type( type )
 {
     m_identifiers->add( identifier );
@@ -220,7 +220,7 @@ Node::Ptr IdentifierPath::clone( void ) const
 IdentifierPath::Ptr IdentifierPath::fromIdentifier( const Identifier::Ptr& identifier )
 {
     const auto& location = identifier->sourceLocation();
-    return Ast::make< IdentifierPath >( location, identifier );
+    return AST::make< IdentifierPath >( location, identifier );
 }
 
 //

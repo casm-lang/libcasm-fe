@@ -55,7 +55,7 @@
 #include <libpass/PassUsage>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char SymbolRegistrationPass::id = 0;
 

@@ -52,7 +52,7 @@
 #include <libcasm-fe/ast/Token>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 //
 //

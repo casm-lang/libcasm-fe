@@ -63,7 +63,7 @@
 #include <unordered_map>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char SymbolResolverPass::id = 0;
 
@@ -127,8 +127,8 @@ void NamespaceResolveVisitor::visit( UsingPathDefinition& node )
         {
             const auto& name = namespaceSymbol.first;
             const auto symbolName =
-                Ast::make< Identifiers >( location, path.identifiers()->data() );
-            symbolName->add( Ast::make< Identifier >( location, name ) );
+                AST::make< Identifiers >( location, path.identifiers()->data() );
+            symbolName->add( AST::make< Identifier >( location, name ) );
             const IdentifierPath symbolPath( symbolName );
 
             registerSymbolWithPath( node, symbolPath, true );
@@ -274,7 +274,7 @@ void ReplaceIdentifierNameVisitor::visit( Identifier& node )
 //
 
 ReplaceTypeVisitor::ReplaceTypeVisitor(
-    libcasm_fe::Logger& log, const Ast::Type::Ptr& from, const Ast::Type::Ptr& to )
+    libcasm_fe::Logger& log, const AST::Type::Ptr& from, const AST::Type::Ptr& to )
 : m_log( log )
 , m_from( from )
 , m_to( to )
@@ -369,7 +369,7 @@ void ReplaceTypeVisitor::visit( BuiltinDefinition& node )
         replaceReturnType = m_to;
     }
 
-    const auto& replaceDomainType = Ast::make< RelationType >(
+    const auto& replaceDomainType = AST::make< RelationType >(
         domainType.sourceLocation(),
         domainType.name()->duplicate< IdentifierPath >(),
         domainType.leftBraceToken(),
@@ -449,7 +449,7 @@ void SymbolResolveVisitor::visit( InitDefinition& node )
     const auto& programFunction = programSymbol->ptr< FunctionDefinition >();
 
     const auto& location = node.sourceLocation();
-    const auto& initializers = Ast::make< Initializers >( location );
+    const auto& initializers = AST::make< Initializers >( location );
     if( node.isSingleAgent() )
     {
         const auto& agentDomainName = TypeInfo::TYPE_NAME_AGENT;
@@ -458,24 +458,24 @@ void SymbolResolveVisitor::visit( InitDefinition& node )
         assert( agentDomainSymbol->id() == Node::ID::DOMAIN_DEFINITION and " inconsistent state " );
         const auto& agentDomainDefinition = agentDomainSymbol->ptr< DomainDefinition >();
 
-        const auto& agentDomainType = Ast::make< BasicType >(
+        const auto& agentDomainType = AST::make< BasicType >(
             location,
             IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( location, TypeInfo::TYPE_NAME_INTEGER ) ) );
+                AST::make< Identifier >( location, TypeInfo::TYPE_NAME_INTEGER ) ) );
         agentDomainDefinition->setDomainType( agentDomainType );
         agentDomainDefinition->accept( *this );
         m_agentDomainDefinition = agentDomainDefinition;
 
-        const auto& zeroLiteral = Ast::make< ValueLiteral >(
+        const auto& zeroLiteral = AST::make< ValueLiteral >(
             location, std::make_shared< libcasm_ir::IntegerConstant >( 0 ) );
 
-        const auto& programArguments = Ast::make< Expressions >( location );
+        const auto& programArguments = AST::make< Expressions >( location );
         programArguments->add( zeroLiteral );
 
         const auto& ruleReference =
-            Ast::make< ReferenceLiteral >( location, Token::unresolved(), node.initPath() );
+            AST::make< ReferenceLiteral >( location, Token::unresolved(), node.initPath() );
 
-        const auto& initializer = Ast::make< Initializer >(
+        const auto& initializer = AST::make< Initializer >(
             location,
             Token::unresolved(),
             programArguments,
@@ -550,12 +550,12 @@ void SymbolResolveVisitor::visit( EnumerationDefinition& node )
 
     // CASM::enumeration::enumeration::
     const auto& sourceLocation = node.sourceLocation();
-    // const auto& casmIdentifier = Ast::make< Identifier >( sourceLocation, "CASM" );
+    // const auto& casmIdentifier = AST::make< Identifier >( sourceLocation, "CASM" );
     const auto& enumerationIdentifier =
-        Ast::make< Identifier >( sourceLocation, TypeInfo::TYPE_NAME_ENUMERATION );
-    // const auto& enumerationName = Ast::make< IdentifierPath >( sourceLocation, casmIdentifier );
+        AST::make< Identifier >( sourceLocation, TypeInfo::TYPE_NAME_ENUMERATION );
+    // const auto& enumerationName = AST::make< IdentifierPath >( sourceLocation, casmIdentifier );
     const auto& enumerationName =
-        Ast::make< IdentifierPath >( sourceLocation, enumerationIdentifier );
+        AST::make< IdentifierPath >( sourceLocation, enumerationIdentifier );
     enumerationName->addIdentifier( enumerationIdentifier );
     // enumerationName->addIdentifier( enumerationIdentifier );
 
@@ -621,11 +621,11 @@ void SymbolResolveVisitor::visit( EnumerationDefinition& node )
             implementDefinition->duplicate< ImplementDefinition >();
         duplicateImplementDefinition->templateInstances()->clear();
 
-        const auto& fromBasicType = Ast::make< BasicType >(
+        const auto& fromBasicType = AST::make< BasicType >(
             enumerationIdentifier->sourceLocation(),
             IdentifierPath::fromIdentifier( enumerationIdentifier ) );
 
-        const auto& duplicateDomainType = node.domainType()->duplicate< Ast::Type >();
+        const auto& duplicateDomainType = node.domainType()->duplicate< AST::Type >();
 
         ReplaceTypeVisitor replaceTypeVisitor( m_log, fromBasicType, duplicateDomainType );
         duplicateImplementDefinition->accept( replaceTypeVisitor );
@@ -733,7 +733,7 @@ void SymbolResolveVisitor::visit( ImplementDefinition& node )
         if( not behaviorSymbol )
         {
             const auto& casmBehaviorPath = IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( behaviorType->sourceLocation(), "CASM" ) );
+                AST::make< Identifier >( behaviorType->sourceLocation(), "CASM" ) );
             for( const auto& behaviorPathIdentifier : *behaviorPath->identifiers() )
             {
                 casmBehaviorPath->addIdentifier( behaviorPathIdentifier );
@@ -757,7 +757,7 @@ void SymbolResolveVisitor::visit( ImplementDefinition& node )
         if( not domainTypeSymbol )
         {
             const auto& casmDomainTypePath = IdentifierPath::fromIdentifier(
-                Ast::make< Identifier >( node.domainType()->sourceLocation(), "CASM" ) );
+                AST::make< Identifier >( node.domainType()->sourceLocation(), "CASM" ) );
             casmDomainTypePath->addIdentifier( node.identifier() );
 
             domainTypeSymbolResult = m_symboltable.findSymbol( *casmDomainTypePath );
@@ -1032,7 +1032,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     if( not symbol )
     {
         const auto& casmSymbolPath =
-            IdentifierPath::fromIdentifier( Ast::make< Identifier >( sourceLocation, "CASM" ) );
+            IdentifierPath::fromIdentifier( AST::make< Identifier >( sourceLocation, "CASM" ) );
         for( const auto& symbolPathIdentifier : *symbolPath->identifiers() )
         {
             casmSymbolPath->addIdentifier( symbolPathIdentifier );
@@ -1402,7 +1402,7 @@ Definition::Ptr SymbolResolveVisitor::resolveSymbol( const Definition& node ) co
     return symbol;
 }
 
-void SymbolResolveVisitor::resolveBehaviorInstance( Ast::Type& node )
+void SymbolResolveVisitor::resolveBehaviorInstance( AST::Type& node )
 {
     if( node.typeDefinition() )
     {
@@ -1429,7 +1429,7 @@ void SymbolResolveVisitor::resolveBehaviorInstance( Ast::Type& node )
     if( not domainNamespace )
     {
         domainPath = IdentifierPath::fromIdentifier(
-            Ast::make< Identifier >( node.sourceLocation(), "CASM" ) );
+            AST::make< Identifier >( node.sourceLocation(), "CASM" ) );
         for( const auto& domainPathIdentifier : *node.name()->identifiers() )
         {
             domainPath->addIdentifier( domainPathIdentifier );
@@ -1478,7 +1478,7 @@ void SymbolResolveVisitor::resolveBehaviorInstance( Ast::Type& node )
 
         // TODO: FIXME: @ppaulweber: check if template parameter variable is concrete type
 
-        const auto& fromBasicType = Ast::make< BasicType >(
+        const auto& fromBasicType = AST::make< BasicType >(
             from->sourceLocation(), IdentifierPath::fromIdentifier( from->identifier() ) );
 
         ReplaceTypeVisitor replaceTypeVisitor( m_log, fromBasicType, to );
@@ -1495,7 +1495,7 @@ void SymbolResolveVisitor::resolveBehaviorInstance( Ast::Type& node )
 
     behaviorDefinition->addTemplateInstance( duplicateBehaviorDefinition );
 
-    const auto& duplicateImplementDefinition = Ast::make< ImplementDefinition >(
+    const auto& duplicateImplementDefinition = AST::make< ImplementDefinition >(
         implementDefinition->sourceLocation(),
         implementDefinition->templateNode(),
         implementDefinition->implementToken(),
@@ -1513,7 +1513,7 @@ void SymbolResolveVisitor::resolveBehaviorInstance( Ast::Type& node )
     implementDefinition->addTemplateInstance( duplicateImplementDefinition );
 }
 
-void SymbolResolveVisitor::resolveTypeInstance( Ast::Type& node )
+void SymbolResolveVisitor::resolveTypeInstance( AST::Type& node )
 {
     if( node.typeDefinition() )
     {
@@ -1582,7 +1582,7 @@ void SymbolResolveVisitor::resolveTypeInstance( Ast::Type& node )
     }
 
     ReplaceTypeVisitor replaceTypeVisitor(
-        m_log, domainDefinition->domainType(), node.ptr< Ast::Type >() );
+        m_log, domainDefinition->domainType(), node.ptr< AST::Type >() );
 
     const auto& duplicateDomainDefinition = domainDefinition->duplicate< DomainDefinition >();
     duplicateDomainDefinition->accept( replaceTypeVisitor );
@@ -1649,7 +1649,7 @@ void SymbolResolveVisitor::resolveTypeInstance( Ast::Type& node )
 
         const auto& implementDefinition = implementSymbol->ptr< ImplementDefinition >();
 
-        const auto& duplicateImplementDefinition = Ast::make< ImplementDefinition >(
+        const auto& duplicateImplementDefinition = AST::make< ImplementDefinition >(
             implementDefinition->sourceLocation(),
             std::make_shared< Template >(
                 Token::unresolved(),
@@ -1747,7 +1747,7 @@ Definition::Ptr SymbolResolveVisitor::resolveBuiltinCall(
                 continue;
             }
 
-            const auto& fromBasicType = Ast::make< BasicType >(
+            const auto& fromBasicType = AST::make< BasicType >(
                 from->sourceLocation(), IdentifierPath::fromIdentifier( from->identifier() ) );
 
             ReplaceTypeVisitor replaceTypeVisitor( m_log, fromBasicType, to->variableType() );

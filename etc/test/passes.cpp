@@ -52,7 +52,7 @@
 #include <libpass/analyze/LoadFilePass>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 static const auto source = R"***(
 CASM

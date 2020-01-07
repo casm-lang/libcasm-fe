@@ -50,7 +50,7 @@
 #include "Rule.h"
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 void EmptyVisitor::visit( HeaderDefinition& )
 {

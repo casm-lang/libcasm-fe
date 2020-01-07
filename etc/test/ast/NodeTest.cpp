@@ -47,9 +47,9 @@
 
 #include <memory>
 
-using namespace libcasm_fe::Ast;
+using namespace libcasm_fe::AST;
 
-TEST( AstIdentifierPath, baseNameShouldBeEqualToTheLastIdentifier )
+TEST( ASTIdentifierPath, baseNameShouldBeEqualToTheLastIdentifier )
 {
     // GIVEN
     auto identifiers = std::make_shared< Identifiers >();
@@ -63,7 +63,7 @@ TEST( AstIdentifierPath, baseNameShouldBeEqualToTheLastIdentifier )
     EXPECT_EQ( "bar", identifierPath.baseName() );
 }
 
-TEST( AstIdentifierPath, baseDirShouldBeEmptyIfAbsolutePathConsistsOfOnlyOneIdentifier )
+TEST( ASTIdentifierPath, baseDirShouldBeEmptyIfAbsolutePathConsistsOfOnlyOneIdentifier )
 {
     // WHEN
     const IdentifierPath identifierPath(
@@ -73,7 +73,7 @@ TEST( AstIdentifierPath, baseDirShouldBeEmptyIfAbsolutePathConsistsOfOnlyOneIden
     EXPECT_TRUE( identifierPath.baseDir().empty() );
 }
 
-TEST( AstIdentifierPath, baseDirShouldBeEmptyIfRelativePathConsistsOfOnlyOneIdentifier )
+TEST( ASTIdentifierPath, baseDirShouldBeEmptyIfRelativePathConsistsOfOnlyOneIdentifier )
 {
     // WHEN
     const IdentifierPath identifierPath(
@@ -84,7 +84,7 @@ TEST( AstIdentifierPath, baseDirShouldBeEmptyIfRelativePathConsistsOfOnlyOneIden
 }
 
 TEST(
-    AstIdentifierPath, baseDirShouldBeEqualToFirstIdentifierIfAbsolutePathConsistsOfTwoIdentifiers )
+    ASTIdentifierPath, baseDirShouldBeEqualToFirstIdentifierIfAbsolutePathConsistsOfTwoIdentifiers )
 {
     // GIVEN
     auto identifiers = std::make_shared< Identifiers >();
@@ -99,7 +99,7 @@ TEST(
 }
 
 TEST(
-    AstIdentifierPath,
+    ASTIdentifierPath,
     baseDirShouldBeEqualToFirstIdentifierWithLeadingDotIfRelativePathConsistsOfTwoIdentifiers )
 {
     // GIVEN
@@ -114,7 +114,7 @@ TEST(
     EXPECT_EQ( "::foo", identifierPath.baseDir() );
 }
 
-TEST( AstIdentifierPath, pathShouldConcatenateIdentifiersWithDotIfIdentifierPathIsAbsolute )
+TEST( ASTIdentifierPath, pathShouldConcatenateIdentifiersWithDotIfIdentifierPathIsAbsolute )
 {
     // GIVEN
     auto identifiers = std::make_shared< Identifiers >();
@@ -129,7 +129,7 @@ TEST( AstIdentifierPath, pathShouldConcatenateIdentifiersWithDotIfIdentifierPath
 }
 
 TEST(
-    AstIdentifierPath,
+    ASTIdentifierPath,
     pathShouldConcatenateIdentifiersWithDotAndAddLeadingDotIfIdentifierPathIsRelative )
 {
     // GIVEN

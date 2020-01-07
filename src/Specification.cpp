@@ -64,7 +64,7 @@ Specification::Specification( void )
 , m_location()
 , m_header()
 , m_definitions()
-, m_spans( std::make_shared< Ast::Spans >() )
+, m_spans( std::make_shared< AST::Spans >() )
 , m_symboltable( std::make_shared< Namespace >() )
 {
 }
@@ -117,32 +117,32 @@ const std::string& Specification::name( void ) const
     return m_name;
 }
 
-void Specification::setHeader( const Ast::HeaderDefinition::Ptr& header )
+void Specification::setHeader( const AST::HeaderDefinition::Ptr& header )
 {
     m_header = header;
 }
 
-const Ast::HeaderDefinition::Ptr& Specification::header( void ) const
+const AST::HeaderDefinition::Ptr& Specification::header( void ) const
 {
     return m_header;
 }
 
-void Specification::setDefinitions( const Ast::Definitions::Ptr& definitions )
+void Specification::setDefinitions( const AST::Definitions::Ptr& definitions )
 {
     m_definitions = definitions;
 }
 
-const Ast::Definitions::Ptr& Specification::definitions( void ) const
+const AST::Definitions::Ptr& Specification::definitions( void ) const
 {
     return m_definitions;
 }
 
-void Specification::setSpans( const Ast::Spans::Ptr& spans )
+void Specification::setSpans( const AST::Spans::Ptr& spans )
 {
     m_spans = spans;
 }
 
-const Ast::Spans::Ptr& Specification::spans( void ) const
+const AST::Spans::Ptr& Specification::spans( void ) const
 {
     return m_spans;
 }

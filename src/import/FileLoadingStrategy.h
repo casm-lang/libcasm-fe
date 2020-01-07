@@ -63,7 +63,7 @@ namespace libcasm_fe
         std::string basePath( void ) const;
 
         libstdhl::Standard::RFC3986::URI toURI(
-            const Ast::IdentifierPath::Ptr& identifierPath ) const override;
+            const AST::IdentifierPath::Ptr& identifierPath ) const override;
 
         libpass::LoadFilePass::Input::Ptr loadSource(
             const libstdhl::Standard::RFC3986::URI& location ) const override;
@@ -73,7 +73,7 @@ namespace libcasm_fe
          * Converts the identifier path into a file-system path by replacing all dots with slashes
          * and appending it to the base path.
          */
-        std::string toFileSystemPath( const Ast::IdentifierPath::Ptr& identifierPath ) const;
+        std::string toFileSystemPath( const AST::IdentifierPath::Ptr& identifierPath ) const;
 
       private:
         const std::string m_basePath;

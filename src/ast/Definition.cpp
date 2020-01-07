@@ -51,7 +51,7 @@
 #include <libcasm-fe/ast/Literal>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 //
 //
@@ -131,7 +131,7 @@ void Definition::clone( Definition& duplicate ) const
 HeaderDefinition::HeaderDefinition( const Token::Ptr& headerToken )
 : Definition(
       Node::ID::HEADER_DEFINITION,
-      Ast::make< Identifier >( headerToken->sourceLocation(), headerToken->tokenString() ) )
+      AST::make< Identifier >( headerToken->sourceLocation(), headerToken->tokenString() ) )
 , m_headerToken( headerToken )
 {
 }
@@ -243,7 +243,7 @@ TypeDefinition::TypeDefinition(
     const Node::ID id, const Type::Ptr& domainType, const Template::Ptr& templateNode )
 : Definition(
       id,
-      Ast::make< Identifier >( domainType->name()->sourceLocation(), domainType->name()->path() ) )
+      AST::make< Identifier >( domainType->name()->sourceLocation(), domainType->name()->path() ) )
 , m_domainType( domainType )
 , m_templateNode( templateNode )
 , m_templateInstances( std::make_shared< TypeDefinitions >() )
@@ -761,13 +761,13 @@ EnumerationDefinition::EnumerationDefinition(
     const Token::Ptr& rightBraceToken )
 : TypeDefinition(
       Node::ID::ENUMERATION_DEFINITION,
-      Ast::make< BasicType >(
+      AST::make< BasicType >(
           identifier->sourceLocation(), IdentifierPath::fromIdentifier( identifier ) ),
-      Ast::make< Template >(
+      AST::make< Template >(
           identifier->sourceLocation(),
           Token::unresolved(),
           Token::unresolved(),
-          Ast::make< VariableDefinitions >( identifier->sourceLocation() ),
+          AST::make< VariableDefinitions >( identifier->sourceLocation() ),
           Token::unresolved() ) )
 , m_enumerators( enumerators )
 , m_enumerationToken( enumerationToken )
@@ -894,7 +894,7 @@ UsingPathDefinition::UsingPathDefinition(
     const Token::Ptr& asterixToken )
 : Definition(
       Node::ID::USING_PATH_DEFINITION,
-      Ast::make< Identifier >( path->sourceLocation(), path->path() ) )
+      AST::make< Identifier >( path->sourceLocation(), path->path() ) )
 , m_path( path )
 , m_usingToken( usingToken )
 , m_doubleColonToken( doubleColonToken )
@@ -1058,7 +1058,7 @@ StructureDefinition::StructureDefinition(
     const Token::Ptr& rightBraceToken )
 : TypeDefinition(
       Node::ID::STRUCTURE_DEFINITION,
-      Ast::make< BasicType >(
+      AST::make< BasicType >(
           identifier->sourceLocation(), IdentifierPath::fromIdentifier( identifier ) ),
       templateNode )
 , m_functions( functions )
@@ -1377,11 +1377,11 @@ Node::Ptr BuiltinDefinition::clone( void ) const
 InitDefinition::InitDefinition( const Token::Ptr& initToken, const IdentifierPath::Ptr& initPath )
 : Definition(
       Node::ID::INIT_DEFINITION,
-      Ast::make< Identifier >( initToken->sourceLocation(), initToken->tokenString() ) )
+      AST::make< Identifier >( initToken->sourceLocation(), initToken->tokenString() ) )
 , m_initToken( initToken )
 , m_initPath( initPath )
 , m_leftBraceToken( Token::unresolved() )
-, m_initializers( Ast::make< Initializers >( initToken->sourceLocation() ) )
+, m_initializers( AST::make< Initializers >( initToken->sourceLocation() ) )
 , m_rightBraceToken( Token::unresolved() )
 , m_external( false )
 {
@@ -1394,7 +1394,7 @@ InitDefinition::InitDefinition(
     const Token::Ptr& rightBraceToken )
 : Definition(
       Node::ID::INIT_DEFINITION,
-      Ast::make< Identifier >( initToken->sourceLocation(), initToken->tokenString() ) )
+      AST::make< Identifier >( initToken->sourceLocation(), initToken->tokenString() ) )
 , m_initToken( initToken )
 , m_initPath( nullptr )
 , m_leftBraceToken( leftBraceToken )

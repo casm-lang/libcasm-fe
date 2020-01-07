@@ -52,7 +52,7 @@
 
 namespace libcasm_fe
 {
-    namespace Ast
+    namespace AST
     {
         class Attribute : public Node
         {

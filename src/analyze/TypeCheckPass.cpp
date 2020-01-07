@@ -59,7 +59,7 @@
 #include <libstdhl/String>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char TypeCheckPass::id = 0;
 
@@ -78,7 +78,7 @@ TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symbolta
 }
 
 void TypeCheckVisitor::resolveRelationType(
-    Definition& node, VariableDefinitions& argumentTypes, Ast::Type& returnType )
+    Definition& node, VariableDefinitions& argumentTypes, AST::Type& returnType )
 {
     u1 valid = true;
     std::size_t position = 0;
@@ -122,7 +122,7 @@ void TypeCheckVisitor::resolveRelationType(
 }
 
 void TypeCheckVisitor::resolveRelationType(
-    Definition& node, Types& argumentTypes, Ast::Type& returnType )
+    Definition& node, Types& argumentTypes, AST::Type& returnType )
 {
     u1 valid = true;
     std::size_t position = 0;
@@ -618,7 +618,7 @@ void TypeCheckVisitor::visit( BasicType& node )
         {
             const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
             const auto domainDefinitionType =
-                static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
+                static_cast< const AST::Type* >( domainDefinition.domainType().get() );
 
             if( node.id() != domainDefinitionType->id() )
             {
@@ -806,7 +806,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
         {
             const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
             const auto domainDefinitionType =
-                static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
+                static_cast< const AST::Type* >( domainDefinition.domainType().get() );
             if( node.id() != domainDefinitionType->id() )
             {
                 m_log.error(
@@ -1006,7 +1006,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
         {
             const auto& behaviorDefinition = static_cast< const BehaviorDefinition& >( *symbol );
             const auto domainDefinitionType =
-                static_cast< const Ast::Type* >( behaviorDefinition.domainType().get() );
+                static_cast< const AST::Type* >( behaviorDefinition.domainType().get() );
             if( node.id() != domainDefinitionType->id() )
             {
                 m_log.error(
@@ -1031,7 +1031,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
         {
             const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
             const auto domainDefinitionType =
-                static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
+                static_cast< const AST::Type* >( domainDefinition.domainType().get() );
             if( node.id() != domainDefinitionType->id() )
             {
                 m_log.error(
@@ -1169,7 +1169,7 @@ void TypeCheckVisitor::visit( RelationType& node )
         {
             const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
             const auto domainDefinitionType =
-                static_cast< const Ast::Type* >( domainDefinition.domainType().get() );
+                static_cast< const AST::Type* >( domainDefinition.domainType().get() );
             if( node.id() != domainDefinitionType->id() )
             {
                 m_log.error(

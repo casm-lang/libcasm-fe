@@ -48,7 +48,7 @@
 
 namespace libcasm_fe
 {
-    namespace Ast
+    namespace AST
     {
         class HeaderDefinition;
         class InitDefinition;

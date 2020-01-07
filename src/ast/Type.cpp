@@ -53,7 +53,7 @@
 #include <libcasm-fe/ast/Token>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 static const auto unresolvedIdentifierPath =
     IdentifierPath::fromIdentifier( std::make_shared< Identifier >( "$unresolved$" ) );
@@ -99,7 +99,7 @@ const Token::Ptr& Type::delimiterToken( void ) const
 
 IdentifierPath::Ptr Type::signaturePath( void ) const
 {
-    const auto& typeSignatureIdentifier = Ast::make< Identifier >( sourceLocation(), signature() );
+    const auto& typeSignatureIdentifier = AST::make< Identifier >( sourceLocation(), signature() );
 
     const auto path = IdentifierPath::fromIdentifier( name()->identifiers()->front() );
     for( std::size_t i = 1; i < name()->identifiers()->size(); i++ )
@@ -218,7 +218,7 @@ TupleType::TupleType(
 : EmbracedType(
       Node::ID::TUPLE_TYPE,
       IdentifierPath::fromIdentifier(
-          Ast::make< Identifier >( subTypes->sourceLocation(), TypeInfo::TYPE_NAME_TUPLE ) ),
+          AST::make< Identifier >( subTypes->sourceLocation(), TypeInfo::TYPE_NAME_TUPLE ) ),
       leftBraceToken,
       rightBraceToken )
 , m_subTypes( subTypes )
@@ -272,7 +272,7 @@ RecordType::RecordType(
 : EmbracedType(
       Node::ID::RECORD_TYPE,
       IdentifierPath::fromIdentifier(
-          Ast::make< Identifier >( namedSubTypes->sourceLocation(), TypeInfo::TYPE_NAME_RECORD ) ),
+          AST::make< Identifier >( namedSubTypes->sourceLocation(), TypeInfo::TYPE_NAME_RECORD ) ),
       leftBraceToken,
       rightBraceToken )
 , m_namedSubTypes( namedSubTypes )

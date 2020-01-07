@@ -51,7 +51,7 @@
 
 namespace libcasm_fe
 {
-    namespace Ast
+    namespace AST
     {
         class Identifier final : public Node
         {

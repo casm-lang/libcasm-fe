@@ -51,7 +51,7 @@
 #include "various/GrammarToken.h"
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 const std::string& Namespace::delimiter( void )
 {
@@ -70,7 +70,7 @@ Namespace::Namespace( void )
 {
 }
 
-void Namespace::registerSymbol( const std::string& name, const Ast::Definition::Ptr& definition )
+void Namespace::registerSymbol( const std::string& name, const AST::Definition::Ptr& definition )
 {
     const auto result = m_symbols.emplace( name, definition );
     if( not result.second )
@@ -171,7 +171,7 @@ Namespace::Ptr Namespace::findNamespace( const IdentifierPath& path ) const
     return _namespace;
 }
 
-const std::unordered_map< std::string, Ast::Definition::Ptr >& Namespace::symbols( void ) const
+const std::unordered_map< std::string, AST::Definition::Ptr >& Namespace::symbols( void ) const
 {
     return m_symbols;
 }
@@ -204,7 +204,7 @@ void Namespace::registerTypeDefinition( TypeDefinition& node )
     }
 }
 
-Ast::TypeDefinition::Ptr Namespace::findTypeDefinition( const libcasm_ir::Type::ID typeID ) const
+AST::TypeDefinition::Ptr Namespace::findTypeDefinition( const libcasm_ir::Type::ID typeID ) const
 {
     const auto& definitionResult = m_typeIdToTypeDefinition.find( typeID );
     if( definitionResult == m_typeIdToTypeDefinition.end() )

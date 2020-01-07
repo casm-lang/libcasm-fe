@@ -52,7 +52,7 @@
 
 namespace libcasm_fe
 {
-    namespace Ast
+    namespace AST
     {
         class VariableDefinition;
         using VariableDefinitions = NodeList< VariableDefinition >;

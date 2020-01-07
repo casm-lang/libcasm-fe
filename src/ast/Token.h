@@ -56,7 +56,7 @@ namespace libcasm_fe
         enum class Token : u8;
     }
 
-    namespace Ast
+    namespace AST
     {
         class Token final : public Node
         {

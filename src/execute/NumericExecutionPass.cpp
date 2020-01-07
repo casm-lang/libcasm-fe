@@ -61,7 +61,7 @@
 #include <mutex>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char NumericExecutionPass::id = 0;
 

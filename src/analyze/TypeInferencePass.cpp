@@ -67,7 +67,7 @@
 #include <libstdhl/String>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char TypeInferencePass::id = 0;
 
@@ -143,7 +143,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void resolveDomainTypeBehaviorImplementSymbol(
         TargetCallExpression& node,
         const libcasm_ir::Type::Ptr& domainType,
-        const Ast::Type::Ptr& behaviorType,
+        const AST::Type::Ptr& behaviorType,
         const std::string& symbolName,
         const libcasm_ir::Type::Ptr& resultType = nullptr );
 
@@ -600,7 +600,7 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         }
     }
 
-    Ast::Type::Ptr behaviorType = nullptr;
+    AST::Type::Ptr behaviorType = nullptr;
     if( not structureMember )
     {
         std::vector< TypeDefinition::Ptr > behaviors = {};
@@ -753,10 +753,10 @@ void TypeInferenceVisitor::visit( LiteralCallExpression& node )
     const auto& sourceLocation = node.sourceLocation();
     const auto& expressionType = node.object()->type();
 
-    const auto& behaviorType = Ast::make< TemplateType >(
+    const auto& behaviorType = AST::make< TemplateType >(
         sourceLocation,
         IdentifierPath::fromIdentifier(
-            Ast::make< Identifier >( sourceLocation, "ElementAccess" ) ),
+            AST::make< Identifier >( sourceLocation, "ElementAccess" ) ),
         Token::unresolved(),
         std::make_shared< Types >(),
         Token::unresolved() );
@@ -877,9 +877,9 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
     const auto& sourceLocation = node.sourceLocation();
     const auto& expressionType = node.fromExpression()->type();
 
-    const auto& behaviorType = Ast::make< TemplateType >(
+    const auto& behaviorType = AST::make< TemplateType >(
         sourceLocation,
-        IdentifierPath::fromIdentifier( Ast::make< Identifier >( sourceLocation, "TypeCasting" ) ),
+        IdentifierPath::fromIdentifier( AST::make< Identifier >( sourceLocation, "TypeCasting" ) ),
         Token::unresolved(),
         std::make_shared< Types >(),
         Token::unresolved() );
@@ -956,10 +956,10 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
     const auto& sourceLocation = node.sourceLocation();
     const auto& expressionType = expression->type();
 
-    const auto& behaviorType = Ast::make< BasicType >(
+    const auto& behaviorType = AST::make< BasicType >(
         sourceLocation,
         IdentifierPath::fromIdentifier(
-            Ast::make< Identifier >( sourceLocation, operation->second.first ) ) );
+            AST::make< Identifier >( sourceLocation, operation->second.first ) ) );
 
     const auto& symbolName = operation->second.second;
 
@@ -1063,10 +1063,10 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
     const auto& sourceLocation = node.sourceLocation();
     const auto& expressionType = lhsExpression->type();
 
-    const auto& behaviorType = Ast::make< BasicType >(
+    const auto& behaviorType = AST::make< BasicType >(
         sourceLocation,
         IdentifierPath::fromIdentifier(
-            Ast::make< Identifier >( sourceLocation, operation->second.first ) ) );
+            AST::make< Identifier >( sourceLocation, operation->second.first ) ) );
 
     const auto& symbolName = operation->second.second;
 
@@ -1132,7 +1132,7 @@ void TypeInferenceVisitor::visit( ListLiteral& node )
     // assert( subTypeDefinition and " inconsistent state " );
     // subTypeDefinition->accept( *this );
 
-    // const auto& subType = subTypeDefinition->domainType()->duplicate< Ast::Type >();
+    // const auto& subType = subTypeDefinition->domainType()->duplicate< AST::Type >();
 
     // const auto& domainSymbol = m_symboltable.findSymbol( TypeInfo::TYPE_NAME_LIST );
     // assert( domainSymbol and " inconsistent state, checked during symbol registration " );
@@ -1144,7 +1144,7 @@ void TypeInferenceVisitor::visit( ListLiteral& node )
     // const auto& duplicateDomainDefinition = domainSymbol->duplicate< DomainDefinition >();
     // for( auto const& templateSymbol : *domainDefinition->templateSymbols() )
     // {
-    //     const auto& fromBasicType = Ast::make< BasicType >(
+    //     const auto& fromBasicType = AST::make< BasicType >(
     //         templateSymbol->sourceLocation(),
     //         IdentifierPath::fromIdentifier( templateSymbol->identifier() ) );
 
@@ -1262,7 +1262,7 @@ void TypeInferenceVisitor::visit( RangeLiteral& node )
     assert( subTypeDefinition and " inconsistent state " );
     subTypeDefinition->accept( *this );
 
-    const auto& subType = subTypeDefinition->domainType()->duplicate< Ast::Type >();
+    const auto& subType = subTypeDefinition->domainType()->duplicate< AST::Type >();
 
     const auto& domainSymbol = m_symboltable.findSymbol( TypeInfo::TYPE_NAME_RANGE );
     assert( domainSymbol and " inconsistent state, checked during symbol registration " );
@@ -1274,7 +1274,7 @@ void TypeInferenceVisitor::visit( RangeLiteral& node )
     const auto& duplicateDomainDefinition = domainSymbol->duplicate< DomainDefinition >();
     for( auto const& templateSymbol : *domainDefinition->templateNode()->symbols() )
     {
-        const auto& fromBasicType = Ast::make< BasicType >(
+        const auto& fromBasicType = AST::make< BasicType >(
             templateSymbol->sourceLocation(),
             IdentifierPath::fromIdentifier( templateSymbol->identifier() ) );
 
@@ -1565,10 +1565,10 @@ void TypeInferenceVisitor::visit( CardinalityExpression& node )
 
     const auto& sourceLocation = node.sourceLocation();
     const auto& expressionType = node.expression()->type();
-    const auto& behaviorType = Ast::make< BasicType >(
+    const auto& behaviorType = AST::make< BasicType >(
         sourceLocation,
         IdentifierPath::fromIdentifier(
-            Ast::make< Identifier >( sourceLocation, "Cardinality" ) ) );
+            AST::make< Identifier >( sourceLocation, "Cardinality" ) ) );
     const auto& symbolName = "size";
 
     try
@@ -2002,7 +2002,7 @@ void TypeInferenceVisitor::assignment(
 void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
     TargetCallExpression& node,
     const libcasm_ir::Type::Ptr& domainType,
-    const Ast::Type::Ptr& behaviorType,
+    const AST::Type::Ptr& behaviorType,
     const std::string& symbolName,
     const libcasm_ir::Type::Ptr& resultType )
 {
@@ -2029,7 +2029,7 @@ void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
     {
         const auto& behaviorName = behaviorType->name()->path();
         const auto& behaviorPath = IdentifierPath::fromIdentifier(
-            Ast::make< Identifier >( node.sourceLocation(), "CASM" ) );
+            AST::make< Identifier >( node.sourceLocation(), "CASM" ) );
         for( const auto& behaviorTypeNameIdentifier : *behaviorType->name()->identifiers() )
         {
             behaviorPath->addIdentifier( behaviorTypeNameIdentifier );
@@ -2156,7 +2156,7 @@ void TypeInferenceVisitor::inference(
         if( arguments[ c ]->id() == Node::ID::VALUE_LITERAL )
         {
             const auto argumentValue =
-                static_cast< Ast::ValueLiteral* >( arguments[ c ].get() )->value();
+                static_cast< AST::ValueLiteral* >( arguments[ c ].get() )->value();
             argValues.emplace_back( argumentValue );
         }
         else

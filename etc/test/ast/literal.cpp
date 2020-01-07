@@ -48,9 +48,9 @@
 #include <memory>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
-TEST( AstValueLiteral, toStringOfBoolean )
+TEST( ASTValueLiteral, toStringOfBoolean )
 {
     // 'true'
     {
@@ -64,7 +64,7 @@ TEST( AstValueLiteral, toStringOfBoolean )
         const auto loc = SourceLocation( begin, end );
 
         const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
-        const auto literal = Ast::make< ValueLiteral >( loc, value );
+        const auto literal = AST::make< ValueLiteral >( loc, value );
         EXPECT_EQ( literal->toString(), "true" );
 
         libstdhl::File::remove( *filename );
@@ -81,14 +81,14 @@ TEST( AstValueLiteral, toStringOfBoolean )
         const auto loc = SourceLocation( begin, end );
 
         const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( false );
-        const auto literal = Ast::make< ValueLiteral >( loc, value );
+        const auto literal = AST::make< ValueLiteral >( loc, value );
         EXPECT_EQ( literal->toString(), "false" );
 
         libstdhl::File::remove( *filename );
     }
 }
 
-TEST( AstValueLiteral, toStringOfBinary )
+TEST( ASTValueLiteral, toStringOfBinary )
 {
     {
         const auto radix = libstdhl::Type::Radix::BINARY;
@@ -103,7 +103,7 @@ TEST( AstValueLiteral, toStringOfBinary )
             const auto loc = SourceLocation( begin, end );
 
             const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( "0", radix );
-            const auto literal = Ast::make< ValueLiteral >( loc, value );
+            const auto literal = AST::make< ValueLiteral >( loc, value );
             literal->setRadix( radix );
             EXPECT_EQ( literal->toString(), "0b0" );
 
@@ -120,7 +120,7 @@ TEST( AstValueLiteral, toStringOfBinary )
             const auto loc = SourceLocation( begin, end );
 
             const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( "1", radix );
-            const auto literal = Ast::make< ValueLiteral >( loc, value );
+            const auto literal = AST::make< ValueLiteral >( loc, value );
             literal->setRadix( radix );
             EXPECT_EQ( literal->toString(), "0b1" );
 
@@ -138,7 +138,7 @@ TEST( AstValueLiteral, toStringOfBinary )
 
             const auto value =
                 libstdhl::Memory::get< libcasm_ir::BinaryConstant >( "0000111001010", radix );
-            const auto literal = Ast::make< ValueLiteral >( loc, value );
+            const auto literal = AST::make< ValueLiteral >( loc, value );
             literal->setRadix( radix );
             EXPECT_EQ( literal->toString(), "0b0000111001010" );
 
@@ -156,7 +156,7 @@ TEST( AstValueLiteral, toStringOfBinary )
 
             const auto value =
                 libstdhl::Memory::get< libcasm_ir::BinaryConstant >( "11111", radix );
-            const auto literal = Ast::make< ValueLiteral >( loc, value );
+            const auto literal = AST::make< ValueLiteral >( loc, value );
             literal->setRadix( radix );
             EXPECT_EQ( literal->toString(), "0b11111" );
 
@@ -176,7 +176,7 @@ TEST( AstValueLiteral, toStringOfBinary )
             const auto loc = SourceLocation( begin, end );
 
             const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( "0", radix );
-            const auto literal = Ast::make< ValueLiteral >( loc, value );
+            const auto literal = AST::make< ValueLiteral >( loc, value );
             literal->setRadix( radix );
             EXPECT_EQ( literal->toString(), "0x0" );
 
@@ -193,7 +193,7 @@ TEST( AstValueLiteral, toStringOfBinary )
             const auto loc = SourceLocation( begin, end );
 
             const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( "1", radix );
-            const auto literal = Ast::make< ValueLiteral >( loc, value );
+            const auto literal = AST::make< ValueLiteral >( loc, value );
             literal->setRadix( radix );
             EXPECT_EQ( literal->toString(), "0x1" );
 
@@ -211,7 +211,7 @@ TEST( AstValueLiteral, toStringOfBinary )
 
             const auto value =
                 libstdhl::Memory::get< libcasm_ir::BinaryConstant >( "0feed00123401", radix );
-            const auto literal = Ast::make< ValueLiteral >( loc, value );
+            const auto literal = AST::make< ValueLiteral >( loc, value );
             literal->setRadix( radix );
             EXPECT_EQ( literal->toString(), "0x0feed00123401" );
 
@@ -229,7 +229,7 @@ TEST( AstValueLiteral, toStringOfBinary )
 
             const auto value =
                 libstdhl::Memory::get< libcasm_ir::BinaryConstant >( "fffff", radix );
-            const auto literal = Ast::make< ValueLiteral >( loc, value );
+            const auto literal = AST::make< ValueLiteral >( loc, value );
             literal->setRadix( radix );
             EXPECT_EQ( literal->toString(), "0xfffff" );
 
@@ -238,7 +238,7 @@ TEST( AstValueLiteral, toStringOfBinary )
     }
 }
 
-TEST( AstValueLiteral, toStringOfInteger )
+TEST( ASTValueLiteral, toStringOfInteger )
 {
     const auto radix = libstdhl::Type::Radix::DECIMAL;
     {
@@ -252,7 +252,7 @@ TEST( AstValueLiteral, toStringOfInteger )
         const auto loc = SourceLocation( begin, end );
 
         const auto value = libstdhl::Memory::get< libcasm_ir::IntegerConstant >( "0", radix );
-        const auto literal = Ast::make< ValueLiteral >( loc, value );
+        const auto literal = AST::make< ValueLiteral >( loc, value );
         EXPECT_EQ( literal->toString(), "0" );
 
         libstdhl::File::remove( *filename );
@@ -268,7 +268,7 @@ TEST( AstValueLiteral, toStringOfInteger )
         const auto loc = SourceLocation( begin, end );
 
         const auto value = libstdhl::Memory::get< libcasm_ir::IntegerConstant >( "1", radix );
-        const auto literal = Ast::make< ValueLiteral >( loc, value );
+        const auto literal = AST::make< ValueLiteral >( loc, value );
         EXPECT_EQ( literal->toString(), "1" );
 
         libstdhl::File::remove( *filename );
@@ -284,7 +284,7 @@ TEST( AstValueLiteral, toStringOfInteger )
         const auto loc = SourceLocation( begin, end );
 
         const auto value = libstdhl::Memory::get< libcasm_ir::IntegerConstant >( "-1", radix );
-        const auto literal = Ast::make< ValueLiteral >( loc, value );
+        const auto literal = AST::make< ValueLiteral >( loc, value );
         EXPECT_EQ( literal->toString(), "-1" );
 
         libstdhl::File::remove( *filename );
@@ -301,7 +301,7 @@ TEST( AstValueLiteral, toStringOfInteger )
 
         const auto value =
             libstdhl::Memory::get< libcasm_ir::IntegerConstant >( "1782634879", radix );
-        const auto literal = Ast::make< ValueLiteral >( loc, value );
+        const auto literal = AST::make< ValueLiteral >( loc, value );
         EXPECT_EQ( literal->toString(), "1782634879" );
 
         libstdhl::File::remove( *filename );
@@ -318,7 +318,7 @@ TEST( AstValueLiteral, toStringOfInteger )
 
         const auto value =
             libstdhl::Memory::get< libcasm_ir::IntegerConstant >( "-4343424", radix );
-        const auto literal = Ast::make< ValueLiteral >( loc, value );
+        const auto literal = AST::make< ValueLiteral >( loc, value );
         EXPECT_EQ( literal->toString(), "-4343424" );
 
         libstdhl::File::remove( *filename );

@@ -60,7 +60,7 @@
 #include <libstdhl/std/rfc3986>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char ProjectResolverPass::id = 0;
 

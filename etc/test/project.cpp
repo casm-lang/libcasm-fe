@@ -52,7 +52,7 @@
 #include <libpass/analyze/LoadFilePass>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 #define TEST_PASS( PASS, FILENAME, STATUS, CONFIG )                                               \
     {                                                                                             \

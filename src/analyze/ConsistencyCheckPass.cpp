@@ -64,7 +64,7 @@
 #include <algorithm>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 namespace IR = libcasm_ir;
 
