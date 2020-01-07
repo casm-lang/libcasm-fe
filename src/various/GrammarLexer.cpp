@@ -733,7 +733,7 @@ using namespace libcasm_fe;
 
 // Code run each time a token is matched, see GrammarToken.hpp.
 #define YY_TOKEN_ACTION( TOKEN ) \
-    const auto token = Ast::make< Ast::Token >( m_loc, Grammar::Token:: TOKEN ); \
+    const auto token = AST::make< AST::Token >( m_loc, Grammar::Token:: TOKEN ); \
     token->setSpans( fetchSpansAndReset() ); \
     return Parser::make_##TOKEN( token, m_loc );
 
@@ -947,7 +947,7 @@ YY_RULE_SETUP
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( yytext + 2, libstdhl::Type::BINARY );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = AST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
         valueLiteral->setRadix( libstdhl::Type::Radix::BINARY );
     }
@@ -967,7 +967,7 @@ YY_RULE_SETUP
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( yytext + 2, libstdhl::Type::HEXADECIMAL );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = AST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
         valueLiteral->setRadix( libstdhl::Type::Radix::HEXADECIMAL );
     }
@@ -987,7 +987,7 @@ YY_RULE_SETUP
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::RationalConstant >( yytext + 2 );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = AST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
 
     }
@@ -1007,7 +1007,7 @@ YY_RULE_SETUP
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::IntegerConstant >( yytext, libstdhl::Type::DECIMAL );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = AST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
     }
     catch( const std::domain_error& e )
@@ -1026,7 +1026,7 @@ YY_RULE_SETUP
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::DecimalConstant >( yytext );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = AST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
 
     }
@@ -1451,7 +1451,7 @@ case 88:
 YY_RULE_SETUP
 #line 263 "obj/src/GrammarLexer.l"
 { // space
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::SPACE, yyleng);
+    const auto span = AST::make< Span >( m_loc, Grammar::Span::SPACE, yyleng);
     m_spans->add(span);
     m_loc.step();
 }
@@ -1467,7 +1467,7 @@ case 90:
 YY_RULE_SETUP
 #line 273 "obj/src/GrammarLexer.l"
 { // tabulator
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::TABULATOR, yyleng );
+    const auto span = AST::make< Span >( m_loc, Grammar::Span::TABULATOR, yyleng );
     m_spans->add(span);
     m_loc.step();
 }
@@ -1478,7 +1478,7 @@ YY_RULE_SETUP
 #line 279 "obj/src/GrammarLexer.l"
 { // newline
     m_loc.lines( yyleng );
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::NEWLINE, yyleng );
+    const auto span = AST::make< Span >( m_loc, Grammar::Span::NEWLINE, yyleng );
     m_spans->add(span);
     m_loc.step();
 }
@@ -1503,7 +1503,7 @@ YY_RULE_SETUP
     }
     else
     {
-        const auto identifier = Ast::make< Identifier >( m_loc, m_strbuf );
+        const auto identifier = AST::make< Identifier >( m_loc, m_strbuf );
         identifier->setSpans( fetchSpansAndReset() );
         return Parser::make_IDENTIFIER( identifier, m_loc );
     }
@@ -1551,7 +1551,7 @@ case 96:
 YY_RULE_SETUP
 #line 337 "obj/src/GrammarLexer.l"
 {
-    const auto identifier = Ast::make< Identifier >( m_loc, m_strbuf );
+    const auto identifier = AST::make< Identifier >( m_loc, m_strbuf );
     identifier->setSpans( fetchSpansAndReset() );
     const auto token = Parser::make_IDENTIFIER( identifier, m_loc );
     unput( yytext[0] );
@@ -1567,7 +1567,7 @@ YY_RULE_SETUP
     m_loc.columns( -yyleng );
     unput( yytext[0] );
     BEGIN( INITIAL );
-    const auto identifier = Ast::make< Identifier >( m_loc, m_strbuf );
+    const auto identifier = AST::make< Identifier >( m_loc, m_strbuf );
     identifier->setSpans( fetchSpansAndReset() );
     return Parser::make_IDENTIFIER( identifier, m_loc );
 }
@@ -1613,7 +1613,7 @@ YY_RULE_SETUP
             unput( firstCharacter );
         }
 
-        const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+        const auto span = AST::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
         m_spans->add( span );
         m_loc.step();
         BEGIN( INITIAL );
@@ -1625,7 +1625,7 @@ YY_RULE_SETUP
         {
             unput( secondCharacter );
             unput( firstCharacter );
-            const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+            const auto span = AST::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
             m_spans->add( span );
             m_loc.step();
             BEGIN( INITIAL );
@@ -1641,7 +1641,7 @@ YY_RULE_SETUP
 case YY_STATE_EOF(YY_INLINE_COMMENT):
 #line 409 "obj/src/GrammarLexer.l"
 {
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+    const auto span = AST::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
     m_spans->add(span);
     BEGIN( INITIAL );
 }
@@ -1660,7 +1660,7 @@ YY_RULE_SETUP
 #line 421 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( yytext );
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::BLOCK_COMMENT, m_strbuf.length() );
+    const auto span = AST::make< Span >( m_loc, Grammar::Span::BLOCK_COMMENT, m_strbuf.length() );
     m_spans->add(span);
     m_loc.step();
     BEGIN( INITIAL );
@@ -1717,7 +1717,7 @@ YY_RULE_SETUP
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::StringConstant >( m_strbuf );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = AST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
     }
     catch( const std::domain_error& e )

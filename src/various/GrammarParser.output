@@ -401,88 +401,88 @@ Terminals, with rules where they appear
 
     "end of file" (0) 0
     error (256) 8 29 36 37 41 98 112 113 116 117 134 166 170 174 206 272 278
-    "CASM" <Ast::Token::Ptr> (258) 2 3 246
-    "init" <Ast::Token::Ptr> (259) 23 24
-    "derived" <Ast::Token::Ptr> (260) 26 27 28 29 77
-    "enumeration" <Ast::Token::Ptr> (261) 25 248
-    "rule" <Ast::Token::Ptr> (262) 30 31 32 33 34 35 36 37 78
-    "using" <Ast::Token::Ptr> (263) 44 45 46
-    "invariant" <Ast::Token::Ptr> (264) 47
-    "import" <Ast::Token::Ptr> (265) 48 49
-    "structure" <Ast::Token::Ptr> (266) 50
-    "behavior" <Ast::Token::Ptr> (267) 55
-    "implement" <Ast::Token::Ptr> (268) 67 68
-    "for" <Ast::Token::Ptr> (269) 68
-    "self" <Ast::Token::Ptr> (270) 247
-    "this" <Ast::Token::Ptr> (271) 161 232
-    "domain" <Ast::Token::Ptr> (272) 75
-    "builtin" <Ast::Token::Ptr> (273) 76
-    "template" <Ast::Token::Ptr> (274) 64
-    "function" <Ast::Token::Ptr> (275) 38
-    "defined" <Ast::Token::Ptr> (276) 235
-    "seq" <Ast::Token::Ptr> (277) 115 117
-    "endseq" <Ast::Token::Ptr> (278) 115 117
-    "par" <Ast::Token::Ptr> (279) 111 113
-    "endpar" <Ast::Token::Ptr> (280) 111 113
-    "skip" <Ast::Token::Ptr> (281) 94
-    "let" <Ast::Token::Ptr> (282) 104 176
-    "local" <Ast::Token::Ptr> (283) 105
-    "in" <Ast::Token::Ptr> (284) 104 105 106 107 108 176 178 179 180 245
-    "forall" <Ast::Token::Ptr> (285) 106 107 179
-    "choose" <Ast::Token::Ptr> (286) 108 178
-    "iterate" <Ast::Token::Ptr> (287) 109
-    "do" <Ast::Token::Ptr> (288) 106 107 108 121 178
-    "if" <Ast::Token::Ptr> (289) 95 96 177
-    "then" <Ast::Token::Ptr> (290) 95 96 177
-    "else" <Ast::Token::Ptr> (291) 96 177
-    "case" <Ast::Token::Ptr> (292) 97 98
-    "of" <Ast::Token::Ptr> (293) 97 98
-    "default" <Ast::Token::Ptr> (294) 101
-    "holds" <Ast::Token::Ptr> (295) 179
-    "exists" <Ast::Token::Ptr> (296) 180
-    "with" <Ast::Token::Ptr> (297) 107 180
-    "as" <Ast::Token::Ptr> (298) 49 175
-    "while" <Ast::Token::Ptr> (299) 121
-    "undef" <Ast::Token::Ptr> (300) 194
-    "false" <Ast::Token::Ptr> (301) 196
-    "true" <Ast::Token::Ptr> (302) 195
-    "and" <Ast::Token::Ptr> (303) 154
-    "or" <Ast::Token::Ptr> (304) 152
-    "xor" <Ast::Token::Ptr> (305) 153
-    "implies" <Ast::Token::Ptr> (306) 156
-    "not" <Ast::Token::Ptr> (307) 157
-    "+" <Ast::Token::Ptr> (308) 138 140
-    "-" <Ast::Token::Ptr> (309) 139 141
-    "=" <Ast::Token::Ptr> (310) 25 26 27 28 29 30 31 32 33 34 35 36 37 44 47 50 55 67 68 147 237 267
-    "(" <Ast::Token::Ptr> (311) 27 28 29 32 33 34 35 36 37 133 134 163 164 165 166 168 169 170 172 173 174 208 222 242
-    ")" <Ast::Token::Ptr> (312) 27 28 29 32 33 34 35 36 37 133 134 163 164 165 166 168 169 170 172 173 174 208 222 242
-    "[" <Ast::Token::Ptr> (313) 204 205 206 207 276 277 278
-    "]" <Ast::Token::Ptr> (314) 204 205 206 207 276 277 278
-    "{" <Ast::Token::Ptr> (315) 24 25 50 55 67 68 97 98 110 112 209 223 235 237
-    "}" <Ast::Token::Ptr> (316) 24 25 50 55 67 68 97 98 110 112 209 223 235 237
-    ":" <Ast::Token::Ptr> (317) 38 77 78 101 102 103 212 257 273
-    "::" <Ast::Token::Ptr> (318) 46 249
-    "_" <Ast::Token::Ptr> (319) 102
-    "|" <Ast::Token::Ptr> (320) 181
-    "@" <Ast::Token::Ptr> (321) 203
-    "," <Ast::Token::Ptr> (322) 42 122 208 210 213 222 223 231 233 239 253 255 262 265 268
-    "<" <Ast::Token::Ptr> (323) 64 148 224 225
-    ">" <Ast::Token::Ptr> (324) 64 149 224 225
-    "*" <Ast::Token::Ptr> (325) 46 142 227
-    "/" <Ast::Token::Ptr> (326) 143
-    "%" <Ast::Token::Ptr> (327) 144
-    "^" <Ast::Token::Ptr> (328) 145
-    "'" <Ast::Token::Ptr> (329) 226
-    ".." <Ast::Token::Ptr> (330) 207
-    "." <Ast::Token::Ptr> (331) 167 168 169 170 171
-    "->" <Ast::Token::Ptr> (332) 26 27 28 29 31 33 35 37 38 77 78 225 242 243 273
-    "=>" <Ast::Token::Ptr> (333) 155
-    ":=" <Ast::Token::Ptr> (334) 118 119
-    "!=" <Ast::Token::Ptr> (335) 146
-    "<=" <Ast::Token::Ptr> (336) 150
-    ">=" <Ast::Token::Ptr> (337) 151
-    "{|" <Ast::Token::Ptr> (338) 114 116
-    "|}" <Ast::Token::Ptr> (339) 114 116
+    "CASM" <AST::Token::Ptr> (258) 2 3 246
+    "init" <AST::Token::Ptr> (259) 23 24
+    "derived" <AST::Token::Ptr> (260) 26 27 28 29 77
+    "enumeration" <AST::Token::Ptr> (261) 25 248
+    "rule" <AST::Token::Ptr> (262) 30 31 32 33 34 35 36 37 78
+    "using" <AST::Token::Ptr> (263) 44 45 46
+    "invariant" <AST::Token::Ptr> (264) 47
+    "import" <AST::Token::Ptr> (265) 48 49
+    "structure" <AST::Token::Ptr> (266) 50
+    "behavior" <AST::Token::Ptr> (267) 55
+    "implement" <AST::Token::Ptr> (268) 67 68
+    "for" <AST::Token::Ptr> (269) 68
+    "self" <AST::Token::Ptr> (270) 247
+    "this" <AST::Token::Ptr> (271) 161 232
+    "domain" <AST::Token::Ptr> (272) 75
+    "builtin" <AST::Token::Ptr> (273) 76
+    "template" <AST::Token::Ptr> (274) 64
+    "function" <AST::Token::Ptr> (275) 38
+    "defined" <AST::Token::Ptr> (276) 235
+    "seq" <AST::Token::Ptr> (277) 115 117
+    "endseq" <AST::Token::Ptr> (278) 115 117
+    "par" <AST::Token::Ptr> (279) 111 113
+    "endpar" <AST::Token::Ptr> (280) 111 113
+    "skip" <AST::Token::Ptr> (281) 94
+    "let" <AST::Token::Ptr> (282) 104 176
+    "local" <AST::Token::Ptr> (283) 105
+    "in" <AST::Token::Ptr> (284) 104 105 106 107 108 176 178 179 180 245
+    "forall" <AST::Token::Ptr> (285) 106 107 179
+    "choose" <AST::Token::Ptr> (286) 108 178
+    "iterate" <AST::Token::Ptr> (287) 109
+    "do" <AST::Token::Ptr> (288) 106 107 108 121 178
+    "if" <AST::Token::Ptr> (289) 95 96 177
+    "then" <AST::Token::Ptr> (290) 95 96 177
+    "else" <AST::Token::Ptr> (291) 96 177
+    "case" <AST::Token::Ptr> (292) 97 98
+    "of" <AST::Token::Ptr> (293) 97 98
+    "default" <AST::Token::Ptr> (294) 101
+    "holds" <AST::Token::Ptr> (295) 179
+    "exists" <AST::Token::Ptr> (296) 180
+    "with" <AST::Token::Ptr> (297) 107 180
+    "as" <AST::Token::Ptr> (298) 49 175
+    "while" <AST::Token::Ptr> (299) 121
+    "undef" <AST::Token::Ptr> (300) 194
+    "false" <AST::Token::Ptr> (301) 196
+    "true" <AST::Token::Ptr> (302) 195
+    "and" <AST::Token::Ptr> (303) 154
+    "or" <AST::Token::Ptr> (304) 152
+    "xor" <AST::Token::Ptr> (305) 153
+    "implies" <AST::Token::Ptr> (306) 156
+    "not" <AST::Token::Ptr> (307) 157
+    "+" <AST::Token::Ptr> (308) 138 140
+    "-" <AST::Token::Ptr> (309) 139 141
+    "=" <AST::Token::Ptr> (310) 25 26 27 28 29 30 31 32 33 34 35 36 37 44 47 50 55 67 68 147 237 267
+    "(" <AST::Token::Ptr> (311) 27 28 29 32 33 34 35 36 37 133 134 163 164 165 166 168 169 170 172 173 174 208 222 242
+    ")" <AST::Token::Ptr> (312) 27 28 29 32 33 34 35 36 37 133 134 163 164 165 166 168 169 170 172 173 174 208 222 242
+    "[" <AST::Token::Ptr> (313) 204 205 206 207 276 277 278
+    "]" <AST::Token::Ptr> (314) 204 205 206 207 276 277 278
+    "{" <AST::Token::Ptr> (315) 24 25 50 55 67 68 97 98 110 112 209 223 235 237
+    "}" <AST::Token::Ptr> (316) 24 25 50 55 67 68 97 98 110 112 209 223 235 237
+    ":" <AST::Token::Ptr> (317) 38 77 78 101 102 103 212 257 273
+    "::" <AST::Token::Ptr> (318) 46 249
+    "_" <AST::Token::Ptr> (319) 102
+    "|" <AST::Token::Ptr> (320) 181
+    "@" <AST::Token::Ptr> (321) 203
+    "," <AST::Token::Ptr> (322) 42 122 208 210 213 222 223 231 233 239 253 255 262 265 268
+    "<" <AST::Token::Ptr> (323) 64 148 224 225
+    ">" <AST::Token::Ptr> (324) 64 149 224 225
+    "*" <AST::Token::Ptr> (325) 46 142 227
+    "/" <AST::Token::Ptr> (326) 143
+    "%" <AST::Token::Ptr> (327) 144
+    "^" <AST::Token::Ptr> (328) 145
+    "'" <AST::Token::Ptr> (329) 226
+    ".." <AST::Token::Ptr> (330) 207
+    "." <AST::Token::Ptr> (331) 167 168 169 170 171
+    "->" <AST::Token::Ptr> (332) 26 27 28 29 31 33 35 37 38 77 78 225 242 243 273
+    "=>" <AST::Token::Ptr> (333) 155
+    ":=" <AST::Token::Ptr> (334) 118 119
+    "!=" <AST::Token::Ptr> (335) 146
+    "<=" <AST::Token::Ptr> (336) 150
+    ">=" <AST::Token::Ptr> (337) 151
+    "{|" <AST::Token::Ptr> (338) 114 116
+    "|}" <AST::Token::Ptr> (339) 114 116
     "binary" <ValueLiteral::Ptr> (340) 200
     "hexadecimal" <ValueLiteral::Ptr> (341) 201
     "integer" <ValueLiteral::Ptr> (342) 197
@@ -741,7 +741,7 @@ Nonterminals, with rules where they appear
     Types <Types::Ptr> (177)
         on left: 213 214
         on right: 213 222 224
-    Type <libcasm_fe::Ast::Type::Ptr> (178)
+    Type <libcasm_fe::AST::Type::Ptr> (178)
         on left: 215 216 217 218 219 220
         on right: 26 27 28 29 31 33 35 37 38 44 55 67 68 75 77 78 175 213 214 222 225 227 228 257 273
     BasicType <BasicType::Ptr> (179)
