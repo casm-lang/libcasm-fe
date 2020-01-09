@@ -137,15 +137,15 @@ SOURCE_TEST( execute, NumericExecutionPass, source, true, , );  // TODO: FIXME:
 static const auto source_add = R"***(
 CASM
 
-init add
+init test
 
 [symbolic] function a : -> Integer
 [symbolic] function b : -> Integer
 [symbolic] function c : -> Integer
 
-rule add = 
+rule test = 
 {
-	c = a + b
+	c := a + b
 	program( self ) := undef
 }
 
