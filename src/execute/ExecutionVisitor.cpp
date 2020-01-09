@@ -78,7 +78,7 @@ class ScopedOverwrite : public libstdhl::RestoreOnScopeExit< T >
     }
 };
 
-static std::string updateAsString( const ExecutionUpdateSet::Update& update )
+std::string ExecutionVisitor::updateAsString( const ExecutionUpdateSet::Update& update )
 {
     const auto& location = update.location;
     const auto& value = update.value;
@@ -104,7 +104,8 @@ static std::string updateAsString( const ExecutionUpdateSet::Update& update )
     return locationStr + " := " + value.value.name();
 }
 
-static UpdateException::UpdateInfo updateAsUpdateInfo( const ExecutionUpdateSet::Update& update )
+UpdateException::UpdateInfo ExecutionVisitor::updateAsUpdateInfo(
+    const ExecutionUpdateSet::Update& update )
 {
     return { update.value.producer->ptr< Node >(),
              update.location.function()->ptr< FunctionDefinition >(),
@@ -1540,6 +1541,13 @@ void StateInitializationVisitor::visit( FunctionDefinition& node )
     transaction.merge();
 }
 
+InvariantChecker::InvariantChecker(
+    ExecutionLocationRegistry& locationRegistry, const Storage& globalState )
+: m_globalState( globalState )
+, m_locationRegistry( locationRegistry )
+{
+}
+
 void InvariantChecker::check( const Specification& specification )
 {
     UpdateSetManager< ExecutionUpdateSet > updateSetManager;
@@ -1737,38 +1745,7 @@ void SymbolicExecutionVisitor::visit( WhileRule& node )
 
 void SymbolicExecutionVisitor::visit( VariableBinding& node )
 {
-<<<<<<< HEAD
-    for( const auto& agent : agents )
-    {
-        try
-        {
-            agent.updateSet()->mergeInto( &m_collectedUpdates );
-        }
-        catch( const ExecutionUpdateSet::Conflict& conflict )
-        {
-            // existing
-            const auto& updateA = conflict.existingUpdate();
-            const auto updateStrA = updateAsString( updateA );
-            const auto agentStrA = updateA.value.agent.name();
-
-            // conflicting
-            const auto& updateB = conflict.conflictingUpdate();
-            const auto updateStrB = updateAsString( updateB );
-            const auto agentStrB = updateB.value.agent.name();
-
-            throw UpdateException(
-                {},
-                "Conflict while collection updates from agents. Update '" + updateStrA +
-                    "' produced by agent " + agentStrA + " clashed with update '" + updateStrB +
-                    "' produced by agent " + agentStrB,
-                {},
-                { updateAsUpdateInfo( updateA ), updateAsUpdateInfo( updateB ) },
-                libcasm_fe::Code::UpdateSetMergeConflict );
-        }
-    }
-=======
     ExecutionVisitor::visit( node );
->>>>>>> Agent: extraced Agent into separate file for symbolic execution
 }
 
 IR::SymbolicExecutionEnvironment& SymbolicExecutionVisitor::environment()

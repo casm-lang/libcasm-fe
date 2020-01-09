@@ -51,6 +51,7 @@
 #include <libcasm-fe/ast/RecursiveVisitor>
 #include <libcasm-fe/ast/Rule>
 #include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/execute/UpdateException>
 
 #include <libcasm-ir/Exception>
 #include <libcasm-ir/Operation>
@@ -316,13 +317,13 @@ void AgentScheduler::collectUpdates( const std::vector< Agent >& agents )
             const auto agentStrB = updateB.value.agent.name();
             const auto& sourceLocationB = updateB.value.producer->sourceLocation();
 
-            const auto info = "Conflict while collection updates from agent " + agentStrB +
-                              ". Update '" + updateStrA + "' produced by agent " + agentStrA +
-                              " clashed with update '" + updateStrB + "' produced by agent " +
-                              agentStrB;
-            throw RuntimeException(
-                { sourceLocationA, sourceLocationB },
-                info,
+            throw UpdateException(
+                {},
+                "Conflict while collection updates from agents. Update '" + updateStrA +
+                    "' produced by agent " + agentStrA + " clashed with update '" + updateStrB +
+                    "' produced by agent " + agentStrB,
+                {},
+                { ExecutionVisitor::updateAsUpdateInfo( updateA ), ExecutionVisitor::updateAsUpdateInfo( updateB ) },
                 libcasm_fe::Code::UpdateSetMergeConflict );
         }
     }
@@ -334,9 +335,3 @@ void AgentScheduler::fireUpdates( void )
     m_collectedUpdates.clear();
 }
 
-InvariantChecker::InvariantChecker(
-    ExecutionLocationRegistry& locationRegistry, const Storage& globalState )
-: m_globalState( globalState )
-, m_locationRegistry( locationRegistry )
-{
-}

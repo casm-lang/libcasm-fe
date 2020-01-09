@@ -55,6 +55,7 @@
 #include <libcasm-fe/execute/ReferenceConstant>
 #include <libcasm-fe/execute/Stack>
 #include <libcasm-fe/execute/UpdateSet>
+#include <libcasm-fe/execute/UpdateException>
 
 #include <libstdhl/Enum>
 #include <libstdhl/Hash>
@@ -241,6 +242,7 @@ namespace libcasm_fe
         void visit( Ast::VariableBinding& node ) override;
 
         static std::string updateAsString( const ExecutionUpdateSet::Update& update );
+        static UpdateException::UpdateInfo updateAsUpdateInfo( const ExecutionUpdateSet::Update& update );
 
       protected:
         u1 hasEmptyUpdateSet( void ) const;
