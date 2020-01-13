@@ -47,16 +47,20 @@
 
 #include "../various/GrammarToken.h"
 
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
-#include <libcasm-fe/analyze/SymbolResolverPass>
+#include <libcasm-fe/analyze/TemplatingPass>
+#include <libcasm-fe/ast/Declaration>
+#include <libcasm-fe/ast/Literal>
+#include <libcasm-fe/ast/Visitor>
 #include <libcasm-fe/import/SpecificationMergerPass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/transform/SourceToCstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
-
-#include <libstdhl/String>
 
 using namespace libcasm_fe;
 using namespace AST;
@@ -71,6 +75,58 @@ static libpass::PassRegistration< TypeCheckPass > PASS(
 // TypeCheckVisitor
 //
 
+namespace libcasm_fe
+{
+    namespace AST
+    {
+        class TypeCheckVisitor final : public RecursiveVisitor
+        {
+          public:
+            TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
+
+            void visit( DerivedDefinition& node ) override;
+            void visit( FunctionDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
+            void visit( EnumerationDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
+            void visit( UsingDefinition& node ) override;
+            void visit( StructureDefinition& node ) override;
+            void visit( BehaviorDefinition& node ) override;
+            void visit( ImplementDefinition& node ) override;
+            void visit( VariableDefinition& node ) override;
+            void visit( Declaration& node ) override;
+
+            void visit( DirectCallExpression& node ) override;
+
+            void visit( BasicType& node ) override;
+            void visit( TupleType& node ) override;
+            void visit( RecordType& node ) override;
+            void visit( FixedSizedType& node ) override;
+            void visit( RelationType& node ) override;
+            void visit( TemplateType& node ) override;
+
+          private:
+            void resolveRelationType(
+                TypedNode& node, VariableDefinitions& argumentTypes, Type& returnType );
+            void resolveRelationType( TypedNode& node, Types& argumentTypes, Type& returnType );
+
+            void pushSymbol( const VariableDefinition::Ptr& symbol );
+            void pushSymbols( const VariableDefinitions::Ptr& symbols );
+            void popSymbol( const VariableDefinition::Ptr& symbol );
+            void popSymbols( const VariableDefinitions::Ptr& symbols );
+
+            void pushVariableBindings( const VariableBindings::Ptr& variableBindings );
+            void popVariableBindings( const VariableBindings::Ptr& variableBindings );
+
+            libcasm_fe::Logger& m_log;
+            Namespace& m_symboltable;
+
+            std::unordered_map< std::string, VariableDefinition::Ptr > m_symbols;
+        };
+    }
+}
+
 TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
@@ -78,7 +134,7 @@ TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symbolta
 }
 
 void TypeCheckVisitor::resolveRelationType(
-    Definition& node, VariableDefinitions& argumentTypes, AST::Type& returnType )
+    TypedNode& node, VariableDefinitions& argumentTypes, AST::Type& returnType )
 {
     u1 valid = true;
     std::size_t position = 0;
@@ -106,7 +162,8 @@ void TypeCheckVisitor::resolveRelationType(
     {
         m_log.error(
             { returnType.sourceLocation() },
-            "unable to resolve return type of '" + returnType.description() + "'",
+            "unable to resolve return type of " + node.description() + " '" +
+                returnType.description() + "'",
             Code::Unspecified );
         valid = false;
     }
@@ -122,7 +179,7 @@ void TypeCheckVisitor::resolveRelationType(
 }
 
 void TypeCheckVisitor::resolveRelationType(
-    Definition& node, Types& argumentTypes, AST::Type& returnType )
+    TypedNode& node, Types& argumentTypes, AST::Type& returnType )
 {
     u1 valid = true;
     std::size_t position = 0;
@@ -150,7 +207,8 @@ void TypeCheckVisitor::resolveRelationType(
     {
         m_log.error(
             { returnType.sourceLocation() },
-            "unable to resolve return type of '" + returnType.description() + "'",
+            "unable to resolve return type of " + node.description() + " '" +
+                returnType.description() + "'",
             Code::Unspecified );
         valid = false;
     }
@@ -203,7 +261,7 @@ void TypeCheckVisitor::visit( FunctionDefinition& node )
     resolveRelationType( node, *argumentTypes, *returnType );
 
     node.defined()->accept( *this );
-    node.initially()->accept( *this );
+    node.initiallyRule()->accept( *this );
 }
 
 void TypeCheckVisitor::visit( RuleDefinition& node )
@@ -230,21 +288,6 @@ void TypeCheckVisitor::visit( RuleDefinition& node )
 
 void TypeCheckVisitor::visit( DomainDefinition& node )
 {
-    for( const auto& templateInstance : *node.templateInstances() )
-    {
-        if( templateInstance->id() == Node::ID::DOMAIN_DEFINITION )
-        {
-            const auto& templateDefinition = templateInstance->ptr< DomainDefinition >();
-            templateDefinition->accept( *this );
-        }
-        else
-        {
-            assert( templateInstance->id() == Node::ID::ENUMERATION_DEFINITION );
-            const auto& templateDefinition = templateInstance->ptr< EnumerationDefinition >();
-            templateDefinition->accept( *this );
-        }
-    }
-
     if( node.type() )
     {
         return;
@@ -252,11 +295,11 @@ void TypeCheckVisitor::visit( DomainDefinition& node )
 
     const auto& domainType = node.domainType();
 
-    pushSymbols( node.templateNode()->symbols() );
+    pushSymbols( node.templateSymbols() );
 
     domainType->accept( *this );
 
-    popSymbols( node.templateNode()->symbols() );
+    popSymbols( node.templateSymbols() );
 
     node.setType( domainType->type() );
 
@@ -275,13 +318,6 @@ void TypeCheckVisitor::visit( DomainDefinition& node )
 
 void TypeCheckVisitor::visit( EnumerationDefinition& node )
 {
-    for( const auto& templateInstance : *node.templateInstances() )
-    {
-        assert( templateInstance->id() == Node::ID::ENUMERATION_DEFINITION );
-        const auto& templateDefinition = templateInstance->ptr< EnumerationDefinition >();
-        templateDefinition->accept( *this );
-    }
-
     if( node.type() and node.domainType()->type() )
     {
         return;
@@ -321,18 +357,17 @@ void TypeCheckVisitor::visit( BuiltinDefinition& node )
         return;
     }
 
-    const auto& argumentTypes = node.relationType().argumentTypes();
-    const auto& returnType = node.relationType().returnType();
+    const auto& argumentTypes = node.argumentTypes();
+    const auto& returnType = node.returnType();
 
-    pushSymbols( node.templateNode()->symbols() );
+    pushSymbols( node.templateSymbols() );
 
     argumentTypes->accept( *this );
     returnType->accept( *this );
 
-    popSymbols( node.templateNode()->symbols() );
+    popSymbols( node.templateSymbols() );
 
     resolveRelationType( node, *argumentTypes, *returnType );
-    node.domainType()->setType( node.type() );
 }
 
 void TypeCheckVisitor::visit( UsingDefinition& node )
@@ -371,25 +406,18 @@ void TypeCheckVisitor::visit( StructureDefinition& node )
     const auto type = std::make_shared< libcasm_ir::ObjectType >( typeName );
     node.setType( type );
 
-    pushSymbols( node.templateNode()->symbols() );
+    pushSymbols( node.templateSymbols() );
 
     node.domainType()->accept( *this );
     node.functions()->accept( *this );
 
-    popSymbols( node.templateNode()->symbols() );
+    popSymbols( node.templateSymbols() );
 
     m_symboltable.registerTypeDefinition( node );
 }
 
 void TypeCheckVisitor::visit( BehaviorDefinition& node )
 {
-    for( const auto& templateInstance : *node.templateInstances() )
-    {
-        assert( templateInstance->id() == Node::ID::BEHAVIOR_DEFINITION );
-        const auto& templateDefinition = templateInstance->ptr< BehaviorDefinition >();
-        templateDefinition->accept( *this );
-    }
-
     if( node.type() )
     {
         return;
@@ -400,12 +428,12 @@ void TypeCheckVisitor::visit( BehaviorDefinition& node )
     const auto type = std::make_shared< libcasm_ir::ObjectType >( typeName );
     node.setType( type );
 
-    pushSymbols( node.templateNode()->symbols() );
+    pushSymbols( node.templateSymbols() );
 
     node.domainType()->accept( *this );
     node.definitions()->accept( *this );
 
-    popSymbols( node.templateNode()->symbols() );
+    popSymbols( node.templateSymbols() );
 
     try
     {
@@ -419,19 +447,6 @@ void TypeCheckVisitor::visit( BehaviorDefinition& node )
 
 void TypeCheckVisitor::visit( ImplementDefinition& node )
 {
-    for( const auto& templateInstance : *node.templateInstances() )
-    {
-        if( templateInstance->id() == Node::ID::IMPLEMENT_DEFINITION )
-        {
-            const auto& templateDefinition = templateInstance->ptr< ImplementDefinition >();
-            templateDefinition->accept( *this );
-        }
-        else
-        {
-            assert( templateInstance->id() == Node::ID::BUILTIN_DEFINITION );
-        }
-    }
-
     if( node.type() )
     {
         return;
@@ -453,26 +468,13 @@ void TypeCheckVisitor::visit( ImplementDefinition& node )
         return;
     }
 
-    pushSymbols( node.templateNode()->symbols() );
-
-    for( const auto& templateInstance : *node.templateInstances() )
-    {
-        if( templateInstance->id() == Node::ID::BUILTIN_DEFINITION )
-        {
-            const auto& templateDefinition = templateInstance->ptr< BuiltinDefinition >();
-            templateDefinition->accept( *this );
-        }
-        else
-        {
-            assert( templateInstance->id() == Node::ID::IMPLEMENT_DEFINITION );
-        }
-    }
+    pushSymbols( node.templateSymbols() );
 
     node.behaviorType()->accept( *this );
     node.domainType()->accept( *this );
     node.definitions()->accept( *this );
 
-    popSymbols( node.templateNode()->symbols() );
+    popSymbols( node.templateSymbols() );
 
     node.setType( node.domainType()->type() );
 }
@@ -546,7 +548,6 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
             node.setType( symbol->type()->ptr_result() );
             return;
         }
-        case DirectCallExpression::TargetType::THIS:      // [[fallthrough]]
         case DirectCallExpression::TargetType::CONSTANT:  // [[fallthrough]]
         case DirectCallExpression::TargetType::VARIABLE:
         {
@@ -811,7 +812,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
             {
                 m_log.error(
                     { node.sourceLocation() },
-                    node.description() + "  '" + typeName + "' is not a" +
+                    node.description() + "  '" + typeName + "' is not a " +
                         domainDefinitionType->description(),
                     Code::Unspecified );
                 return;
@@ -883,7 +884,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                         const auto& lhsUnaryExpression =
                             static_cast< const UnaryExpression& >( *lhs );
                         lhs = lhsUnaryExpression.expression();
-                        if( lhsUnaryExpression.operationToken()->token() == Grammar::Token::MINUS )
+                        if( lhsUnaryExpression.operationToken() == Grammar::Token::MINUS )
                         {
                             lhsNegative = true;
                         }
@@ -905,7 +906,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                         const auto& rhsUnaryExpression =
                             static_cast< const UnaryExpression& >( *rhs );
                         rhs = rhsUnaryExpression.expression();
-                        if( rhsUnaryExpression.operationToken()->token() == Grammar::Token::MINUS )
+                        if( rhsUnaryExpression.operationToken() == Grammar::Token::MINUS )
                         {
                             rhsNegative = true;
                         }
@@ -994,10 +995,20 @@ void TypeCheckVisitor::visit( TemplateType& node )
         return;
     }
 
-    const auto& typeName = node.signature();
+    if( node.varadic() )
+    {
+        m_log.debug( { node.sourceLocation() }, "omit type check of varadic" );
+        return;
+    }
 
+    const auto& typeName = node.signature();
     const auto& symbol = node.typeDefinition();
     assert( symbol and " inconsistent state @ SymbolResolverPass " );
+
+    if( not symbol->isTemplate() )
+    {
+        RecursiveVisitor::visit( node );
+    }
 
     switch( symbol->id() )
     {
@@ -1011,7 +1022,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
             {
                 m_log.error(
                     { node.sourceLocation() },
-                    node.description() + "  '" + typeName + "' is not a" +
+                    node.description() + "  '" + typeName + "' is not a " +
                         domainDefinitionType->description(),
                     Code::TypeAnnotationInvalidTemplateTypeName );
                 return;
@@ -1036,7 +1047,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
             {
                 m_log.error(
                     { node.sourceLocation() },
-                    node.description() + "  '" + typeName + "' is not a" +
+                    node.description() + "  '" + typeName + "' is not a " +
                         domainDefinitionType->description(),
                     Code::TypeAnnotationInvalidTemplateTypeName );
                 return;
@@ -1123,63 +1134,30 @@ void TypeCheckVisitor::visit( RelationType& node )
 
     RecursiveVisitor::visit( node );
 
+    if( node.mapping() )
+    {
+        m_log.debug( { node.sourceLocation() }, "omit type check of mapping" );
+        return;
+    }
+
     const auto& typeName = node.signature();
 
-    u1 valid = true;
-    std::size_t position = 0;
-    libcasm_ir::Types argumentTypeList;
-    for( auto argument : *node.argumentTypes() )
-    {
-        position++;
-        if( not argument->type() )
-        {
-            m_log.error(
-                { argument->sourceLocation() },
-                "unable to resolve relation argument type '" + argument->description() +
-                    "' at position " + std::to_string( position ),
-                Code::Unspecified );
-            valid = false;
-            continue;
-        }
-
-        argumentTypeList.add( argument->type() );
-    }
-
-    const auto& returnType = *node.returnType();
-    if( not returnType.type() )
-    {
-        m_log.error(
-            { returnType.sourceLocation() },
-            "unable to resolve relation return type of '" + returnType.description() + "'",
-            Code::Unspecified );
-        valid = false;
-    }
-
-    if( not valid )
+    resolveRelationType( node, *node.argumentTypes(), *node.returnType() );
+    if( not node.type() )
     {
         return;
     }
 
+    auto nodeType = node.type();
+    node.setType( nullptr );
+    const auto& relationType = std::static_pointer_cast< libcasm_ir::RelationType >( nodeType );
+
     const auto& symbol = node.typeDefinition();
     assert( symbol and " inconsistent state @ SymbolResolverPass " );
-
     switch( symbol->id() )
     {
         case Node::ID::DOMAIN_DEFINITION:
         {
-            const auto& domainDefinition = static_cast< const DomainDefinition& >( *symbol );
-            const auto domainDefinitionType =
-                static_cast< const AST::Type* >( domainDefinition.domainType().get() );
-            if( node.id() != domainDefinitionType->id() )
-            {
-                m_log.error(
-                    { node.sourceLocation() },
-                    node.description() + "  '" + typeName + "' is not a" +
-                        domainDefinitionType->description(),
-                    Code::TypeAnnotationInvalidTemplateTypeName );
-                return;
-            }
-
             if( not symbol->type() )
             {
                 libcasm_ir::Type::Ptr type = nullptr;
@@ -1187,15 +1165,12 @@ void TypeCheckVisitor::visit( RelationType& node )
 
                 if( typeKind == TypeInfo::TYPE_NAME_RULEREF )
                 {
-                    type = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
-                        libstdhl::Memory::make< libcasm_ir::RelationType >(
-                            returnType.type(), argumentTypeList ) );
+                    type = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >( relationType );
                 }
                 else if( typeKind == TypeInfo::TYPE_NAME_FUNCREF )
                 {
-                    type = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
-                        libstdhl::Memory::make< libcasm_ir::RelationType >(
-                            returnType.type(), argumentTypeList ) );
+                    type =
+                        libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >( relationType );
                 }
 
                 symbol->setType( type );
@@ -1212,7 +1187,7 @@ void TypeCheckVisitor::visit( RelationType& node )
         }
         case Node::ID::BUILTIN_DEFINITION:
         {
-            symbol->accept( *this );
+            // symbol->accept( *this );
             const auto& type = symbol->type();
             if( symbol->type() )
             {
@@ -1303,6 +1278,7 @@ void TypeCheckVisitor::popVariableBindings( const VariableBindings::Ptr& variabl
 void TypeCheckPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SpecificationMergerPass >();
+    pu.scheduleAfter< TemplatingPass >();
 }
 
 u1 TypeCheckPass::run( libpass::PassResult& pr )
@@ -1313,7 +1289,7 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     TypeCheckVisitor visitor( log, *specification->symboltable() );
-    specification->definitions()->accept( visitor );
+    specification->ast()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
@@ -1322,6 +1298,7 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
         log.debug( "found %lu error(s) during type checking", errors );
         return false;
     }
+    log.info( "symbol table =\n" + specification->symboltable()->dump() );
 
     return true;
 }

@@ -46,11 +46,6 @@
 #ifndef _LIBCASM_FE_TYPE_CHECK_PASS_H_
 #define _LIBCASM_FE_TYPE_CHECK_PASS_H_
 
-#include <libcasm-fe/Logger>
-#include <libcasm-fe/Namespace>
-#include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
-
 #include <libpass/Pass>
 
 namespace libcasm_fe
@@ -66,53 +61,6 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
-    };
-
-    class TypeCheckVisitor final : public AST::RecursiveVisitor
-    {
-      public:
-        TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
-
-        void visit( AST::DerivedDefinition& node ) override;
-        void visit( AST::FunctionDefinition& node ) override;
-        void visit( AST::RuleDefinition& node ) override;
-        void visit( AST::EnumerationDefinition& node ) override;
-        void visit( AST::DomainDefinition& node ) override;
-        void visit( AST::BuiltinDefinition& node ) override;
-        void visit( AST::UsingDefinition& node ) override;
-        void visit( AST::StructureDefinition& node ) override;
-        void visit( AST::BehaviorDefinition& node ) override;
-        void visit( AST::ImplementDefinition& node ) override;
-        void visit( AST::VariableDefinition& node ) override;
-        void visit( AST::Declaration& node ) override;
-
-        void visit( AST::DirectCallExpression& node ) override;
-
-        void visit( AST::BasicType& node ) override;
-        void visit( AST::TupleType& node ) override;
-        void visit( AST::RecordType& node ) override;
-        void visit( AST::FixedSizedType& node ) override;
-        void visit( AST::RelationType& node ) override;
-        void visit( AST::TemplateType& node ) override;
-
-      private:
-        void resolveRelationType(
-            AST::Definition& node, AST::VariableDefinitions& argumentTypes, AST::Type& returnType );
-        void resolveRelationType(
-            AST::Definition& node, AST::Types& argumentTypes, AST::Type& returnType );
-
-        void pushSymbol( const AST::VariableDefinition::Ptr& symbol );
-        void pushSymbols( const AST::VariableDefinitions::Ptr& symbols );
-        void popSymbol( const AST::VariableDefinition::Ptr& symbol );
-        void popSymbols( const AST::VariableDefinitions::Ptr& symbols );
-
-        void pushVariableBindings( const AST::VariableBindings::Ptr& variableBindings );
-        void popVariableBindings( const AST::VariableBindings::Ptr& variableBindings );
-
-        libcasm_fe::Logger& m_log;
-        Namespace& m_symboltable;
-
-        std::unordered_map< std::string, AST::VariableDefinition::Ptr > m_symbols;
     };
 }
 
