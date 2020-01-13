@@ -50,7 +50,7 @@
 #include <libcasm-fe/import/ImportError>
 #include <libcasm-fe/import/LibraryLoaderPass>
 #include <libcasm-fe/import/PathLoadingStrategy>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/transform/CstToAstPass>
 
 #include <libpass/PassLogger>
 #include <libpass/PassManager>
@@ -59,11 +59,11 @@
 #include <libstdhl/String>
 
 #include <filesystem>
+#include <iostream>
 
 #include "CASM.casm.h"
 
 using namespace libcasm_fe;
-using namespace AST;
 
 SpecificationLoader::SpecificationLoader(
     libstdhl::Log::Stream& logStream, const LoadingStrategy::Ptr& loadingStrategy )
@@ -85,7 +85,7 @@ void SpecificationLoader::setSpecificationRepository(
 }
 
 Specification::Ptr SpecificationLoader::loadSpecification(
-    const IdentifierPath::Ptr& identifierPath )
+    const AST::IdentifierPath::Ptr& identifierPath )
 {
     libpass::PassLogger log( &LibraryLoaderPass::id, m_logStream );
 
@@ -183,8 +183,8 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     }
 
     const auto& passResult = passManager.result();
-    assert( passResult.hasOutput< SourceToAstPass >() );
-    const auto passData = passResult.output< SourceToAstPass >();
+    assert( passResult.hasOutput< CstToAstPass >() );
+    const auto passData = passResult.output< CstToAstPass >();
     const auto specification = passData->specification();
 
     assert( specificationRepository()->get( uriString ) == specification );
