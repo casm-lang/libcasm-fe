@@ -43,8 +43,8 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_SOURCE_TO_AST_PASS_H_
-#define _LIBCASM_FE_SOURCE_TO_AST_PASS_H_
+#ifndef _LIBCASM_FE_SOURCE_TO_CST_PASS_H_
+#define _LIBCASM_FE_SOURCE_TO_CST_PASS_H_
 
 #include <libcasm-fe/Specification>
 
@@ -52,8 +52,6 @@
 #include <libpass/PassData>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
-
-#include <libstdhl/std/rfc3986>
 
 /**
    @brief    TODO
@@ -63,7 +61,7 @@
 
 namespace libcasm_fe
 {
-    class SourceToAstPass final : public libpass::Pass
+    class SourceToCstPass final : public libpass::Pass
     {
       public:
         static char id;
@@ -99,7 +97,7 @@ namespace libcasm_fe
     };
 }
 
-#endif  // _LIBCASM_FE_SOURCE_TO_AST_PASS_H_
+#endif  // _LIBCASM_FE_SOURCE_TO_CST_PASS_H_
 
 //
 //  Local variables:

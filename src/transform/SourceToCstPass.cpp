@@ -43,16 +43,17 @@
 //  statement from your version.
 //
 
-#include "SourceToAstPass.h"
+#include "SourceToCstPass.h"
 
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/analyze/ProjectResolverPass>
-#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
+
+#include <libstdhl/std/rfc3986>
 
 #include "../Lexer.h"
 #include "../various/GrammarParser.tab.h"
@@ -60,19 +61,22 @@
 
 using namespace libcasm_fe;
 
-namespace IR = libcasm_ir;
+char SourceToCstPass::id = 0;
 
-char SourceToAstPass::id = 0;
+static libpass::PassRegistration< SourceToCstPass > PASS(
+    "Source Parsing Pass", "parse the source code and generates an CST", "src2cst", 0 );
 
-static libpass::PassRegistration< SourceToAstPass > PASS(
-    "SourceToAstPass", "parse the source code and generate an AST", "ast-parse", 0 );
+//
+//
+// SourceToCstPass
+//
 
-void SourceToAstPass::usage( libpass::PassUsage& pu )
+void SourceToCstPass::usage( libpass::PassUsage& pu )
 {
     pu.require< ProjectResolverPass >();
 }
 
-u1 SourceToAstPass::run( libpass::PassResult& pr )
+u1 SourceToCstPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
@@ -104,27 +108,27 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
     }
     else
     {
-        const auto& sourceLocation = specification->header()->sourceLocation();
-        const auto casmImport = AST::make< ImportDefinition >(
+        const auto& sourceLocation = specification->cst()->header()->sourceLocation();
+        const auto casmImport = CST::make< ImportDefinition >(
             sourceLocation,
             Token::unresolved(),
-            IdentifierPath::fromIdentifier( AST::make< Identifier >( sourceLocation, "CASM" ) ) );
-        specification->definitions()->add( casmImport );
+            IdentifierPath::fromIdentifier( CST::make< Identifier >( sourceLocation, "CASM" ) ) );
+        specification->cst()->definitions()->add( casmImport );
 
-        const auto casmUsing = AST::make< UsingPathDefinition >(
+        const auto casmUsing = CST::make< UsingPathDefinition >(
             sourceLocation,
             Token::unresolved(),
-            IdentifierPath::fromIdentifier( AST::make< Identifier >( sourceLocation, "CASM" ) ),
+            IdentifierPath::fromIdentifier( CST::make< Identifier >( sourceLocation, "CASM" ) ),
             std::make_shared< Token >( Grammar::Token::DOUBLECOLON ),
             std::make_shared< Token >( Grammar::Token::ASTERIX ) );
-        specification->definitions()->add( casmUsing );
+        specification->cst()->definitions()->add( casmUsing );
     }
 
-    pr.setOutput< SourceToAstPass >( specification );
+    pr.setOutput< SourceToCstPass >( specification );
     return true;
 }
 
-void SourceToAstPass::setDebug( u1 enable )
+void SourceToCstPass::setDebug( u1 enable )
 {
     m_debug = enable;
 }
