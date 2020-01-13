@@ -48,24 +48,24 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
+#include <libcasm-fe/cst/Declaration>
+#include <libcasm-fe/cst/Visitor>
 
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/transform/SourceToCstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
 using namespace libcasm_fe;
-using namespace AST;
+using namespace CST;
 
 char AttributionPass::id = 0;
 
 static libpass::PassRegistration< AttributionPass > PASS(
-    "AstAttributionPass",
-    "applies the definition attributes to the AST and performs various "
-    "attribution checks",
-    "ast-attr",
+    "Attribution Pass",
+    "applies the definition attributes to the CST and performs various attribution checks",
+    "cst-attr",
     0 );
 
 // attribute names (case sensitive)
@@ -85,13 +85,20 @@ static const std::string PURE_ATTRIBUTE = "pure";
 static const std::string SYNCHRONOUS_ATTRIBUTE = "synchronous";
 static const std::string ASYNCHRONOUS_ATTRIBUTE = "asynchronous";
 static const std::string EXPORT_ATTRIBUTE = "export";
+static const std::string ABSTRACT_ATTRIBUTE = "abstract";
+static const std::string TEMPLATE_ATTRIBUTE = "template";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
     DEPRECATED_ATTRIBUTE,   IN_ATTRIBUTE,       MONITORED_ATTRIBUTE, EXTERNAL_ATTRIBUTE,
     CONTROLLED_ATTRIBUTE,   INTERNAL_ATTRIBUTE, SHARED_ATTRIBUTE,    OUT_ATTRIBUTE,
     STATIC_ATTRIBUTE,       SYMBOLIC_ATTRIBUTE, PURE_ATTRIBUTE,      SYNCHRONOUS_ATTRIBUTE,
-    ASYNCHRONOUS_ATTRIBUTE, EXPORT_ATTRIBUTE,
+    ASYNCHRONOUS_ATTRIBUTE, EXPORT_ATTRIBUTE,   ABSTRACT_ATTRIBUTE,
+};
+
+// list of allowed symbol attribute names
+static const std::unordered_set< std::string > VALID_SYMBOL_ATTRIBUTES = {
+    TEMPLATE_ATTRIBUTE,
 };
 
 // list of allowed expression attribute names
@@ -100,21 +107,28 @@ static const std::unordered_set< std::string > VALID_EXPRESSION_ATTRIBUTES = {
     DUMPS_ATTRIBUTE,
 };
 
-class DefinitionAttributionVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    DefinitionAttributionVisitor( libcasm_fe::Logger& log, Definition& definition );
+    namespace CST
+    {
+        class DefinitionAttributionVisitor final : public RecursiveVisitor
+        {
+          public:
+            DefinitionAttributionVisitor( libcasm_fe::Logger& log, Definition& definition );
 
-    const std::unordered_set< std::string >& attributeNames() const;
+            const std::unordered_set< std::string >& attributeNames() const;
 
-    void visit( BasicAttribute& node ) override;
-    void visit( ExpressionAttribute& node ) override;
+            void visit( BasicAttribute& node ) override;
+            void visit( SymbolAttribute& node ) override;
+            void visit( ExpressionAttribute& node ) override;
 
-  private:
-    libcasm_fe::Logger& m_log;
-    Definition& m_definition;
-    std::unordered_set< std::string > m_attributeNames;
-};
+          private:
+            libcasm_fe::Logger& m_log;
+            Definition& m_definition;
+            std::unordered_set< std::string > m_attributeNames;
+        };
+    }
+}
 
 DefinitionAttributionVisitor::DefinitionAttributionVisitor(
     libcasm_fe::Logger& log, Definition& definition )
@@ -164,6 +178,39 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     }
 }
 
+void DefinitionAttributionVisitor::visit( SymbolAttribute& node )
+{
+    const auto& name = node.identifier()->name();
+
+    // allow only symbol attributes
+    if( VALID_SYMBOL_ATTRIBUTES.count( name ) == 0 )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "'" + name + "' is a unknown " + node.description(),
+            Code::AttributionSymbolAttributeUnknown );
+        return;
+    }
+
+    // template can be used multiple times
+    if( name == TEMPLATE_ATTRIBUTE )
+    {
+        m_definition.templateSymbols()->add( node.symbol() );
+        return;
+    }
+
+    // each attribute should only be used once
+    if( m_attributeNames.count( name ) != 0 )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            node.description() + " " + name + "' has already been used",
+            Code::AttributionExpressionAttributeAlreadyUsed );
+        return;
+    }
+    m_attributeNames.insert( node.identifier()->name() );
+}
+
 void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
 {
     const auto& name = node.identifier()->name();
@@ -190,29 +237,35 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
     m_attributeNames.insert( node.identifier()->name() );
 }
 
-class DefinitionVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    DefinitionVisitor( libcasm_fe::Logger& log );
+    namespace CST
+    {
+        class DefinitionVisitor final : public RecursiveVisitor
+        {
+          public:
+            DefinitionVisitor( libcasm_fe::Logger& log );
 
-    void visit( VariableDefinition& node ) override;
-    void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( EnumeratorDefinition& node ) override;
-    void visit( EnumerationDefinition& node ) override;
-    void visit( UsingDefinition& node ) override;
-    void visit( ImportDefinition& node ) override;
-    void visit( DomainDefinition& node ) override;
-    void visit( BuiltinDefinition& node ) override;
-    void visit( StructureDefinition& node ) override;
-    void visit( BehaviorDefinition& node ) override;
-    void visit( ImplementDefinition& node ) override;
-    void visit( Declaration& node ) override;
+            void visit( VariableDefinition& node ) override;
+            void visit( FunctionDefinition& node ) override;
+            void visit( DerivedDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
+            void visit( EnumeratorDefinition& node ) override;
+            void visit( EnumerationDefinition& node ) override;
+            void visit( UsingDefinition& node ) override;
+            void visit( ImportDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
+            void visit( StructureDefinition& node ) override;
+            void visit( BehaviorDefinition& node ) override;
+            void visit( ImplementDefinition& node ) override;
+            void visit( Declaration& node ) override;
 
-  private:
-    libcasm_fe::Logger& m_log;
-};
+          private:
+            libcasm_fe::Logger& m_log;
+        };
+    }
+}
 
 DefinitionVisitor::DefinitionVisitor( libcasm_fe::Logger& log )
 : m_log( log )
@@ -443,7 +496,11 @@ void DefinitionVisitor::visit( DomainDefinition& node )
     const auto& attributeNames = visitor.attributeNames();
     for( const auto& name : attributeNames )
     {
-        if( name == EXPORT_ATTRIBUTE )
+        if( name == ABSTRACT_ATTRIBUTE )
+        {
+            node.setAbstract( true );
+        }
+        else if( name == EXPORT_ATTRIBUTE )
         {
             node.setExported( true );
         }
@@ -574,19 +631,25 @@ void DefinitionVisitor::visit( Declaration& node )
     }
 }
 
-class HeaderVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    HeaderVisitor( libcasm_fe::Logger& log, Specification& specification );
+    namespace CST
+    {
+        class HeaderVisitor final : public RecursiveVisitor
+        {
+          public:
+            HeaderVisitor( libcasm_fe::Logger& log, libcasm_fe::Specification& specification );
 
-    void visit( HeaderDefinition& node ) override;
+            void visit( HeaderDefinition& node ) override;
 
-  private:
-    libcasm_fe::Logger& m_log;
-    Specification& m_specification;
-};
+          private:
+            libcasm_fe::Logger& m_log;
+            libcasm_fe::Specification& m_specification;
+        };
+    }
+}
 
-HeaderVisitor::HeaderVisitor( libcasm_fe::Logger& log, Specification& specification )
+HeaderVisitor::HeaderVisitor( libcasm_fe::Logger& log, libcasm_fe::Specification& specification )
 : m_log( log )
 , m_specification( specification )
 {
@@ -604,32 +667,32 @@ void HeaderVisitor::visit( HeaderDefinition& node )
     {
         if( name == SYNCHRONOUS_ATTRIBUTE )
         {
-            m_specification.setAsmType( Specification::AsmType::SYNCHRONOUS );
+            m_specification.setAsmType( libcasm_fe::Specification::AsmType::SYNCHRONOUS );
         }
         else if( name == ASYNCHRONOUS_ATTRIBUTE )
         {
-            m_specification.setAsmType( Specification::AsmType::ASYNCHRONOUS );
+            m_specification.setAsmType( libcasm_fe::Specification::AsmType::ASYNCHRONOUS );
         }
     }
 }
 
 void AttributionPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
+    pu.require< SourceToCstPass >();
 }
 
 u1 AttributionPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
+    const auto data = pr.output< SourceToCstPass >();
     const auto specification = data->specification();
 
     DefinitionVisitor definitionVisitor( log );
-    specification->definitions()->accept( definitionVisitor );
+    specification->cst()->definitions()->accept( definitionVisitor );
 
     HeaderVisitor headerVisitor( log, *specification );
-    specification->header()->accept( headerVisitor );
+    specification->cst()->header()->accept( headerVisitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
