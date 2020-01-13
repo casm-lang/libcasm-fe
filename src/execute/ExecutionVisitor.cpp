@@ -46,13 +46,10 @@
 #include "ExecutionVisitor.h"
 
 #include <libcasm-fe/Logger>
-#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
-#include <libcasm-fe/ast/Expression>
-#include <libcasm-fe/ast/RecursiveVisitor>
-#include <libcasm-fe/ast/Rule>
 #include <libcasm-fe/execute/RuntimeException>
 #include <libcasm-fe/execute/UpdateException>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/lst/Expression>
+#include <libcasm-fe/lst/Rule>
 
 #include <libcasm-ir/Exception>
 #include <libcasm-ir/Instruction>
@@ -66,7 +63,7 @@
 #include <thread>
 
 using namespace libcasm_fe;
-using namespace AST;
+using namespace LST;
 
 namespace IR = libcasm_ir;
 
@@ -135,7 +132,7 @@ void Storage::fireUpdateSet( ExecutionUpdateSet* updateSet )
 
 void Storage::set( const Location& location, const Value& value )
 {
-    if( location.function()->isProgram() )
+    if( location.function()->program() )
     {
         m_programState.set( location, value );
     }
@@ -147,7 +144,7 @@ void Storage::set( const Location& location, const Value& value )
 
 void Storage::remove( const Location& location )
 {
-    if( location.function()->isProgram() )
+    if( location.function()->program() )
     {
         m_programState.remove( location );
     }
@@ -159,7 +156,7 @@ void Storage::remove( const Location& location )
 
 libstdhl::Optional< Storage::Value > Storage::get( const Location& location ) const
 {
-    if( location.function()->isProgram() )
+    if( location.function()->program() )
     {
         return m_programState.get( location );
     }
@@ -195,12 +192,11 @@ void ExecutionVisitor::execute( const ReferenceConstant& value )
     assert( value.defined() && "Reference must be defined" );
 
     const auto& literal = value.value();
-    assert(
-        ( literal->referenceType() == ReferenceLiteral::ReferenceType::RULE ) &&
-        "Must be a rule reference" );
+    const auto& literalReference = literal->reference();
+    assert( literalReference->id() == Node::ID::RULE_DEFINITION and " shall be rule reference " );
 
-    const auto& rule = std::static_pointer_cast< RuleDefinition >( literal->reference() );
-    assert( ( rule->arguments()->size() == 0 ) && "Only parameter-less rules are supported" );
+    const auto& rule = std::static_pointer_cast< RuleDefinition >( literalReference );
+    assert( rule->type()->arguments().size() == 0 and " only parameter-less rules are supported" );
 
     execute( rule );
 }
@@ -213,16 +209,9 @@ void ExecutionVisitor::execute( const Definition::Ptr& definition )
     m_frameStack.pop();
 }
 
-void ExecutionVisitor::visit( Initially& node )
+void ExecutionVisitor::visit( Root& node )
 {
-    // just evaluate the encapsulated initializers
-    node.initializers()->accept( *this );
-}
-
-void ExecutionVisitor::visit( Initializer& node )
-{
-    // just evaluate the encapsulated update rule
-    node.updateRule()->accept( *this );
+    node.definitions()->accept( *this );
 }
 
 void ExecutionVisitor::visit( VariableDefinition& node )
@@ -261,7 +250,7 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
                 return;
             }
 
-            if( not node.isLocal() )
+            if( not node.local() )
             {
                 const auto function = m_globalState.get( *location );
                 if( function )
@@ -272,7 +261,7 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
             }
         }
 
-        node.defined()->expression()->accept( *this );  // return value already on stack
+        node.defined()->accept( *this );  // return value already on stack
     }
 }
 
@@ -329,6 +318,15 @@ void ExecutionVisitor::visit( EnumeratorDefinition& node )
     m_evaluationStack.push( IR::EnumerationConstant( enumType, node.identifier()->name() ) );
 }
 
+void ExecutionVisitor::visit( EnumerationDefinition& node )
+{
+    throw RuntimeException(
+        { node.sourceLocation() },
+        "unimplemented",  // TODO: FIXME: @ppaulweber
+        m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+        Code::Internal );
+}
+
 void ExecutionVisitor::visit( InvariantDefinition& node )
 {
     node.expression()->accept( *this );
@@ -352,9 +350,13 @@ void ExecutionVisitor::visit( InvariantDefinition& node )
     }
 }
 
-void ExecutionVisitor::visit( StructureDefinition& node )
+void ExecutionVisitor::visit( DomainDefinition& node )
 {
-    // TODO: FIXME: @ppaulweber: continue, related to #35
+    throw RuntimeException(
+        { node.sourceLocation() },
+        "unimplemented",  // TODO: FIXME: @ppaulweber
+        m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+        Code::Internal );
 }
 
 void ExecutionVisitor::visit( BuiltinDefinition& node )
@@ -391,11 +393,6 @@ void ExecutionVisitor::visit( BuiltinDefinition& node )
     }
 }
 
-void ExecutionVisitor::visit( UndefLiteral& node )
-{
-    m_evaluationStack.push( IR::Constant::undef( node.type() ) );
-}
-
 void ExecutionVisitor::visit( ValueLiteral& node )
 {
     m_evaluationStack.push( *node.value() );
@@ -404,6 +401,15 @@ void ExecutionVisitor::visit( ValueLiteral& node )
 void ExecutionVisitor::visit( ReferenceLiteral& node )
 {
     m_evaluationStack.push( ReferenceConstant( &node ) );
+}
+
+void ExecutionVisitor::visit( SetLiteral& node )
+{
+    throw RuntimeException(
+        { node.sourceLocation() },
+        "unimplemented",  // TODO: FIXME: @ppaulweber
+        m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+        Code::Internal );
 }
 
 void ExecutionVisitor::visit( ListLiteral& node )
@@ -470,19 +476,6 @@ void ExecutionVisitor::visit( RecordLiteral& node )
     m_evaluationStack.push( IR::RecordConstant( recordType, recordElements ) );
 }
 
-void ExecutionVisitor::visit( BasicType& node )
-{
-    const auto rangeType = std::make_shared< IR::RangeType >( node.type() );
-    const auto range = std::make_shared< IR::Range >( rangeType );
-    m_evaluationStack.push( IR::RangeConstant( rangeType, range ) );
-}
-
-void ExecutionVisitor::visit( EmbracedExpression& node )
-{
-    // just evaluate the named expression and push it to the stack
-    node.expression()->accept( *this );
-}
-
 void ExecutionVisitor::visit( NamedExpression& node )
 {
     // just evaluate the embraced expression and push it to the stack
@@ -533,99 +526,12 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             node.targetDefinition()->accept( *this );
             break;
         }
-        case DirectCallExpression::TargetType::THIS:
-        {
-            node.targetDefinition()->accept( *this );
-            break;
-        }
         case DirectCallExpression::TargetType::UNKNOWN:
         {
             assert( !"cannot call an unknown target" );
             break;
         }
     }
-}
-
-void ExecutionVisitor::visit( MethodCallExpression& node )
-{
-    node.object()->accept( *this );
-    const auto object = m_evaluationStack.pop();
-
-    switch( node.methodType() )
-    {
-        case MethodCallExpression::MethodType::FUNCTION:  // [[fallthrough]]
-        case MethodCallExpression::MethodType::DERIVED:
-        {
-            // if( not object.defined() )
-            // {
-            //     throw RuntimeException(
-            //         { node.object()->sourceLocation() },
-            //         "cannot call a method of an undefined object",
-            //         m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            //         Code::Unspecified );
-            // }
-
-            const auto& definition = node.targetDefinition();
-            m_frameStack.push(
-                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-            definition->accept( *this );
-            m_frameStack.pop();
-            break;
-        }
-        case MethodCallExpression::MethodType::RULE:
-        {
-            // if( not object.defined() )
-            // {
-            //     throw RuntimeException(
-            //         node.object()->sourceLocation(),
-            //         "cannot call a method of an undefined object",
-            //         m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            //         Code::RuntimeException );
-            // }
-
-            Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
-            const auto& definition = node.targetDefinition();
-            m_frameStack.push(
-                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-            definition->accept( *this );
-            m_frameStack.pop();
-            try
-            {
-                transaction.merge();
-            }
-            catch( const ExecutionUpdateSet::Conflict& conflict )
-            {
-                handleMergeConflict( node, conflict );
-            }
-            break;
-        }
-        case MethodCallExpression::MethodType::UNKNOWN:
-        {
-            assert( !"cannot call an unknown method" );
-            break;
-        }
-    }
-}
-
-void ExecutionVisitor::visit( LiteralCallExpression& node )
-{
-    const auto& definition = node.targetDefinition();
-    m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-
-    try
-    {
-        definition->accept( *this );
-    }
-    catch( const std::exception& e )
-    {
-        throw RuntimeException(
-            { node.sourceLocation() },
-            node.description() + " expression has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::RuntimeException );
-    }
-
-    m_frameStack.pop();
 }
 
 void ExecutionVisitor::visit( IndirectCallExpression& node )
@@ -642,10 +548,11 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     }
 
     const auto& literal = value.value();
-    switch( literal->referenceType() )
+    const auto& literalReference = literal->reference();
+    switch( literal->reference()->id() )
     {
-        case ReferenceLiteral::ReferenceType::FUNCTION:  // [[fallthrough]]
-        case ReferenceLiteral::ReferenceType::DERIVED:
+        case Node::ID::FUNCTION_DEFINITION:  // [[fallthrough]]
+        case Node::ID::DERIVED_DEFINITION:
         {
             const auto& definition = std::static_pointer_cast< Definition >( literal->reference() );
             m_frameStack.push(
@@ -654,7 +561,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             m_frameStack.pop();
             break;
         }
-        case ReferenceLiteral::ReferenceType::RULE:
+        case Node::ID::RULE_DEFINITION:
         {
             Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
             const auto& definition = std::static_pointer_cast< Definition >( literal->reference() );
@@ -672,75 +579,12 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             }
             break;
         }
-        case ReferenceLiteral::ReferenceType::UNKNOWN:
+        default:
         {
             assert( !"cannot call an unknown target" );
             break;
         }
     }
-}
-
-void ExecutionVisitor::visit( TypeCastingExpression& node )
-{
-    const auto& definition = node.targetDefinition();
-    m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-
-    try
-    {
-        definition->accept( *this );
-    }
-    catch( const std::exception& e )
-    {
-        throw RuntimeException(
-            { node.sourceLocation() },
-            "type casting expression has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::RuntimeException );
-    }
-
-    m_frameStack.pop();
-}
-
-void ExecutionVisitor::visit( UnaryExpression& node )
-{
-    const auto& definition = node.targetDefinition();
-    m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-
-    try
-    {
-        definition->accept( *this );
-    }
-    catch( const std::exception& e )
-    {
-        throw RuntimeException(
-            { node.sourceLocation() },
-            "unary expression has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::RuntimeException );
-    }
-
-    m_frameStack.pop();
-}
-
-void ExecutionVisitor::visit( BinaryExpression& node )
-{
-    const auto& definition = node.targetDefinition();
-    m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-
-    try
-    {
-        definition->accept( *this );
-    }
-    catch( const std::exception& e )
-    {
-        throw RuntimeException(
-            { node.sourceLocation() },
-            "binary expression has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::RuntimeException );
-    }
-
-    m_frameStack.pop();
 }
 
 void ExecutionVisitor::visit( LetExpression& node )
@@ -895,25 +739,8 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     }
 }
 
-void ExecutionVisitor::visit( CardinalityExpression& node )
+void ExecutionVisitor::visit( SkipRule& node )
 {
-    const auto& definition = node.targetDefinition();
-    m_frameStack.push( makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-
-    try
-    {
-        definition->accept( *this );
-    }
-    catch( const std::exception& e )
-    {
-        throw RuntimeException(
-            { node.sourceLocation() },
-            "cardinality expression has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::Unspecified );
-    }
-
-    m_frameStack.pop();
 }
 
 void ExecutionVisitor::visit( ConditionalRule& node )
@@ -1011,7 +838,7 @@ void ExecutionVisitor::visit( LocalRule& node )
 {
     Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
 
-    std::unordered_set< AST::FunctionDefinition* > localFunctions;
+    std::unordered_set< LST::FunctionDefinition* > localFunctions;
 
     {
         Transaction initTransaction( &m_updateSetManager, Semantics::Parallel, 100 );
@@ -1222,44 +1049,6 @@ void ExecutionVisitor::visit( CallRule& node )
     }
 }
 
-void ExecutionVisitor::visit( WhileRule& node )
-{
-    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
-    const auto* updateSet = m_updateSetManager.currentUpdateSet();
-
-    std::size_t previousEpoch;
-    do
-    {
-        node.condition()->accept( *this );
-        const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
-
-        if( not condition.defined() )
-        {
-            throw RuntimeException(
-                { node.condition()->sourceLocation() },
-                "condition must be true or false but was undefined",
-                m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-                Code::WhileRuleInvalidCondition );
-        }
-        else if( condition.value() == false )
-        {
-            break;
-        }
-
-        previousEpoch = updateSet->epoch();
-        node.rule()->accept( *this );
-    } while( previousEpoch != updateSet->epoch() );
-
-    try
-    {
-        transaction.merge();
-    }
-    catch( const ExecutionUpdateSet::Conflict& conflict )
-    {
-        handleMergeConflict( node, conflict );
-    }
-}
-
 void ExecutionVisitor::visit( VariableBinding& node )
 {
     node.expression()->accept( *this );
@@ -1283,6 +1072,22 @@ void ExecutionVisitor::visit( VariableBinding& node )
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.variable()->localIndex();
     frame->setLocal( variableIndex, value );
+}
+
+void ExecutionVisitor::visit( Identifier& node )
+{
+}
+
+void ExecutionVisitor::visit( IdentifierPath& node )
+{
+}
+
+void ExecutionVisitor::visit( DefaultCase& node )
+{
+}
+
+void ExecutionVisitor::visit( ExpressionCase& node )
+{
 }
 
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
@@ -1380,6 +1185,7 @@ void ExecutionVisitor::foreachInUniverse(
 {
     auto* frame = m_frameStack.top();
 
+    // TODO: FIXME: @ppaulweber: move this to CST to AST transformation
     // Handle multiple forall variables by creating a lambda-function chain
     // e.g. forall x, y in U do
     //          subRule()
@@ -1424,8 +1230,7 @@ void StateInitializationVisitor::visit( Specification& node )
 {
     m_updateSetManager.fork( Semantics::Sequential, 100 );
 
-    node.header()->accept( *this );
-    node.definitions()->accept( *this );
+    node.lst()->definitions()->accept( *this );
 
     auto updateSet = m_updateSetManager.currentUpdateSet();
     m_globalState.fireUpdateSet( updateSet );
@@ -1434,7 +1239,7 @@ void StateInitializationVisitor::visit( Specification& node )
 
 void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
-    assert( not node.isLocal() );
+    assert( not node.local() );
 
     Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
     ExecutionVisitor executionVisitor(
@@ -1923,6 +1728,13 @@ void SymbolicStateInitializationVisitor::visit( Specification& node )
 
     node.header()->accept( *this );
     node.definitions()->accept( *this );
+
+    // for( const auto& definition : *specification.lst()->definitions() )
+    // {
+    //     if( definition->id() != Node::ID::INVARIANT_DEFINITION )
+    //     {
+    //         continue;
+    //     }
 
     auto updateSet = m_updateSetManager.currentUpdateSet();
     m_globalState.fireUpdateSet( updateSet );
