@@ -77,7 +77,7 @@ rule test =
     TEST_FILE_CREATE( file, spec );
 
     // THEN
-    TEST_PASS( AstDumpSourcePass, file, true, );
+    TEST_PASS( CstEmitPass, file, true, );
 
     // CLEANUP
     TEST_FILE_REMOVE( file );

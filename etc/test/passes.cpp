@@ -120,10 +120,11 @@ function foo : -> Integer
 
 SOURCE_TEST( analyze, ConsistencyCheckPass, source, true, , );
 
-SOURCE_TEST( transform, SourceToAstPass, source, true, , { pass.setDebug( false ); } );
+SOURCE_TEST( transform, SourceToCstPass, source, true, , { pass.setDebug( false ); } );
 
-SOURCE_TEST( transform, AstDumpSourcePass, source, true, , );
-SOURCE_TEST( transform, AstDumpDotPass, source, true, , );
+SOURCE_TEST( transform, CstEmitPass, source, true, , );
+SOURCE_TEST( transform, CstDumpPass, source, true, , );
+SOURCE_TEST( transform, AstDumpPass, source, true, , );
 
 SOURCE_TEST( execute, NumericExecutionPass, source, true, , );  // TODO: FIXME:
 // https://github.com/casm-lang/casm/issues/93
