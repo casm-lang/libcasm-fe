@@ -43,78 +43,85 @@
 //  statement from your version.
 //
 
-#include "AstDumpSourcePass.h"
+#include "CstEmitPass.h"
 
-#include <iostream>
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
-#include <libcasm-fe/ast/RecursiveVisitor>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/cst/Literal>
+#include <libcasm-fe/cst/Visitor>
+#include <libcasm-fe/transform/SourceToCstPass>
+
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
-#include "../various/GrammarToken.h"
+#include <iostream>
 
 using namespace libcasm_fe;
-using namespace AST;
+using namespace CST;
 
-namespace ir = libcasm_ir;
+char CstEmitPass::id = 0;
 
-char AstDumpSourcePass::id = 0;
-
-static libpass::PassRegistration< AstDumpSourcePass > PASS(
-    "AstDumpSourcePass",
-    "generates CASM specification of the AST and emits to specified output path",
-    "ast-emit",
+static libpass::PassRegistration< CstEmitPass > PASS(
+    "CstEmitPass",
+    "emits the CASM specification based on the parsed CST and writes it to a specified output path",
+    "cst-emit",
     0 );
 
-class AstDumpSourceVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    explicit AstDumpSourceVisitor( std::ostream& stream );
+    namespace CST
+    {
+        class CSTDumpSourceVisitor final : public RecursiveVisitor
+        {
+          public:
+            explicit CSTDumpSourceVisitor( std::ostream& stream );
 
-    void visit( BuiltinDefinition& node ) override;
-    void visit( DomainDefinition& node ) override;
-    void visit( ImportDefinition& node ) override;
-    void visit( UsingPathDefinition& node ) override;
-    void visit( InitDefinition& node ) override;
-    void visit( Initializer& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( EmbracedExpression& node ) override;
+            void visit( BuiltinDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
+            void visit( ImportDefinition& node ) override;
+            void visit( UsingPathDefinition& node ) override;
+            void visit( InitDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
 
-    void visit( UndefLiteral& node ) override;
-    void visit( ValueLiteral& node ) override;
+            void visit( EmbracedExpression& node ) override;
 
-    void visit( UnresolvedType& node ) override;
-    void visit( Identifier& node ) override;
-    void visit( Token& node ) override;
-    void visit( Span& node ) override;
-    void visit( Defined& node ) override;
-    void visit( Template& node ) override;
+            void visit( UndefLiteral& node ) override;
+            void visit( ValueLiteral& node ) override;
 
-  private:
-    std::ostream& m_stream;
-};
+            void visit( UnresolvedType& node ) override;
+            void visit( Identifier& node ) override;
+            void visit( Token& node ) override;
+            void visit( Span& node ) override;
+            void visit( Defined& node ) override;
+            void visit( Initially& node ) override;
 
-AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
+          private:
+            std::ostream& m_stream;
+        };
+    }
+}
+
+CSTDumpSourceVisitor::CSTDumpSourceVisitor( std::ostream& stream )
 : m_stream( stream )
 {
 }
 
-void AstDumpSourceVisitor::visit( DomainDefinition& node )
+void CSTDumpSourceVisitor::visit( DomainDefinition& node )
 {
     // omit domain information
 }
 
-void AstDumpSourceVisitor::visit( BuiltinDefinition& node )
+void CSTDumpSourceVisitor::visit( BuiltinDefinition& node )
 {
     // omit builtin information
 }
 
-void AstDumpSourceVisitor::visit( UsingPathDefinition& node )
+void CSTDumpSourceVisitor::visit( UsingPathDefinition& node )
 {
     if( node.usingToken()->token() == Grammar::Token::UNRESOLVED )
     {
@@ -123,7 +130,7 @@ void AstDumpSourceVisitor::visit( UsingPathDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpSourceVisitor::visit( ImportDefinition& node )
+void CSTDumpSourceVisitor::visit( ImportDefinition& node )
 {
     if( node.importToken()->token() == Grammar::Token::UNRESOLVED )
     {
@@ -132,7 +139,7 @@ void AstDumpSourceVisitor::visit( ImportDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpSourceVisitor::visit( InitDefinition& node )
+void CSTDumpSourceVisitor::visit( InitDefinition& node )
 {
     node.attributes()->accept( *this );
     node.initToken()->accept( *this );
@@ -148,17 +155,7 @@ void AstDumpSourceVisitor::visit( InitDefinition& node )
     }
 }
 
-void AstDumpSourceVisitor::visit( Initializer& node )
-{
-    node.delimiterToken()->accept( *this );
-    node.leftBraceToken()->accept( *this );
-    node.arguments()->accept( *this );
-    node.rightBraceToken()->accept( *this );
-    node.mapsToken()->accept( *this );
-    node.value()->accept( *this );
-}
-
-void AstDumpSourceVisitor::visit( RuleDefinition& node )
+void CSTDumpSourceVisitor::visit( RuleDefinition& node )
 {
     node.attributes()->accept( *this );
     node.ruleToken()->accept( *this );
@@ -175,7 +172,7 @@ void AstDumpSourceVisitor::visit( RuleDefinition& node )
     node.rule()->accept( *this );
 }
 
-void AstDumpSourceVisitor::visit( EmbracedExpression& node )
+void CSTDumpSourceVisitor::visit( EmbracedExpression& node )
 {
     if( node.leftBraceToken()->token() == Grammar::Token::UNRESOLVED )
     {
@@ -184,29 +181,29 @@ void AstDumpSourceVisitor::visit( EmbracedExpression& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpSourceVisitor::visit( UndefLiteral& node )
+void CSTDumpSourceVisitor::visit( UndefLiteral& node )
 {
     RecursiveVisitor::visit( node );
     m_stream << "undef";
 }
 
-void AstDumpSourceVisitor::visit( ValueLiteral& node )
+void CSTDumpSourceVisitor::visit( ValueLiteral& node )
 {
     RecursiveVisitor::visit( node );
     m_stream << node.toString();
 }
 
-void AstDumpSourceVisitor::visit( UnresolvedType& node )
+void CSTDumpSourceVisitor::visit( UnresolvedType& node )
 {
 }
 
-void AstDumpSourceVisitor::visit( Identifier& node )
+void CSTDumpSourceVisitor::visit( Identifier& node )
 {
     RecursiveVisitor::visit( node );
     m_stream << node.name();
 }
 
-void AstDumpSourceVisitor::visit( Token& node )
+void CSTDumpSourceVisitor::visit( Token& node )
 {
     if( node.token() == Grammar::Token::UNRESOLVED )
     {
@@ -216,13 +213,13 @@ void AstDumpSourceVisitor::visit( Token& node )
     m_stream << node.tokenString();
 }
 
-void AstDumpSourceVisitor::visit( Span& node )
+void CSTDumpSourceVisitor::visit( Span& node )
 {
     RecursiveVisitor::visit( node );
     m_stream << node.toString();
 }
 
-void AstDumpSourceVisitor::visit( Defined& node )
+void CSTDumpSourceVisitor::visit( Defined& node )
 {
     if( node.definedToken()->token() == Grammar::Token::UNRESOLVED )
     {
@@ -231,35 +228,37 @@ void AstDumpSourceVisitor::visit( Defined& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpSourceVisitor::visit( Template& node )
+void CSTDumpSourceVisitor::visit( Initially& node )
 {
-    if( node.templateToken()->token() == Grammar::Token::UNRESOLVED )
+    if( node.equalToken()->token() == Grammar::Token::UNRESOLVED )
     {
         return;
     }
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpSourcePass::usage( libpass::PassUsage& pu )
+//
+//
+// CstEmitPass
+//
+
+void CstEmitPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
+    pu.require< SourceToCstPass >();
     pu.scheduleAfter< ConsistencyCheckPass >();
 }
 
-u1 AstDumpSourcePass::run( libpass::PassResult& pr )
+u1 CstEmitPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto& data = pr.output< SourceToAstPass >();
+    const auto& data = pr.output< SourceToCstPass >();
     const auto& specification = data->specification();
 
     auto& outputStream = std::cout;
 
-    AstDumpSourceVisitor visitor{ outputStream };
-
-    specification->header()->accept( visitor );
-    specification->definitions()->accept( visitor );
-    specification->spans()->accept( visitor );
+    CSTDumpSourceVisitor visitor{ outputStream };
+    specification->cst()->accept( visitor );
 
     return true;
 }
