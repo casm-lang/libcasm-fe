@@ -77,6 +77,8 @@ namespace libcasm_fe
 
         void registerSymbol( const std::string& name, const AST::Definition::Ptr& definition );
 
+        void replaceSymbol( const std::string& name, const AST::Definition::Ptr& definition );
+
         void registerNamespace(
             const std::string& name,
             const Namespace::Ptr& _namespace,
@@ -109,6 +111,8 @@ namespace libcasm_fe
         const std::unordered_map< std::string, AST::Definition::Ptr >& symbols( void ) const;
 
         const std::unordered_map< std::string, Linkage >& namespaces( void ) const;
+
+        u1 empty( void ) const;
 
         void registerTypeDefinition( AST::TypeDefinition& node );
 

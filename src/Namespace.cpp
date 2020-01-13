@@ -79,6 +79,20 @@ void Namespace::registerSymbol( const std::string& name, const AST::Definition::
     }
 }
 
+void Namespace::replaceSymbol( const std::string& name, const AST::Definition::Ptr& definition )
+{
+    const auto& symbol = findSymbol( name );
+    if( not symbol )
+    {
+        throw std::domain_error( "symbol '" + name + "' not registered" );
+    }
+
+    m_symbols.erase( name );
+
+    const auto result = m_symbols.emplace( name, definition );
+    assert( result.second and "inconsistent state" );
+}
+
 void Namespace::registerNamespace(
     const std::string& name, const Namespace::Ptr& _namespace, const Visibility visibility )
 {
@@ -181,6 +195,11 @@ const std::unordered_map< std::string, Namespace::Linkage >& Namespace::namespac
     return m_namespaces;
 }
 
+u1 Namespace::empty( void ) const
+{
+    return symbols().size() == 0 and namespaces().size() == 0;
+}
+
 #include <iostream>
 
 void Namespace::registerTypeDefinition( TypeDefinition& node )
@@ -241,23 +260,39 @@ std::string Namespace::dump(
         const auto& name = symbol.first;
         const auto& definition = symbol.second;
         const auto& type = definition->type();
+        const auto prefix = indention + name + Namespace::delimiter();
 
-        stream << indention << name << " "
+        stream << prefix
                << libstdhl::Ansi::format< libstdhl::Ansi::Color::MAGENTA >(
                       definition->description() )
                << " "
+               << libstdhl::Ansi::format< libstdhl::Ansi::Color::YELLOW >(
+                      definition->abstract() ? "abstract " : "" )
+               << libstdhl::Ansi::format< libstdhl::Ansi::Color::RED >(
+                      definition->isTemplate() ? "template " : "" )
                << libstdhl::Ansi::format< libstdhl::Ansi::Color::CYAN >(
                       definition->typeDescription() )
                << " "
                << libstdhl::Ansi::format< libstdhl::Ansi::Color::BLUE >(
                       type ? type->description() : "$unresolved$" )
                << "\n";
+
+        if( not definition->symboltable()->empty() and
+            definition->id() != Node::ID::USING_DEFINITION )
+        {
+            stream << definition->symboltable()->dump( prefix, visited );
+        }
     }
 
     for( const auto& _namespace : m_namespaces )
     {
         const auto& name = _namespace.first;
         const auto& space = _namespace.second.first;
+        if( not space )
+        {
+            continue;
+        }
+
         const auto visibility = libstdhl::Ansi::format< libstdhl::Ansi::Color::MAGENTA >(
             _namespace.second.second == Visibility::Internal ? "-" : "+" );
         const auto prefix = indention + name + Namespace::delimiter() + visibility;
