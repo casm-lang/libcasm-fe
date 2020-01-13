@@ -57,9 +57,9 @@ add_library( ${PROJECT}-test OBJECT
   passes.cpp
   utf8.cpp
   project.cpp
-  ast/NodeTest.cpp
-  ast/literal.cpp
-  ast/span.cpp
+  cst/NodeTest.cpp
+  cst/literal.cpp
+  cst/span.cpp
   import/FileLoadingStrategyTest.cpp
   import/SpecificationRepositoryTest.cpp
 #  numeric/expression_evaluation.cpp  # TODO: FIXME: PPA: EPE we should enable this test ASAP
