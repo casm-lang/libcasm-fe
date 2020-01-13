@@ -50,9 +50,9 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
-
 #include <libcasm-fe/analyze/PropertyRevisePass>
+#include <libcasm-fe/ast/Literal>
+#include <libcasm-fe/ast/Visitor>
 #include <libcasm-fe/import/SpecificationMergerPass>
 
 #include <libcasm-ir/Type>
@@ -71,83 +71,81 @@ namespace IR = libcasm_ir;
 char ConsistencyCheckPass::id = 0;
 
 static libpass::PassRegistration< ConsistencyCheckPass > PASS(
-    "ASTConsistencyCheckPass", "checks the consistency of the AST representation", "ast-check", 0 );
+    "Consistency Check Pass", "checks the consistency of the AST representation", "ast-check", 0 );
 
 //
 //
 // ConsistencyCheckVisitor
 //
 
-class ConsistencyCheckVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    ConsistencyCheckVisitor( libcasm_fe::Logger& m_log );
+    namespace AST
+    {
+        class ConsistencyCheckVisitor final : public RecursiveVisitor
+        {
+          public:
+            ConsistencyCheckVisitor( libcasm_fe::Logger& m_log );
 
-    void visit( Specification& node );
+            void visit( VariableDefinition& node ) override;
+            void visit( FunctionDefinition& node ) override;
+            void visit( DerivedDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
+            void visit( EnumeratorDefinition& node ) override;
+            void visit( EnumerationDefinition& node ) override;
+            void visit( UsingDefinition& node ) override;
+            void visit( InvariantDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
+            void visit( StructureDefinition& node ) override;
+            void visit( BehaviorDefinition& node ) override;
+            void visit( ImplementDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
 
-    void visit( VariableDefinition& node ) override;
-    void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( EnumeratorDefinition& node ) override;
-    void visit( EnumerationDefinition& node ) override;
-    void visit( UsingDefinition& node ) override;
-    void visit( InvariantDefinition& node ) override;
-    void visit( DomainDefinition& node ) override;
-    void visit( StructureDefinition& node ) override;
-    void visit( BehaviorDefinition& node ) override;
-    void visit( ImplementDefinition& node ) override;
-    void visit( BuiltinDefinition& node ) override;
+            void visit( UndefLiteral& node ) override;
+            void visit( ValueLiteral& node ) override;
+            void visit( ReferenceLiteral& node ) override;
+            void visit( ListLiteral& node ) override;
+            void visit( RangeLiteral& node ) override;
+            void visit( TupleLiteral& node ) override;
+            void visit( RecordLiteral& node ) override;
 
-    void visit( UndefLiteral& node ) override;
-    void visit( ValueLiteral& node ) override;
-    void visit( ReferenceLiteral& node ) override;
-    void visit( ListLiteral& node ) override;
-    void visit( RangeLiteral& node ) override;
-    void visit( TupleLiteral& node ) override;
-    void visit( RecordLiteral& node ) override;
+            void visit( NamedExpression& node ) override;
+            void visit( DirectCallExpression& node ) override;
+            void visit( MethodCallExpression& node ) override;
+            void visit( LiteralCallExpression& node ) override;
+            void visit( IndirectCallExpression& node ) override;
+            void visit( TypeCastingExpression& node ) override;
+            void visit( UnaryExpression& node ) override;
+            void visit( BinaryExpression& node ) override;
+            void visit( LetExpression& node ) override;
+            void visit( ConditionalExpression& node ) override;
+            void visit( ChooseExpression& node ) override;
+            void visit( UniversalQuantifierExpression& node ) override;
+            void visit( ExistentialQuantifierExpression& node ) override;
+            void visit( CardinalityExpression& node ) override;
 
-    void visit( NamedExpression& node ) override;
-    void visit( DirectCallExpression& node ) override;
-    void visit( MethodCallExpression& node ) override;
-    void visit( LiteralCallExpression& node ) override;
-    void visit( IndirectCallExpression& node ) override;
-    void visit( TypeCastingExpression& node ) override;
-    void visit( UnaryExpression& node ) override;
-    void visit( BinaryExpression& node ) override;
-    void visit( LetExpression& node ) override;
-    void visit( ConditionalExpression& node ) override;
-    void visit( ChooseExpression& node ) override;
-    void visit( UniversalQuantifierExpression& node ) override;
-    void visit( ExistentialQuantifierExpression& node ) override;
-    void visit( CardinalityExpression& node ) override;
+            void visit( CaseRule& node ) override;
+            void visit( UpdateRule& node ) override;
 
-    void visit( CaseRule& node ) override;
-    void visit( UpdateRule& node ) override;
+            void visit( BasicType& node ) override;
+            void visit( TupleType& node ) override;
+            void visit( RecordType& node ) override;
+            void visit( TemplateType& node ) override;
+            void visit( FixedSizedType& node ) override;
+            void visit( RelationType& node ) override;
 
-    void visit( BasicType& node ) override;
-    void visit( TupleType& node ) override;
-    void visit( RecordType& node ) override;
-    void visit( TemplateType& node ) override;
-    void visit( FixedSizedType& node ) override;
-    void visit( RelationType& node ) override;
+            void verifyHasType( const TypedNode& node );
+            void verifyHasTypeOfKind( const TypedNode& node, const IR::Type::Kind expectedKind );
 
-    void verifyHasType( const TypedNode& node );
-    void verifyHasTypeOfKind( const TypedNode& node, const IR::Type::Kind expectedKind );
-
-  private:
-    libcasm_fe::Logger& m_log;
-};
+          private:
+            libcasm_fe::Logger& m_log;
+        };
+    }
+}
 
 ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 {
-}
-
-void ConsistencyCheckVisitor::visit( Specification& node )
-{
-    node.header()->accept( *this );
-    node.definitions()->accept( *this );
 }
 
 void ConsistencyCheckVisitor::visit( VariableDefinition& node )
@@ -202,7 +200,6 @@ void ConsistencyCheckVisitor::visit( DomainDefinition& node )
 {
     if( node.isTemplate() )
     {
-        node.templateInstances()->accept( *this );
         return;
     }
 
@@ -214,7 +211,6 @@ void ConsistencyCheckVisitor::visit( StructureDefinition& node )
 {
     if( node.isTemplate() )
     {
-        node.templateInstances()->accept( *this );
         return;
     }
 
@@ -226,7 +222,6 @@ void ConsistencyCheckVisitor::visit( BehaviorDefinition& node )
 {
     if( node.isTemplate() )
     {
-        node.templateInstances()->accept( *this );
         return;
     }
 
@@ -238,7 +233,6 @@ void ConsistencyCheckVisitor::visit( ImplementDefinition& node )
 {
     if( node.isTemplate() )
     {
-        node.templateInstances()->accept( *this );
         return;
     }
 
@@ -250,7 +244,6 @@ void ConsistencyCheckVisitor::visit( BuiltinDefinition& node )
 {
     if( node.isTemplate() )
     {
-        node.templateInstances()->accept( *this );
         return;
     }
 
@@ -470,11 +463,11 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
         const auto& methodCall = std::static_pointer_cast< MethodCallExpression >( function );
         name = methodCall->methodName()->name();
 
-        if( methodCall->methodType() != MethodCallExpression::MethodType::FUNCTION )
+        if( methodCall->targetType() != TargetCallExpression::TargetType::FUNCTION )
         {
             m_log.error(
                 { function->sourceLocation() },
-                "updating " + methodCall->methodTypeName() + " '" + name +
+                "updating " + methodCall->targetTypeName() + " '" + name +
                     "' is not allowed, only function symbols are allowed" );
             return;
         }
@@ -597,7 +590,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     ConsistencyCheckVisitor visitor( log );
-    visitor.visit( *specification );
+    specification->ast()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
