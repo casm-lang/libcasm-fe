@@ -45,14 +45,14 @@
 
 #include "Frame.h"
 
-#include "../ast/Definition.h"
+#include <libcasm-fe/lst/Definition>
 
 #include <libcasm-ir/Constant>
 
 #include <libstdhl/String>
 
 using namespace libcasm_fe;
-using namespace AST;
+using namespace LST;
 
 namespace ir = libcasm_ir;
 
@@ -177,7 +177,7 @@ static std::string generateCalleeTraceLine(
             type = "Function";
             name = function->identifier()->name();
 
-            const auto numberOfArguments = function->argumentTypes()->size();
+            const auto numberOfArguments = function->type()->arguments().size();
             for( std::size_t i = 0; i < numberOfArguments; i++ )
             {
                 if( i > 0 )
