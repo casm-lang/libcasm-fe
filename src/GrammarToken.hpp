@@ -61,7 +61,6 @@ SELF            "self"
 THIS            "this"
 DOMAIN          "domain"
 BUILTIN         "builtin"
-TEMPLATE        "template"
 
 FUNCTION        "function"
 DEFINED         "defined"
@@ -124,8 +123,6 @@ PERCENT         "%"
 CARET           "^"
 MARK            "'"
 
-DOTDOT          ".."
-DOT             "."
 MAPS            "->"
 ARROW           "=>"
 UPDATE          ":="
@@ -134,6 +131,9 @@ LESSEQ          "<="
 GREATEREQ       ">="
 SEQ_BRACKET     "{|"
 ENDSEQ_BRACKET  "|}"
+DOT             "."
+DOTDOT          ".."
+DOTDOTDOT       "..."
 
 //  
 //  Local variables:
