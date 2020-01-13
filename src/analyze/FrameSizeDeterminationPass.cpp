@@ -48,9 +48,9 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
-
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/Visitor>
 #include <libcasm-fe/import/SpecificationMergerPass>
 
 #include <libpass/PassRegistry>
@@ -68,52 +68,56 @@ using namespace AST;
 char FrameSizeDeterminationPass::id = 0;
 
 static libpass::PassRegistration< FrameSizeDeterminationPass > PASS(
-    "ASTFrameSizeDeterminationPass",
-    "determines the required size of call frames",
-    "ast-frame-size-det",
+    "Frame Size Determination Pass",
+    "determines the required call frame size in the AST",
+    "ast-frame-size",
     0 );
 
-class FrameSizeDeterminationVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    explicit FrameSizeDeterminationVisitor( libcasm_fe::Logger& log );
+    namespace AST
+    {
+        class FrameSizeDeterminationVisitor final : public RecursiveVisitor
+        {
+          public:
+            explicit FrameSizeDeterminationVisitor( libcasm_fe::Logger& log );
 
-    void visit( Specification& node );
+            void visit( FunctionDefinition& node ) override;
+            void visit( DerivedDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
+            void visit( InvariantDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
 
-    void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( InvariantDefinition& node ) override;
-    void visit( BuiltinDefinition& node ) override;
+            void visit( LetExpression& node ) override;
+            void visit( ChooseExpression& node ) override;
+            void visit( UniversalQuantifierExpression& node ) override;
+            void visit( ExistentialQuantifierExpression& node ) override;
 
-    void visit( LetExpression& node ) override;
-    void visit( ChooseExpression& node ) override;
-    void visit( UniversalQuantifierExpression& node ) override;
-    void visit( ExistentialQuantifierExpression& node ) override;
+            void visit( LetRule& node ) override;
+            void visit( LocalRule& node ) override;
+            void visit( ForallRule& node ) override;
+            void visit( ChooseRule& node ) override;
 
-    void visit( LetRule& node ) override;
-    void visit( LocalRule& node ) override;
-    void visit( ForallRule& node ) override;
-    void visit( ChooseRule& node ) override;
+            /**
+             * Visits the expression and then pushes the variable onto the stack.
+             * @note The caller needs to pop the variable again!
+             */
+            void visit( VariableBinding& node ) override;
 
-    /**
-     * Visits the expression and then pushes the variable onto the stack.
-     * @note The caller needs to pop the variable again!
-     */
-    void visit( VariableBinding& node ) override;
+          private:
+            void pushLocal( VariableDefinition& variable );
+            void pushLocals( VariableDefinitions& variables );
+            void popLocal( void );
+            void popLocals( std::size_t count );
 
-  private:
-    void pushLocal( VariableDefinition& variable );
-    void pushLocals( VariableDefinitions& variables );
-    void popLocal( void );
-    void popLocals( std::size_t count );
+          private:
+            libcasm_fe::Logger& m_log;
 
-  private:
-    libcasm_fe::Logger& m_log;
-
-    std::size_t m_numberOfLocals;
-    std::size_t m_maxNumberOfLocals;
-};
+            std::size_t m_numberOfLocals;
+            std::size_t m_maxNumberOfLocals;
+        };
+    }
+}
 
 FrameSizeDeterminationVisitor::FrameSizeDeterminationVisitor( libcasm_fe::Logger& log )
 : RecursiveVisitor()
@@ -121,12 +125,6 @@ FrameSizeDeterminationVisitor::FrameSizeDeterminationVisitor( libcasm_fe::Logger
 , m_numberOfLocals( 0 )
 , m_maxNumberOfLocals( 0 )
 {
-}
-
-void FrameSizeDeterminationVisitor::visit( Specification& node )
-{
-    node.header()->accept( *this );
-    node.definitions()->accept( *this );
 }
 
 void FrameSizeDeterminationVisitor::visit( FunctionDefinition& node )
@@ -205,7 +203,7 @@ void FrameSizeDeterminationVisitor::visit( InvariantDefinition& node )
 
 void FrameSizeDeterminationVisitor::visit( BuiltinDefinition& node )
 {
-    node.setMaximumNumberOfLocals( node.relationType().argumentTypes()->size() );
+    node.setMaximumNumberOfLocals( node.argumentTypes()->size() );
 
 #ifndef NDEBUG
     m_log.debug(
@@ -329,7 +327,7 @@ u1 FrameSizeDeterminationPass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     FrameSizeDeterminationVisitor visitor( log );
-    visitor.visit( *specification );
+    specification->ast()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
