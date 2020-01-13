@@ -87,7 +87,6 @@ libpass::LoadFilePass::Input::Ptr FileLoadingStrategy::loadSource(
 std::string FileLoadingStrategy::toFileSystemPath(
     const AST::IdentifierPath::Ptr& identifierPath ) const
 {
-    assert( identifierPath->type() == AST::IdentifierPath::Type::ABSOLUTE );
     const auto identifierPathName = identifierPath->path();
     const auto filePath =
         libstdhl::String::replaceAll( identifierPathName, Namespace::delimiter(), "/" );

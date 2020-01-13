@@ -48,11 +48,11 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/analyze/ProjectResolverPass>
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
-#include <libcasm-fe/ast/RecursiveVisitor>
+#include <libcasm-fe/ast/Visitor>
 #include <libcasm-fe/import/FileLoadingStrategy>
 #include <libcasm-fe/import/ImportError>
 #include <libcasm-fe/import/SpecificationLoader>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/transform/CstToAstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
@@ -64,21 +64,27 @@ using namespace AST;
 char LibraryLoaderPass::id = 0;
 
 static libpass::PassRegistration< LibraryLoaderPass > PASS(
-    "ASTLibraryLoaderPass", "imports the specified CASM libraries", "ast-lib-loader", 0 );
+    "Library Loader Pass", "imports the defined CASM library (module)", "ast-lib-loader", 0 );
 
-class LibraryLoaderVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    LibraryLoaderVisitor(
-        libcasm_fe::Logger& log, Namespace& symboltable, SpecificationLoader& loader );
+    namespace AST
+    {
+        class LibraryLoaderVisitor final : public RecursiveVisitor
+        {
+          public:
+            LibraryLoaderVisitor(
+                libcasm_fe::Logger& log, Namespace& symboltable, SpecificationLoader& loader );
 
-    void visit( ImportDefinition& node ) override;
+            void visit( ImportDefinition& node ) override;
 
-  private:
-    libcasm_fe::Logger& m_log;
-    Namespace& m_symboltable;
-    SpecificationLoader& m_loader;
-};
+          private:
+            libcasm_fe::Logger& m_log;
+            Namespace& m_symboltable;
+            SpecificationLoader& m_loader;
+        };
+    }
+}
 
 LibraryLoaderVisitor::LibraryLoaderVisitor(
     libcasm_fe::Logger& log, Namespace& symboltable, SpecificationLoader& loader )
@@ -92,7 +98,7 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
 {
     RecursiveVisitor::visit( node );
 
-    Specification::Ptr specification = nullptr;
+    libcasm_fe::Specification::Ptr specification = nullptr;
     const auto& path = node.path();
     try
     {
@@ -105,7 +111,7 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
     }
     assert( specification );
 
-    for( const auto& definition : *specification->definitions() )
+    for( const auto& definition : *specification->ast()->definitions() )
     {
         if( definition->id() == Node::ID::INIT_DEFINITION )
         {
@@ -128,7 +134,7 @@ void LibraryLoaderVisitor::visit( ImportDefinition& node )
 
 void LibraryLoaderPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
+    pu.require< CstToAstPass >();
     pu.require< ProjectResolverPass >();
     pu.scheduleAfter< SymbolRegistrationPass >();
 }
@@ -137,7 +143,7 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
+    const auto data = pr.output< CstToAstPass >();
     const auto specification = data->specification();
     const auto symboltable = specification->symboltable();
     const auto specificationFileName = specification->location()->path();
@@ -189,7 +195,7 @@ u1 LibraryLoaderPass::run( libpass::PassResult& pr )
     loader.specificationRepository()->store( specification->location()->toString(), specification );
 
     LibraryLoaderVisitor visitor( log, *symboltable, loader );
-    specification->definitions()->accept( visitor );
+    specification->ast()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
