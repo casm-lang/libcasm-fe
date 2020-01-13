@@ -45,7 +45,7 @@
 
 #include "ReferenceConstant.h"
 
-#include <libcasm-fe/ast/Node>
+#include <libcasm-fe/lst/Node>
 
 using namespace libcasm_fe;
 
@@ -56,13 +56,13 @@ static const auto VOID = libstdhl::Memory::get< libcasm_ir::VoidType >();
 // ReferenceConstant
 //
 
-ReferenceConstant::ReferenceConstant( const AST::ReferenceLiteral* literal )
-: libcasm_ir::ReferenceConstant< AST::ReferenceLiteral >( VOID, literal, classid() )
+ReferenceConstant::ReferenceConstant( const LST::ReferenceLiteral* literal )
+: libcasm_ir::ReferenceConstant< LST::ReferenceLiteral >( VOID, literal, classid() )
 {
 }
 
 ReferenceConstant::ReferenceConstant( void )
-: libcasm_ir::ReferenceConstant< AST::ReferenceLiteral >( VOID, classid() )
+: libcasm_ir::ReferenceConstant< LST::ReferenceLiteral >( VOID, classid() )
 {
 }
 
@@ -82,7 +82,7 @@ std::size_t ReferenceConstant::hash( void ) const
 {
     if( defined() )
     {
-        return std::hash< AST::TypedNode* >()( value()->reference().get() );
+        return std::hash< LST::Node* >()( value()->reference().get() );
     }
     else
     {
