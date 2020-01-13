@@ -1,10 +1,9 @@
 //
-//  Copyright (C) 2014-2021 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2020 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
-//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -43,70 +42,46 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_AST_IDENTIFIER_H_
-#define _LIBCASM_FE_AST_IDENTIFIER_H_
+#include "Specification.h"
 
-#include <libcasm-fe/ast/Node>
+using namespace libcasm_fe;
+using namespace CST;
 
-namespace libcasm_fe
+//
+//
+// Specification
+//
+
+Specification::Specification(
+    const HeaderDefinition::Ptr& header,
+    const Definitions::Ptr& definitions,
+    const Spans::Ptr& spans )
+: Node( Node::ID::SPECIFICATION )
+, m_header( header )
+, m_definitions( definitions )
+, m_spans( spans )
 {
-    namespace AST
-    {
-        class Identifier final : public Node
-        {
-          public:
-            using Ptr = std::shared_ptr< Identifier >;
-
-            explicit Identifier( const std::string& name );
-
-            const std::string& name( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-            Node::Ptr clone( void ) const override final;
-
-          private:
-            const std::string m_name;
-        };
-
-        using Identifiers = NodeList< Identifier >;
-
-        /**
-           @brief An identifier path is an identifier + namespaces.
-         */
-        class IdentifierPath final : public Node
-        {
-          public:
-            using Ptr = std::shared_ptr< IdentifierPath >;
-
-            IdentifierPath( const Identifier::Ptr& identifier );
-
-            IdentifierPath( const Identifiers::Ptr& identifiers );
-
-            void addIdentifier( const Identifier::Ptr& identifier );
-
-            Identifiers::Ptr identifiers( void ) const;
-
-            const std::string& baseName( void ) const;
-
-            std::string baseDir( void ) const;
-
-            std::string path( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-            Node::Ptr clone( void ) const override final;
-
-          public:
-            static IdentifierPath::Ptr fromIdentifier( const Identifier::Ptr& identifier );
-
-          private:
-            const Identifiers::Ptr m_identifiers;
-        };
-    }
 }
 
-#endif  // _LIBCASM_FE_AST_IDENTIFIER_H_
+const HeaderDefinition::Ptr& Specification::header( void ) const
+{
+    return m_header;
+}
+
+const Definitions::Ptr& Specification::definitions( void ) const
+{
+    return m_definitions;
+}
+
+const Spans::Ptr& Specification::spans( void ) const
+{
+    return m_spans;
+}
+
+void Specification::clone( Specification& duplicate ) const
+{
+    // TODO: FIXME: @ppaulweber: remove 'clone'
+}
 
 //
 //  Local variables:

@@ -43,12 +43,11 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LITERAL_H_
-#define _LIBCASM_FE_LITERAL_H_
+#ifndef _LIBCASM_FE_AST_LITERAL_H_
+#define _LIBCASM_FE_AST_LITERAL_H_
 
 #include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Expression>
-#include <libcasm-fe/ast/Token>
 #include <libcasm-fe/ast/Type>
 
 #include <libcasm-ir/Constant>
@@ -64,22 +63,8 @@ namespace libcasm_fe
 
             explicit Literal( Node::ID id );
 
-            void setSpans( const Spans::Ptr& spans );
-            const Spans::Ptr& spans( void ) const;
-
-            void setLeftBracket( const Token::Ptr& leftBracket );
-            const Token::Ptr& leftBracket( void ) const;
-
-            void setRightBracket( const Token::Ptr& rightBracket );
-            const Token::Ptr& rightBracket( void ) const;
-
           protected:
             void clone( Literal& duplicate ) const;
-
-          private:
-            Token::Ptr m_leftBracket;
-            Token::Ptr m_rightBracket;
-            Spans::Ptr m_spans;
         };
 
         using Literals = NodeList< Literal >;
@@ -105,8 +90,6 @@ namespace libcasm_fe
 
             const libcasm_ir::Constant::Ptr& value( void ) const;
 
-            void setValue( const libcasm_ir::Constant::Ptr& value );
-
             void setRadix( const libstdhl::Type::Radix radix );
 
             libstdhl::Type::Radix radix( void ) const;
@@ -118,7 +101,7 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            libcasm_ir::Constant::Ptr m_value;
+            const libcasm_ir::Constant::Ptr m_value;
             libstdhl::Type::Radix m_radix;
         };
 
@@ -135,12 +118,9 @@ namespace libcasm_fe
 
             using Ptr = std::shared_ptr< ReferenceLiteral >;
 
-            explicit ReferenceLiteral(
-                const Token::Ptr& at, const IdentifierPath::Ptr& identifier );
+            explicit ReferenceLiteral( const IdentifierPath::Ptr& identifier );
 
             const IdentifierPath::Ptr& identifier( void ) const;
-
-            const Token::Ptr& at( void ) const;
 
             void setReferenceType( ReferenceType referenceType );
 
@@ -156,9 +136,25 @@ namespace libcasm_fe
 
           private:
             const IdentifierPath::Ptr m_identifier;
-            const Token::Ptr m_at;
             ReferenceType m_referenceType;
             Definition::Ptr m_reference;
+        };
+
+        class SetLiteral final : public Literal
+        {
+          public:
+            using Ptr = std::shared_ptr< SetLiteral >;
+
+            explicit SetLiteral( const Expressions::Ptr& expressions );
+
+            const Expressions::Ptr& expressions( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+
+          private:
+            const Expressions::Ptr m_expressions;
         };
 
         class ListLiteral final : public Literal
@@ -183,14 +179,10 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< RangeLiteral >;
 
-            RangeLiteral(
-                const Expression::Ptr& left,
-                const Token::Ptr& dotdot,
-                const Expression::Ptr& right );
+            RangeLiteral( const Expression::Ptr& left, const Expression::Ptr& right );
 
             const Expression::Ptr& left( void ) const;
             const Expression::Ptr& right( void ) const;
-            const Token::Ptr& dotdot( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -199,7 +191,6 @@ namespace libcasm_fe
           private:
             const Expression::Ptr m_left;
             const Expression::Ptr m_right;
-            const Token::Ptr m_dotdot;
         };
 
         class TupleLiteral final : public Literal
@@ -238,7 +229,7 @@ namespace libcasm_fe
     }
 }
 
-#endif  // _LIBCASM_FE_LITERAL_H_
+#endif  // _LIBCASM_FE_AST_LITERAL_H_
 
 //
 //  Local variables:

@@ -42,10 +42,12 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_DECLARATION_H_
-#define _LIBCASM_FE_DECLARATION_H_
+#ifndef _LIBCASM_FE_AST_DECLARATION_H_
+#define _LIBCASM_FE_AST_DECLARATION_H_
 
 #include <libcasm-fe/ast/Definition>
+
+#include <libcasm-fe/cst/Declaration>
 
 namespace libcasm_fe
 {
@@ -56,33 +58,17 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Declaration >;
 
-            enum class Kind
-            {
-                DERIVED,
-                RULE
-            };
+            using Kind = CST::Declaration::Kind;
 
             Declaration(
-                const Token::Ptr& kindToken,
                 const Identifier::Ptr& identifier,
-                const Token::Ptr& colonToken,
                 const Types::Ptr& argumentTypes,
-                const Token::Ptr& mapsToken,
-                const Type::Ptr& returnType );
+                const Type::Ptr& returnType,
+                const Kind kind );
 
             const Types::Ptr& argumentTypes( void ) const;
 
-            void setArgumentTypes( const Types::Ptr& argumentTypes );
-
             const Type::Ptr& returnType( void ) const;
-
-            void setReturnType( const Type::Ptr& returnType );
-
-            const Token::Ptr& kindToken( void ) const;
-
-            const Token::Ptr& colonToken( void ) const;
-
-            const Token::Ptr& mapsToken( void ) const;
 
             Kind kind( void ) const;
 
@@ -95,11 +81,8 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            Types::Ptr m_argumentTypes;
-            Type::Ptr m_returnType;
-            const Token::Ptr m_kindToken;
-            const Token::Ptr m_colonToken;
-            const Token::Ptr m_mapsToken;
+            const Types::Ptr m_argumentTypes;
+            const Type::Ptr m_returnType;
             const Kind m_kind;
         };
 
@@ -107,7 +90,7 @@ namespace libcasm_fe
     }
 }
 
-#endif  // _LIBCASM_FE_DECLARATION_H_
+#endif  // _LIBCASM_FE_AST_DECLARATION_H_
 
 //
 //  Local variables:

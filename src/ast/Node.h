@@ -43,8 +43,8 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_NODE_H_
-#define _LIBCASM_FE_NODE_H_
+#ifndef _LIBCASM_FE_AST_NODE_H_
+#define _LIBCASM_FE_AST_NODE_H_
 
 #include <libcasm-fe/CasmFE>
 #include <libcasm-fe/ast/Visitor>
@@ -65,8 +65,9 @@ namespace libcasm_fe
           public:
             enum class ID
             {
+                ROOT,
+
                 // definitions
-                HEADER_DEFINITION,
                 INIT_DEFINITION,
                 INITIALLY,
                 VARIABLE_DEFINITION,
@@ -90,14 +91,17 @@ namespace libcasm_fe
                 UNDEF_LITERAL,
                 VALUE_LITERAL,
                 REFERENCE_LITERAL,
+                SET_LITERAL,
                 LIST_LITERAL,
                 RANGE_LITERAL,
                 TUPLE_LITERAL,
                 RECORD_LITERAL,
 
                 // expressions
+                ABSTRACT_EXPRESSION,
                 EMBRACED_EXPRESSION,
                 NAMED_EXPRESSION,
+                MAPPED_EXPRESSION,
                 DIRECT_CALL_EXPRESSION,
                 METHOD_CALL_EXPRESSION,
                 LITERAL_CALL_EXPRESSION,
@@ -125,7 +129,6 @@ namespace libcasm_fe
                 SEQUENCE_RULE,
                 UPDATE_RULE,
                 CALL_RULE,
-                WHILE_RULE,
 
                 // types
                 UNRESOLVED_TYPE,
@@ -136,15 +139,6 @@ namespace libcasm_fe
                 FIXED_SIZED_TYPE,
                 RELATION_TYPE,
 
-                // attributes
-                BASIC_ATTRIBUTE,
-                EXPRESSION_ATTRIBUTE,
-
-                // helper
-                DEFINED,
-                TEMPLATE,
-                INITIALIZER,
-
                 // other
                 NODE_LIST,
                 IDENTIFIER,
@@ -152,8 +146,6 @@ namespace libcasm_fe
                 EXPRESSION_CASE,
                 DEFAULT_CASE,
                 VARIABLE_BINDING,
-                TOKEN,
-                SPAN,
             };
 
           public:
@@ -281,7 +273,7 @@ namespace libcasm_fe
     }
 }
 
-#endif  // _LIBCASM_FE_NODE_H_
+#endif  // _LIBCASM_FE_AST_NODE_H_
 
 //
 //  Local variables:

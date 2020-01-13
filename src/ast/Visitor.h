@@ -43,17 +43,16 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_VISITOR_H_
-#define _LIBCASM_FE_VISITOR_H_
+#ifndef _LIBCASM_FE_AST_VISITOR_H_
+#define _LIBCASM_FE_AST_VISITOR_H_
 
 namespace libcasm_fe
 {
     namespace AST
     {
-        class HeaderDefinition;
+        class Root;
+
         class InitDefinition;
-        class Initially;
-        class Initializer;
         class VariableDefinition;
         class FunctionDefinition;
         class DerivedDefinition;
@@ -74,13 +73,16 @@ namespace libcasm_fe
         class UndefLiteral;
         class ValueLiteral;
         class ReferenceLiteral;
+        class SetLiteral;
         class ListLiteral;
         class RangeLiteral;
         class TupleLiteral;
         class RecordLiteral;
 
+        class AbstractExpression;
         class EmbracedExpression;
         class NamedExpression;
+        class MappedExpression;
         class DirectCallExpression;
         class MethodCallExpression;
         class LiteralCallExpression;
@@ -107,7 +109,6 @@ namespace libcasm_fe
         class SequenceRule;
         class UpdateRule;
         class CallRule;
-        class WhileRule;
 
         class UnresolvedType;
         class BasicType;
@@ -117,19 +118,11 @@ namespace libcasm_fe
         class FixedSizedType;
         class RelationType;
 
-        class BasicAttribute;
-        class ExpressionAttribute;
-
-        class Defined;
-        class Template;
-
         class Identifier;
         class IdentifierPath;
         class ExpressionCase;
         class DefaultCase;
         class VariableBinding;
-        class Token;
-        class Span;
 
         /**
          * @extends CasmFE
@@ -139,10 +132,9 @@ namespace libcasm_fe
           public:
             virtual ~Visitor( void ) = default;
 
-            virtual void visit( HeaderDefinition& node ) = 0;
+            virtual void visit( Root& node ) = 0;
+
             virtual void visit( InitDefinition& node ) = 0;
-            virtual void visit( Initially& node ) = 0;
-            virtual void visit( Initializer& node ) = 0;
             virtual void visit( VariableDefinition& node ) = 0;
             virtual void visit( FunctionDefinition& node ) = 0;
             virtual void visit( DerivedDefinition& node ) = 0;
@@ -163,13 +155,16 @@ namespace libcasm_fe
             virtual void visit( UndefLiteral& node ) = 0;
             virtual void visit( ValueLiteral& node ) = 0;
             virtual void visit( ReferenceLiteral& node ) = 0;
+            virtual void visit( SetLiteral& node ) = 0;
             virtual void visit( ListLiteral& node ) = 0;
             virtual void visit( RangeLiteral& node ) = 0;
             virtual void visit( TupleLiteral& node ) = 0;
             virtual void visit( RecordLiteral& node ) = 0;
 
+            virtual void visit( AbstractExpression& node ) = 0;
             virtual void visit( EmbracedExpression& node ) = 0;
             virtual void visit( NamedExpression& node ) = 0;
+            virtual void visit( MappedExpression& node ) = 0;
             virtual void visit( DirectCallExpression& node ) = 0;
             virtual void visit( MethodCallExpression& node ) = 0;
             virtual void visit( LiteralCallExpression& node ) = 0;
@@ -196,7 +191,6 @@ namespace libcasm_fe
             virtual void visit( SequenceRule& node ) = 0;
             virtual void visit( UpdateRule& node ) = 0;
             virtual void visit( CallRule& node ) = 0;
-            virtual void visit( WhileRule& node ) = 0;
 
             virtual void visit( UnresolvedType& node ) = 0;
             virtual void visit( BasicType& node ) = 0;
@@ -206,24 +200,172 @@ namespace libcasm_fe
             virtual void visit( FixedSizedType& node ) = 0;
             virtual void visit( RelationType& node ) = 0;
 
-            virtual void visit( BasicAttribute& node ) = 0;
-            virtual void visit( ExpressionAttribute& node ) = 0;
-
-            virtual void visit( Defined& node ) = 0;
-            virtual void visit( Template& node ) = 0;
-
             virtual void visit( Identifier& node ) = 0;
             virtual void visit( IdentifierPath& node ) = 0;
             virtual void visit( ExpressionCase& node ) = 0;
             virtual void visit( DefaultCase& node ) = 0;
             virtual void visit( VariableBinding& node ) = 0;
-            virtual void visit( Token& node ) = 0;
-            virtual void visit( Span& node ) = 0;
+        };
+
+        class RecursiveVisitor : public Visitor
+        {
+          public:
+            void visit( Root& node ) override;
+
+            void visit( InitDefinition& node ) override;
+            void visit( VariableDefinition& node ) override;
+            void visit( FunctionDefinition& node ) override;
+            void visit( DerivedDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
+            void visit( EnumeratorDefinition& node ) override;
+            void visit( EnumerationDefinition& node ) override;
+            void visit( UsingDefinition& node ) override;
+            void visit( UsingPathDefinition& node ) override;
+            void visit( InvariantDefinition& node ) override;
+            void visit( ImportDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
+            void visit( StructureDefinition& node ) override;
+            void visit( BehaviorDefinition& node ) override;
+            void visit( ImplementDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
+            void visit( Declaration& node ) override;
+
+            void visit( UndefLiteral& node ) override;
+            void visit( ValueLiteral& node ) override;
+            void visit( ReferenceLiteral& node ) override;
+            void visit( SetLiteral& node ) override;
+            void visit( ListLiteral& node ) override;
+            void visit( RangeLiteral& node ) override;
+            void visit( TupleLiteral& node ) override;
+            void visit( RecordLiteral& node ) override;
+
+            void visit( AbstractExpression& node ) override;
+            void visit( EmbracedExpression& node ) override;
+            void visit( NamedExpression& node ) override;
+            void visit( MappedExpression& node ) override;
+            void visit( DirectCallExpression& node ) override;
+            void visit( MethodCallExpression& node ) override;
+            void visit( LiteralCallExpression& node ) override;
+            void visit( IndirectCallExpression& node ) override;
+            void visit( TypeCastingExpression& node ) override;
+            void visit( UnaryExpression& node ) override;
+            void visit( BinaryExpression& node ) override;
+            void visit( LetExpression& node ) override;
+            void visit( ConditionalExpression& node ) override;
+            void visit( ChooseExpression& node ) override;
+            void visit( UniversalQuantifierExpression& node ) override;
+            void visit( ExistentialQuantifierExpression& node ) override;
+            void visit( CardinalityExpression& node ) override;
+
+            void visit( SkipRule& node ) override;
+            void visit( ConditionalRule& node ) override;
+            void visit( CaseRule& node ) override;
+            void visit( LetRule& node ) override;
+            void visit( LocalRule& node ) override;
+            void visit( ForallRule& node ) override;
+            void visit( ChooseRule& node ) override;
+            void visit( IterateRule& node ) override;
+            void visit( BlockRule& node ) override;
+            void visit( SequenceRule& node ) override;
+            void visit( UpdateRule& node ) override;
+            void visit( CallRule& node ) override;
+
+            void visit( UnresolvedType& node ) override;
+            void visit( BasicType& node ) override;
+            void visit( TupleType& node ) override;
+            void visit( RecordType& node ) override;
+            void visit( TemplateType& node ) override;
+            void visit( FixedSizedType& node ) override;
+            void visit( RelationType& node ) override;
+
+            void visit( Identifier& node ) override;
+            void visit( IdentifierPath& node ) override;
+            void visit( ExpressionCase& node ) override;
+            void visit( DefaultCase& node ) override;
+            void visit( VariableBinding& node ) override;
+        };
+
+        class EmptyVisitor : public Visitor
+        {
+          public:
+            void visit( Root& node ) override;
+
+            void visit( InitDefinition& node ) override;
+            void visit( VariableDefinition& node ) override;
+            void visit( FunctionDefinition& node ) override;
+            void visit( DerivedDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
+            void visit( EnumeratorDefinition& node ) override;
+            void visit( EnumerationDefinition& node ) override;
+            void visit( UsingDefinition& node ) override;
+            void visit( UsingPathDefinition& node ) override;
+            void visit( InvariantDefinition& node ) override;
+            void visit( ImportDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
+            void visit( StructureDefinition& node ) override;
+            void visit( BehaviorDefinition& node ) override;
+            void visit( ImplementDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
+            void visit( Declaration& node ) override;
+
+            void visit( UndefLiteral& node ) override;
+            void visit( ValueLiteral& node ) override;
+            void visit( ReferenceLiteral& node ) override;
+            void visit( SetLiteral& node ) override;
+            void visit( ListLiteral& node ) override;
+            void visit( RangeLiteral& node ) override;
+            void visit( TupleLiteral& node ) override;
+            void visit( RecordLiteral& node ) override;
+
+            void visit( AbstractExpression& node ) override;
+            void visit( EmbracedExpression& node ) override;
+            void visit( NamedExpression& node ) override;
+            void visit( MappedExpression& node ) override;
+            void visit( DirectCallExpression& node ) override;
+            void visit( MethodCallExpression& node ) override;
+            void visit( LiteralCallExpression& node ) override;
+            void visit( IndirectCallExpression& node ) override;
+            void visit( TypeCastingExpression& node ) override;
+            void visit( UnaryExpression& node ) override;
+            void visit( BinaryExpression& node ) override;
+            void visit( LetExpression& node ) override;
+            void visit( ConditionalExpression& node ) override;
+            void visit( ChooseExpression& node ) override;
+            void visit( UniversalQuantifierExpression& node ) override;
+            void visit( ExistentialQuantifierExpression& node ) override;
+            void visit( CardinalityExpression& node ) override;
+
+            void visit( SkipRule& node ) override;
+            void visit( ConditionalRule& node ) override;
+            void visit( CaseRule& node ) override;
+            void visit( LetRule& node ) override;
+            void visit( LocalRule& node ) override;
+            void visit( ForallRule& node ) override;
+            void visit( ChooseRule& node ) override;
+            void visit( IterateRule& node ) override;
+            void visit( BlockRule& node ) override;
+            void visit( SequenceRule& node ) override;
+            void visit( UpdateRule& node ) override;
+            void visit( CallRule& node ) override;
+
+            void visit( UnresolvedType& node ) override;
+            void visit( BasicType& node ) override;
+            void visit( TupleType& node ) override;
+            void visit( RecordType& node ) override;
+            void visit( TemplateType& node ) override;
+            void visit( FixedSizedType& node ) override;
+            void visit( RelationType& node ) override;
+
+            void visit( Identifier& node ) override;
+            void visit( IdentifierPath& node ) override;
+            void visit( ExpressionCase& node ) override;
+            void visit( DefaultCase& node ) override;
+            void visit( VariableBinding& node ) override;
         };
     }
 }
 
-#endif  // _LIBCASM_FE_VISITOR_H_
+#endif  // _LIBCASM_FE_AST_VISITOR_H_
 
 //
 //  Local variables:

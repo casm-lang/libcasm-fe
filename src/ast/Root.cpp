@@ -1,10 +1,9 @@
 //
-//  Copyright (C) 2014-2021 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2020 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
-//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -43,116 +42,36 @@
 //  statement from your version.
 //
 
-#include "Attribute.h"
-
-#include "../various/GrammarToken.h"
-
-#include <libcasm-fe/ast/Token>
-
-#include <cassert>
+#include "Root.h"
 
 using namespace libcasm_fe;
 using namespace AST;
 
 //
 //
-// Attribute
+// Root
 //
 
-Attribute::Attribute( Node::ID type, const Identifier::Ptr& identifier )
-: Node( type )
-, m_identifier( identifier )
-, m_leftBrace( Token::unresolved() )
-, m_rightBrace( Token::unresolved() )
+Root::Root( const Definitions::Ptr& definitions )
+: Node( Node::ID::ROOT )
+, m_definitions( definitions )
 {
 }
 
-const Identifier::Ptr& Attribute::identifier( void ) const
+const Definitions::Ptr& Root::definitions( void ) const
 {
-    return m_identifier;
+    return m_definitions;
 }
 
-void Attribute::setLeftBrace( const Token::Ptr& leftBrace )
-{
-    assert( m_leftBrace->token() == Grammar::Token::UNRESOLVED );
-    m_leftBrace = leftBrace;
-}
-
-const Token::Ptr& Attribute::leftBrace( void ) const
-{
-    return m_leftBrace;
-}
-
-void Attribute::setRightBrace( const Token::Ptr& rightBrace )
-{
-    assert( m_rightBrace->token() == Grammar::Token::UNRESOLVED );
-    m_rightBrace = rightBrace;
-}
-
-const Token::Ptr& Attribute::rightBrace( void ) const
-{
-    return m_rightBrace;
-}
-
-void Attribute::clone( Attribute& duplicate ) const
-{
-    Node::clone( duplicate );
-    duplicate.setLeftBrace( leftBrace() );
-    duplicate.setRightBrace( rightBrace() );
-}
-
-//
-//
-// BasicAttribute
-//
-
-BasicAttribute::BasicAttribute( const Identifier::Ptr& identifier )
-: Attribute( Node::ID::BASIC_ATTRIBUTE, identifier )
-{
-}
-
-void BasicAttribute::accept( Visitor& visitor )
+void Root::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
-Node::Ptr BasicAttribute::clone( void ) const
+Node::Ptr Root::clone( void ) const
 {
-    auto duplicate = std::make_shared< BasicAttribute >( identifier()->duplicate< Identifier >() );
-
-    Attribute::clone( *duplicate );
-    return duplicate;
-}
-
-//
-//
-// ExpressionAttribute
-//
-
-ExpressionAttribute::ExpressionAttribute(
-    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
-: Attribute( Node::ID::EXPRESSION_ATTRIBUTE, identifier )
-, m_expression( expression )
-{
-}
-
-const Expression::Ptr& ExpressionAttribute::expression( void ) const
-{
-    return m_expression;
-}
-
-void ExpressionAttribute::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-Node::Ptr ExpressionAttribute::clone( void ) const
-{
-    auto duplicate = std::make_shared< ExpressionAttribute >(
-        identifier()->duplicate< Identifier >(), expression()->duplicate< Expression >() );
-
-    Attribute::clone( *duplicate );
-    return duplicate;
+    // TODO: FIXME: @ppaulweber: remove 'clone'
+    return nullptr;
 }
 
 //

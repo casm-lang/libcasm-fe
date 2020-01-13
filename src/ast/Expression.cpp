@@ -47,7 +47,6 @@
 
 #include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Literal>
-#include <libcasm-fe/ast/Token>
 #include <libcasm-fe/ast/Type>
 
 #include "../various/GrammarToken.h"
@@ -62,25 +61,35 @@ using namespace AST;
 
 Expression::Expression( Node::ID id )
 : TypedPropertyNode( id )
-, m_delimiterToken( Token::unresolved() )
 {
-}
-
-void Expression::setDelimiterToken( const Token::Ptr& delimiterToken )
-{
-    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
-    m_delimiterToken = delimiterToken;
-}
-
-const Token::Ptr& Expression::delimiterToken( void ) const
-{
-    return m_delimiterToken;
 }
 
 void Expression::clone( Expression& duplicate ) const
 {
     TypedPropertyNode::clone( duplicate );
-    duplicate.setDelimiterToken( delimiterToken() );
+}
+
+//
+//
+// AbstractExpression
+//
+
+AbstractExpression::AbstractExpression( void )
+: Expression( Node::ID::ABSTRACT_EXPRESSION )
+{
+}
+
+void AbstractExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr AbstractExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< AbstractExpression >();
+
+    Expression::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -88,30 +97,15 @@ void Expression::clone( Expression& duplicate ) const
 // EmbracedExpression
 //
 
-EmbracedExpression::EmbracedExpression(
-    const Token::Ptr& leftBraceToken,
-    const Expression::Ptr& expression,
-    const Token::Ptr& rightBraceToken )
+EmbracedExpression::EmbracedExpression( const Expression::Ptr& expression )
 : Expression( Node::ID::EMBRACED_EXPRESSION )
 , m_expression( expression )
-, m_leftBraceToken( leftBraceToken )
-, m_rightBraceToken( rightBraceToken )
 {
 }
 
 const Expression::Ptr& EmbracedExpression::expression( void ) const
 {
     return m_expression;
-}
-
-const Token::Ptr& EmbracedExpression::leftBraceToken( void ) const
-{
-    return m_leftBraceToken;
-}
-
-const Token::Ptr& EmbracedExpression::rightBraceToken( void ) const
-{
-    return m_rightBraceToken;
 }
 
 void EmbracedExpression::accept( Visitor& visitor )
@@ -121,8 +115,8 @@ void EmbracedExpression::accept( Visitor& visitor )
 
 Node::Ptr EmbracedExpression::clone( void ) const
 {
-    auto duplicate = std::make_shared< EmbracedExpression >(
-        leftBraceToken(), expression()->duplicate< Expression >(), rightBraceToken() );
+    auto duplicate =
+        std::make_shared< EmbracedExpression >( expression()->duplicate< Expression >() );
 
     Expression::clone( *duplicate );
     return duplicate;
@@ -134,13 +128,10 @@ Node::Ptr EmbracedExpression::clone( void ) const
 //
 
 NamedExpression::NamedExpression(
-    const Identifier::Ptr& identifier,
-    const Token::Ptr& colonToken,
-    const Expression::Ptr& expression )
+    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
 : Expression( Node::ID::NAMED_EXPRESSION )
 , m_identifier( identifier )
 , m_expression( expression )
-, m_colonToken( colonToken )
 {
 }
 
@@ -154,11 +145,6 @@ const Expression::Ptr& NamedExpression::expression( void ) const
     return m_expression;
 }
 
-const Token::Ptr& NamedExpression::colonToken( void ) const
-{
-    return m_colonToken;
-}
-
 void NamedExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -167,9 +153,44 @@ void NamedExpression::accept( Visitor& visitor )
 Node::Ptr NamedExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< NamedExpression >(
-        identifier()->duplicate< Identifier >(),
-        colonToken(),
-        expression()->duplicate< Expression >() );
+        identifier()->duplicate< Identifier >(), expression()->duplicate< Expression >() );
+
+    Expression::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//
+// MappedExpression
+//
+
+MappedExpression::MappedExpression(
+    const Expressions::Ptr& arguments, const Expression::Ptr& value )
+: Expression( Node::ID::MAPPED_EXPRESSION )
+, m_arguments( arguments )
+, m_value( value )
+{
+}
+
+const Expressions::Ptr& MappedExpression::arguments( void ) const
+{
+    return m_arguments;
+}
+
+const Expression::Ptr& MappedExpression::value( void ) const
+{
+    return m_value;
+}
+
+void MappedExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr MappedExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< MappedExpression >(
+        arguments()->duplicate< Expressions >(), value()->duplicate< Expression >() );
 
     Expression::clone( *duplicate );
     return duplicate;
@@ -183,8 +204,6 @@ Node::Ptr NamedExpression::clone( void ) const
 CallExpression::CallExpression( const Node::ID id, const Expressions::Ptr& arguments )
 : Expression( id )
 , m_arguments( arguments )
-, m_leftBracketToken( Token::unresolved() )
-, m_rightBracketToken( Token::unresolved() )
 {
 }
 
@@ -193,31 +212,9 @@ const Expressions::Ptr& CallExpression::arguments( void ) const
     return m_arguments;
 }
 
-void CallExpression::setLeftBracketToken( const Token::Ptr& leftBracketToken )
-{
-    m_leftBracketToken = leftBracketToken;
-}
-
-const Token::Ptr& CallExpression::leftBracketToken( void ) const
-{
-    return m_leftBracketToken;
-}
-
-void CallExpression::setRightBracketToken( const Token::Ptr& rightBracketToken )
-{
-    m_rightBracketToken = rightBracketToken;
-}
-
-const Token::Ptr& CallExpression::rightBracketToken( void ) const
-{
-    return m_rightBracketToken;
-}
-
 void CallExpression::clone( CallExpression& duplicate ) const
 {
     Expression::clone( duplicate );
-    duplicate.setLeftBracketToken( leftBracketToken() );
-    duplicate.setRightBracketToken( rightBracketToken() );
 }
 
 //
@@ -226,22 +223,18 @@ void CallExpression::clone( CallExpression& duplicate ) const
 //
 
 TargetCallExpression::TargetCallExpression(
-    const Node::ID id, const Expressions::Ptr& arguments, const Template::Ptr& templateNode )
+    const Node::ID id,
+    const Expressions::Ptr& arguments,
+    const VariableDefinitions::Ptr& templateSymbols )
 : CallExpression( id, arguments )
+, m_templateSymbols( templateSymbols )
 , m_targetDefinition()
-, m_templateNode( templateNode )
+, m_targetType( TargetType::UNKNOWN )
 {
 }
 
 TargetCallExpression::TargetCallExpression( const Node::ID id, const Expressions::Ptr& arguments )
-: TargetCallExpression(
-      id,
-      arguments,
-      std::make_shared< Template >(
-          Token::unresolved(),
-          Token::unresolved(),
-          std::make_shared< VariableDefinitions >(),
-          Token::unresolved() ) )
+: TargetCallExpression( id, arguments, std::make_shared< VariableDefinitions >() )
 {
 }
 
@@ -250,9 +243,9 @@ TargetCallExpression::TargetCallExpression( const Node::ID id )
 {
 }
 
-const Template::Ptr& TargetCallExpression::templateNode( void ) const
+const VariableDefinitions::Ptr& TargetCallExpression::templateSymbols( void ) const
 {
-    return m_templateNode;
+    return m_templateSymbols;
 }
 
 void TargetCallExpression::setTargetDefinition( const Definition::Ptr& definition )
@@ -271,77 +264,22 @@ u1 TargetCallExpression::hasTargetDefinition( void ) const
     return m_targetDefinition != nullptr;
 }
 
-void TargetCallExpression::clone( TargetCallExpression& duplicate ) const
-{
-    CallExpression::clone( duplicate );
-    duplicate.setTargetDefinition( m_targetDefinition );
-}
-
-//
-//
-// DirectCallExpression
-//
-
-DirectCallExpression::DirectCallExpression(
-    const Template::Ptr& templateNode,
-    const IdentifierPath::Ptr& identifier,
-    const Token::Ptr& leftBracketToken,
-    const Expressions::Ptr& arguments,
-    const Token::Ptr& rightBracketToken )
-: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments, templateNode )
-, m_identifier( identifier )
-, m_targetType( TargetType::UNKNOWN )
-{
-    setLeftBracketToken( leftBracketToken );
-    setRightBracketToken( rightBracketToken );
-}
-
-DirectCallExpression::DirectCallExpression(
-    const IdentifierPath::Ptr& identifier,
-    const Token::Ptr& leftBracketToken,
-    const Expressions::Ptr& arguments,
-    const Token::Ptr& rightBracketToken )
-: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
-, m_identifier( identifier )
-, m_targetType( TargetType::UNKNOWN )
-{
-    setLeftBracketToken( leftBracketToken );
-    setRightBracketToken( rightBracketToken );
-}
-
-DirectCallExpression::DirectCallExpression( const IdentifierPath::Ptr& identifier )
-: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION )
-, m_identifier( identifier )
-, m_targetType( TargetType::UNKNOWN )
-{
-}
-
-void DirectCallExpression::setIdentifier( const IdentifierPath::Ptr& identifier )
-{
-    m_identifier = identifier;
-}
-
-const IdentifierPath::Ptr& DirectCallExpression::identifier( void ) const
-{
-    return m_identifier;
-}
-
-void DirectCallExpression::setTargetType( TargetType targetType )
+void TargetCallExpression::setTargetType( TargetType targetType )
 {
     m_targetType = targetType;
 }
 
-DirectCallExpression::TargetType DirectCallExpression::targetType( void ) const
+TargetCallExpression::TargetType TargetCallExpression::targetType( void ) const
 {
     return m_targetType;
 }
 
-std::string DirectCallExpression::targetTypeName( void ) const
+std::string TargetCallExpression::targetTypeName( void ) const
 {
     return targetTypeString( m_targetType );
 }
 
-std::string DirectCallExpression::targetTypeString( const TargetType targetType )
+std::string TargetCallExpression::targetTypeString( const TargetType targetType )
 {
     switch( targetType )
     {
@@ -355,7 +293,7 @@ std::string DirectCallExpression::targetTypeString( const TargetType targetType 
         }
         case TargetType::BUILTIN:
         {
-            return "built-in";
+            return "builtin";
         }
         case TargetType::RULE:
         {
@@ -373,10 +311,6 @@ std::string DirectCallExpression::targetTypeString( const TargetType targetType 
         {
             return "variable";
         }
-        case TargetType::THIS:
-        {
-            return "this";
-        }
         case TargetType::UNKNOWN:
         {
             return "unknown";
@@ -387,6 +321,50 @@ std::string DirectCallExpression::targetTypeString( const TargetType targetType 
     return std::string();
 }
 
+void TargetCallExpression::clone( TargetCallExpression& duplicate ) const
+{
+    CallExpression::clone( duplicate );
+    duplicate.setTargetDefinition( m_targetDefinition );
+    duplicate.setTargetType( targetType() );
+}
+
+//
+//
+// DirectCallExpression
+//
+
+DirectCallExpression::DirectCallExpression(
+    const VariableDefinitions::Ptr& templateSymbols,
+    const IdentifierPath::Ptr& identifier,
+    const Expressions::Ptr& arguments )
+: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments, templateSymbols )
+, m_identifier( identifier )
+{
+}
+
+DirectCallExpression::DirectCallExpression(
+    const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
+: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
+, m_identifier( identifier )
+{
+}
+
+DirectCallExpression::DirectCallExpression( const IdentifierPath::Ptr& identifier )
+: TargetCallExpression( Node::ID::DIRECT_CALL_EXPRESSION )
+, m_identifier( identifier )
+{
+}
+
+void DirectCallExpression::setIdentifier( const IdentifierPath::Ptr& identifier )
+{
+    m_identifier = identifier;
+}
+
+const IdentifierPath::Ptr& DirectCallExpression::identifier( void ) const
+{
+    return m_identifier;
+}
+
 void DirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -395,14 +373,11 @@ void DirectCallExpression::accept( Visitor& visitor )
 Node::Ptr DirectCallExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< DirectCallExpression >(
-        templateNode()->duplicate< Template >(),
+        templateSymbols()->duplicate< VariableDefinitions >(),
         identifier()->duplicate< IdentifierPath >(),
-        leftBracketToken(),
-        arguments()->duplicate< Expressions >(),
-        leftBracketToken() );
+        arguments()->duplicate< Expressions >() );
 
     TargetCallExpression::clone( *duplicate );
-    duplicate->setTargetType( targetType() );
     return duplicate;
 }
 
@@ -413,14 +388,10 @@ Node::Ptr DirectCallExpression::clone( void ) const
 
 MethodCallExpression::MethodCallExpression(
     const Expression::Ptr& object,
-    const Token::Ptr& dotToken,
     const Identifier::Ptr& methodName,
     const Expressions::Ptr& arguments )
 : TargetCallExpression( Node::ID::METHOD_CALL_EXPRESSION, std::make_shared< Expressions >() )
-, m_object( object )
 , m_methodName( methodName )
-, m_dotToken( dotToken )
-, m_methodType( MethodType::UNKNOWN )
 {
     this->arguments()->add( object );
     for( const auto& argument : *arguments )
@@ -440,47 +411,6 @@ const Identifier::Ptr& MethodCallExpression::methodName( void ) const
     return m_methodName;
 }
 
-const Token::Ptr& MethodCallExpression::dotToken( void ) const
-{
-    return m_dotToken;
-}
-
-void MethodCallExpression::setMethodType( MethodType methodType )
-{
-    m_methodType = methodType;
-}
-
-MethodCallExpression::MethodType MethodCallExpression::methodType( void ) const
-{
-    return m_methodType;
-}
-
-std::string MethodCallExpression::methodTypeName( void ) const
-{
-    switch( m_methodType )
-    {
-        case MethodType::FUNCTION:
-        {
-            return "function";
-        }
-        case MethodType::DERIVED:
-        {
-            return "derived";
-        }
-        case MethodType::RULE:
-        {
-            return "rule";
-        }
-        case MethodType::UNKNOWN:
-        {
-            return "unknown";
-        }
-    }
-
-    assert( !" internal error! " );
-    return std::string();
-}
-
 void MethodCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -490,12 +420,10 @@ Node::Ptr MethodCallExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< MethodCallExpression >(
         object()->duplicate< Expression >(),
-        dotToken(),
         methodName()->duplicate< Identifier >(),
         arguments()->duplicate< Expressions >() );
 
     TargetCallExpression::clone( *duplicate );
-    duplicate->setMethodType( methodType() );
     return duplicate;
 }
 
@@ -505,12 +433,9 @@ Node::Ptr MethodCallExpression::clone( void ) const
 //
 
 LiteralCallExpression::LiteralCallExpression(
-    const Expression::Ptr& object,
-    const Token::Ptr& dotToken,
-    const std::shared_ptr< Literal >& literal )
+    const Expression::Ptr& object, const std::shared_ptr< Literal >& literal )
 : TargetCallExpression( Node::ID::LITERAL_CALL_EXPRESSION, std::make_shared< Expressions >() )
 , m_literal( literal )
-, m_dotToken( dotToken )
 {
     arguments()->add( object );
     arguments()->add( m_literal );
@@ -528,11 +453,6 @@ const std::shared_ptr< Literal >& LiteralCallExpression::literal( void ) const
     return m_literal;
 }
 
-const Token::Ptr& LiteralCallExpression::dotToken( void ) const
-{
-    return m_dotToken;
-}
-
 void LiteralCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -541,7 +461,7 @@ void LiteralCallExpression::accept( Visitor& visitor )
 Node::Ptr LiteralCallExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< LiteralCallExpression >(
-        object()->duplicate< Expression >(), dotToken(), literal()->duplicate< Literal >() );
+        object()->duplicate< Expression >(), literal()->duplicate< Literal >() );
 
     TargetCallExpression::clone( *duplicate );
     return duplicate;
@@ -594,10 +514,9 @@ Node::Ptr IndirectCallExpression::clone( void ) const
 //
 
 TypeCastingExpression::TypeCastingExpression(
-    const Expression::Ptr& fromExpression, const Token::Ptr& asToken, const Type::Ptr& asType )
+    const Expression::Ptr& fromExpression, const Type::Ptr& asType )
 : TargetCallExpression( Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
 , m_asType( asType )
-, m_asToken( asToken )
 {
     arguments()->add( fromExpression );
 }
@@ -613,11 +532,6 @@ const Type::Ptr& TypeCastingExpression::asType( void ) const
     return m_asType;
 }
 
-const Token::Ptr& TypeCastingExpression::asToken( void ) const
-{
-    return m_asToken;
-}
-
 void TypeCastingExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -626,7 +540,7 @@ void TypeCastingExpression::accept( Visitor& visitor )
 Node::Ptr TypeCastingExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< TypeCastingExpression >(
-        fromExpression()->duplicate< Expression >(), asToken(), asType()->duplicate< Type >() );
+        fromExpression()->duplicate< Expression >(), asType()->duplicate< Type >() );
 
     TargetCallExpression::clone( *duplicate );
     return duplicate;
@@ -638,7 +552,7 @@ Node::Ptr TypeCastingExpression::clone( void ) const
 //
 
 UnaryExpression::UnaryExpression(
-    const Token::Ptr& operationToken, const Expression::Ptr& expression )
+    const Grammar::Token operationToken, const Expression::Ptr& expression )
 : TargetCallExpression( Node::ID::UNARY_EXPRESSION, std::make_shared< Expressions >() )
 , m_operationToken( operationToken )
 {
@@ -651,9 +565,14 @@ const Expression::Ptr& UnaryExpression::expression( void ) const
     return arguments()->front();
 }
 
-const Token::Ptr& UnaryExpression::operationToken( void ) const
+const Grammar::Token UnaryExpression::operationToken( void ) const
 {
     return m_operationToken;
+}
+
+const std::string UnaryExpression::operationTokenString( void ) const
+{
+    return Grammar::tokenAsString( operationToken() );
 }
 
 void UnaryExpression::accept( Visitor& visitor )
@@ -676,7 +595,7 @@ Node::Ptr UnaryExpression::clone( void ) const
 //
 
 BinaryExpression::BinaryExpression(
-    const Expression::Ptr& left, const Token::Ptr& operationToken, const Expression::Ptr& right )
+    const Expression::Ptr& left, const Grammar::Token operationToken, const Expression::Ptr& right )
 : TargetCallExpression( Node::ID::BINARY_EXPRESSION, std::make_shared< Expressions >() )
 , m_operationToken( operationToken )
 {
@@ -696,9 +615,14 @@ const Expression::Ptr& BinaryExpression::right( void ) const
     return arguments()->back();
 }
 
-const Token::Ptr& BinaryExpression::operationToken( void ) const
+const Grammar::Token BinaryExpression::operationToken( void ) const
 {
     return m_operationToken;
+}
+
+const std::string BinaryExpression::operationTokenString( void ) const
+{
+    return Grammar::tokenAsString( operationToken() );
 }
 
 void BinaryExpression::accept( Visitor& visitor )
@@ -721,14 +645,10 @@ Node::Ptr BinaryExpression::clone( void ) const
 //
 
 VariableBinding::VariableBinding(
-    const VariableDefinition::Ptr& variable,
-    const Token::Ptr& equalToken,
-    const Expression::Ptr& expression )
+    const VariableDefinition::Ptr& variable, const Expression::Ptr& expression )
 : TypedNode( Node::ID::VARIABLE_BINDING )
 , m_variable( variable )
 , m_expression( expression )
-, m_equalToken( equalToken )
-, m_delimiterToken( Token::unresolved() )
 {
 }
 
@@ -742,22 +662,6 @@ const Expression::Ptr& VariableBinding::expression( void ) const
     return m_expression;
 }
 
-const Token::Ptr& VariableBinding::equalToken( void ) const
-{
-    return m_equalToken;
-}
-
-void VariableBinding::setDelimiterToken( const Token::Ptr& delimiterToken )
-{
-    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
-    m_delimiterToken = delimiterToken;
-}
-
-const Token::Ptr& VariableBinding::delimiterToken( void ) const
-{
-    return m_delimiterToken;
-}
-
 void VariableBinding::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -766,12 +670,9 @@ void VariableBinding::accept( Visitor& visitor )
 Node::Ptr VariableBinding::clone( void ) const
 {
     auto duplicate = std::make_shared< VariableBinding >(
-        variable()->duplicate< VariableDefinition >(),
-        equalToken(),
-        expression()->duplicate< Expression >() );
+        variable()->duplicate< VariableDefinition >(), expression()->duplicate< Expression >() );
 
     TypedNode::clone( *duplicate );
-    duplicate->setDelimiterToken( delimiterToken() );
     return duplicate;
 }
 
@@ -781,15 +682,10 @@ Node::Ptr VariableBinding::clone( void ) const
 //
 
 LetExpression::LetExpression(
-    const Token::Ptr& letToken,
-    const VariableBindings::Ptr& variableBindings,
-    const Token::Ptr& inToken,
-    const Expression::Ptr& expression )
+    const VariableBindings::Ptr& variableBindings, const Expression::Ptr& expression )
 : Expression( Node::ID::LET_EXPRESSION )
 , m_variableBindings( variableBindings )
 , m_expression( expression )
-, m_letToken( letToken )
-, m_inToken( inToken )
 {
 }
 
@@ -803,16 +699,6 @@ const Expression::Ptr& LetExpression::expression( void ) const
     return m_expression;
 }
 
-const Token::Ptr& LetExpression::letToken( void ) const
-{
-    return m_letToken;
-}
-
-const Token::Ptr& LetExpression::inToken( void ) const
-{
-    return m_inToken;
-}
-
 void LetExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -821,9 +707,7 @@ void LetExpression::accept( Visitor& visitor )
 Node::Ptr LetExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< LetExpression >(
-        letToken(),
         variableBindings()->duplicate< VariableBindings >(),
-        inToken(),
         expression()->duplicate< Expression >() );
 
     Expression::clone( *duplicate );
@@ -836,19 +720,13 @@ Node::Ptr LetExpression::clone( void ) const
 //
 
 ConditionalExpression::ConditionalExpression(
-    const Token::Ptr& ifToken,
     const Expression::Ptr& condition,
-    const Token::Ptr& thenToken,
     const Expression::Ptr& thenExpression,
-    const Token::Ptr& elseToken,
     const Expression::Ptr& elseExpression )
 : Expression( Node::ID::CONDITIONAL_EXPRESSION )
 , m_condition( condition )
 , m_thenExpression( thenExpression )
 , m_elseExpression( elseExpression )
-, m_ifToken( ifToken )
-, m_thenToken( thenToken )
-, m_elseToken( elseToken )
 {
 }
 
@@ -867,21 +745,6 @@ const Expression::Ptr& ConditionalExpression::elseExpression( void ) const
     return m_elseExpression;
 }
 
-const Token::Ptr& ConditionalExpression::ifToken( void ) const
-{
-    return m_ifToken;
-}
-
-const Token::Ptr& ConditionalExpression::thenToken( void ) const
-{
-    return m_thenToken;
-}
-
-const Token::Ptr& ConditionalExpression::elseToken( void ) const
-{
-    return m_elseToken;
-}
-
 void ConditionalExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -890,11 +753,8 @@ void ConditionalExpression::accept( Visitor& visitor )
 Node::Ptr ConditionalExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< ConditionalExpression >(
-        ifToken(),
         condition()->duplicate< Expression >(),
-        thenToken(),
         thenExpression()->duplicate< Expression >(),
-        elseToken(),
         elseExpression()->duplicate< Expression >() );
 
     Expression::clone( *duplicate );
@@ -907,19 +767,13 @@ Node::Ptr ConditionalExpression::clone( void ) const
 //
 
 ChooseExpression::ChooseExpression(
-    const Token::Ptr& chooseToken,
     const VariableDefinitions::Ptr& variables,
-    const Token::Ptr& inToken,
     const Expression::Ptr& universe,
-    const Token::Ptr& doToken,
     const Expression::Ptr& expression )
 : Expression( Node::ID::CHOOSE_EXPRESSION )
 , m_variables( variables )
 , m_universe( universe )
 , m_expression( expression )
-, m_chooseToken( chooseToken )
-, m_inToken( inToken )
-, m_doToken( doToken )
 {
 }
 
@@ -938,21 +792,6 @@ const Expression::Ptr& ChooseExpression::expression( void ) const
     return m_expression;
 }
 
-const Token::Ptr& ChooseExpression::chooseToken( void ) const
-{
-    return m_chooseToken;
-}
-
-const Token::Ptr& ChooseExpression::inToken( void ) const
-{
-    return m_inToken;
-}
-
-const Token::Ptr& ChooseExpression::doToken( void ) const
-{
-    return m_doToken;
-}
-
 void ChooseExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -961,11 +800,8 @@ void ChooseExpression::accept( Visitor& visitor )
 Node::Ptr ChooseExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< ChooseExpression >(
-        chooseToken(),
         variables()->duplicate< VariableDefinitions >(),
-        inToken(),
         universe()->duplicate< Expression >(),
-        doToken(),
         expression()->duplicate< Expression >() );
 
     Expression::clone( *duplicate );
@@ -979,19 +815,13 @@ Node::Ptr ChooseExpression::clone( void ) const
 
 QuantifierExpression::QuantifierExpression(
     Node::ID id,
-    const Token::Ptr& quantifierToken,
     const VariableDefinitions::Ptr& predicateVariables,
-    const Token::Ptr& inToken,
     const Expression::Ptr& universe,
-    const Token::Ptr& doToken,
     const Expression::Ptr& proposition )
 : Expression( id )
 , m_predicateVariables( predicateVariables )
 , m_universe( universe )
 , m_proposition( proposition )
-, m_quantifierToken( quantifierToken )
-, m_inToken( inToken )
-, m_doToken( doToken )
 {
 }
 
@@ -1010,21 +840,6 @@ const Expression::Ptr& QuantifierExpression::proposition( void ) const
     return m_proposition;
 }
 
-const Token::Ptr& QuantifierExpression::quantifierToken( void ) const
-{
-    return m_quantifierToken;
-}
-
-const Token::Ptr& QuantifierExpression::inToken( void ) const
-{
-    return m_inToken;
-}
-
-const Token::Ptr& QuantifierExpression::doToken( void ) const
-{
-    return m_doToken;
-}
-
 void QuantifierExpression::clone( QuantifierExpression& duplicate ) const
 {
     Expression::clone( duplicate );
@@ -1036,20 +851,11 @@ void QuantifierExpression::clone( QuantifierExpression& duplicate ) const
 //
 
 UniversalQuantifierExpression::UniversalQuantifierExpression(
-    const Token::Ptr& forallToken,
     const std::shared_ptr< VariableDefinitions >& predicateVariables,
-    const Token::Ptr& inToken,
     const Expression::Ptr& universe,
-    const Token::Ptr& holdsToken,
     const Expression::Ptr& proposition )
 : QuantifierExpression(
-      Node::ID::UNIVERSAL_QUANTIFIER_EXPRESSION,
-      forallToken,
-      predicateVariables,
-      inToken,
-      universe,
-      holdsToken,
-      proposition )
+      Node::ID::UNIVERSAL_QUANTIFIER_EXPRESSION, predicateVariables, universe, proposition )
 {
 }
 
@@ -1061,11 +867,8 @@ void UniversalQuantifierExpression::accept( Visitor& visitor )
 Node::Ptr UniversalQuantifierExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< UniversalQuantifierExpression >(
-        quantifierToken(),
         predicateVariables()->duplicate< VariableDefinitions >(),
-        inToken(),
         universe()->duplicate< Expression >(),
-        doToken(),
         proposition()->duplicate< Expression >() );
 
     QuantifierExpression::clone( *duplicate );
@@ -1078,20 +881,11 @@ Node::Ptr UniversalQuantifierExpression::clone( void ) const
 //
 
 ExistentialQuantifierExpression::ExistentialQuantifierExpression(
-    const Token::Ptr& existsToken,
     const std::shared_ptr< VariableDefinitions >& predicateVariables,
-    const Token::Ptr& inToken,
     const Expression::Ptr& universe,
-    const Token::Ptr& withToken,
     const Expression::Ptr& proposition )
 : QuantifierExpression(
-      Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION,
-      existsToken,
-      predicateVariables,
-      inToken,
-      universe,
-      withToken,
-      proposition )
+      Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION, predicateVariables, universe, proposition )
 {
 }
 
@@ -1103,11 +897,8 @@ void ExistentialQuantifierExpression::accept( Visitor& visitor )
 Node::Ptr ExistentialQuantifierExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< ExistentialQuantifierExpression >(
-        quantifierToken(),
         predicateVariables()->duplicate< VariableDefinitions >(),
-        inToken(),
         universe()->duplicate< Expression >(),
-        doToken(),
         proposition()->duplicate< Expression >() );
 
     QuantifierExpression::clone( *duplicate );
@@ -1119,13 +910,8 @@ Node::Ptr ExistentialQuantifierExpression::clone( void ) const
 // CardinalityExpression
 //
 
-CardinalityExpression::CardinalityExpression(
-    const Token::Ptr& leftVerticalBarToken,
-    const Expression::Ptr& expression,
-    const Token::Ptr& rightVerticalBarToken )
+CardinalityExpression::CardinalityExpression( const Expression::Ptr& expression )
 : TargetCallExpression( Node::ID::CARDINALITY_EXPRESSION, std::make_shared< Expressions >() )
-, m_leftVerticalBarToken( leftVerticalBarToken )
-, m_rightVerticalBarToken( rightVerticalBarToken )
 {
     arguments()->add( expression );
 }
@@ -1136,16 +922,6 @@ const Expression::Ptr& CardinalityExpression::expression( void ) const
     return arguments()->front();
 }
 
-const Token::Ptr& CardinalityExpression::leftVerticalBarToken( void ) const
-{
-    return m_leftVerticalBarToken;
-}
-
-const Token::Ptr& CardinalityExpression::rightVerticalBarToken( void ) const
-{
-    return m_rightVerticalBarToken;
-}
-
 void CardinalityExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -1153,8 +929,8 @@ void CardinalityExpression::accept( Visitor& visitor )
 
 Node::Ptr CardinalityExpression::clone( void ) const
 {
-    auto duplicate = std::make_shared< CardinalityExpression >(
-        leftVerticalBarToken(), expression()->duplicate< Expression >(), leftVerticalBarToken() );
+    auto duplicate =
+        std::make_shared< CardinalityExpression >( expression()->duplicate< Expression >() );
 
     TargetCallExpression::clone( *duplicate );
     return duplicate;

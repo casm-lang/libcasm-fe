@@ -45,10 +45,7 @@
 
 #include "Identifier.h"
 
-#include "../various/GrammarToken.h"
-
 #include <libcasm-fe/Namespace>
-#include <libcasm-fe/ast/Token>
 
 #include <cassert>
 
@@ -60,53 +57,15 @@ using namespace AST;
 // Identifier
 //
 
-Identifier::Identifier( void )
-: Identifier( std::string() )
-{
-}
-
 Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )
 , m_name( name )
-, m_doubleColon( Token::unresolved() )
-, m_spans( std::make_shared< Spans >() )
 {
 }
 
 const std::string& Identifier::name( void ) const
 {
     return m_name;
-}
-
-void Identifier::setName( const std::string& name )
-{
-    m_name = name;
-}
-
-bool Identifier::empty( void ) const
-{
-    return m_name.empty();
-}
-
-void Identifier::setDoubleColon( const Token::Ptr& doubleColon )
-{
-    assert( m_doubleColon->token() == Grammar::Token::UNRESOLVED );
-    m_doubleColon = doubleColon;
-}
-
-const Token::Ptr& Identifier::doubleColon( void ) const
-{
-    return m_doubleColon;
-}
-
-void Identifier::setSpans( const Spans::Ptr& spans )
-{
-    m_spans = spans;
-}
-
-const Spans::Ptr& Identifier::spans( void ) const
-{
-    return m_spans;
 }
 
 void Identifier::accept( Visitor& visitor )
@@ -119,8 +78,6 @@ Node::Ptr Identifier::clone( void ) const
     auto duplicate = std::make_shared< Identifier >( std::string( name() ) );
 
     Node::clone( *duplicate );
-    duplicate->setDoubleColon( doubleColon() );
-    duplicate->setSpans( spans() );
     return duplicate;
 }
 
@@ -129,18 +86,16 @@ Node::Ptr Identifier::clone( void ) const
 // IdentifierPath
 //
 
-IdentifierPath::IdentifierPath( const Identifier::Ptr& identifier, Type type )
+IdentifierPath::IdentifierPath( const Identifier::Ptr& identifier )
 : Node( Node::ID::IDENTIFIER_PATH )
 , m_identifiers( AST::make< Identifiers >( identifier->sourceLocation() ) )
-, m_type( type )
 {
     m_identifiers->add( identifier );
 }
 
-IdentifierPath::IdentifierPath( const Identifiers::Ptr& identifiers, Type type )
+IdentifierPath::IdentifierPath( const Identifiers::Ptr& identifiers )
 : Node( Node::ID::IDENTIFIER_PATH )
 , m_identifiers( identifiers )
-, m_type( type )
 {
     assert( not identifiers->empty() && "identifiers must not be empty" );
 }
@@ -153,11 +108,6 @@ void IdentifierPath::addIdentifier( const Identifier::Ptr& identifier )
 Identifiers::Ptr IdentifierPath::identifiers( void ) const
 {
     return m_identifiers;
-}
-
-IdentifierPath::Type IdentifierPath::type( void ) const
-{
-    return m_type;
 }
 
 const std::string& IdentifierPath::baseName( void ) const
@@ -184,11 +134,6 @@ std::string IdentifierPath::path( void ) const
 {
     std::string path;
 
-    if( m_type == Type::RELATIVE )
-    {
-        path += Namespace::delimiter();
-    }
-
     bool isFirstElement = true;
     for( const auto& identifier : *m_identifiers )
     {
@@ -211,7 +156,7 @@ void IdentifierPath::accept( Visitor& visitor )
 Node::Ptr IdentifierPath::clone( void ) const
 {
     auto duplicate =
-        std::make_shared< IdentifierPath >( identifiers()->duplicate< Identifiers >(), type() );
+        std::make_shared< IdentifierPath >( identifiers()->duplicate< Identifiers >() );
 
     Node::clone( *duplicate );
     return duplicate;

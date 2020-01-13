@@ -77,9 +77,9 @@ std::string Node::description( void ) const
 {
     switch( m_id )
     {
-        case ID::HEADER_DEFINITION:
+        case ID::ROOT:
         {
-            return "header";
+            return "root";
         }
         case ID::INIT_DEFINITION:
         {
@@ -171,6 +171,10 @@ std::string Node::description( void ) const
         {
             return "range";
         }
+        case ID::SET_LITERAL:
+        {
+            return "set";
+        }
         case ID::LIST_LITERAL:
         {
             return "list";
@@ -183,6 +187,10 @@ std::string Node::description( void ) const
         {
             return "record";
         }
+        case ID::ABSTRACT_EXPRESSION:
+        {
+            return "abstract expression";
+        }
         case ID::EMBRACED_EXPRESSION:
         {
             return "embraced expression";
@@ -190,6 +198,10 @@ std::string Node::description( void ) const
         case ID::NAMED_EXPRESSION:
         {
             return "named expression";
+        }
+        case ID::MAPPED_EXPRESSION:
+        {
+            return "mapped expression";
         }
         case ID::DIRECT_CALL_EXPRESSION:
         {
@@ -291,10 +303,6 @@ std::string Node::description( void ) const
         {
             return "call";
         }
-        case ID::WHILE_RULE:
-        {
-            return "while";
-        }
         case ID::UNRESOLVED_TYPE:
         {
             return "unresolved type";
@@ -323,27 +331,6 @@ std::string Node::description( void ) const
         {
             return "relation type";
         }
-        case ID::BASIC_ATTRIBUTE:
-        {
-            return "basic attribute";
-        }
-        case ID::EXPRESSION_ATTRIBUTE:
-        {
-            return "expression attribute";
-        }
-        // helper
-        case ID::DEFINED:
-        {
-            return "defined";
-        }
-        case ID::TEMPLATE:
-        {
-            return "template";
-        }
-        case ID::INITIALIZER:
-        {
-            return "initializer";
-        }
         // other
         case ID::NODE_LIST:
         {
@@ -368,14 +355,6 @@ std::string Node::description( void ) const
         case ID::VARIABLE_BINDING:
         {
             return "variable binding";
-        }
-        case ID::TOKEN:
-        {
-            return "token";
-        }
-        case ID::SPAN:
-        {
-            return "span";
         }
     }
 

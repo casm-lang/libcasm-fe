@@ -50,7 +50,6 @@
 #include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Literal>
-#include <libcasm-fe/ast/Token>
 
 using namespace libcasm_fe;
 using namespace AST;
@@ -67,7 +66,6 @@ Type::Type( const Node::ID id, const IdentifierPath::Ptr& name )
 : TypedNode( id )
 , m_name( name )
 , m_typeDefinition()
-, m_delimiterToken( Token::unresolved() )
 {
 }
 
@@ -84,17 +82,6 @@ void Type::setTypeDefinition( const TypeDefinition::Ptr& typeDefinition )
 const TypeDefinition::Ptr& Type::typeDefinition( void ) const
 {
     return m_typeDefinition;
-}
-
-void Type::setDelimiterToken( const Token::Ptr& delimiterToken )
-{
-    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
-    m_delimiterToken = delimiterToken;
-}
-
-const Token::Ptr& Type::delimiterToken( void ) const
-{
-    return m_delimiterToken;
 }
 
 IdentifierPath::Ptr Type::signaturePath( void ) const
@@ -116,7 +103,6 @@ void Type::clone( Type& duplicate ) const
 {
     TypedNode::clone( duplicate );
     duplicate.setTypeDefinition( m_typeDefinition );
-    duplicate.setDelimiterToken( delimiterToken() );
 }
 
 //
@@ -177,50 +163,14 @@ Node::Ptr BasicType::clone( void ) const
 
 //
 //
-// EmbracedType
-//
-
-EmbracedType::EmbracedType(
-    const Node::ID id,
-    const IdentifierPath::Ptr& name,
-    const Token::Ptr& leftBraceToken,
-    const Token::Ptr& rightBraceToken )
-: Type( id, name )
-, m_leftBraceToken( leftBraceToken )
-, m_rightBraceToken( rightBraceToken )
-{
-}
-
-const Token::Ptr& EmbracedType::leftBraceToken( void ) const
-{
-    return m_leftBraceToken;
-}
-
-const Token::Ptr& EmbracedType::rightBraceToken( void ) const
-{
-    return m_rightBraceToken;
-}
-
-void EmbracedType::clone( EmbracedType& duplicate ) const
-{
-    Type::clone( duplicate );
-}
-
-//
-//
 // TupleType
 //
 
-TupleType::TupleType(
-    const Token::Ptr& leftBraceToken,
-    const Types::Ptr& subTypes,
-    const Token::Ptr& rightBraceToken )
-: EmbracedType(
+TupleType::TupleType( const Types::Ptr& subTypes )
+: Type(
       Node::ID::TUPLE_TYPE,
       IdentifierPath::fromIdentifier(
-          AST::make< Identifier >( subTypes->sourceLocation(), TypeInfo::TYPE_NAME_TUPLE ) ),
-      leftBraceToken,
-      rightBraceToken )
+          AST::make< Identifier >( subTypes->sourceLocation(), TypeInfo::TYPE_NAME_TUPLE ) ) )
 , m_subTypes( subTypes )
 {
 }
@@ -253,10 +203,9 @@ void TupleType::accept( Visitor& visitor )
 
 Node::Ptr TupleType::clone( void ) const
 {
-    auto duplicate = std::make_shared< TupleType >(
-        leftBraceToken(), subTypes()->duplicate< Types >(), rightBraceToken() );
+    auto duplicate = std::make_shared< TupleType >( subTypes()->duplicate< Types >() );
 
-    EmbracedType::clone( *duplicate );
+    Type::clone( *duplicate );
     return duplicate;
 }
 
@@ -265,16 +214,11 @@ Node::Ptr TupleType::clone( void ) const
 // RecordType
 //
 
-RecordType::RecordType(
-    const Token::Ptr& leftBraceToken,
-    const VariableDefinitions::Ptr& namedSubTypes,
-    const Token::Ptr& rightBraceToken )
-: EmbracedType(
+RecordType::RecordType( const VariableDefinitions::Ptr& namedSubTypes )
+: Type(
       Node::ID::RECORD_TYPE,
       IdentifierPath::fromIdentifier(
-          AST::make< Identifier >( namedSubTypes->sourceLocation(), TypeInfo::TYPE_NAME_RECORD ) ),
-      leftBraceToken,
-      rightBraceToken )
+          AST::make< Identifier >( namedSubTypes->sourceLocation(), TypeInfo::TYPE_NAME_RECORD ) ) )
 , m_namedSubTypes( namedSubTypes )
 {
 }
@@ -307,10 +251,10 @@ void RecordType::accept( Visitor& visitor )
 
 Node::Ptr RecordType::clone( void ) const
 {
-    auto duplicate = std::make_shared< RecordType >(
-        leftBraceToken(), namedSubTypes()->duplicate< VariableDefinitions >(), rightBraceToken() );
+    auto duplicate =
+        std::make_shared< RecordType >( namedSubTypes()->duplicate< VariableDefinitions >() );
 
-    EmbracedType::clone( *duplicate );
+    Type::clone( *duplicate );
     return duplicate;
 }
 
@@ -319,12 +263,8 @@ Node::Ptr RecordType::clone( void ) const
 // TemplateType
 //
 
-TemplateType::TemplateType(
-    const IdentifierPath::Ptr& identifier,
-    const Token::Ptr& leftBraceToken,
-    const Types::Ptr& subTypes,
-    const Token::Ptr& rightBraceToken )
-: EmbracedType( Node::ID::TEMPLATE_TYPE, identifier, leftBraceToken, rightBraceToken )
+TemplateType::TemplateType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes )
+: Type( Node::ID::TEMPLATE_TYPE, identifier )
 , m_subTypes( subTypes )
 {
 }
@@ -339,10 +279,21 @@ void TemplateType::setSubTypes( const Types::Ptr& subTypes )
     m_subTypes = subTypes;
 }
 
+u1 TemplateType::varadic( void ) const
+{
+    return subTypes()->size() == 0;
+}
+
 std::string TemplateType::signature( void ) const
 {
     std::stringstream stream;
     stream << name()->baseName();
+
+    if( varadic() )
+    {
+        return stream.str();
+    }
+
     stream << "<";
 
     for( const auto& subType : *subTypes() )
@@ -364,12 +315,9 @@ void TemplateType::accept( Visitor& visitor )
 Node::Ptr TemplateType::clone( void ) const
 {
     auto duplicate = std::make_shared< TemplateType >(
-        name()->duplicate< IdentifierPath >(),
-        leftBraceToken(),
-        subTypes()->duplicate< Types >(),
-        rightBraceToken() );
+        name()->duplicate< IdentifierPath >(), subTypes()->duplicate< Types >() );
 
-    EmbracedType::clone( *duplicate );
+    Type::clone( *duplicate );
     return duplicate;
 }
 
@@ -380,15 +328,11 @@ Node::Ptr TemplateType::clone( void ) const
 
 RelationType::RelationType(
     const IdentifierPath::Ptr& identifier,
-    const Token::Ptr& leftBraceToken,
     const Types::Ptr& argumentTypes,
-    const Token::Ptr& mapsToken,
-    const Type::Ptr& returnType,
-    const Token::Ptr& rightBraceToken )
-: EmbracedType( Node::ID::RELATION_TYPE, identifier, leftBraceToken, rightBraceToken )
+    const Type::Ptr& returnType )
+: Type( Node::ID::RELATION_TYPE, identifier )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
-, m_mapsToken( mapsToken )
 {
 }
 
@@ -402,9 +346,9 @@ const Type::Ptr& RelationType::returnType( void ) const
     return m_returnType;
 }
 
-const Token::Ptr& RelationType::mapsToken( void ) const
+u1 RelationType::mapping( void ) const
 {
-    return m_mapsToken;
+    return name()->path() == "";
 }
 
 std::string RelationType::signature( void ) const
@@ -437,13 +381,10 @@ Node::Ptr RelationType::clone( void ) const
 {
     auto duplicate = std::make_shared< RelationType >(
         name()->duplicate< IdentifierPath >(),
-        leftBraceToken(),
         argumentTypes()->duplicate< Types >(),
-        mapsToken(),
-        returnType()->duplicate< Type >(),
-        rightBraceToken() );
+        returnType()->duplicate< Type >() );
 
-    EmbracedType::clone( *duplicate );
+    Type::clone( *duplicate );
     return duplicate;
 }
 
@@ -452,24 +393,15 @@ Node::Ptr RelationType::clone( void ) const
 // FixedSizedType
 //
 
-FixedSizedType::FixedSizedType(
-    const IdentifierPath::Ptr& identifier,
-    const Token::Ptr& markToken,
-    const Expression::Ptr& size )
+FixedSizedType::FixedSizedType( const IdentifierPath::Ptr& identifier, const Expression::Ptr& size )
 : Type( Node::ID::FIXED_SIZED_TYPE, identifier )
 , m_size( size )
-, m_markToken( markToken )
 {
 }
 
 const Expression::Ptr& FixedSizedType::size( void ) const
 {
     return m_size;
-}
-
-const Token::Ptr& FixedSizedType::markToken( void ) const
-{
-    return m_markToken;
 }
 
 std::string FixedSizedType::signature( void ) const
@@ -503,7 +435,7 @@ std::string FixedSizedType::signature( void ) const
             {
                 const auto& lhsUnaryExpression = static_cast< const UnaryExpression& >( *lhs );
                 lhs = lhsUnaryExpression.expression();
-                if( lhsUnaryExpression.operationToken()->token() == Grammar::Token::MINUS )
+                if( lhsUnaryExpression.operationToken() == Grammar::Token::MINUS )
                 {
                     stream << "-";
                 }
@@ -525,7 +457,7 @@ std::string FixedSizedType::signature( void ) const
             {
                 const auto& rhsUnaryExpression = static_cast< const UnaryExpression& >( *rhs );
                 rhs = rhsUnaryExpression.expression();
-                if( rhsUnaryExpression.operationToken()->token() == Grammar::Token::MINUS )
+                if( rhsUnaryExpression.operationToken() == Grammar::Token::MINUS )
                 {
                     stream << "-";
                 }
@@ -564,7 +496,7 @@ void FixedSizedType::accept( Visitor& visitor )
 Node::Ptr FixedSizedType::clone( void ) const
 {
     auto duplicate = std::make_shared< FixedSizedType >(
-        name()->duplicate< IdentifierPath >(), markToken(), size()->duplicate< Expression >() );
+        name()->duplicate< IdentifierPath >(), size()->duplicate< Expression >() );
 
     Type::clone( *duplicate );
     return duplicate;

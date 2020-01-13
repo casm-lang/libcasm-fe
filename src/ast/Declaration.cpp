@@ -44,8 +44,6 @@
 
 #include "Declaration.h"
 
-#include "../various/GrammarToken.h"
-
 #include <cassert>
 
 using namespace libcasm_fe;
@@ -57,34 +55,18 @@ using namespace AST;
 //
 
 Declaration::Declaration(
-    const Token::Ptr& kindToken,
     const Identifier::Ptr& identifier,
-    const Token::Ptr& colonToken,
     const Types::Ptr& argumentTypes,
-    const Token::Ptr& mapsToken,
-    const Type::Ptr& returnType )
+    const Type::Ptr& returnType,
+    const Kind kind )
 : Definition( Node::ID::DECLARATION, identifier )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
-, m_kindToken( kindToken )
-, m_colonToken( colonToken )
-, m_mapsToken( mapsToken )
-, m_kind(
-      kindToken->token() == Grammar::Token::DERIVED ? Declaration::Kind::DERIVED
-                                                    : Declaration::Kind::RULE )
+, m_kind( kind )
 {
-    assert( kindToken );
-    if( kindToken->token() == Grammar::Token::DERIVED )
+    if( m_kind == Kind::DERIVED )
     {
         setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-    }
-    else if( kindToken->token() == Grammar::Token::RULE )
-    {
-        // OK
-    }
-    else
-    {
-        assert( false and " inconsistent state @ GrammarParser " );
     }
 }
 
@@ -93,19 +75,9 @@ const Types::Ptr& Declaration::argumentTypes( void ) const
     return m_argumentTypes;
 }
 
-void Declaration::setArgumentTypes( const Types::Ptr& argumentTypes )
-{
-    m_argumentTypes = argumentTypes;
-}
-
 const Type::Ptr& Declaration::returnType( void ) const
 {
     return m_returnType;
-}
-
-void Declaration::setReturnType( const Type::Ptr& returnType )
-{
-    m_returnType = returnType;
 }
 
 Declaration::Kind Declaration::kind( void ) const
@@ -131,25 +103,10 @@ std::string Declaration::kindName( void ) const
     return std::string();
 }
 
-const Token::Ptr& Declaration::kindToken( void ) const
-{
-    return m_kindToken;
-}
-
-const Token::Ptr& Declaration::colonToken( void ) const
-{
-    return m_colonToken;
-}
-
-const Token::Ptr& Declaration::mapsToken( void ) const
-{
-    return m_mapsToken;
-}
-
 std::string Declaration::typeDescription( void ) const
 {
     std::stringstream stream;
-    stream << kindToken()->tokenString() << " " << colonToken()->tokenString() << " ";
+    stream << kindName() << " : ";
 
     const auto& innerTypes = argumentTypes();
     for( const auto& innerType : *innerTypes )
@@ -162,7 +119,7 @@ std::string Declaration::typeDescription( void ) const
         stream.seekp( -2, stream.cur );
     }
 
-    stream << mapsToken()->tokenString() << " ";
+    stream << "-> ";
     stream << returnType()->signature() << " ";
 
     return stream.str();
@@ -176,12 +133,10 @@ void Declaration::accept( Visitor& visitor )
 Node::Ptr Declaration::clone( void ) const
 {
     auto duplicate = std::make_shared< Declaration >(
-        kindToken(),
         identifier()->duplicate< Identifier >(),
-        colonToken(),
         argumentTypes()->duplicate< Types >(),
-        mapsToken(),
-        returnType()->duplicate< Type >() );
+        returnType()->duplicate< Type >(),
+        kind() );
 
     Definition::clone( *duplicate );
     return duplicate;

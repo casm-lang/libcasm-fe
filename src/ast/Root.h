@@ -1,10 +1,9 @@
 //
-//  Copyright (C) 2014-2021 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2020 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
-//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -43,70 +42,36 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_AST_IDENTIFIER_H_
-#define _LIBCASM_FE_AST_IDENTIFIER_H_
+#ifndef _LIBCASM_FE_AST_ROOT_H_
+#define _LIBCASM_FE_AST_ROOT_H_
 
+#include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Node>
 
 namespace libcasm_fe
 {
     namespace AST
     {
-        class Identifier final : public Node
+        class Root : public Node
         {
           public:
-            using Ptr = std::shared_ptr< Identifier >;
+            using Ptr = std::shared_ptr< Root >;
 
-            explicit Identifier( const std::string& name );
+            explicit Root( const Definitions::Ptr& definitions );
 
-            const std::string& name( void ) const;
+            const Definitions::Ptr& definitions( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
             Node::Ptr clone( void ) const override final;
 
           private:
-            const std::string m_name;
-        };
-
-        using Identifiers = NodeList< Identifier >;
-
-        /**
-           @brief An identifier path is an identifier + namespaces.
-         */
-        class IdentifierPath final : public Node
-        {
-          public:
-            using Ptr = std::shared_ptr< IdentifierPath >;
-
-            IdentifierPath( const Identifier::Ptr& identifier );
-
-            IdentifierPath( const Identifiers::Ptr& identifiers );
-
-            void addIdentifier( const Identifier::Ptr& identifier );
-
-            Identifiers::Ptr identifiers( void ) const;
-
-            const std::string& baseName( void ) const;
-
-            std::string baseDir( void ) const;
-
-            std::string path( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-            Node::Ptr clone( void ) const override final;
-
-          public:
-            static IdentifierPath::Ptr fromIdentifier( const Identifier::Ptr& identifier );
-
-          private:
-            const Identifiers::Ptr m_identifiers;
+            const Definitions::Ptr m_definitions;
         };
     }
 }
 
-#endif  // _LIBCASM_FE_AST_IDENTIFIER_H_
+#endif  // _LIBCASM_FE_AST_ROOT_H_
 
 //
 //  Local variables:

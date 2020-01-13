@@ -1,10 +1,9 @@
 //
-//  Copyright (C) 2014-2021 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2020 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
-//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -43,76 +42,47 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_ATTRIBUTE_H_
-#define _LIBCASM_FE_ATTRIBUTE_H_
+#ifndef _LIBCASM_FE_CST_SPECIFICATION_H_
+#define _LIBCASM_FE_CST_SPECIFICATION_H_
 
-#include <libcasm-fe/ast/Expression>
-#include <libcasm-fe/ast/Node>
-#include <libcasm-fe/ast/Token>
+#include <libcasm-fe/cst/Definition>
+#include <libcasm-fe/cst/Node>
+#include <libcasm-fe/cst/Span>
 
 namespace libcasm_fe
 {
-    namespace AST
+    namespace CST
     {
-        class Attribute : public Node
+        class Specification : public Node
         {
           public:
-            using Ptr = std::shared_ptr< Attribute >;
+            using Ptr = std::shared_ptr< Specification >;
 
-            Attribute( Node::ID id, const Identifier::Ptr& identifier );
+            explicit Specification(
+                const HeaderDefinition::Ptr& header,
+                const Definitions::Ptr& definitions,
+                const Spans::Ptr& spans );
 
-            const Identifier::Ptr& identifier( void ) const;
+            const HeaderDefinition::Ptr& header( void ) const;
 
-            void setLeftBrace( const Token::Ptr& leftBrace );
-            const Token::Ptr& leftBrace( void ) const;
+            const Definitions::Ptr& definitions( void ) const;
 
-            void setRightBrace( const Token::Ptr& rightBrace );
-            const Token::Ptr& rightBrace( void ) const;
+            const Spans::Ptr& spans( void ) const;
 
           protected:
-            void clone( Attribute& duplicate ) const;
+            void clone( Specification& duplicate ) const;
 
           private:
-            const Identifier::Ptr m_identifier;
-            Token::Ptr m_leftBrace;
-            Token::Ptr m_rightBrace;
-        };
+            const HeaderDefinition::Ptr m_header;
 
-        using Attributes = NodeList< Attribute >;
+            const Definitions::Ptr m_definitions;
 
-        class BasicAttribute final : public Attribute
-        {
-          public:
-            using Ptr = std::shared_ptr< BasicAttribute >;
-
-            explicit BasicAttribute( const Identifier::Ptr& identifier );
-
-            void accept( Visitor& visitor ) override final;
-
-            Node::Ptr clone( void ) const override final;
-        };
-
-        class ExpressionAttribute final : public Attribute
-        {
-          public:
-            using Ptr = std::shared_ptr< ExpressionAttribute >;
-
-            ExpressionAttribute(
-                const Identifier::Ptr& identifier, const Expression::Ptr& expression );
-
-            const Expression::Ptr& expression( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-            Node::Ptr clone( void ) const override final;
-
-          private:
-            const Expression::Ptr m_expression;
+            const Spans::Ptr m_spans;
         };
     }
 }
 
-#endif  // _LIBCASM_FE_ATTRIBUTE_H_
+#endif  // _LIBCASM_FE_CST_SPECIFICATION_H_
 
 //
 //  Local variables:
