@@ -201,7 +201,7 @@ function generate_parser
     for element in $tokens; do
         #printf "%2i -> %s\n" $uid $element
 	    if [ "$mode" = "name" ]; then
-	        echo "%type <AST::Token::Ptr> $element" >> $dst
+	        echo "%type <CST::Token::Ptr> $element" >> $dst
 	        mode=token
 	    else
 	        # mode token
