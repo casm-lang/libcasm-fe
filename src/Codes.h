@@ -52,24 +52,23 @@ namespace libcasm_fe
     // --------------------------------------------------------- 0*** ...
     // generic syntax error
     {
-        SyntaxError = 0x0000  // 00** ... syntax/grammar
-        ,
+        SyntaxError = 0x0000,  // 00** ... syntax/grammar
         SyntaxErrorUnrecognizedCharacter = 0x0001,
         SyntaxErrorUnclosedString = 0x0002,
         SyntaxErrorInvalidStatement = 0x0003,
-        SyntaxErrorUnclosedComment = 0x0004
+        SyntaxErrorUnclosedComment = 0x0004,
 
         // --------------------------------------------------------- 05** ...
         // attribution errors
-        ,
         AttributionBasicAttributeUnknown = 0x0400,
         AttributionBasicAttributeAlreadyUsed = 0x0401,
         AttributionExpressionAttributeUnknown = 0x0410,
-        AttributionExpressionAttributeAlreadyUsed = 0x0411
+        AttributionExpressionAttributeAlreadyUsed = 0x0411,
+        AttributionSymbolAttributeUnknown = 0x0420,
+        AttributionSymbolAttributeAlreadyUsed = 0x0421,
 
         // --------------------------------------------------------- 05** ...
         // symbol resolver errors
-        ,
         SymbolIsUnknown = 0x0500,
         SymbolIsInvalid = 0x0501,
         SymbolAlreadyDefined = 0x0502,
@@ -329,6 +328,7 @@ namespace libcasm_fe
         TypeUnsupported = 0xfffe
 
         ,
+        Internal = 0xe505,
         Unspecified = 0xffff
     };
 }
