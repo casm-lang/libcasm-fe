@@ -43,8 +43,8 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_AST_TO_CASM_IR_PASS_H_
-#define _LIBCASM_FE_AST_TO_CASM_IR_PASS_H_
+#ifndef _LIBCASM_FE_LST_TO_IR_PASS_H_
+#define _LIBCASM_FE_LST_TO_IR_PASS_H_
 
 #include <libpass/Pass>
 
@@ -56,7 +56,7 @@
 
 namespace libcasm_fe
 {
-    class AstToCasmIRPass final : public libpass::Pass
+    class LstToIrPass final : public libpass::Pass
     {
       public:
         static char id;
@@ -67,7 +67,7 @@ namespace libcasm_fe
     };
 }
 
-#endif  // _LIBCASM_FE_AST_TO_CASM_IR_PASS_H_
+#endif  // _LIBCASM_FE_LST_TO_IR_PASS_H_
 
 //
 //  Local variables:
