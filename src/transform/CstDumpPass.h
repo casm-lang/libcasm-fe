@@ -43,8 +43,8 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_AST_DUMP_DOT_PASS_H_
-#define _LIBCASM_FE_AST_DUMP_DOT_PASS_H_
+#ifndef _LIBCASM_FE_CST_DUMP_PASS_H_
+#define _LIBCASM_FE_CST_DUMP_PASS_H_
 
 #include <libpass/Pass>
 
@@ -53,7 +53,7 @@ namespace libcasm_fe
     /**
      * @brief Generates a DOT graph of the AST
      */
-    class AstDumpDotPass final : public libpass::Pass
+    class CstDumpPass final : public libpass::Pass
     {
       public:
         static char id;
@@ -74,7 +74,7 @@ namespace libcasm_fe
     };
 }
 
-#endif  // _LIBCASM_FE_AST_DUMP_DOT_PASS_H_
+#endif  // _LIBCASM_FE_CST_DUMP_PASS_H_
 
 //
 //  Local variables:

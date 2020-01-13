@@ -1,4 +1,3 @@
-
 //
 //  Copyright (C) 2014-2021 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
@@ -44,14 +43,19 @@
 //  statement from your version.
 //
 
-#include "AstDumpDotPass.h"
+#include "CstDumpPass.h"
+
+#include "../various/GrammarToken.h"
 
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
-#include <libcasm-fe/ast/RecursiveVisitor>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/cst/Declaration>
+#include <libcasm-fe/cst/Literal>
+#include <libcasm-fe/cst/Visitor>
+#include <libcasm-fe/transform/SourceToCstPass>
+
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
@@ -62,312 +66,314 @@
 #include <iostream>
 #include <stack>
 
-#include "../various/GrammarToken.h"
-
 using namespace libcasm_fe;
-using namespace AST;
+using namespace CST;
 
-char AstDumpDotPass::id = 0;
+char CstDumpPass::id = 0;
 
-static libpass::PassRegistration< AstDumpDotPass > PASS(
-    "AstDumpDotPass",
-    "generates DOT graph of the AST and dumps to specified output path",
-    "ast-dump",
+static libpass::PassRegistration< CstDumpPass > PASS(
+    "CstDumpPass",
+    "generates DOT graph of the CST and dumps to specified output path",
+    "cst-dump",
     0 );
 
-class AstDumpDotVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  private:
-    /**
-     * @brief RAII dot link
-     */
-    class DotLink
+    namespace CST
     {
-      public:
-        DotLink( AstDumpDotVisitor* visitor, void* node )
-        : m_visitor( visitor )
+        class CSTDumpDotVisitor final : public RecursiveVisitor
         {
-            if( not visitor->m_parentNodes.empty() )
+          private:
+            /**
+             * @brief RAII dot link
+             */
+            class DotLink
             {
-                auto parentNode = visitor->m_parentNodes.top();
-                visitor->dumpLink( parentNode, node );
-            }
-            visitor->m_parentNodes.push( node );
-        }
+              public:
+                DotLink( CSTDumpDotVisitor* visitor, void* node )
+                : m_visitor( visitor )
+                {
+                    if( not visitor->m_parentNodes.empty() )
+                    {
+                        auto parentNode = visitor->m_parentNodes.top();
+                        visitor->dumpLink( parentNode, node );
+                    }
+                    visitor->m_parentNodes.push( node );
+                }
 
-        ~DotLink()
-        {
-            m_visitor->m_parentNodes.pop();
-        }
+                ~DotLink()
+                {
+                    m_visitor->m_parentNodes.pop();
+                }
 
-      private:
-        AstDumpDotVisitor* m_visitor;
-    };
+              private:
+                CSTDumpDotVisitor* m_visitor;
+            };
 
-  public:
-    AstDumpDotVisitor( std::ostream& stream, const u1 dumpSpan );
+          public:
+            CSTDumpDotVisitor(
+                std::ostream& stream,
+                const std::string& name,
+                const std::string& location,
+                const u1 dumpSpan );
 
-    void setDumpNodeLocation( u1 dumpNodeLocation );
+            void setDumpNodeLocation( u1 dumpNodeLocation );
 
-    void visit( Specification& specification );
+            void visit( Root& node ) override;
 
-    void visit( HeaderDefinition& node ) override;
-    void visit( InitDefinition& node ) override;
-    void visit( Initially& node ) override;
-    void visit( Initializer& node ) override;
-    void visit( VariableDefinition& node ) override;
-    void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( EnumeratorDefinition& node ) override;
-    void visit( EnumerationDefinition& node ) override;
-    void visit( UsingDefinition& node ) override;
-    void visit( UsingPathDefinition& node ) override;
-    void visit( InvariantDefinition& node ) override;
-    void visit( ImportDefinition& node ) override;
-    void visit( DomainDefinition& node ) override;
-    void visit( StructureDefinition& node ) override;
-    void visit( BehaviorDefinition& node ) override;
-    void visit( ImplementDefinition& node ) override;
-    void visit( BuiltinDefinition& node ) override;
-    void visit( Declaration& node ) override;
+            void visit( HeaderDefinition& node ) override;
+            void visit( InitDefinition& node ) override;
+            void visit( VariableDefinition& node ) override;
+            void visit( FunctionDefinition& node ) override;
+            void visit( DerivedDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
+            void visit( EnumeratorDefinition& node ) override;
+            void visit( EnumerationDefinition& node ) override;
+            void visit( UsingDefinition& node ) override;
+            void visit( UsingPathDefinition& node ) override;
+            void visit( InvariantDefinition& node ) override;
+            void visit( ImportDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
+            void visit( StructureDefinition& node ) override;
+            void visit( BehaviorDefinition& node ) override;
+            void visit( ImplementDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
+            void visit( Declaration& node ) override;
 
-    void visit( ValueLiteral& node ) override;
-    void visit( ReferenceLiteral& node ) override;
-    void visit( UndefLiteral& node ) override;
-    void visit( ListLiteral& node ) override;
-    void visit( RangeLiteral& node ) override;
-    void visit( TupleLiteral& node ) override;
-    void visit( RecordLiteral& node ) override;
+            void visit( ValueLiteral& node ) override;
+            void visit( ReferenceLiteral& node ) override;
+            void visit( UndefLiteral& node ) override;
+            void visit( SetLiteral& node ) override;
+            void visit( ListLiteral& node ) override;
+            void visit( RangeLiteral& node ) override;
+            void visit( TupleLiteral& node ) override;
+            void visit( RecordLiteral& node ) override;
 
-    void visit( EmbracedExpression& node ) override;
-    void visit( NamedExpression& node ) override;
-    void visit( DirectCallExpression& node ) override;
-    void visit( MethodCallExpression& node ) override;
-    void visit( LiteralCallExpression& node ) override;
-    void visit( IndirectCallExpression& node ) override;
-    void visit( TypeCastingExpression& node ) override;
-    void visit( UnaryExpression& node ) override;
-    void visit( BinaryExpression& node ) override;
-    void visit( LetExpression& node ) override;
-    void visit( ConditionalExpression& node ) override;
-    void visit( ChooseExpression& node ) override;
-    void visit( UniversalQuantifierExpression& node ) override;
-    void visit( ExistentialQuantifierExpression& node ) override;
-    void visit( CardinalityExpression& node ) override;
+            void visit( AbstractExpression& node ) override;
+            void visit( EmbracedExpression& node ) override;
+            void visit( NamedExpression& node ) override;
+            void visit( MappedExpression& node ) override;
+            void visit( DirectCallExpression& node ) override;
+            void visit( MethodCallExpression& node ) override;
+            void visit( LiteralCallExpression& node ) override;
+            void visit( IndirectCallExpression& node ) override;
+            void visit( TypeCastingExpression& node ) override;
+            void visit( UnaryExpression& node ) override;
+            void visit( BinaryExpression& node ) override;
+            void visit( LetExpression& node ) override;
+            void visit( ConditionalExpression& node ) override;
+            void visit( ChooseExpression& node ) override;
+            void visit( UniversalQuantifierExpression& node ) override;
+            void visit( ExistentialQuantifierExpression& node ) override;
+            void visit( CardinalityExpression& node ) override;
 
-    void visit( SkipRule& node ) override;
-    void visit( ConditionalRule& node ) override;
-    void visit( CaseRule& node ) override;
-    void visit( LetRule& node ) override;
-    void visit( LocalRule& node ) override;
-    void visit( ForallRule& node ) override;
-    void visit( ChooseRule& node ) override;
-    void visit( IterateRule& node ) override;
-    void visit( BlockRule& node ) override;
-    void visit( SequenceRule& node ) override;
-    void visit( UpdateRule& node ) override;
-    void visit( CallRule& node ) override;
-    void visit( WhileRule& node ) override;
+            void visit( SkipRule& node ) override;
+            void visit( ConditionalRule& node ) override;
+            void visit( CaseRule& node ) override;
+            void visit( LetRule& node ) override;
+            void visit( LocalRule& node ) override;
+            void visit( ForallRule& node ) override;
+            void visit( ChooseRule& node ) override;
+            void visit( IterateRule& node ) override;
+            void visit( BlockRule& node ) override;
+            void visit( SequenceRule& node ) override;
+            void visit( UpdateRule& node ) override;
+            void visit( CallRule& node ) override;
+            void visit( WhileRule& node ) override;
 
-    void visit( UnresolvedType& node ) override;
-    void visit( BasicType& node ) override;
-    void visit( TupleType& node ) override;
-    void visit( RecordType& node ) override;
-    void visit( TemplateType& node ) override;
-    void visit( FixedSizedType& node ) override;
-    void visit( RelationType& node ) override;
+            void visit( UnresolvedType& node ) override;
+            void visit( BasicType& node ) override;
+            void visit( TupleType& node ) override;
+            void visit( RecordType& node ) override;
+            void visit( TemplateType& node ) override;
+            void visit( FixedSizedType& node ) override;
+            void visit( MappingType& node ) override;
+            void visit( VaradicType& node ) override;
+            void visit( RelationType& node ) override;
 
-    void visit( BasicAttribute& node ) override;
-    void visit( ExpressionAttribute& node ) override;
+            void visit( BasicAttribute& node ) override;
+            void visit( SymbolAttribute& node ) override;
+            void visit( ExpressionAttribute& node ) override;
 
-    void visit( Defined& node ) override;
-    void visit( Template& node ) override;
+            void visit( Defined& node ) override;
+            void visit( Initially& node ) override;
 
-    void visit( Identifier& node ) override;
-    void visit( IdentifierPath& node ) override;
-    void visit( ExpressionCase& node ) override;
-    void visit( DefaultCase& node ) override;
-    void visit( VariableBinding& node ) override;
-    void visit( Token& node ) override;
-    void visit( Span& node ) override;
+            void visit( Identifier& node ) override;
+            void visit( IdentifierPath& node ) override;
+            void visit( ExpressionCase& node ) override;
+            void visit( DefaultCase& node ) override;
+            void visit( VariableBinding& node ) override;
+            void visit( Token& node ) override;
+            void visit( Span& node ) override;
 
-  private:
-    void dumpNode( const Node& node, const std::string& name );
-    void dumpNode( const TypedNode& node, const std::string& name );
-    void dumpNode( const TypedPropertyNode& node, const std::string& name );
-    void dumpNode( const TargetCallExpression& node, const std::string& name );
-    void dumpLabel( const Node& node );
-    void dumpLabel( const TypedNode& node );
-    void dumpLabel( const TypedPropertyNode& node );
-    void dumpLabel( const TargetCallExpression& node );
-    void dumpLink( void* from, void* to );
+          private:
+            void dumpNode( const Node& node, const std::string& name );
+            void dumpNode( const TypedNode& node, const std::string& name );
+            void dumpNode( const TypedPropertyNode& node, const std::string& name );
+            void dumpNode( const TargetCallExpression& node, const std::string& name );
+            void dumpLabel( const Node& node );
+            void dumpLabel( const TypedNode& node );
+            void dumpLabel( const TypedPropertyNode& node );
+            void dumpLabel( const TargetCallExpression& node );
+            void dumpLink( void* from, void* to );
 
-  private:
-    std::ostream& m_stream;
-    const u1 m_dumpSpan;
-    std::stack< void* > m_parentNodes; /**< holds the parent nodes of DotLink */
-    u1 m_dumpNodeLocation = false;     /**< dump node source code location */
-};
+          private:
+            std::ostream& m_stream;
+            const std::string m_name;
+            const std::string m_location;
+            const u1 m_dumpSpan;
+            std::stack< void* > m_parentNodes; /**< holds the parent nodes of DotLink */
+            u1 m_dumpNodeLocation = false;     /**< dump node source code location */
+        };
+    }
+}
 
-AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream, const u1 dumpSpan )
+CSTDumpDotVisitor::CSTDumpDotVisitor(
+    std::ostream& stream, const std::string& name, const std::string& location, const u1 dumpSpan )
 : m_stream( stream )
+, m_name( name )
+, m_location( location )
 , m_dumpSpan( dumpSpan )
 , m_parentNodes()
 , m_dumpNodeLocation( false )
 {
 }
 
-void AstDumpDotVisitor::setDumpNodeLocation( u1 dumpNodeLocation )
+void CSTDumpDotVisitor::setDumpNodeLocation( u1 dumpNodeLocation )
 {
     m_dumpNodeLocation = dumpNodeLocation;
 }
 
-void AstDumpDotVisitor::visit( Specification& specification )
+void CSTDumpDotVisitor::visit( Root& node )
 {
-    m_stream << "subgraph \"" << specification.name() << "\" {\n"
-             << "\"" << &specification << "\" [label=\"Specification\n"
-             << specification.name() << "\n"
-             << specification.location()->toString() << "\"];\n";
+    m_stream << "digraph \"CST\" {\n";
+    m_stream << "subgraph \"" << m_name << "\" {\n"
+             << "\"" << &node << "\" [label=\"Specification\n"
+             << m_name << "\n"
+             << m_location << "\"];\n";
 
     {
-        DotLink link( this, &specification );
-
-        specification.header()->accept( *this );
-        specification.definitions()->accept( *this );
-        specification.spans()->accept( *this );
+        DotLink link( this, &node );
+        RecursiveVisitor::visit( node );
     }
 
     m_stream << "}\n";
+    m_stream << "}\n";
 }
 
-void AstDumpDotVisitor::visit( HeaderDefinition& node )
+void CSTDumpDotVisitor::visit( HeaderDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "HeaderDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( InitDefinition& node )
+void CSTDumpDotVisitor::visit( InitDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "InitDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( Initially& node )
-{
-    DotLink link( this, &node );
-    dumpNode( node, "Initially" );
-    RecursiveVisitor::visit( node );
-}
-
-void AstDumpDotVisitor::visit( Initializer& node )
-{
-    DotLink link( this, &node );
-    dumpNode( node, "Initializer" );
-    RecursiveVisitor::visit( node );
-}
-
-void AstDumpDotVisitor::visit( VariableDefinition& node )
+void CSTDumpDotVisitor::visit( VariableDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "VariableDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( FunctionDefinition& node )
+void CSTDumpDotVisitor::visit( FunctionDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "FunctionDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( DerivedDefinition& node )
+void CSTDumpDotVisitor::visit( DerivedDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "DerivedDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( RuleDefinition& node )
+void CSTDumpDotVisitor::visit( RuleDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RuleDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( EnumeratorDefinition& node )
+void CSTDumpDotVisitor::visit( EnumeratorDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "EnumeratorDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( EnumerationDefinition& node )
+void CSTDumpDotVisitor::visit( EnumerationDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "EnumerationDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( UsingDefinition& node )
+void CSTDumpDotVisitor::visit( UsingDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "UsingDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( UsingPathDefinition& node )
+void CSTDumpDotVisitor::visit( UsingPathDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "UsingPathDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( InvariantDefinition& node )
+void CSTDumpDotVisitor::visit( InvariantDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "InvariantDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ImportDefinition& node )
+void CSTDumpDotVisitor::visit( ImportDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ImportDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( DomainDefinition& node )
+void CSTDumpDotVisitor::visit( DomainDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "DomainDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( StructureDefinition& node )
+void CSTDumpDotVisitor::visit( StructureDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "StructureDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( BehaviorDefinition& node )
+void CSTDumpDotVisitor::visit( BehaviorDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "BehaviorDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ImplementDefinition& node )
+void CSTDumpDotVisitor::visit( ImplementDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ImplementDefinition" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( BuiltinDefinition& node )
+void CSTDumpDotVisitor::visit( BuiltinDefinition& node )
 {
     // TODO: add command-line switch
     DotLink link( this, &node );
@@ -375,342 +381,383 @@ void AstDumpDotVisitor::visit( BuiltinDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( Declaration& node )
+void CSTDumpDotVisitor::visit( Declaration& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "Declaration" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( UndefLiteral& node )
+void CSTDumpDotVisitor::visit( UndefLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "UndefLiteral" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ValueLiteral& node )
+void CSTDumpDotVisitor::visit( ValueLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ValueLiteral: " + node.value()->name() );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ReferenceLiteral& node )
+void CSTDumpDotVisitor::visit( ReferenceLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ReferenceLiteral" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ListLiteral& node )
+void CSTDumpDotVisitor::visit( SetLiteral& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "SetLiteral" );
+    RecursiveVisitor::visit( node );
+}
+
+void CSTDumpDotVisitor::visit( ListLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ListLiteral" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( RangeLiteral& node )
+void CSTDumpDotVisitor::visit( RangeLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RangeLiteral" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( TupleLiteral& node )
+void CSTDumpDotVisitor::visit( TupleLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "TupleLiteral" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( RecordLiteral& node )
+void CSTDumpDotVisitor::visit( RecordLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RecordLiteral" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( EmbracedExpression& node )
+void CSTDumpDotVisitor::visit( AbstractExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "AbstractExpression" );
+}
+
+void CSTDumpDotVisitor::visit( EmbracedExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "EmbracedExpression" );
 }
 
-void AstDumpDotVisitor::visit( NamedExpression& node )
+void CSTDumpDotVisitor::visit( NamedExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "NamedExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( DirectCallExpression& node )
+void CSTDumpDotVisitor::visit( MappedExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "MappedExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void CSTDumpDotVisitor::visit( DirectCallExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "DirectCallExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( MethodCallExpression& node )
+void CSTDumpDotVisitor::visit( MethodCallExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "MethodCallExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( LiteralCallExpression& node )
+void CSTDumpDotVisitor::visit( LiteralCallExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "LiteralCallExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( IndirectCallExpression& node )
+void CSTDumpDotVisitor::visit( IndirectCallExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "IndirectCallExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( TypeCastingExpression& node )
+void CSTDumpDotVisitor::visit( TypeCastingExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "TypeCastingExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( UnaryExpression& node )
+void CSTDumpDotVisitor::visit( UnaryExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "UnaryExpression '" + node.operationToken()->tokenString() + "'" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( BinaryExpression& node )
+void CSTDumpDotVisitor::visit( BinaryExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "BinaryExpression '" + node.operationToken()->tokenString() + "'" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( LetExpression& node )
+void CSTDumpDotVisitor::visit( LetExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "LetExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ConditionalExpression& node )
+void CSTDumpDotVisitor::visit( ConditionalExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ConditionalExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ChooseExpression& node )
+void CSTDumpDotVisitor::visit( ChooseExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ChooseExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( UniversalQuantifierExpression& node )
+void CSTDumpDotVisitor::visit( UniversalQuantifierExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "UniversalQuantifierExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ExistentialQuantifierExpression& node )
+void CSTDumpDotVisitor::visit( ExistentialQuantifierExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ExistentialQuantifierExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( CardinalityExpression& node )
+void CSTDumpDotVisitor::visit( CardinalityExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "CardinalityExpression" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( SkipRule& node )
+void CSTDumpDotVisitor::visit( SkipRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "SkipRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ConditionalRule& node )
+void CSTDumpDotVisitor::visit( ConditionalRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ConditionalRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( CaseRule& node )
+void CSTDumpDotVisitor::visit( CaseRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "CaseRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( LetRule& node )
+void CSTDumpDotVisitor::visit( LetRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "LetRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( LocalRule& node )
+void CSTDumpDotVisitor::visit( LocalRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "LocalRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ForallRule& node )
+void CSTDumpDotVisitor::visit( ForallRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ForallRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ChooseRule& node )
+void CSTDumpDotVisitor::visit( ChooseRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ChooseRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( IterateRule& node )
+void CSTDumpDotVisitor::visit( IterateRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "IterateRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( BlockRule& node )
+void CSTDumpDotVisitor::visit( BlockRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "BlockRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( SequenceRule& node )
+void CSTDumpDotVisitor::visit( SequenceRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "SequenceRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( UpdateRule& node )
+void CSTDumpDotVisitor::visit( UpdateRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "UpdateRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( CallRule& node )
+void CSTDumpDotVisitor::visit( CallRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "CallRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( WhileRule& node )
+void CSTDumpDotVisitor::visit( WhileRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "WhileRule" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( UnresolvedType& node )
+void CSTDumpDotVisitor::visit( UnresolvedType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "UnresolvedType" );
     // omit recursive visiting of node
 }
 
-void AstDumpDotVisitor::visit( BasicType& node )
+void CSTDumpDotVisitor::visit( BasicType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "BasicType" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( TupleType& node )
+void CSTDumpDotVisitor::visit( TupleType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "TupleType" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( RecordType& node )
+void CSTDumpDotVisitor::visit( RecordType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RecordType" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( TemplateType& node )
+void CSTDumpDotVisitor::visit( TemplateType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "TemplateType" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( FixedSizedType& node )
+void CSTDumpDotVisitor::visit( FixedSizedType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "FixedSizedType" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( RelationType& node )
+void CSTDumpDotVisitor::visit( MappingType& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "MappingType" );
+    RecursiveVisitor::visit( node );
+}
+
+void CSTDumpDotVisitor::visit( VaradicType& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "VaradicType" );
+    RecursiveVisitor::visit( node );
+}
+
+void CSTDumpDotVisitor::visit( RelationType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RelationType" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( BasicAttribute& node )
+void CSTDumpDotVisitor::visit( BasicAttribute& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "BasicAttribute" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ExpressionAttribute& node )
+void CSTDumpDotVisitor::visit( SymbolAttribute& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "SymbolAttribute" );
+    RecursiveVisitor::visit( node );
+}
+
+void CSTDumpDotVisitor::visit( ExpressionAttribute& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ExpressionAttribute" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( Defined& node )
+void CSTDumpDotVisitor::visit( Defined& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "Defined" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( Template& node )
+void CSTDumpDotVisitor::visit( Initially& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "Template" );
+    dumpNode( node, "Initially" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( Identifier& node )
+void CSTDumpDotVisitor::visit( Identifier& node )
 {
     DotLink link( this, &node );
     dumpNode( node, node.name() );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( IdentifierPath& node )
+void CSTDumpDotVisitor::visit( IdentifierPath& node )
 {
     DotLink link( this, &node );
 
@@ -730,28 +777,28 @@ void AstDumpDotVisitor::visit( IdentifierPath& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ExpressionCase& node )
+void CSTDumpDotVisitor::visit( ExpressionCase& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ExpressionCase" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( DefaultCase& node )
+void CSTDumpDotVisitor::visit( DefaultCase& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "DefaultCase" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( VariableBinding& node )
+void CSTDumpDotVisitor::visit( VariableBinding& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "VariableBinding" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( Token& node )
+void CSTDumpDotVisitor::visit( Token& node )
 {
     if( node.token() != Grammar::Token::UNRESOLVED )
     {
@@ -761,7 +808,7 @@ void AstDumpDotVisitor::visit( Token& node )
     }
 }
 
-void AstDumpDotVisitor::visit( Span& node )
+void CSTDumpDotVisitor::visit( Span& node )
 {
     if( m_dumpSpan )
     {
@@ -771,7 +818,7 @@ void AstDumpDotVisitor::visit( Span& node )
     }
 }
 
-void AstDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
+void CSTDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
 {
     m_stream << "\"" << &node << "\" [label=\"" << name;
 
@@ -787,7 +834,7 @@ void AstDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
     m_stream << "];\n";
 }
 
-void AstDumpDotVisitor::dumpNode( const TypedNode& node, const std::string& name )
+void CSTDumpDotVisitor::dumpNode( const TypedNode& node, const std::string& name )
 {
     m_stream << "\"" << &node << "\" [label=\"" << name;
 
@@ -796,7 +843,7 @@ void AstDumpDotVisitor::dumpNode( const TypedNode& node, const std::string& name
     m_stream << "\"];\n";
 }
 
-void AstDumpDotVisitor::dumpNode( const TypedPropertyNode& node, const std::string& name )
+void CSTDumpDotVisitor::dumpNode( const TypedPropertyNode& node, const std::string& name )
 {
     m_stream << "\"" << &node << "\" [label=\"" << name;
 
@@ -805,7 +852,7 @@ void AstDumpDotVisitor::dumpNode( const TypedPropertyNode& node, const std::stri
     m_stream << "\"];\n";
 }
 
-void AstDumpDotVisitor::dumpNode( const TargetCallExpression& node, const std::string& name )
+void CSTDumpDotVisitor::dumpNode( const TargetCallExpression& node, const std::string& name )
 {
     m_stream << "\"" << &node << "\" [label=\"" << name;
 
@@ -814,7 +861,7 @@ void AstDumpDotVisitor::dumpNode( const TargetCallExpression& node, const std::s
     m_stream << "\"];\n";
 }
 
-void AstDumpDotVisitor::dumpLabel( const Node& node )
+void CSTDumpDotVisitor::dumpLabel( const Node& node )
 {
     if( m_dumpNodeLocation )
     {
@@ -822,7 +869,7 @@ void AstDumpDotVisitor::dumpLabel( const Node& node )
     }
 }
 
-void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
+void CSTDumpDotVisitor::dumpLabel( const TypedNode& node )
 {
     dumpLabel( static_cast< const Node& >( node ) );
 
@@ -841,7 +888,7 @@ void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
     }
 }
 
-void AstDumpDotVisitor::dumpLabel( const TypedPropertyNode& node )
+void CSTDumpDotVisitor::dumpLabel( const TypedPropertyNode& node )
 {
     dumpLabel( static_cast< const TypedNode& >( node ) );
 
@@ -862,7 +909,7 @@ void AstDumpDotVisitor::dumpLabel( const TypedPropertyNode& node )
     }
 }
 
-void AstDumpDotVisitor::dumpLabel( const TargetCallExpression& node )
+void CSTDumpDotVisitor::dumpLabel( const TargetCallExpression& node )
 {
     m_stream << "\n";
 
@@ -889,35 +936,31 @@ void AstDumpDotVisitor::dumpLabel( const TargetCallExpression& node )
     dumpLabel( static_cast< const TypedPropertyNode& >( node ) );
 }
 
-void AstDumpDotVisitor::dumpLink( void* from, void* to )
+void CSTDumpDotVisitor::dumpLink( void* from, void* to )
 {
     m_stream << "\"" << from << "\" -> \"" << to << "\";\n";
 }
 
-void AstDumpDotPass::usage( libpass::PassUsage& pu )
+void CstDumpPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
-    pu.repeatUntil< ConsistencyCheckPass >();
+    pu.require< SourceToCstPass >();
 }
 
-u1 AstDumpDotPass::run( libpass::PassResult& pr )
+u1 CstDumpPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto& data = pr.output< SourceToAstPass >();
+    const auto& data = pr.output< SourceToCstPass >();
     const auto& specification = data->specification();
 
     const u1 dumpNodeLocation = true;  // TODO: add command-line switch
 
     const auto printDotGraph = [&]( std::ostream& out ) {
-        out << "digraph \"main\" {\n";
-
-        AstDumpDotVisitor visitor{ out, dumpSpan() };
+        CSTDumpDotVisitor visitor{
+            out, specification->name(), specification->location()->toString(), dumpSpan()
+        };
         visitor.setDumpNodeLocation( dumpNodeLocation );
-
-        visitor.visit( *specification );
-
-        out << "}\n";
+        specification->cst()->accept( visitor );
     };
 
     if( outputPath() == "" )
@@ -958,22 +1001,22 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     return true;
 }
 
-void AstDumpDotPass::setOutputPath( const std::string& outputPath )
+void CstDumpPass::setOutputPath( const std::string& outputPath )
 {
     m_outputPath = outputPath;
 }
 
-const std::string& AstDumpDotPass::outputPath( void ) const
+const std::string& CstDumpPass::outputPath( void ) const
 {
     return m_outputPath;
 }
 
-void AstDumpDotPass::setDumpSpan( const u1 enable )
+void CstDumpPass::setDumpSpan( const u1 enable )
 {
     m_dumpSpan = enable;
 }
 
-u1 AstDumpDotPass::dumpSpan( void ) const
+u1 CstDumpPass::dumpSpan( void ) const
 {
     return m_dumpSpan;
 }
