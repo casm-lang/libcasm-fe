@@ -48,24 +48,23 @@
 #include <libcasm-fe/Configuration>
 #include <libcasm-fe/Exception>
 #include <libcasm-fe/Logger>
-#include <libcasm-fe/analyze/TypeCheckPass>
-#include <libcasm-fe/import/LibraryLoaderPass>
-#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
-#include <libpass/PassResult>
-#include <libpass/PassUsage>
 
 #include <libstdhl/String>
 #include <libstdhl/std/rfc3986>
 
 using namespace libcasm_fe;
-using namespace AST;
 
 char ProjectResolverPass::id = 0;
 
 static libpass::PassRegistration< ProjectResolverPass > PASS(
     "ProjectResolverPass", "TODO", "project-resolve", 0 );
+
+//
+//
+// ProjectResolverPass
+//
 
 void ProjectResolverPass::usage( libpass::PassUsage& pu )
 {
