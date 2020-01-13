@@ -46,17 +46,17 @@
 #ifndef _LIBCASM_FE_SYMBOL_RESOLVER_PASS_H_
 #define _LIBCASM_FE_SYMBOL_RESOLVER_PASS_H_
 
-#include <libcasm-fe/Logger>
-#include <libcasm-fe/Namespace>
-#include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
+#include <libcasm-fe/ast/Type>
 
 #include <libpass/Pass>
+#include <libpass/PassData>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 namespace libcasm_fe
 {
     /**
-     * @brief Resolves AST identifiers of type-, call-, ... nodes
+       @brief Resolves AST symbols
      */
     class SymbolResolverPass final : public libpass::Pass
     {
@@ -66,121 +66,26 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
-    };
 
-    class SymbolResolveVisitor final : public AST::RecursiveVisitor
-    {
       public:
-        SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
-
-        void visit( AST::InitDefinition& node ) override;
-
-        void visit( AST::FunctionDefinition& node ) override;
-        void visit( AST::DerivedDefinition& node ) override;
-        void visit( AST::RuleDefinition& node ) override;
-        void visit( AST::EnumerationDefinition& node ) override;
-        void visit( AST::StructureDefinition& node ) override;
-        void visit( AST::BehaviorDefinition& node ) override;
-        void visit( AST::ImplementDefinition& node ) override;
-        void visit( AST::BuiltinDefinition& node ) override;
-        void visit( AST::DomainDefinition& node ) override;
-        void visit( AST::UsingDefinition& node ) override;
-        void visit( AST::Declaration& node ) override;
-
-        void visit( AST::ReferenceLiteral& node ) override;
-
-        void visit( AST::DirectCallExpression& node ) override;
-        void visit( AST::LiteralCallExpression& node ) override;
-        void visit( AST::LetExpression& node ) override;
-        void visit( AST::ChooseExpression& node ) override;
-        void visit( AST::UniversalQuantifierExpression& node ) override;
-        void visit( AST::ExistentialQuantifierExpression& node ) override;
-
-        void visit( AST::LetRule& node ) override;
-        void visit( AST::LocalRule& node ) override;
-        void visit( AST::ForallRule& node ) override;
-        void visit( AST::ChooseRule& node ) override;
-
-        void visit( AST::BasicType& node ) override;
-        void visit( AST::TupleType& node ) override;
-        void visit( AST::RecordType& node ) override;
-        void visit( AST::FixedSizedType& node ) override;
-        void visit( AST::RelationType& node ) override;
-        void visit( AST::TemplateType& node ) override;
-
-      private:
-        void pushSymbol( const AST::Definition::Ptr& symbol );
-        void popSymbol( const AST::Definition::Ptr& symbol );
-
-        template < typename T >
-        void pushSymbols( const typename AST::NodeList< T >::Ptr& symbols )
+        class Output : public libpass::PassData
         {
-            for( const auto& symbol : *symbols )
+          public:
+            using Ptr = std::shared_ptr< Output >;
+
+            Output( const AST::Types::Ptr& templateTypes )
+            : m_templateTypes( templateTypes )
             {
-                pushSymbol( symbol );
             }
-        }
 
-        template < typename T >
-        void popSymbols( const typename AST::NodeList< T >::Ptr& symbols )
-        {
-            for( const auto& symbol : *symbols )
+            AST::Types::Ptr templateTypes( void ) const
             {
-                popSymbol( symbol );
+                return m_templateTypes;
             }
-        }
 
-        void pushVariableBindings( const AST::VariableBindings::Ptr& variableBindings );
-        void popVariableBindings( const AST::VariableBindings::Ptr& variableBindings );
-
-        /**
-         * If the \a definition is a type alias, it will be resolved and the aliased
-         * definition will be returned. Otherwise the given \a definition will be
-         * returned.
-         */
-        AST::Definition::Ptr resolveIfAlias( const AST::Definition::Ptr& definition ) const;
-
-        AST::Definition::Ptr tryResolveSymbol( const AST::IdentifierPath& identifierPath ) const;
-
-        AST::Definition::Ptr resolveSymbol( const AST::Definition& node ) const;
-
-        void resolveBehaviorInstance( AST::Type& node );
-
-        void resolveTypeInstance( AST::Type& node );
-
-        AST::Definition::Ptr resolveBuiltinCall(
-            AST::TargetCallExpression& node, const AST::BuiltinDefinition::Ptr& builtinDefinition );
-
-      private:
-        libcasm_fe::Logger& m_log;
-        Namespace& m_symboltable;
-
-        std::unordered_map< std::string, AST::Definition::Ptr > m_scopeSymbols;
-        AST::TypeDefinition::Ptr m_objectDefinition;
-        AST::TypeDefinition::Ptr m_behaviorDefinition;
-        AST::DomainDefinition::Ptr m_agentDomainDefinition;
-    };
-
-    class ReplaceTypeVisitor final : public AST::RecursiveVisitor
-    {
-      public:
-        ReplaceTypeVisitor(
-            libcasm_fe::Logger& log, const AST::Type::Ptr& from, const AST::Type::Ptr& to );
-
-        void visit( AST::DomainDefinition& node ) override;
-        void visit( AST::RuleDefinition& node ) override;
-        void visit( AST::DerivedDefinition& node ) override;
-        void visit( AST::Declaration& node ) override;
-        void visit( AST::BuiltinDefinition& node ) override;
-        void visit( AST::ImplementDefinition& node ) override;
-        void visit( AST::VariableDefinition& node ) override;
-
-        void visit( AST::TemplateType& node ) override;
-
-      private:
-        libcasm_fe::Logger& m_log;
-        const AST::Type::Ptr& m_from;
-        const AST::Type::Ptr& m_to;
+          private:
+            const AST::Types::Ptr m_templateTypes;
+        };
     };
 }
 

@@ -47,11 +47,18 @@
 
 #include "../various/GrammarToken.h"
 
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
+#include <libcasm-fe/ast/Declaration>
+#include <libcasm-fe/ast/Literal>
+#include <libcasm-fe/ast/Node>
+#include <libcasm-fe/ast/Visitor>
 #include <libcasm-fe/import/LibraryLoaderPass>
 #include <libcasm-fe/import/SpecificationMergerPass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/transform/CstToAstPass>
 
 #include <libcasm-ir/Builtin>
 #include <libcasm-ir/Instruction>
@@ -59,6 +66,8 @@
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
+
+#include <libstdhl/String>
 
 #include <unordered_map>
 
@@ -68,31 +77,34 @@ using namespace AST;
 char SymbolResolverPass::id = 0;
 
 static libpass::PassRegistration< SymbolResolverPass > PASS(
-    "ASTSymbolResolverPass",
-    "resolves AST identifiers of type-, call-, ... nodes",
-    "ast-sym-resolve",
-    0 );
+    "Symbol Resolver Pass", "resolves AST identifiers of symbols and types", "ast-sym-resolve", 0 );
 
 //
 //
 // NamespaceResolveVisitor
 //
 
-class NamespaceResolveVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    NamespaceResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
+    namespace AST
+    {
+        class NamespaceResolveVisitor final : public RecursiveVisitor
+        {
+          public:
+            NamespaceResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
-    void visit( UsingPathDefinition& node ) override;
+            void visit( UsingPathDefinition& node ) override;
 
-  private:
-    void registerSymbolWithPath(
-        UsingPathDefinition& node, const IdentifierPath& path, const u1 useAll = false );
+          private:
+            void registerSymbolWithPath(
+                UsingPathDefinition& node, const IdentifierPath& path, const u1 useAll = false );
 
-  private:
-    libcasm_fe::Logger& m_log;
-    Namespace& m_symboltable;
-};
+          private:
+            libcasm_fe::Logger& m_log;
+            Namespace& m_symboltable;
+        };
+    }
+}
 
 NamespaceResolveVisitor::NamespaceResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
@@ -198,7 +210,7 @@ void NamespaceResolveVisitor::registerSymbolWithPath(
 
         if( definition.get() != otherSymbol.get() )
         {
-            if( node.usingToken()->token() == Grammar::Token::UNRESOLVED )
+            if( libstdhl::String::startsWith( pathName, "CASM" + Namespace::delimiter() ) )
             {
                 // using CASM::* ... report issues from current specification
                 m_log.error(
@@ -236,185 +248,93 @@ void NamespaceResolveVisitor::registerSymbolWithPath(
     }
 }
 
-//
-//
-// ReplaceIdentifierNameVisitor
-//
-
-class ReplaceIdentifierNameVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    ReplaceIdentifierNameVisitor( const Identifier& from, const Identifier& to );
-
-    void visit( Identifier& node ) override;
-
-  private:
-    const Identifier& m_from;
-    const Identifier& m_to;
-};
-
-ReplaceIdentifierNameVisitor::ReplaceIdentifierNameVisitor(
-    const Identifier& from, const Identifier& to )
-: m_from( from )
-, m_to( to )
-{
-}
-
-void ReplaceIdentifierNameVisitor::visit( Identifier& node )
-{
-    if( node.name() == m_from.name() )
+    namespace AST
     {
-        node.setName( m_to.name() );
-    }
-}
-
-//
-//
-// ReplaceRelationTypeVisitor
-//
-
-ReplaceTypeVisitor::ReplaceTypeVisitor(
-    libcasm_fe::Logger& log, const AST::Type::Ptr& from, const AST::Type::Ptr& to )
-: m_log( log )
-, m_from( from )
-, m_to( to )
-{
-}
-
-void ReplaceTypeVisitor::visit( DomainDefinition& node )
-{
-    if( node.domainType()->signature() == m_from->signature() )
-    {
-        node.setDomainType( m_to );
-    }
-}
-
-void ReplaceTypeVisitor::visit( RuleDefinition& node )
-{
-    node.arguments()->accept( *this );
-
-    const auto& returnType = node.returnType();
-    auto replaceReturnType = returnType;
-    if( returnType->signature() == m_from->signature() )
-    {
-        replaceReturnType = m_to;
-    }
-
-    node.setReturnType( replaceReturnType );
-}
-
-void ReplaceTypeVisitor::visit( DerivedDefinition& node )
-{
-    node.arguments()->accept( *this );
-
-    const auto& returnType = node.returnType();
-    auto replaceReturnType = returnType;
-    if( returnType->signature() == m_from->signature() )
-    {
-        replaceReturnType = m_to;
-    }
-
-    node.setReturnType( replaceReturnType );
-}
-
-void ReplaceTypeVisitor::visit( Declaration& node )
-{
-    const auto& replaceArgumentTypes = std::make_shared< Types >();
-    for( const auto& argumentType : *node.argumentTypes() )
-    {
-        if( argumentType->signature() == m_from->signature() )
+        class SymbolResolveVisitor final : public RecursiveVisitor
         {
-            replaceArgumentTypes->add( m_to );
-        }
-        else
-        {
-            replaceArgumentTypes->add( argumentType );
-        }
+          public:
+            SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
+
+            void visit( InitDefinition& node ) override;
+
+            void visit( FunctionDefinition& node ) override;
+            void visit( DerivedDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
+            void visit( EnumerationDefinition& node ) override;
+            void visit( StructureDefinition& node ) override;
+            void visit( BehaviorDefinition& node ) override;
+            void visit( ImplementDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
+            void visit( UsingDefinition& node ) override;
+            void visit( Declaration& node ) override;
+
+            void visit( ReferenceLiteral& node ) override;
+
+            void visit( DirectCallExpression& node ) override;
+            void visit( LetExpression& node ) override;
+            void visit( ChooseExpression& node ) override;
+            void visit( UniversalQuantifierExpression& node ) override;
+            void visit( ExistentialQuantifierExpression& node ) override;
+
+            void visit( LetRule& node ) override;
+            void visit( LocalRule& node ) override;
+            void visit( ForallRule& node ) override;
+            void visit( ChooseRule& node ) override;
+
+            void visit( BasicType& node ) override;
+            void visit( TupleType& node ) override;
+            void visit( RecordType& node ) override;
+            void visit( FixedSizedType& node ) override;
+            void visit( RelationType& node ) override;
+            void visit( TemplateType& node ) override;
+
+            const Types::Ptr& templateTypes( void );
+
+          private:
+            void pushSymbol( const Definition::Ptr& symbol );
+            void popSymbol( const Definition::Ptr& symbol );
+
+            template < typename T >
+            void pushSymbols( const typename NodeList< T >::Ptr& symbols )
+            {
+                for( const auto& symbol : *symbols )
+                {
+                    pushSymbol( symbol );
+                }
+            }
+
+            template < typename T >
+            void popSymbols( const typename NodeList< T >::Ptr& symbols )
+            {
+                for( const auto& symbol : *symbols )
+                {
+                    popSymbol( symbol );
+                }
+            }
+
+            void pushVariableBindings( const VariableBindings::Ptr& variableBindings );
+            void popVariableBindings( const VariableBindings::Ptr& variableBindings );
+
+            Definition::Ptr resolveSymbol(
+                const IdentifierPath& identifierPath, const u1 silent = false );
+            Definition::Ptr resolveAlias( const Definition::Ptr& definition );
+
+            void resolveTypeDefinition( Type& node );
+
+          private:
+            libcasm_fe::Logger& m_log;
+            Namespace& m_symboltable;
+            Types::Ptr m_templateTypes;
+
+            std::unordered_map< std::string, Definition::Ptr > m_scopeSymbols;
+            TypeDefinition::Ptr m_objectTypeDefinition;
+
+            DomainDefinition::Ptr m_agentDomainDefinition;
+        };
     }
-
-    node.setArgumentTypes( replaceArgumentTypes );
-
-    const auto& returnType = node.returnType();
-    auto replaceReturnType = returnType;
-    if( returnType->signature() == m_from->signature() )
-    {
-        replaceReturnType = m_to;
-    }
-
-    node.setReturnType( replaceReturnType );
-}
-
-void ReplaceTypeVisitor::visit( BuiltinDefinition& node )
-{
-    const auto& domainType = node.relationType();
-    const auto& argumentTypes = domainType.argumentTypes();
-    const auto& returnType = domainType.returnType();
-
-    const auto& replaceArgumentTypes = std::make_shared< Types >();
-    for( const auto& argumentType : *argumentTypes )
-    {
-        if( argumentType->signature() == m_from->signature() )
-        {
-            replaceArgumentTypes->add( m_to );
-        }
-        else
-        {
-            replaceArgumentTypes->add( argumentType );
-        }
-    }
-
-    auto replaceReturnType = returnType;
-    if( returnType->signature() == m_from->signature() )
-    {
-        replaceReturnType = m_to;
-    }
-
-    const auto& replaceDomainType = AST::make< RelationType >(
-        domainType.sourceLocation(),
-        domainType.name()->duplicate< IdentifierPath >(),
-        domainType.leftBraceToken(),
-        replaceArgumentTypes,
-        domainType.mapsToken(),
-        replaceReturnType,
-        domainType.rightBraceToken() );
-
-    node.setDomainType( replaceDomainType );
-}
-
-void ReplaceTypeVisitor::visit( ImplementDefinition& node )
-{
-    if( node.domainType()->signature() == m_from->signature() )
-    {
-        node.setDomainType( m_to );
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
-void ReplaceTypeVisitor::visit( VariableDefinition& node )
-{
-    if( node.variableType()->signature() == m_from->signature() )
-    {
-        node.setVariableType( m_to );
-    }
-}
-
-void ReplaceTypeVisitor::visit( TemplateType& node )
-{
-    const auto& replaceArgumentTypes = std::make_shared< Types >();
-    for( const auto& argumentType : *node.subTypes() )
-    {
-        if( argumentType->signature() == m_from->signature() )
-        {
-            replaceArgumentTypes->add( m_to );
-        }
-        else
-        {
-            replaceArgumentTypes->add( argumentType );
-        }
-    }
-
-    node.setSubTypes( replaceArgumentTypes );
 }
 
 //
@@ -426,8 +346,8 @@ SymbolResolveVisitor::SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& 
 : m_log( log )
 , m_symboltable( symboltable )
 , m_scopeSymbols()
-, m_objectDefinition( nullptr )
-, m_behaviorDefinition( nullptr )
+, m_templateTypes( std::make_shared< Types >() )
+, m_objectTypeDefinition( nullptr )
 , m_agentDomainDefinition( nullptr )
 {
 }
@@ -441,79 +361,50 @@ void SymbolResolveVisitor::visit( InitDefinition& node )
         return;
     }
 
-    const auto temporaryAgentDomainDefinition = m_agentDomainDefinition;
-
-    const auto& programSymbol = m_symboltable.findSymbol( "program" );
-    assert( programSymbol and " inconsistent state @ CASM prelude specification " );
-    assert( programSymbol->id() == Node::ID::FUNCTION_DEFINITION );
-    const auto& programFunction = programSymbol->ptr< FunctionDefinition >();
-
-    const auto& location = node.sourceLocation();
-    const auto& initializers = AST::make< Initializers >( location );
-    if( node.isSingleAgent() )
-    {
-        const auto& agentDomainName = TypeInfo::TYPE_NAME_AGENT;
-        const auto& agentDomainSymbol = m_symboltable.findSymbol( agentDomainName );
-        assert( agentDomainSymbol and " inconsistent state @ CASM prelude specification " );
-        assert( agentDomainSymbol->id() == Node::ID::DOMAIN_DEFINITION and " inconsistent state " );
-        const auto& agentDomainDefinition = agentDomainSymbol->ptr< DomainDefinition >();
-
-        const auto& agentDomainType = AST::make< BasicType >(
-            location,
-            IdentifierPath::fromIdentifier(
-                AST::make< Identifier >( location, TypeInfo::TYPE_NAME_INTEGER ) ) );
-        agentDomainDefinition->setDomainType( agentDomainType );
-        agentDomainDefinition->accept( *this );
-        m_agentDomainDefinition = agentDomainDefinition;
-
-        const auto& zeroLiteral = AST::make< ValueLiteral >(
-            location, std::make_shared< libcasm_ir::IntegerConstant >( 0 ) );
-
-        const auto& programArguments = AST::make< Expressions >( location );
-        programArguments->add( zeroLiteral );
-
-        const auto& ruleReference =
-            AST::make< ReferenceLiteral >( location, Token::unresolved(), node.initPath() );
-
-        const auto& initializer = AST::make< Initializer >(
-            location,
-            Token::unresolved(),
-            programArguments,
-            Token::unresolved(),
-            Token::unresolved(),
-            ruleReference );
-
-        initializers->add( initializer );
-    }
-    else
-    {
-        for( const auto& initializer : *node.initializers() )
-        {
-            initializers->add( initializer );
-        }
-    }
-
-    if( m_agentDomainDefinition )
-    {
-        programFunction->initially()->setInitializers( initializers );
-        programFunction->accept( *this );
-    }
-
-    m_agentDomainDefinition = temporaryAgentDomainDefinition;
+    RecursiveVisitor::visit( node );
 }
 
 void SymbolResolveVisitor::visit( FunctionDefinition& node )
 {
-    // apply the name of the function declaration to the initializer functions
-    for( const auto& initializer : *node.initially()->initializers() )
+    const auto& initially = node.initially();
+    const auto& initiallyLocation = initially->sourceLocation();
+    const auto& initiallyRules = AST::make< Rules >( initiallyLocation );
+
+    AST::MappedExpressions::Ptr mappedExpressions = initially;
+    if( node.program() )
     {
-        const auto& updateRuleFunction = initializer->updateRule()->function();
-        assert( updateRuleFunction->id() == Node::ID::DIRECT_CALL_EXPRESSION );
-        const auto& directCallExpression = updateRuleFunction->ptr< DirectCallExpression >();
-        directCallExpression->setIdentifier( IdentifierPath::fromIdentifier( node.identifier() ) );
+        const auto& initSymbol = m_symboltable.findSymbol( "init" );
+        assert( initSymbol and " inconsistent state " );
+        assert( initSymbol->id() == Node::ID::INIT_DEFINITION );
+        const auto& initDefinition = initSymbol->ptr< InitDefinition >();
+
+        // set init definition initializer mapped expressions for program function
+        mappedExpressions = initDefinition->initializers();
     }
 
+    for( const auto& mappedExpression : *mappedExpressions )
+    {
+        const auto& value = mappedExpression->value();
+        if( value->id() == Node::ID::ABSTRACT_EXPRESSION )
+        {
+            continue;
+        }
+
+        const auto& location = AST::make< AST::DirectCallExpression >(
+            initiallyLocation,
+            AST::IdentifierPath::fromIdentifier( node.identifier() ),
+            mappedExpression->arguments() );
+
+        const auto& updateRule = make< AST::UpdateRule >( initiallyLocation, location, value );
+        initiallyRules->add( updateRule );
+    }
+
+    const auto& initiallyRule = AST::make< AST::SequenceRule >( initiallyLocation, initiallyRules );
+    node.setInitiallyRule( initiallyRule );
+
+    pushSymbol( node.ptr< Definition >() );
     RecursiveVisitor::visit( node );
+    popSymbol( node.ptr< Definition >() );
 }
 
 void SymbolResolveVisitor::visit( DerivedDefinition& node )
@@ -533,368 +424,164 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
 void SymbolResolveVisitor::visit( EnumerationDefinition& node )
 {
     const auto& objectSymbol = node.ptr< TypeDefinition >();
-    const auto temporaryObjectDefinition = m_objectDefinition;
-    m_objectDefinition = objectSymbol;
-    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
+    const auto temporaryObjectDefinition = m_objectTypeDefinition;
+    m_objectTypeDefinition = objectSymbol;
+    pushSymbols< VariableDefinition >( node.templateSymbols() );
 
     node.domainType()->accept( *this );
 
-    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
-    m_objectDefinition = temporaryObjectDefinition;
-
-    // Domain::Type::
-    const auto& domainTypeName = node.domainType()->signature();
-    const auto& domainTypePath = node.domainType()->signaturePath();
-    const auto& domainTypeNamespace = m_symboltable.findNamespace( *domainTypePath );
-    assert( domainTypeNamespace and " inconsistent state, checked during symbol registration " );
-
-    // CASM::enumeration::enumeration::
-    const auto& sourceLocation = node.sourceLocation();
-    // const auto& casmIdentifier = AST::make< Identifier >( sourceLocation, "CASM" );
-    const auto& enumerationIdentifier =
-        AST::make< Identifier >( sourceLocation, TypeInfo::TYPE_NAME_ENUMERATION );
-    // const auto& enumerationName = AST::make< IdentifierPath >( sourceLocation, casmIdentifier );
-    const auto& enumerationName =
-        AST::make< IdentifierPath >( sourceLocation, enumerationIdentifier );
-    enumerationName->addIdentifier( enumerationIdentifier );
-    // enumerationName->addIdentifier( enumerationIdentifier );
-
-    const auto& enumerationSymbolResult = m_symboltable.findSymbol( *enumerationName );
-    const auto& enumerationSymbol = enumerationSymbolResult.first;
-    assert( enumerationSymbol and " inconsistent state @ SymbolRegistrationPass " );
-    assert( enumerationSymbol->id() == Node::ID::DOMAIN_DEFINITION and " inconsistent state " );
-    const auto& domainDefinition = enumerationSymbol->ptr< DomainDefinition >();
-
-    const auto enumerationNamespace = m_symboltable.findNamespace( *enumerationName );
-    assert( enumerationNamespace and " inconsistent state, checked during symbol registration " );
-
-    ReplaceIdentifierNameVisitor replaceIdentifierNameVisitor(
-        *enumerationIdentifier, *node.identifier() );
-
-    for( const auto& inner : enumerationNamespace->symbols() )
-    {
-        const auto& innerName = inner.first;
-        const auto& innerSymbol = inner.second;
-        const auto& innerNamespace = enumerationNamespace->findNamespace( innerName );
-        assert( innerSymbol and " inconsistent state, inside enumerationNamespace " );
-        assert( innerNamespace and " inconsistent state, inside enumerationNamespace " );
-
-        if( innerSymbol->id() != Node::ID::BEHAVIOR_DEFINITION )
-        {
-            continue;
-        }
-
-        const auto& behaviorDefinition = innerSymbol->ptr< BehaviorDefinition >();
-        const auto& behaviorName = behaviorDefinition->domainType()->signature();
-        const auto behaviorNamespace = std::make_shared< Namespace >();
-
-        // Domain::Type::BehaviorDefinition
-        try
-        {
-            domainTypeNamespace->registerSymbol( behaviorName, behaviorDefinition );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error( { node.sourceLocation() }, std::string( e.what() ) );
-        }
-
-        // Domain::Type::Behavior::
-        try
-        {
-            domainTypeNamespace->registerNamespace( behaviorName, behaviorNamespace );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error( { node.sourceLocation() }, std::string( e.what() ) );
-        }
-
-        const auto& enumerationBehaviorNamespace =
-            enumerationNamespace->findNamespace( behaviorDefinition->domainType()->signature() );
-        assert( enumerationBehaviorNamespace and " inconsistent state @ SymbolRegistrationPass " );
-
-        const auto& implementSymbol = enumerationBehaviorNamespace->findSymbol(
-            behaviorDefinition->domainType()->signature() );
-        assert( implementSymbol and " inconsistent state, inside enumerationNamespace " );
-
-        const auto& implementDefinition = implementSymbol->ptr< ImplementDefinition >();
-        const auto duplicateImplementDefinition =
-            implementDefinition->duplicate< ImplementDefinition >();
-        duplicateImplementDefinition->templateInstances()->clear();
-
-        const auto& fromBasicType = AST::make< BasicType >(
-            enumerationIdentifier->sourceLocation(),
-            IdentifierPath::fromIdentifier( enumerationIdentifier ) );
-
-        const auto& duplicateDomainType = node.domainType()->duplicate< AST::Type >();
-
-        ReplaceTypeVisitor replaceTypeVisitor( m_log, fromBasicType, duplicateDomainType );
-        duplicateImplementDefinition->accept( replaceTypeVisitor );
-
-        const auto& implementName = behaviorDefinition->domainType()->signature();
-        const auto implementNamespace = std::make_shared< Namespace >();
-
-        // Domain::Type::Behavior::ImplementDefinition
-        try
-        {
-            behaviorNamespace->registerSymbol( implementName, implementDefinition );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error( { node.sourceLocation() }, std::string( e.what() ) );
-        }
-
-        // Domain::Type::Behavior::Implement::
-        try
-        {
-            behaviorNamespace->registerNamespace( implementName, implementNamespace );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error( { node.sourceLocation() }, std::string( e.what() ) );
-        }
-
-        SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, *implementNamespace );
-        duplicateImplementDefinition->definitions()->accept( symbolRegistrationVisitor );
-
-        m_objectDefinition = duplicateImplementDefinition;
-        m_behaviorDefinition = behaviorDefinition;
-
-        duplicateImplementDefinition->domainType()->accept( *this );
-        duplicateImplementDefinition->behaviorType()->accept( *this );
-        duplicateImplementDefinition->definitions()->accept( *this );
-
-        m_behaviorDefinition = nullptr;
-        m_objectDefinition = nullptr;
-
-        // adding instance to implement definition
-        implementDefinition->addTemplateInstance( duplicateImplementDefinition );
-    }
+    popSymbols< VariableDefinition >( node.templateSymbols() );
+    m_objectTypeDefinition = temporaryObjectDefinition;
 }
 
 void SymbolResolveVisitor::visit( StructureDefinition& node )
 {
     const auto& objectSymbol = node.ptr< TypeDefinition >();
 
-    const auto temporaryObjectDefinition = m_objectDefinition;
-    m_objectDefinition = objectSymbol;
-
-    const auto temporaryBehaviorDefinition = m_behaviorDefinition;
-    m_behaviorDefinition = nullptr;
-
-    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
+    const auto temporaryObjectDefinition = m_objectTypeDefinition;
+    m_objectTypeDefinition = nullptr;
+    pushSymbols< VariableDefinition >( node.templateSymbols() );
 
     node.domainType()->accept( *this );
+
+    popSymbols< VariableDefinition >( node.templateSymbols() );
+
+    m_objectTypeDefinition = objectSymbol;
+
     node.functions()->accept( *this );
 
-    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
-
-    m_behaviorDefinition = temporaryBehaviorDefinition;
-    m_objectDefinition = temporaryObjectDefinition;
+    m_objectTypeDefinition = temporaryObjectDefinition;
 }
 
 void SymbolResolveVisitor::visit( BehaviorDefinition& node )
 {
     const auto& objectSymbol = node.ptr< TypeDefinition >();
 
-    const auto temporaryObjectDefinition = m_objectDefinition;
-    m_objectDefinition = objectSymbol;
-
-    const auto temporaryBehaviorDefinition = m_behaviorDefinition;
-    m_behaviorDefinition = nullptr;
-
-    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
+    const auto temporaryObjectDefinition = m_objectTypeDefinition;
+    m_objectTypeDefinition = nullptr;
+    pushSymbols< VariableDefinition >( node.templateSymbols() );
 
     node.domainType()->accept( *this );
+
+    m_objectTypeDefinition = objectSymbol;
+
     node.definitions()->accept( *this );
 
-    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
-
-    m_behaviorDefinition = temporaryBehaviorDefinition;
-    m_objectDefinition = temporaryObjectDefinition;
+    popSymbols< VariableDefinition >( node.templateSymbols() );
+    m_objectTypeDefinition = temporaryObjectDefinition;
 }
 
 void SymbolResolveVisitor::visit( ImplementDefinition& node )
 {
     const auto& objectSymbol = node.ptr< TypeDefinition >();
 
-    const auto temporaryObjectDefinition = m_objectDefinition;
-    m_objectDefinition = objectSymbol;
+    const auto temporaryObjectDefinition = m_objectTypeDefinition;
+    m_objectTypeDefinition = nullptr;
+    pushSymbols< VariableDefinition >( node.templateSymbols() );
 
-    const auto temporaryBehaviorDefinition = m_behaviorDefinition;
-    if( node.hasBehavior() )
+    node.domainType()->accept( *this );
+
+    if( node.forBehaviorType() )
     {
-        const auto& behaviorType = node.behaviorType();
-        const auto& behaviorPath = behaviorType->signaturePath();
+        node.behaviorType()->accept( *this );
+    }
 
-        resolveBehaviorInstance( *behaviorType );
+    const auto& typeDefinition = node.domainType()->typeDefinition();
+    assert( typeDefinition and " inconsistent state @ SymbolRegistrationPass " );
+    m_objectTypeDefinition = typeDefinition;
 
-        auto behaviorSymbolResult = m_symboltable.findSymbol( *behaviorPath );
-        auto behaviorSymbol = behaviorSymbolResult.first;
-        if( not behaviorSymbol )
+    node.definitions()->accept( *this );
+
+    popSymbols< VariableDefinition >( node.templateSymbols() );
+    m_objectTypeDefinition = temporaryObjectDefinition;
+
+    const auto& implementDefinition = node.ptr< ImplementDefinition >();
+    if( node.forBehaviorType() )
+    {
+        try
         {
-            const auto& casmBehaviorPath = IdentifierPath::fromIdentifier(
-                AST::make< Identifier >( behaviorType->sourceLocation(), "CASM" ) );
-            for( const auto& behaviorPathIdentifier : *behaviorPath->identifiers() )
-            {
-                casmBehaviorPath->addIdentifier( behaviorPathIdentifier );
-            }
-
-            behaviorSymbolResult = m_symboltable.findSymbol( *casmBehaviorPath );
-            // relax if symbol is behavior definition inside the CASM namespace
-            behaviorSymbol = behaviorSymbolResult.first;
-            assert( behaviorSymbol and " inconsistent state @ SymbolRegistrationPass " );
+            typeDefinition->addExtendedBehavior( implementDefinition );
         }
-
-        const auto behaviorDefinition = behaviorSymbol->ptr< TypeDefinition >();
-        m_behaviorDefinition = behaviorDefinition;
+        catch( const std::domain_error& e )
+        {
+            const auto& behaviorTypeName = node.behaviorType()->signature();
+            const auto& domainTypeName = node.domainType()->signature();
+            const auto& symbol =
+                typeDefinition->symboltable()->findNamespace( "+" )->findSymbol( behaviorTypeName );
+            assert( symbol and " inconsistent state " );
+            if( &node != symbol.get() )
+            {
+                const auto msg = node.description() + " of extended behavior '" + behaviorTypeName +
+                                 "' already defined for '" + domainTypeName + "'";
+                m_log.error( { node.sourceLocation() }, msg, Code::IdentifierIsAlreadyUsed );
+                m_log.info( { symbol->sourceLocation() }, msg );
+            }
+        }
     }
     else
     {
-        const auto& domainTypeName = node.domainType()->signature();
-        const auto& domainTypePath = node.domainType()->signaturePath();
-        auto domainTypeSymbolResult = m_symboltable.findSymbol( *domainTypePath );
-        auto domainTypeSymbol = domainTypeSymbolResult.first;
-        if( not domainTypeSymbol )
+        try
         {
-            const auto& casmDomainTypePath = IdentifierPath::fromIdentifier(
-                AST::make< Identifier >( node.domainType()->sourceLocation(), "CASM" ) );
-            casmDomainTypePath->addIdentifier( node.identifier() );
-
-            domainTypeSymbolResult = m_symboltable.findSymbol( *casmDomainTypePath );
-            domainTypeSymbol = domainTypeSymbolResult.first;
-
-            if( domainTypeSymbol )
+            typeDefinition->setBasicBehavior( implementDefinition );
+        }
+        catch( const std::domain_error& e )
+        {
+            const auto& domainTypeName = node.domainType()->signature();
+            const auto& symbol =
+                typeDefinition->symboltable()->findNamespace( "*" )->findSymbol( domainTypeName );
+            assert( symbol and " inconsistent state " );
+            if( &node != symbol.get() )
             {
-                const std::string msg =
-                    node.description() + " symbol '" + domainTypeName + "' already used";
+                const auto& domainTypeName = node.domainType()->signature();
+                const auto msg = node.description() + " of basic behavior already defined for '" +
+                                 domainTypeName + "'";
                 m_log.error( { node.sourceLocation() }, msg, Code::IdentifierIsAlreadyUsed );
-                m_log.info( { domainTypeSymbol->sourceLocation() }, msg );
-                return;
+                m_log.info( { symbol->sourceLocation() }, msg );
             }
-
-            m_log.error(
-                { node.sourceLocation() },
-                "unknown " + node.description() + " symbol '" + domainTypeName + "' found",
-                Code::SymbolIsUnknown );
-            return;
-        }
-
-        m_behaviorDefinition = objectSymbol;
-    }
-
-    const auto& domainName = m_objectDefinition->domainType()->signaturePath();
-    const auto& domainNamespace = m_symboltable.findNamespace( *domainName );
-    assert( domainNamespace and " inconsistent state @ SymbolRegistrationPass " );
-
-    const auto& behaviorName = m_behaviorDefinition->domainType()->signature();
-    const auto& behaviorNamespace = domainNamespace->findNamespace( behaviorName );
-    if( not behaviorNamespace )
-    {
-        SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, m_symboltable );
-        node.accept( symbolRegistrationVisitor );
-    }
-
-    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
-
-    node.behaviorType()->accept( *this );
-    node.domainType()->accept( *this );
-    node.definitions()->accept( *this );
-
-    // resolve only symbols of built-in instances used inside the implement definition
-    for( const auto& templateInstance : *node.templateInstances() )
-    {
-        if( templateInstance->id() == Node::ID::BUILTIN_DEFINITION )
-        {
-            const auto& templateDefinition = templateInstance->ptr< BuiltinDefinition >();
-            templateDefinition->accept( *this );
-        }
-        else
-        {
-            assert( templateInstance->id() == Node::ID::IMPLEMENT_DEFINITION );
         }
     }
-
-    m_behaviorDefinition = temporaryBehaviorDefinition;
-    m_objectDefinition = temporaryObjectDefinition;
-
-    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
 }
 
 void SymbolResolveVisitor::visit( DomainDefinition& node )
 {
     const auto& objectSymbol = node.ptr< TypeDefinition >();
 
-    const auto temporaryObjectDefinition = m_objectDefinition;
-    m_objectDefinition = objectSymbol;
-    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
+    const auto temporaryObjectDefinition = m_objectTypeDefinition;
+    m_objectTypeDefinition = objectSymbol;
+    pushSymbols< VariableDefinition >( node.templateSymbols() );
 
     node.domainType()->accept( *this );
 
-    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
-    m_objectDefinition = temporaryObjectDefinition;
+    popSymbols< VariableDefinition >( node.templateSymbols() );
+    m_objectTypeDefinition = temporaryObjectDefinition;
 }
 
 void SymbolResolveVisitor::visit( UsingDefinition& node )
 {
-    const auto& symbolName = node.identifier()->name();
-    const auto& symbol = m_symboltable.findSymbol( symbolName );
-    assert( symbol and " inconsistent state @ SymbolRegistrationPass " );
-
-    const auto& usingSymbolName = node.aliasType()->signature();
-    const auto& usingSymbolPath = node.aliasType()->name();
-    auto usingSymbol = tryResolveSymbol( *usingSymbolPath );
-    if( not usingSymbol )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown symbol '" + usingSymbolName + "' found",
-            Code::SymbolIsUnknown );
-        return;
-    }
+    const auto& symbolName = node.aliasType()->signature();
+    const auto& symbolPath = node.aliasType()->name();
 
     node.aliasType()->accept( *this );
 
-    auto aliasSymbol = resolveIfAlias( usingSymbol );
-    m_log.info( { node.sourceLocation() }, aliasSymbol->typeDescription() );
-
-    if( symbol->id() == Node::ID::DOMAIN_DEFINITION and symbolName == TypeInfo::TYPE_NAME_AGENT )
+    const auto& symbol = resolveSymbol( *symbolPath );
+    if( not symbol )
     {
-        const auto& agentDomainDefinition = symbol->ptr< DomainDefinition >();
-        agentDomainDefinition->setDomainType( node.aliasType() );
-        agentDomainDefinition->accept( *this );
-
-        const auto& initSymbol = m_symboltable.findSymbol( "init" );
-        if( initSymbol )
-        {
-            assert( initSymbol->id() == Node::ID::INIT_DEFINITION );
-            const auto temporaryAgentDomainDefinition = m_agentDomainDefinition;
-            m_agentDomainDefinition = agentDomainDefinition;
-
-            initSymbol->accept( *this );
-
-            m_agentDomainDefinition = temporaryAgentDomainDefinition;
-        }
-    }
-    else
-    {
-        const auto& aliasNamespace =
-            m_symboltable.findNamespace( aliasSymbol->identifier()->name() );
-        m_symboltable.registerNamespace( symbolName, aliasNamespace );
+        return;
     }
 }
 
 void SymbolResolveVisitor::visit( BuiltinDefinition& node )
 {
-    const auto& name = node.domainType()->name()->path();
-    auto symbol = m_symboltable.findSymbol( name );
+    const auto& name = node.identifier()->name();
+    const auto& symbol = m_symboltable.findSymbol( name );
     assert( symbol and " inconsistent state, checked during symbol registration " );
 
-    pushSymbols< VariableDefinition >( node.templateNode()->symbols() );
+    pushSymbols< VariableDefinition >( node.templateSymbols() );
 
-    node.relationType().argumentTypes()->accept( *this );
-    node.relationType().returnType()->accept( *this );
+    node.argumentTypes()->accept( *this );
+    node.returnType()->accept( *this );
 
-    popSymbols< VariableDefinition >( node.templateNode()->symbols() );
+    popSymbols< VariableDefinition >( node.templateSymbols() );
 
     if( node.hasTargetId() )
     {
@@ -953,13 +640,9 @@ void SymbolResolveVisitor::visit( ReferenceLiteral& node )
 
     const auto& symbolPath = node.identifier();
     const auto& symbolName = symbolPath->path();
-    const auto& symbol = tryResolveSymbol( *symbolPath );
+    const auto& symbol = resolveSymbol( *symbolPath );
     if( not symbol )
     {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown " + node.description() + " symbol '" + symbolName + "' found",
-            Code::SymbolIsUnknown );
         return;
     }
 
@@ -999,7 +682,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     const auto& sourceLocation = node.sourceLocation();
     const auto& symbolPath = node.identifier();
     const auto& symbolName = symbolPath->path();
-
     const auto validateArgumentsCount = [&]( const std::string& description,
                                              std::size_t expectedNumberOfArguments ) {
         if( node.arguments()->size() != expectedNumberOfArguments )
@@ -1012,50 +694,41 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         }
     };
 
+    std::size_t expectedNumberOfArguments = 0;
     const auto scopeSymbolIt = m_scopeSymbols.find( symbolName );
     if( scopeSymbolIt != m_scopeSymbols.cend() )
     {
-        if( symbolName == "this" )
-        {
-            node.setTargetType( DirectCallExpression::TargetType::THIS );
-        }
-        else
+        const auto& scopeSymbol = scopeSymbolIt->second;
+        if( scopeSymbol->id() == Node::ID::VARIABLE_DEFINITION )
         {
             node.setTargetType( DirectCallExpression::TargetType::VARIABLE );
         }
-        node.setTargetDefinition( scopeSymbolIt->second );
-        validateArgumentsCount( "variable", 0 );
-        return;
-    }
-
-    auto symbol = tryResolveSymbol( *symbolPath );
-    if( not symbol )
-    {
-        const auto& casmSymbolPath =
-            IdentifierPath::fromIdentifier( AST::make< Identifier >( sourceLocation, "CASM" ) );
-        for( const auto& symbolPathIdentifier : *symbolPath->identifiers() )
+        else if( scopeSymbol->id() == Node::ID::FUNCTION_DEFINITION )
         {
-            casmSymbolPath->addIdentifier( symbolPathIdentifier );
+            node.setTargetType( DirectCallExpression::TargetType::FUNCTION );
+            const auto& function = std::static_pointer_cast< FunctionDefinition >( scopeSymbol );
+            expectedNumberOfArguments = function->argumentTypes()->size();
         }
-
-        // relax if symbol is a builtin definition inside the CASM namespace
-        const auto& symbolResult = m_symboltable.findSymbol( *casmSymbolPath );
-        symbol = symbolResult.first;
-        if( not symbol or symbol->id() != Node::ID::BUILTIN_DEFINITION )
+        else
         {
             m_log.error(
                 { sourceLocation },
-                "unknown symbol " + node.description() + " '" + symbolPath->path() + "' found",
-                Code::SymbolIsUnknown );
+                "invalid scope symbol " + node.description() + " '" + symbolPath->path() +
+                    "' found",
+                Code::SymbolIsInvalid );
             return;
         }
+
+        node.setTargetDefinition( scopeSymbol );
+        validateArgumentsCount( scopeSymbol->description(), expectedNumberOfArguments );
+        return;
     }
 
-    assert( symbol and " inconsistent state @ SymbolRegistrationPass " );
-
-    symbol = resolveIfAlias( symbol );
-
-    std::size_t expectedNumberOfArguments = 0;
+    auto symbol = resolveSymbol( *symbolPath );
+    if( not symbol )
+    {
+        return;
+    }
 
     switch( symbol->id() )
     {
@@ -1098,14 +771,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         case Node::ID::BUILTIN_DEFINITION:
         {
             node.setTargetType( DirectCallExpression::TargetType::BUILTIN );
-            const auto& builtinDefinition = symbol->ptr< BuiltinDefinition >();
-            expectedNumberOfArguments = builtinDefinition->relationType().argumentTypes()->size();
-
-            symbol = resolveBuiltinCall( node, builtinDefinition );
-            if( not symbol )
-            {
-                return;
-            }
+            const auto& builtin = symbol->ptr< BuiltinDefinition >();
+            expectedNumberOfArguments = builtin->argumentTypes()->size();
             break;
         }
         default:
@@ -1119,11 +786,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
     node.setTargetDefinition( symbol );
     validateArgumentsCount( symbol->description(), expectedNumberOfArguments );
-}
-
-void SymbolResolveVisitor::visit( LiteralCallExpression& node )
-{
-    RecursiveVisitor::visit( node );
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )
@@ -1203,9 +865,7 @@ void SymbolResolveVisitor::visit( BasicType& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& domainInstanceTypeName = node.signature();
-
-    const auto scopeSymbolIt = m_scopeSymbols.find( domainInstanceTypeName );
+    const auto scopeSymbolIt = m_scopeSymbols.find( node.signature() );
     if( scopeSymbolIt != m_scopeSymbols.cend() )
     {
         const auto& scopeSymbol = scopeSymbolIt->second;
@@ -1215,59 +875,88 @@ void SymbolResolveVisitor::visit( BasicType& node )
         return;
     }
 
-    resolveTypeInstance( node );
+    resolveTypeDefinition( node );
 }
 
 void SymbolResolveVisitor::visit( TupleType& node )
 {
     RecursiveVisitor::visit( node );
-
-    resolveTypeInstance( node );
+    resolveTypeDefinition( node );
 }
 
 void SymbolResolveVisitor::visit( RecordType& node )
 {
     RecursiveVisitor::visit( node );
-
-    resolveTypeInstance( node );
+    resolveTypeDefinition( node );
 }
 
 void SymbolResolveVisitor::visit( FixedSizedType& node )
 {
     RecursiveVisitor::visit( node );
-
-    resolveTypeInstance( node );
+    resolveTypeDefinition( node );
 }
 
 void SymbolResolveVisitor::visit( RelationType& node )
 {
     RecursiveVisitor::visit( node );
 
-    resolveTypeInstance( node );
+    if( node.mapping() )
+    {
+        return;
+    }
+
+    resolveTypeDefinition( node );
 }
 
 void SymbolResolveVisitor::visit( TemplateType& node )
 {
-    resolveTypeInstance( node );
-
-    if( not node.typeDefinition() )
+    if( node.varadic() )
     {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown " + node.description() + " symbol '" + node.signature() + "' found",
-            Code::SymbolIsUnknown );
+        const auto scopeSymbolIt = m_scopeSymbols.find( node.signature() );
+        if( scopeSymbolIt != m_scopeSymbols.cend() )
+        {
+            const auto& scopeSymbol = scopeSymbolIt->second;
+            assert( scopeSymbol->id() == Node::ID::VARIABLE_DEFINITION );
+            const auto& variableDefinition = scopeSymbol->ptr< VariableDefinition >();
+            node.setTypeDefinition( variableDefinition->objectDefinition() );
+            return;
+        }
     }
+
+    resolveTypeDefinition( node );
+
+    const auto& typeDefinition = node.typeDefinition();
+    const auto templating = typeDefinition and typeDefinition->domainType().get() != &node;
+    if( templating )
+    {
+        pushSymbols< VariableDefinition >( typeDefinition->templateSymbols() );
+    }
+
+    RecursiveVisitor::visit( node );
+
+    if( templating )
+    {
+        popSymbols< VariableDefinition >( typeDefinition->templateSymbols() );
+    }
+}
+
+const Types::Ptr& SymbolResolveVisitor::templateTypes( void )
+{
+    return m_templateTypes;
 }
 
 void SymbolResolveVisitor::pushSymbol( const Definition::Ptr& symbol )
 {
-    symbol->accept( *this );
+    if( symbol->id() != Node::ID::FUNCTION_DEFINITION )
+    {
+        symbol->accept( *this );
+    }
 
     const auto& name = symbol->identifier()->name();
     static const auto THIS( "this" );
     if( name == THIS )
     {
-        if( not m_objectDefinition )
+        if( not m_objectTypeDefinition )
         {
             m_log.error(
                 { symbol->sourceLocation() },
@@ -1277,7 +966,7 @@ void SymbolResolveVisitor::pushSymbol( const Definition::Ptr& symbol )
 
         assert( symbol->id() == Node::ID::VARIABLE_DEFINITION );
         const auto& variableDefinition = symbol->ptr< VariableDefinition >();
-        variableDefinition->setObjectDefinition( m_objectDefinition );
+        variableDefinition->setObjectDefinition( m_objectTypeDefinition );
     }
 
     const auto result = m_scopeSymbols.emplace( name, symbol );
@@ -1317,7 +1006,48 @@ void SymbolResolveVisitor::popVariableBindings( const VariableBindings::Ptr& var
     }
 }
 
-Definition::Ptr SymbolResolveVisitor::resolveIfAlias( const Definition::Ptr& definition ) const
+Definition::Ptr SymbolResolveVisitor::resolveSymbol( const IdentifierPath& node, const u1 silent )
+{
+    const auto& symbolName = node.path();
+    const auto scopeSymbolIt = m_scopeSymbols.find( symbolName );
+    if( scopeSymbolIt != m_scopeSymbols.cend() )
+    {
+        return scopeSymbolIt->second;
+    }
+
+    const auto& symbolResult = m_symboltable.findSymbol( node );
+    const auto& symbol = symbolResult.first;
+    const auto accessible = symbolResult.second;
+    if( not symbol )
+    {
+        if( not silent )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "unknown " + node.description() + " symbol '" + symbolName + "' found",
+                Code::SymbolIsUnknown );
+        }
+        return nullptr;
+    }
+
+    if( not accessible )
+    {
+        if( not silent )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "'" + symbolName + "' is not accessible",
+                Code::SymbolIsInaccessible );
+            m_log.warning(
+                { symbol->sourceLocation() }, "'" + symbolName + "' has not been exported" );
+        }
+        return nullptr;
+    }
+
+    return resolveAlias( symbol );
+}
+
+Definition::Ptr SymbolResolveVisitor::resolveAlias( const Definition::Ptr& definition )
 {
     if( definition->id() != Node::ID::USING_DEFINITION )
     {
@@ -1325,464 +1055,52 @@ Definition::Ptr SymbolResolveVisitor::resolveIfAlias( const Definition::Ptr& def
     }
 
     const auto& usingDefinition = static_cast< const UsingDefinition& >( *definition );
-    const auto& symbol = tryResolveSymbol( *usingDefinition.aliasType()->signaturePath() );
-
-    if( symbol )
-    {
-        return resolveIfAlias( symbol );  // resolve again, the symbol may be another alias
-    }
-    else
-    {
-        return definition;
-    }
+    usingDefinition.aliasType()->accept( *this );
+    return resolveAlias( usingDefinition.aliasType()->typeDefinition() );
 }
 
-Definition::Ptr SymbolResolveVisitor::tryResolveSymbol( const IdentifierPath& symbolPath ) const
+void SymbolResolveVisitor::resolveTypeDefinition( AST::Type& node )
 {
-    const auto& symbolName = symbolPath.path();
+    m_log.info(
+        { node.sourceLocation() },
+        "resolving: " + node.signature() +
+            ( node.typeDefinition() ? "\n" + node.typeDefinition()->symboltable()->dump() : "" ) );
 
-    const auto scopeSymbolIt = m_scopeSymbols.find( symbolName );
-    if( scopeSymbolIt != m_scopeSymbols.cend() )
-    {
-        return scopeSymbolIt->second;
-    }
-
-    const auto& symbolResult = m_symboltable.findSymbol( symbolPath );
-    const auto& symbol = symbolResult.first;
-    const auto accessible = symbolResult.second;
-
-    if( symbol and not accessible )
-    {
-        m_log.error(
-            { symbolPath.sourceLocation() },
-            "'" + symbolName + "' is not accessible",
-            Code::SymbolIsInaccessible );
-        m_log.warning( { symbol->sourceLocation() }, "'" + symbolName + "' has not been exported" );
-    }
-
-    return symbol;
-}
-
-Definition::Ptr SymbolResolveVisitor::resolveSymbol( const Definition& node ) const
-{
-    Namespace* symboltable = &m_symboltable;
-
-    if( m_objectDefinition )
-    {
-        const auto& domainName = m_objectDefinition->domainType()->signaturePath();
-        const auto& domainNamespace = symboltable->findNamespace( *domainName );
-        if( not domainNamespace )
-        {
-            return nullptr;
-        }
-        assert( domainNamespace and " inconsistent state @ SymbolRegistrationPass " );
-        symboltable = domainNamespace.get();
-    }
-
-    if( m_behaviorDefinition )
-    {
-        const auto& behaviorName = m_behaviorDefinition->domainType()->signaturePath();
-        const auto& behaviorNamespace = symboltable->findNamespace( *behaviorName );
-        if( not behaviorNamespace )
-        {
-            return nullptr;
-        }
-
-        assert( behaviorNamespace and " inconsistent state " );
-        symboltable = behaviorNamespace.get();
-    }
-
-    const auto& name = node.identifier()->name();
-    const auto& symbol = symboltable->findSymbol( name );
-    if( not symbol )
-    {
-        return nullptr;
-    }
-
-    return symbol;
-}
-
-void SymbolResolveVisitor::resolveBehaviorInstance( AST::Type& node )
-{
     if( node.typeDefinition() )
     {
         return;
     }
 
-    const auto& templateTypeNode = static_cast< const TemplateType& >( node );
-
-    // Domain(Behavior)::Type(Behavior)
-    const auto& domainTypeName = node.signature();
-    const auto& domainTypePath = node.signaturePath();
-    const auto& domainTypeSymbolResult = m_symboltable.findSymbol( *domainTypePath );
-    const auto& domainTypeSymbol = domainTypeSymbolResult.first;
-    if( domainTypeSymbol )
-    {
-        assert( domainTypeSymbol->id() == Node::ID::BEHAVIOR_DEFINITION );
-        node.setTypeDefinition( domainTypeSymbol->ptr< TypeDefinition >() );
-        return;
-    }
-
-    // Domain(Behavior)::
-    auto domainPath = node.name();
-    auto domainNamespace = m_symboltable.findNamespace( *domainPath );
-    if( not domainNamespace )
-    {
-        domainPath = IdentifierPath::fromIdentifier(
-            AST::make< Identifier >( node.sourceLocation(), "CASM" ) );
-        for( const auto& domainPathIdentifier : *node.name()->identifiers() )
-        {
-            domainPath->addIdentifier( domainPathIdentifier );
-        }
-        domainNamespace = m_symboltable.findNamespace( *domainPath );
-        assert( domainNamespace and " inconsistent state @ SymbolRegistrationPass " );
-    }
-
-    assert( m_objectDefinition and m_objectDefinition->id() == Node::ID::IMPLEMENT_DEFINITION );
-    const auto& implementDefinition = m_objectDefinition->ptr< ImplementDefinition >();
-
-    // Symbol(Behavior)
-    const auto& behaviorSymbolResult = m_symboltable.findSymbol( *domainPath );
-    const auto& behaviorSymbol = behaviorSymbolResult.first;
-    assert( behaviorSymbol and " inconsistent state @ SymbolRegistrationPass " );
-    assert( behaviorSymbol->id() == Node::ID::BEHAVIOR_DEFINITION and " inconsistent state " );
-    const auto& behaviorDefinition = behaviorSymbol->ptr< BehaviorDefinition >();
-    // assert( behaviorDefinition->templateNode()->symbols()->size() > 0 and " inconsistent state "
-    // );
-    if( behaviorDefinition->templateNode()->symbols()->size() == 0 )
-    {
-        return;
-    }
-
-    if( templateTypeNode.subTypes()->size() !=
-        behaviorDefinition->templateNode()->symbols()->size() )
-    {
-        m_log.error(
-            { templateTypeNode.sourceLocation(), behaviorDefinition->sourceLocation() },
-            templateTypeNode.description() + " has parameter size " +
-                std::to_string( templateTypeNode.subTypes()->size() ) + ", but template " +
-                behaviorDefinition->description() + " definition needs parameter size " +
-                std::to_string( behaviorDefinition->templateNode()->symbols()->size() ),
-            Code::Unspecified );
-        // assert( false );
-        return;
-    }
-
-    const auto& duplicateBehaviorDefinition = behaviorDefinition->duplicate< BehaviorDefinition >();
-    duplicateBehaviorDefinition->templateInstances()->clear();
-
-    for( std::size_t position = 0; position < templateTypeNode.subTypes()->size(); position++ )
-    {
-        const auto& from = ( *behaviorDefinition->templateNode()->symbols() )[ position ];
-        const auto& to = ( *templateTypeNode.subTypes() )[ position ];
-
-        // TODO: FIXME: @ppaulweber: check if template parameter variable is concrete type
-
-        const auto& fromBasicType = AST::make< BasicType >(
-            from->sourceLocation(), IdentifierPath::fromIdentifier( from->identifier() ) );
-
-        ReplaceTypeVisitor replaceTypeVisitor( m_log, fromBasicType, to );
-        duplicateBehaviorDefinition->accept( replaceTypeVisitor );
-    }
-
-    // clear the replaced template symbols
-    duplicateBehaviorDefinition->templateNode()->symbols()->clear();
-
-    // Domain::InstanceSymbol + Domain::InstanceType::
-    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, m_symboltable );
-    duplicateBehaviorDefinition->accept( symbolRegistrationVisitor );
-    duplicateBehaviorDefinition->accept( *this );
-
-    behaviorDefinition->addTemplateInstance( duplicateBehaviorDefinition );
-
-    const auto& duplicateImplementDefinition = AST::make< ImplementDefinition >(
-        implementDefinition->sourceLocation(),
-        implementDefinition->templateNode(),
-        implementDefinition->implementToken(),
-        duplicateBehaviorDefinition->domainType(),
-        implementDefinition->forToken(),
-        implementDefinition->domainType(),
-        implementDefinition->assignmentToken(),
-        implementDefinition->leftBraceToken(),
-        implementDefinition->definitions(),
-        implementDefinition->rightBraceToken() );
-
-    duplicateImplementDefinition->accept( symbolRegistrationVisitor );
-    duplicateImplementDefinition->accept( *this );
-
-    implementDefinition->addTemplateInstance( duplicateImplementDefinition );
-}
-
-void SymbolResolveVisitor::resolveTypeInstance( AST::Type& node )
-{
-    if( node.typeDefinition() )
-    {
-        return;
-    }
-
-    const auto& domainInstanceTypeName = node.signature();
-    const auto& domainInstanceTypePath = node.signaturePath();
-    const auto& domainInstanceTypeSymbolResult =
-        m_symboltable.findSymbol( *domainInstanceTypePath );
-    const auto& domainInstanceTypeSymbol = domainInstanceTypeSymbolResult.first;
-
-    if( domainInstanceTypeSymbol )
+    const auto& typeSymbol = resolveSymbol( *node.signaturePath(), true );
+    if( typeSymbol )
     {
         assert(
-            domainInstanceTypeSymbol->id() == Node::ID::DOMAIN_DEFINITION or
-            domainInstanceTypeSymbol->id() == Node::ID::ENUMERATION_DEFINITION or
-            domainInstanceTypeSymbol->id() == Node::ID::STRUCTURE_DEFINITION or
-            domainInstanceTypeSymbol->id() == Node::ID::BEHAVIOR_DEFINITION or
-            domainInstanceTypeSymbol->id() == Node::ID::USING_DEFINITION );
+            typeSymbol->id() == Node::ID::DOMAIN_DEFINITION or
+            typeSymbol->id() == Node::ID::ENUMERATION_DEFINITION or
+            typeSymbol->id() == Node::ID::BEHAVIOR_DEFINITION or
+            typeSymbol->id() == Node::ID::IMPLEMENT_DEFINITION or
+            typeSymbol->id() == Node::ID::STRUCTURE_DEFINITION );
 
-        if( domainInstanceTypeSymbol->id() == Node::ID::USING_DEFINITION )
-        {
-            const auto& usingDomainSymbol = domainInstanceTypeSymbol->ptr< UsingDefinition >();
-            usingDomainSymbol->aliasType()->accept( *this );
-            node.setTypeDefinition( usingDomainSymbol->aliasType()->typeDefinition() );
-            return;
-        }
-
-        const auto& typeDefinition = domainInstanceTypeSymbol->ptr< TypeDefinition >();
+        const auto& typeDefinition = typeSymbol->ptr< TypeDefinition >();
         node.setTypeDefinition( typeDefinition );
         return;
     }
 
-    const auto& domainName = node.name();
-    const auto& domainSymbolResult = m_symboltable.findSymbol( *domainName );
-    const auto& domainSymbol = domainSymbolResult.first;
+    const auto& domainSymbol = resolveSymbol( *node.name() );
     if( not domainSymbol )
     {
-        // unknown symbol found
         return;
     }
 
-    if( domainSymbol->id() == Node::ID::USING_DEFINITION )
-    {
-        const auto& usingDomainSymbol = domainSymbol->ptr< UsingDefinition >();
-        usingDomainSymbol->aliasType()->accept( *this );
-        node.setTypeDefinition( usingDomainSymbol->aliasType()->typeDefinition() );
-        return;
-    }
+    assert(
+        domainSymbol->id() == Node::ID::DOMAIN_DEFINITION or
+        domainSymbol->id() == Node::ID::ENUMERATION_DEFINITION or
+        domainSymbol->id() == Node::ID::BEHAVIOR_DEFINITION or
+        domainSymbol->id() == Node::ID::STRUCTURE_DEFINITION );
 
-    assert( domainSymbol and " inconsistent state, checked during symbol registration " );
-    const auto& domainDefinition = domainSymbol->ptr< DomainDefinition >();
-
-    u1 isProperty = false;
-    if( domainName->path() == "Integer" and node.id() == Node::ID::FIXED_SIZED_TYPE )
-    {
-        isProperty = true;
-    }
-    else
-    {
-        if( not domainDefinition->isTemplate() )
-        {
-            return;
-        }
-    }
-
-    ReplaceTypeVisitor replaceTypeVisitor(
-        m_log, domainDefinition->domainType(), node.ptr< AST::Type >() );
-
-    const auto& duplicateDomainDefinition = domainDefinition->duplicate< DomainDefinition >();
-    duplicateDomainDefinition->accept( replaceTypeVisitor );
-    duplicateDomainDefinition->templateNode()->symbols()->clear();
-    node.setTypeDefinition( duplicateDomainDefinition );
-
-    // Domain::InstanceSymbol + Domain::InstanceType::
-    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, m_symboltable );
-    duplicateDomainDefinition->accept( symbolRegistrationVisitor );
-    duplicateDomainDefinition->accept( *this );
-
-    // add instance domain to template domain
-    domainDefinition->addTemplateInstance( duplicateDomainDefinition );
-
-    if( isProperty )
-    {
-        return;
-    }
-
-    // Domain::Type::
-    const auto& domainTypeName = domainDefinition->domainType()->signature();
-    const auto& domainTypePath = domainDefinition->domainType()->signaturePath();
-    const auto& domainTypeNamespace = m_symboltable.findNamespace( *domainTypePath );
-    assert( domainTypeNamespace and " inconsistent state @ SymbolRegistrationPass " );
-
-    // Domain::InstanceType::
-    const auto& domainInstanceTypeNamespace =
-        m_symboltable.findNamespace( *domainInstanceTypePath );
-    assert( domainInstanceTypeNamespace and " inconsistent state " );
-
-    for( const auto& inner : domainTypeNamespace->symbols() )
-    {
-        const auto& innerName = inner.first;
-        const auto& innerSymbol = inner.second;
-        assert( innerSymbol and " inconsistent state @ domainTypeNamespace " );
-
-        if( innerSymbol->id() != Node::ID::BEHAVIOR_DEFINITION )
-        {
-            continue;
-        }
-
-        const auto& innerNamespace = domainTypeNamespace->findNamespace( innerName );
-        assert( innerNamespace and " inconsistent state @ domainTypeNamespace " );
-
-        const auto& behaviorDefinition = innerSymbol->ptr< BehaviorDefinition >();
-        const auto& duplicateBehaviorDefinition =
-            behaviorDefinition->duplicate< BehaviorDefinition >();
-        duplicateBehaviorDefinition->templateInstances()->clear();
-        duplicateBehaviorDefinition->accept( replaceTypeVisitor );
-        duplicateBehaviorDefinition->templateNode()->symbols()->clear();
-
-        // adding instance to behavior definition
-        behaviorDefinition->addTemplateInstance( duplicateBehaviorDefinition );
-
-        const auto& implementNamespace =
-            domainTypeNamespace->findNamespace( behaviorDefinition->domainType()->signature() );
-        assert( implementNamespace and " inconsistent state @ SymbolRegistrationPass " );
-
-        const auto& implementSymbol =
-            implementNamespace->findSymbol( behaviorDefinition->domainType()->signature() );
-        assert( implementSymbol and " inconsistent state @ domainTypeNamespace " );
-        assert(
-            implementSymbol->id() == Node::ID::IMPLEMENT_DEFINITION and " inconsistent state " );
-
-        const auto& implementDefinition = implementSymbol->ptr< ImplementDefinition >();
-
-        const auto& duplicateImplementDefinition = AST::make< ImplementDefinition >(
-            implementDefinition->sourceLocation(),
-            std::make_shared< Template >(
-                Token::unresolved(),
-                Token::unresolved(),
-                std::make_shared< VariableDefinitions >(),
-                Token::unresolved() ),
-            implementDefinition->implementToken(),
-            duplicateBehaviorDefinition->domainType(),
-            implementDefinition->forToken(),
-            duplicateDomainDefinition->domainType(),
-            implementDefinition->assignmentToken(),
-            implementDefinition->leftBraceToken(),
-            implementDefinition->definitions()->duplicate< Definitions >(),
-            implementDefinition->rightBraceToken() );
-
-        duplicateImplementDefinition->accept( replaceTypeVisitor );
-        duplicateImplementDefinition->accept( symbolRegistrationVisitor );
-
-        const auto temporaryObjectDefinition = m_objectDefinition;
-        const auto temporaryBehaviorDefinition = m_behaviorDefinition;
-
-        m_objectDefinition = duplicateImplementDefinition;
-        m_behaviorDefinition = duplicateBehaviorDefinition;
-
-        duplicateImplementDefinition->domainType()->accept( *this );
-        duplicateImplementDefinition->behaviorType()->accept( *this );
-        duplicateImplementDefinition->definitions()->accept( *this );
-
-        m_objectDefinition = temporaryObjectDefinition;
-        m_behaviorDefinition = temporaryBehaviorDefinition;
-
-        // adding instance to implement definition
-        implementDefinition->addTemplateInstance( duplicateImplementDefinition );
-    }
-}
-
-Definition::Ptr SymbolResolveVisitor::resolveBuiltinCall(
-    TargetCallExpression& node, const BuiltinDefinition::Ptr& builtinDefinition )
-{
-    if( builtinDefinition->templateNode()->symbols()->size() > 0 )
-    {
-        const auto& domainInstanceTypeName = builtinDefinition->relationType().signature();
-        const auto& domainInstanceTypePath = builtinDefinition->relationType().signaturePath();
-        const auto& domainInstanceTypeSymbolResult =
-            m_symboltable.findSymbol( *domainInstanceTypePath );
-        const auto& domainInstanceTypeSymbol = domainInstanceTypeSymbolResult.first;
-        const auto& duplicateBuiltinDefinition =
-            builtinDefinition->duplicate< BuiltinDefinition >();
-        duplicateBuiltinDefinition->templateInstances()->clear();
-
-        if( node.templateNode()->symbols()->size() !=
-            builtinDefinition->templateNode()->symbols()->size() )
-        {
-            if( node.templateNode()->symbols()->size() == 0 )
-            {
-                m_log.error(
-                    { node.sourceLocation(),
-                      builtinDefinition->templateNode()->symbols()->sourceLocation() },
-                    "builtin call is missing 'template< ... >' parameters, because "
-                    "template builtin definition needs parameter size of " +
-                        std::to_string( builtinDefinition->templateNode()->symbols()->size() ),
-                    Code::Unspecified );
-            }
-            else
-            {
-                m_log.error(
-                    { node.templateNode()->symbols()->sourceLocation(),
-                      builtinDefinition->templateNode()->symbols()->sourceLocation() },
-                    "template builtin call has parameter size " +
-                        std::to_string( node.templateNode()->symbols()->size() ) +
-                        ", but template builtin definition needs parameter size " +
-                        std::to_string( builtinDefinition->templateNode()->symbols()->size() ),
-                    Code::Unspecified );
-            }
-            return nullptr;
-        }
-
-        // Domain::InstanceSymbol + Domain::InstanceType::
-        SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, m_symboltable );
-
-        u1 valid = true;
-        for( std::size_t position = 0; position < node.templateNode()->symbols()->size();
-             position++ )
-        {
-            const auto& from = ( *builtinDefinition->templateNode()->symbols() )[ position ];
-            const auto& to = ( *node.templateNode()->symbols() )[ position ];
-
-            if( from->identifier()->name() != to->identifier()->name() )
-            {
-                m_log.error(
-                    { to->identifier()->sourceLocation(), from->identifier()->sourceLocation() },
-                    "template parameter variable mismatch at position " +
-                        std::to_string( position + 1 ) );
-                valid = false;
-                continue;
-            }
-
-            const auto& fromBasicType = AST::make< BasicType >(
-                from->sourceLocation(), IdentifierPath::fromIdentifier( from->identifier() ) );
-
-            ReplaceTypeVisitor replaceTypeVisitor( m_log, fromBasicType, to->variableType() );
-            duplicateBuiltinDefinition->accept( replaceTypeVisitor );
-        }
-
-        // clear the replaced template symbols
-        duplicateBuiltinDefinition->templateNode()->symbols()->clear();
-
-        if( not valid )
-        {
-            return nullptr;
-        }
-
-        assert( m_objectDefinition and m_objectDefinition->id() == Node::ID::IMPLEMENT_DEFINITION );
-        const auto& implementDefinition = m_objectDefinition->ptr< ImplementDefinition >();
-
-        const auto& duplicateBuiltinSymbolPath =
-            duplicateBuiltinDefinition->domainType()->signaturePath();
-        const auto& duplicateBuiltinSymbolResult =
-            m_symboltable.findSymbol( *duplicateBuiltinSymbolPath );
-        const auto& duplicateBuiltinSymbol = duplicateBuiltinSymbolResult.first;
-
-        if( not duplicateBuiltinSymbol )
-        {
-            duplicateBuiltinDefinition->accept( symbolRegistrationVisitor );
-        }
-        duplicateBuiltinDefinition->accept( *this );
-
-        // symbol resolving of builtin is done during ImplementDefinition symbol resolving
-        implementDefinition->addTemplateInstance( duplicateBuiltinDefinition );
-        return duplicateBuiltinDefinition->ptr< Definition >();
-    }
-
-    return builtinDefinition;
+    const auto& typeDefinition = domainSymbol->ptr< TypeDefinition >();
+    node.setTypeDefinition( typeDefinition );
+    return;
 }
 
 //
@@ -1792,38 +1110,40 @@ Definition::Ptr SymbolResolveVisitor::resolveBuiltinCall(
 
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
-    pu.scheduleAfter< LibraryLoaderPass >();
+    pu.require< SpecificationMergerPass >();
 }
 
 u1 SymbolResolverPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
+    const auto data = pr.output< SpecificationMergerPass >();
     const auto specification = data->specification();
+    auto& symboltable = *specification->symboltable();
 
-    NamespaceResolveVisitor namespaceResolveVisitor( log, *specification->symboltable() );
-    specification->definitions()->accept( namespaceResolveVisitor );
+    NamespaceResolveVisitor namespaceResolveVisitor( log, symboltable );
+    specification->ast()->accept( namespaceResolveVisitor );
 
     if( log.errors() > 0 )
     {
-        log.debug( "symbol table =\n" + specification->symboltable()->dump() );
+        log.debug( "symbol table =\n" + symboltable.dump() );
         log.debug( "found %lu error(s) during namespace resolving", log.errors() );
         return false;
     }
 
-    SymbolResolveVisitor visitor( log, *specification->symboltable() );
-    specification->definitions()->accept( visitor );
+    SymbolResolveVisitor visitor( log, symboltable );
+    specification->ast()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
     {
-        log.debug( "symbol table =\n" + specification->symboltable()->dump() );
+        log.debug( "symbol table =\n" + symboltable.dump() );
         log.debug( "found %lu error(s) during symbol resolving", errors );
         return false;
     }
+    log.info( "symbol table =\n" + symboltable.dump() );
 
+    pr.setOutput< SymbolResolverPass >( visitor.templateTypes() );
     return true;
 }
 
