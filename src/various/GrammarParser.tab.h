@@ -54,10 +54,9 @@
     }
 
     #include <libcasm-fe/Specification>
-    #include <libcasm-fe/ast/Definition>
-    #include <libcasm-fe/ast/Expression>
-    #include <libcasm-fe/ast/Rule>
-    #include <libcasm-fe/ast/Token>
+    #include <libcasm-fe/cst/Definition>
+    #include <libcasm-fe/cst/Declaration>
+    #include <libcasm-fe/cst/Literal>
     #include <libcasm-fe/Exception>
     #include <libcasm-fe/TypeInfo>
     #include <libcasm-fe/Logger>
@@ -65,11 +64,11 @@
     #include <libstdhl/SourceLocation>
 
     using namespace libcasm_fe;
-    using namespace AST;
+    using namespace CST;
 
     #define YY_NULLPTR nullptr
 
-#line 73 "GrammarParser.tab.h"
+#line 72 "GrammarParser.tab.h"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -204,7 +203,7 @@
 
 #line 51 "../../obj/src/GrammarParser.y"
 namespace libcasm_fe {
-#line 208 "GrammarParser.tab.h"
+#line 207 "GrammarParser.tab.h"
 
 
 
@@ -434,7 +433,6 @@ namespace libcasm_fe {
       // "this"
       // "domain"
       // "builtin"
-      // "template"
       // "function"
       // "defined"
       // "seq"
@@ -490,8 +488,6 @@ namespace libcasm_fe {
       // "%"
       // "^"
       // "'"
-      // ".."
-      // "."
       // "->"
       // "=>"
       // ":="
@@ -500,6 +496,9 @@ namespace libcasm_fe {
       // ">="
       // "{|"
       // "|}"
+      // "."
+      // ".."
+      // "..."
       char dummy1[sizeof (AST::Token::Ptr)];
 
       // Attribute
@@ -593,7 +592,7 @@ namespace libcasm_fe {
       char dummy29[sizeof (ExistentialQuantifierExpression::Ptr)];
 
       // Term
-      // SimpleOrClaspedTerm
+      // Expression
       // OperatorExpression
       char dummy30[sizeof (Expression::Ptr)];
 
@@ -641,119 +640,121 @@ namespace libcasm_fe {
       // InitDefinition
       char dummy43[sizeof (InitDefinition::Ptr)];
 
-      // Initializer
-      char dummy44[sizeof (Initializer::Ptr)];
-
-      // Initializers
-      char dummy45[sizeof (Initializers::Ptr)];
-
       // MaybeInitially
-      char dummy46[sizeof (Initially::Ptr)];
+      char dummy44[sizeof (Initially::Ptr)];
 
       // InvariantDefinition
-      char dummy47[sizeof (InvariantDefinition::Ptr)];
+      char dummy45[sizeof (InvariantDefinition::Ptr)];
 
       // IterateRule
-      char dummy48[sizeof (IterateRule::Ptr)];
+      char dummy46[sizeof (IterateRule::Ptr)];
 
       // LetExpression
-      char dummy49[sizeof (LetExpression::Ptr)];
+      char dummy47[sizeof (LetExpression::Ptr)];
 
       // LetRule
-      char dummy50[sizeof (LetRule::Ptr)];
+      char dummy48[sizeof (LetRule::Ptr)];
 
       // ListLiteral
-      char dummy51[sizeof (ListLiteral::Ptr)];
+      char dummy49[sizeof (ListLiteral::Ptr)];
 
       // Literal
-      char dummy52[sizeof (Literal::Ptr)];
+      char dummy50[sizeof (Literal::Ptr)];
 
       // LiteralCallExpression
-      char dummy53[sizeof (LiteralCallExpression::Ptr)];
+      char dummy51[sizeof (LiteralCallExpression::Ptr)];
 
       // LocalRule
-      char dummy54[sizeof (LocalRule::Ptr)];
+      char dummy52[sizeof (LocalRule::Ptr)];
+
+      // MappedExpression
+      char dummy53[sizeof (MappedExpression::Ptr)];
+
+      // MappedExpressions
+      char dummy54[sizeof (MappedExpressions::Ptr)];
+
+      // MappingType
+      char dummy55[sizeof (MappingType::Ptr)];
 
       // MethodCallExpression
-      char dummy55[sizeof (MethodCallExpression::Ptr)];
+      char dummy56[sizeof (MethodCallExpression::Ptr)];
 
       // Assignment
-      char dummy56[sizeof (NamedExpression::Ptr)];
+      char dummy57[sizeof (NamedExpression::Ptr)];
 
       // Assignments
-      char dummy57[sizeof (NamedExpressions::Ptr)];
+      char dummy58[sizeof (NamedExpressions::Ptr)];
 
       // RangeLiteral
-      char dummy58[sizeof (RangeLiteral::Ptr)];
+      char dummy59[sizeof (RangeLiteral::Ptr)];
 
       // RecordLiteral
-      char dummy59[sizeof (RecordLiteral::Ptr)];
+      char dummy60[sizeof (RecordLiteral::Ptr)];
 
       // RecordType
-      char dummy60[sizeof (RecordType::Ptr)];
+      char dummy61[sizeof (RecordType::Ptr)];
 
       // ReferenceLiteral
-      char dummy61[sizeof (ReferenceLiteral::Ptr)];
+      char dummy62[sizeof (ReferenceLiteral::Ptr)];
 
       // RelationType
-      char dummy62[sizeof (RelationType::Ptr)];
+      char dummy63[sizeof (RelationType::Ptr)];
 
       // Rule
-      char dummy63[sizeof (Rule::Ptr)];
+      char dummy64[sizeof (Rule::Ptr)];
 
       // RuleDefinition
-      char dummy64[sizeof (RuleDefinition::Ptr)];
+      char dummy65[sizeof (RuleDefinition::Ptr)];
 
       // Rules
-      char dummy65[sizeof (Rules::Ptr)];
+      char dummy66[sizeof (Rules::Ptr)];
 
       // SequenceRule
-      char dummy66[sizeof (SequenceRule::Ptr)];
+      char dummy67[sizeof (SequenceRule::Ptr)];
 
       // SkipRule
-      char dummy67[sizeof (SkipRule::Ptr)];
+      char dummy68[sizeof (SkipRule::Ptr)];
 
       // Specification
-      char dummy68[sizeof (Specification::Ptr)];
+      char dummy69[sizeof (Specification::Ptr)];
 
       // StructureDefinition
-      char dummy69[sizeof (StructureDefinition::Ptr)];
+      char dummy70[sizeof (StructureDefinition::Ptr)];
 
-      // Template
-      // MaybeTemplate
-      char dummy70[sizeof (Template::Ptr)];
+      // SymbolAttribute
+      char dummy71[sizeof (SymbolAttribute::Ptr)];
 
       // TemplateType
-      char dummy71[sizeof (TemplateType::Ptr)];
+      char dummy72[sizeof (TemplateType::Ptr)];
 
       // TupleLiteral
-      char dummy72[sizeof (TupleLiteral::Ptr)];
+      char dummy73[sizeof (TupleLiteral::Ptr)];
 
       // TupleType
-      char dummy73[sizeof (TupleType::Ptr)];
+      char dummy74[sizeof (TupleType::Ptr)];
 
       // TypeCastingExpression
-      char dummy74[sizeof (TypeCastingExpression::Ptr)];
+      char dummy75[sizeof (TypeCastingExpression::Ptr)];
 
       // Types
       // FunctionParameters
       // MaybeFunctionParameters
-      char dummy75[sizeof (Types::Ptr)];
+      char dummy76[sizeof (Types::Ptr)];
 
       // UndefinedLiteral
-      char dummy76[sizeof (UndefLiteral::Ptr)];
+      char dummy77[sizeof (UndefLiteral::Ptr)];
 
       // UniversalQuantifierExpression
-      char dummy77[sizeof (UniversalQuantifierExpression::Ptr)];
+      char dummy78[sizeof (UniversalQuantifierExpression::Ptr)];
 
       // UpdateRule
-      char dummy78[sizeof (UpdateRule::Ptr)];
+      char dummy79[sizeof (UpdateRule::Ptr)];
 
       // UsingDefinition
-      char dummy79[sizeof (UsingDefinition::Ptr)];
+      char dummy80[sizeof (UsingDefinition::Ptr)];
 
       // UsingPathDefinition
-      char dummy80[sizeof (UsingPathDefinition::Ptr)];
+      char dummy81[sizeof (UsingPathDefinition::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -767,33 +768,34 @@ namespace libcasm_fe {
       // DecimalLiteral
       // BinaryLiteral
       // StringLiteral
-      char dummy81[sizeof (ValueLiteral::Ptr)];
+      char dummy82[sizeof (ValueLiteral::Ptr)];
+
+      // VaradicType
+      char dummy83[sizeof (VaradicType::Ptr)];
 
       // VariableBinding
-      char dummy82[sizeof (VariableBinding::Ptr)];
+      char dummy84[sizeof (VariableBinding::Ptr)];
 
       // VariableBindings
-      char dummy83[sizeof (VariableBindings::Ptr)];
+      char dummy85[sizeof (VariableBindings::Ptr)];
 
       // Variable
       // TypedVariable
       // AttributedVariable
       // TypedAttributedVariable
-      // TemplateVariable
-      char dummy84[sizeof (VariableDefinition::Ptr)];
+      char dummy86[sizeof (VariableDefinition::Ptr)];
 
       // MethodParameters
       // Parameters
       // AttributedVariables
       // TypedVariables
-      // TemplateVariables
-      char dummy85[sizeof (VariableDefinitions::Ptr)];
+      char dummy87[sizeof (VariableDefinitions::Ptr)];
 
       // WhileRule
-      char dummy86[sizeof (WhileRule::Ptr)];
+      char dummy88[sizeof (WhileRule::Ptr)];
 
       // Type
-      char dummy87[sizeof (libcasm_fe::AST::Type::Ptr)];
+      char dummy89[sizeof (libcasm_fe::CST::Type::Ptr)];
     };
 
     /// The size of the largest semantic type.
@@ -861,72 +863,72 @@ namespace libcasm_fe {
     THIS = 271,                    // "this"
     DOMAIN = 272,                  // "domain"
     BUILTIN = 273,                 // "builtin"
-    TEMPLATE = 274,                // "template"
-    FUNCTION = 275,                // "function"
-    DEFINED = 276,                 // "defined"
-    SEQ = 277,                     // "seq"
-    ENDSEQ = 278,                  // "endseq"
-    PAR = 279,                     // "par"
-    ENDPAR = 280,                  // "endpar"
-    SKIP = 281,                    // "skip"
-    LET = 282,                     // "let"
-    LOCAL = 283,                   // "local"
-    IN = 284,                      // "in"
-    FORALL = 285,                  // "forall"
-    CHOOSE = 286,                  // "choose"
-    ITERATE = 287,                 // "iterate"
-    DO = 288,                      // "do"
-    IF = 289,                      // "if"
-    THEN = 290,                    // "then"
-    ELSE = 291,                    // "else"
-    CASE = 292,                    // "case"
-    OF = 293,                      // "of"
-    DEFAULT = 294,                 // "default"
-    HOLDS = 295,                   // "holds"
-    EXISTS = 296,                  // "exists"
-    WITH = 297,                    // "with"
-    AS = 298,                      // "as"
-    WHILE = 299,                   // "while"
-    UNDEF = 300,                   // "undef"
-    FALSE = 301,                   // "false"
-    TRUE = 302,                    // "true"
-    AND = 303,                     // "and"
-    OR = 304,                      // "or"
-    XOR = 305,                     // "xor"
-    IMPLIES = 306,                 // "implies"
-    NOT = 307,                     // "not"
-    PLUS = 308,                    // "+"
-    MINUS = 309,                   // "-"
-    EQUAL = 310,                   // "="
-    LPAREN = 311,                  // "("
-    RPAREN = 312,                  // ")"
-    LSQPAREN = 313,                // "["
-    RSQPAREN = 314,                // "]"
-    LCURPAREN = 315,               // "{"
-    RCURPAREN = 316,               // "}"
-    COLON = 317,                   // ":"
-    DOUBLECOLON = 318,             // "::"
-    UNDERLINE = 319,               // "_"
-    VERTICAL_BAR = 320,            // "|"
-    AT = 321,                      // "@"
-    COMMA = 322,                   // ","
-    LESSER = 323,                  // "<"
-    GREATER = 324,                 // ">"
-    ASTERIX = 325,                 // "*"
-    SLASH = 326,                   // "/"
-    PERCENT = 327,                 // "%"
-    CARET = 328,                   // "^"
-    MARK = 329,                    // "'"
-    DOTDOT = 330,                  // ".."
-    DOT = 331,                     // "."
-    MAPS = 332,                    // "->"
-    ARROW = 333,                   // "=>"
-    UPDATE = 334,                  // ":="
-    NEQUAL = 335,                  // "!="
-    LESSEQ = 336,                  // "<="
-    GREATEREQ = 337,               // ">="
-    SEQ_BRACKET = 338,             // "{|"
-    ENDSEQ_BRACKET = 339,          // "|}"
+    FUNCTION = 274,                // "function"
+    DEFINED = 275,                 // "defined"
+    SEQ = 276,                     // "seq"
+    ENDSEQ = 277,                  // "endseq"
+    PAR = 278,                     // "par"
+    ENDPAR = 279,                  // "endpar"
+    SKIP = 280,                    // "skip"
+    LET = 281,                     // "let"
+    LOCAL = 282,                   // "local"
+    IN = 283,                      // "in"
+    FORALL = 284,                  // "forall"
+    CHOOSE = 285,                  // "choose"
+    ITERATE = 286,                 // "iterate"
+    DO = 287,                      // "do"
+    IF = 288,                      // "if"
+    THEN = 289,                    // "then"
+    ELSE = 290,                    // "else"
+    CASE = 291,                    // "case"
+    OF = 292,                      // "of"
+    DEFAULT = 293,                 // "default"
+    HOLDS = 294,                   // "holds"
+    EXISTS = 295,                  // "exists"
+    WITH = 296,                    // "with"
+    AS = 297,                      // "as"
+    WHILE = 298,                   // "while"
+    UNDEF = 299,                   // "undef"
+    FALSE = 300,                   // "false"
+    TRUE = 301,                    // "true"
+    AND = 302,                     // "and"
+    OR = 303,                      // "or"
+    XOR = 304,                     // "xor"
+    IMPLIES = 305,                 // "implies"
+    NOT = 306,                     // "not"
+    PLUS = 307,                    // "+"
+    MINUS = 308,                   // "-"
+    EQUAL = 309,                   // "="
+    LPAREN = 310,                  // "("
+    RPAREN = 311,                  // ")"
+    LSQPAREN = 312,                // "["
+    RSQPAREN = 313,                // "]"
+    LCURPAREN = 314,               // "{"
+    RCURPAREN = 315,               // "}"
+    COLON = 316,                   // ":"
+    DOUBLECOLON = 317,             // "::"
+    UNDERLINE = 318,               // "_"
+    VERTICAL_BAR = 319,            // "|"
+    AT = 320,                      // "@"
+    COMMA = 321,                   // ","
+    LESSER = 322,                  // "<"
+    GREATER = 323,                 // ">"
+    ASTERIX = 324,                 // "*"
+    SLASH = 325,                   // "/"
+    PERCENT = 326,                 // "%"
+    CARET = 327,                   // "^"
+    MARK = 328,                    // "'"
+    MAPS = 329,                    // "->"
+    ARROW = 330,                   // "=>"
+    UPDATE = 331,                  // ":="
+    NEQUAL = 332,                  // "!="
+    LESSEQ = 333,                  // "<="
+    GREATEREQ = 334,               // ">="
+    SEQ_BRACKET = 335,             // "{|"
+    ENDSEQ_BRACKET = 336,          // "|}"
+    DOT = 337,                     // "."
+    DOTDOT = 338,                  // ".."
+    DOTDOTDOT = 339,               // "..."
     BINARY = 340,                  // "binary"
     HEXADECIMAL = 341,             // "hexadecimal"
     INTEGER = 342,                 // "integer"
@@ -976,72 +978,72 @@ namespace libcasm_fe {
         S_THIS = 16,                             // "this"
         S_DOMAIN = 17,                           // "domain"
         S_BUILTIN = 18,                          // "builtin"
-        S_TEMPLATE = 19,                         // "template"
-        S_FUNCTION = 20,                         // "function"
-        S_DEFINED = 21,                          // "defined"
-        S_SEQ = 22,                              // "seq"
-        S_ENDSEQ = 23,                           // "endseq"
-        S_PAR = 24,                              // "par"
-        S_ENDPAR = 25,                           // "endpar"
-        S_SKIP = 26,                             // "skip"
-        S_LET = 27,                              // "let"
-        S_LOCAL = 28,                            // "local"
-        S_IN = 29,                               // "in"
-        S_FORALL = 30,                           // "forall"
-        S_CHOOSE = 31,                           // "choose"
-        S_ITERATE = 32,                          // "iterate"
-        S_DO = 33,                               // "do"
-        S_IF = 34,                               // "if"
-        S_THEN = 35,                             // "then"
-        S_ELSE = 36,                             // "else"
-        S_CASE = 37,                             // "case"
-        S_OF = 38,                               // "of"
-        S_DEFAULT = 39,                          // "default"
-        S_HOLDS = 40,                            // "holds"
-        S_EXISTS = 41,                           // "exists"
-        S_WITH = 42,                             // "with"
-        S_AS = 43,                               // "as"
-        S_WHILE = 44,                            // "while"
-        S_UNDEF = 45,                            // "undef"
-        S_FALSE = 46,                            // "false"
-        S_TRUE = 47,                             // "true"
-        S_AND = 48,                              // "and"
-        S_OR = 49,                               // "or"
-        S_XOR = 50,                              // "xor"
-        S_IMPLIES = 51,                          // "implies"
-        S_NOT = 52,                              // "not"
-        S_PLUS = 53,                             // "+"
-        S_MINUS = 54,                            // "-"
-        S_EQUAL = 55,                            // "="
-        S_LPAREN = 56,                           // "("
-        S_RPAREN = 57,                           // ")"
-        S_LSQPAREN = 58,                         // "["
-        S_RSQPAREN = 59,                         // "]"
-        S_LCURPAREN = 60,                        // "{"
-        S_RCURPAREN = 61,                        // "}"
-        S_COLON = 62,                            // ":"
-        S_DOUBLECOLON = 63,                      // "::"
-        S_UNDERLINE = 64,                        // "_"
-        S_VERTICAL_BAR = 65,                     // "|"
-        S_AT = 66,                               // "@"
-        S_COMMA = 67,                            // ","
-        S_LESSER = 68,                           // "<"
-        S_GREATER = 69,                          // ">"
-        S_ASTERIX = 70,                          // "*"
-        S_SLASH = 71,                            // "/"
-        S_PERCENT = 72,                          // "%"
-        S_CARET = 73,                            // "^"
-        S_MARK = 74,                             // "'"
-        S_DOTDOT = 75,                           // ".."
-        S_DOT = 76,                              // "."
-        S_MAPS = 77,                             // "->"
-        S_ARROW = 78,                            // "=>"
-        S_UPDATE = 79,                           // ":="
-        S_NEQUAL = 80,                           // "!="
-        S_LESSEQ = 81,                           // "<="
-        S_GREATEREQ = 82,                        // ">="
-        S_SEQ_BRACKET = 83,                      // "{|"
-        S_ENDSEQ_BRACKET = 84,                   // "|}"
+        S_FUNCTION = 19,                         // "function"
+        S_DEFINED = 20,                          // "defined"
+        S_SEQ = 21,                              // "seq"
+        S_ENDSEQ = 22,                           // "endseq"
+        S_PAR = 23,                              // "par"
+        S_ENDPAR = 24,                           // "endpar"
+        S_SKIP = 25,                             // "skip"
+        S_LET = 26,                              // "let"
+        S_LOCAL = 27,                            // "local"
+        S_IN = 28,                               // "in"
+        S_FORALL = 29,                           // "forall"
+        S_CHOOSE = 30,                           // "choose"
+        S_ITERATE = 31,                          // "iterate"
+        S_DO = 32,                               // "do"
+        S_IF = 33,                               // "if"
+        S_THEN = 34,                             // "then"
+        S_ELSE = 35,                             // "else"
+        S_CASE = 36,                             // "case"
+        S_OF = 37,                               // "of"
+        S_DEFAULT = 38,                          // "default"
+        S_HOLDS = 39,                            // "holds"
+        S_EXISTS = 40,                           // "exists"
+        S_WITH = 41,                             // "with"
+        S_AS = 42,                               // "as"
+        S_WHILE = 43,                            // "while"
+        S_UNDEF = 44,                            // "undef"
+        S_FALSE = 45,                            // "false"
+        S_TRUE = 46,                             // "true"
+        S_AND = 47,                              // "and"
+        S_OR = 48,                               // "or"
+        S_XOR = 49,                              // "xor"
+        S_IMPLIES = 50,                          // "implies"
+        S_NOT = 51,                              // "not"
+        S_PLUS = 52,                             // "+"
+        S_MINUS = 53,                            // "-"
+        S_EQUAL = 54,                            // "="
+        S_LPAREN = 55,                           // "("
+        S_RPAREN = 56,                           // ")"
+        S_LSQPAREN = 57,                         // "["
+        S_RSQPAREN = 58,                         // "]"
+        S_LCURPAREN = 59,                        // "{"
+        S_RCURPAREN = 60,                        // "}"
+        S_COLON = 61,                            // ":"
+        S_DOUBLECOLON = 62,                      // "::"
+        S_UNDERLINE = 63,                        // "_"
+        S_VERTICAL_BAR = 64,                     // "|"
+        S_AT = 65,                               // "@"
+        S_COMMA = 66,                            // ","
+        S_LESSER = 67,                           // "<"
+        S_GREATER = 68,                          // ">"
+        S_ASTERIX = 69,                          // "*"
+        S_SLASH = 70,                            // "/"
+        S_PERCENT = 71,                          // "%"
+        S_CARET = 72,                            // "^"
+        S_MARK = 73,                             // "'"
+        S_MAPS = 74,                             // "->"
+        S_ARROW = 75,                            // "=>"
+        S_UPDATE = 76,                           // ":="
+        S_NEQUAL = 77,                           // "!="
+        S_LESSEQ = 78,                           // "<="
+        S_GREATEREQ = 79,                        // ">="
+        S_SEQ_BRACKET = 80,                      // "{|"
+        S_ENDSEQ_BRACKET = 81,                   // "|}"
+        S_DOT = 82,                              // "."
+        S_DOTDOT = 83,                           // ".."
+        S_DOTDOTDOT = 84,                        // "..."
         S_BINARY = 85,                           // "binary"
         S_HEXADECIMAL = 86,                      // "hexadecimal"
         S_INTEGER = 87,                          // "integer"
@@ -1077,63 +1079,63 @@ namespace libcasm_fe {
         S_BehaviorDefinition = 117,              // BehaviorDefinition
         S_BehaviorDefinitionElement = 118,       // BehaviorDefinitionElement
         S_BehaviorDefinitionList = 119,          // BehaviorDefinitionList
-        S_Template = 120,                        // Template
-        S_MaybeTemplate = 121,                   // MaybeTemplate
-        S_ImplementDefinition = 122,             // ImplementDefinition
-        S_ImplementDefinitionList = 123,         // ImplementDefinitionList
-        S_ImplementDefinitionElement = 124,      // ImplementDefinitionElement
-        S_ImplementDefinitionAttributedElement = 125, // ImplementDefinitionAttributedElement
-        S_DomainDefinition = 126,                // DomainDefinition
-        S_BuiltinDefinition = 127,               // BuiltinDefinition
-        S_Declaration = 128,                     // Declaration
-        S_Rules = 129,                           // Rules
-        S_Rule = 130,                            // Rule
-        S_SkipRule = 131,                        // SkipRule
-        S_ConditionalRule = 132,                 // ConditionalRule
-        S_CaseRule = 133,                        // CaseRule
-        S_CaseLabels = 134,                      // CaseLabels
-        S_CaseLabel = 135,                       // CaseLabel
-        S_LetRule = 136,                         // LetRule
-        S_LocalRule = 137,                       // LocalRule
-        S_ForallRule = 138,                      // ForallRule
-        S_ChooseRule = 139,                      // ChooseRule
-        S_IterateRule = 140,                     // IterateRule
-        S_BlockRule = 141,                       // BlockRule
-        S_SequenceRule = 142,                    // SequenceRule
-        S_UpdateRule = 143,                      // UpdateRule
-        S_CallRule = 144,                        // CallRule
-        S_WhileRule = 145,                       // WhileRule
-        S_Terms = 146,                           // Terms
-        S_Term = 147,                            // Term
-        S_SimpleOrClaspedTerm = 148,             // SimpleOrClaspedTerm
-        S_OperatorExpression = 149,              // OperatorExpression
-        S_CallExpression = 150,                  // CallExpression
-        S_DirectCallExpression = 151,            // DirectCallExpression
-        S_MethodCallExpression = 152,            // MethodCallExpression
-        S_LiteralCallExpression = 153,           // LiteralCallExpression
-        S_IndirectCallExpression = 154,          // IndirectCallExpression
-        S_TypeCastingExpression = 155,           // TypeCastingExpression
-        S_LetExpression = 156,                   // LetExpression
-        S_ConditionalExpression = 157,           // ConditionalExpression
-        S_ChooseExpression = 158,                // ChooseExpression
-        S_UniversalQuantifierExpression = 159,   // UniversalQuantifierExpression
-        S_ExistentialQuantifierExpression = 160, // ExistentialQuantifierExpression
-        S_CardinalityExpression = 161,           // CardinalityExpression
-        S_Literal = 162,                         // Literal
-        S_UndefinedLiteral = 163,                // UndefinedLiteral
-        S_BooleanLiteral = 164,                  // BooleanLiteral
-        S_IntegerLiteral = 165,                  // IntegerLiteral
-        S_RationalLiteral = 166,                 // RationalLiteral
-        S_DecimalLiteral = 167,                  // DecimalLiteral
-        S_BinaryLiteral = 168,                   // BinaryLiteral
-        S_StringLiteral = 169,                   // StringLiteral
-        S_ReferenceLiteral = 170,                // ReferenceLiteral
-        S_ListLiteral = 171,                     // ListLiteral
-        S_RangeLiteral = 172,                    // RangeLiteral
-        S_TupleLiteral = 173,                    // TupleLiteral
-        S_RecordLiteral = 174,                   // RecordLiteral
-        S_Assignments = 175,                     // Assignments
-        S_Assignment = 176,                      // Assignment
+        S_ImplementDefinition = 120,             // ImplementDefinition
+        S_ImplementDefinitionList = 121,         // ImplementDefinitionList
+        S_ImplementDefinitionElement = 122,      // ImplementDefinitionElement
+        S_ImplementDefinitionAttributedElement = 123, // ImplementDefinitionAttributedElement
+        S_DomainDefinition = 124,                // DomainDefinition
+        S_BuiltinDefinition = 125,               // BuiltinDefinition
+        S_Declaration = 126,                     // Declaration
+        S_Rules = 127,                           // Rules
+        S_Rule = 128,                            // Rule
+        S_SkipRule = 129,                        // SkipRule
+        S_ConditionalRule = 130,                 // ConditionalRule
+        S_CaseRule = 131,                        // CaseRule
+        S_CaseLabels = 132,                      // CaseLabels
+        S_CaseLabel = 133,                       // CaseLabel
+        S_LetRule = 134,                         // LetRule
+        S_LocalRule = 135,                       // LocalRule
+        S_ForallRule = 136,                      // ForallRule
+        S_ChooseRule = 137,                      // ChooseRule
+        S_IterateRule = 138,                     // IterateRule
+        S_BlockRule = 139,                       // BlockRule
+        S_SequenceRule = 140,                    // SequenceRule
+        S_UpdateRule = 141,                      // UpdateRule
+        S_CallRule = 142,                        // CallRule
+        S_WhileRule = 143,                       // WhileRule
+        S_Terms = 144,                           // Terms
+        S_Term = 145,                            // Term
+        S_Expression = 146,                      // Expression
+        S_OperatorExpression = 147,              // OperatorExpression
+        S_CallExpression = 148,                  // CallExpression
+        S_DirectCallExpression = 149,            // DirectCallExpression
+        S_MethodCallExpression = 150,            // MethodCallExpression
+        S_LiteralCallExpression = 151,           // LiteralCallExpression
+        S_IndirectCallExpression = 152,          // IndirectCallExpression
+        S_TypeCastingExpression = 153,           // TypeCastingExpression
+        S_LetExpression = 154,                   // LetExpression
+        S_ConditionalExpression = 155,           // ConditionalExpression
+        S_ChooseExpression = 156,                // ChooseExpression
+        S_UniversalQuantifierExpression = 157,   // UniversalQuantifierExpression
+        S_ExistentialQuantifierExpression = 158, // ExistentialQuantifierExpression
+        S_CardinalityExpression = 159,           // CardinalityExpression
+        S_Literal = 160,                         // Literal
+        S_UndefinedLiteral = 161,                // UndefinedLiteral
+        S_BooleanLiteral = 162,                  // BooleanLiteral
+        S_IntegerLiteral = 163,                  // IntegerLiteral
+        S_RationalLiteral = 164,                 // RationalLiteral
+        S_DecimalLiteral = 165,                  // DecimalLiteral
+        S_BinaryLiteral = 166,                   // BinaryLiteral
+        S_StringLiteral = 167,                   // StringLiteral
+        S_ReferenceLiteral = 168,                // ReferenceLiteral
+        S_ListLiteral = 169,                     // ListLiteral
+        S_RangeLiteral = 170,                    // RangeLiteral
+        S_TupleLiteral = 171,                    // TupleLiteral
+        S_RecordLiteral = 172,                   // RecordLiteral
+        S_Assignments = 173,                     // Assignments
+        S_Assignment = 174,                      // Assignment
+        S_MappedExpressions = 175,               // MappedExpressions
+        S_MappedExpression = 176,                // MappedExpression
         S_Types = 177,                           // Types
         S_Type = 178,                            // Type
         S_BasicType = 179,                       // BasicType
@@ -1142,14 +1144,14 @@ namespace libcasm_fe {
         S_TemplateType = 182,                    // TemplateType
         S_RelationType = 183,                    // RelationType
         S_FixedSizedType = 184,                  // FixedSizedType
-        S_FunctionParameters = 185,              // FunctionParameters
-        S_MaybeFunctionParameters = 186,         // MaybeFunctionParameters
-        S_MethodParameters = 187,                // MethodParameters
-        S_Parameters = 188,                      // Parameters
-        S_MaybeDefined = 189,                    // MaybeDefined
-        S_MaybeInitially = 190,                  // MaybeInitially
-        S_Initializers = 191,                    // Initializers
-        S_Initializer = 192,                     // Initializer
+        S_MappingType = 185,                     // MappingType
+        S_VaradicType = 186,                     // VaradicType
+        S_FunctionParameters = 187,              // FunctionParameters
+        S_MaybeFunctionParameters = 188,         // MaybeFunctionParameters
+        S_MethodParameters = 189,                // MethodParameters
+        S_Parameters = 190,                      // Parameters
+        S_MaybeDefined = 191,                    // MaybeDefined
+        S_MaybeInitially = 192,                  // MaybeInitially
         S_Identifier = 193,                      // Identifier
         S_IdentifierPath = 194,                  // IdentifierPath
         S_Variable = 195,                        // Variable
@@ -1158,17 +1160,16 @@ namespace libcasm_fe {
         S_TypedVariable = 198,                   // TypedVariable
         S_AttributedVariable = 199,              // AttributedVariable
         S_TypedAttributedVariable = 200,         // TypedAttributedVariable
-        S_TemplateVariables = 201,               // TemplateVariables
-        S_TemplateVariable = 202,                // TemplateVariable
-        S_VariableBindings = 203,                // VariableBindings
-        S_VariableBinding = 204,                 // VariableBinding
-        S_LocalFunctionDefinitions = 205,        // LocalFunctionDefinitions
-        S_AttributedLocalFunctionDefinition = 206, // AttributedLocalFunctionDefinition
-        S_LocalFunctionDefinition = 207,         // LocalFunctionDefinition
-        S_Attributes = 208,                      // Attributes
-        S_Attribute = 209,                       // Attribute
-        S_BasicAttribute = 210,                  // BasicAttribute
-        S_ExpressionAttribute = 211              // ExpressionAttribute
+        S_VariableBindings = 201,                // VariableBindings
+        S_VariableBinding = 202,                 // VariableBinding
+        S_LocalFunctionDefinitions = 203,        // LocalFunctionDefinitions
+        S_AttributedLocalFunctionDefinition = 204, // AttributedLocalFunctionDefinition
+        S_LocalFunctionDefinition = 205,         // LocalFunctionDefinition
+        S_Attributes = 206,                      // Attributes
+        S_Attribute = 207,                       // Attribute
+        S_BasicAttribute = 208,                  // BasicAttribute
+        S_SymbolAttribute = 209,                 // SymbolAttribute
+        S_ExpressionAttribute = 210              // ExpressionAttribute
       };
     };
 
@@ -1221,7 +1222,6 @@ namespace libcasm_fe {
       case symbol_kind::S_THIS: // "this"
       case symbol_kind::S_DOMAIN: // "domain"
       case symbol_kind::S_BUILTIN: // "builtin"
-      case symbol_kind::S_TEMPLATE: // "template"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -1277,8 +1277,6 @@ namespace libcasm_fe {
       case symbol_kind::S_PERCENT: // "%"
       case symbol_kind::S_CARET: // "^"
       case symbol_kind::S_MARK: // "'"
-      case symbol_kind::S_DOTDOT: // ".."
-      case symbol_kind::S_DOT: // "."
       case symbol_kind::S_MAPS: // "->"
       case symbol_kind::S_ARROW: // "=>"
       case symbol_kind::S_UPDATE: // ":="
@@ -1287,6 +1285,9 @@ namespace libcasm_fe {
       case symbol_kind::S_GREATEREQ: // ">="
       case symbol_kind::S_SEQ_BRACKET: // "{|"
       case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOTDOTDOT: // "..."
         value.move< AST::Token::Ptr > (std::move (that.value));
         break;
 
@@ -1409,7 +1410,7 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_Term: // Term
-      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_Expression: // Expression
       case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.move< Expression::Ptr > (std::move (that.value));
         break;
@@ -1471,14 +1472,6 @@ namespace libcasm_fe {
         value.move< InitDefinition::Ptr > (std::move (that.value));
         break;
 
-      case symbol_kind::S_Initializer: // Initializer
-        value.move< Initializer::Ptr > (std::move (that.value));
-        break;
-
-      case symbol_kind::S_Initializers: // Initializers
-        value.move< Initializers::Ptr > (std::move (that.value));
-        break;
-
       case symbol_kind::S_MaybeInitially: // MaybeInitially
         value.move< Initially::Ptr > (std::move (that.value));
         break;
@@ -1513,6 +1506,18 @@ namespace libcasm_fe {
 
       case symbol_kind::S_LocalRule: // LocalRule
         value.move< LocalRule::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_MappedExpression: // MappedExpression
+        value.move< MappedExpression::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_MappedExpressions: // MappedExpressions
+        value.move< MappedExpressions::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_MappingType: // MappingType
+        value.move< MappingType::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_MethodCallExpression: // MethodCallExpression
@@ -1575,9 +1580,8 @@ namespace libcasm_fe {
         value.move< StructureDefinition::Ptr > (std::move (that.value));
         break;
 
-      case symbol_kind::S_Template: // Template
-      case symbol_kind::S_MaybeTemplate: // MaybeTemplate
-        value.move< Template::Ptr > (std::move (that.value));
+      case symbol_kind::S_SymbolAttribute: // SymbolAttribute
+        value.move< SymbolAttribute::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -1637,6 +1641,10 @@ namespace libcasm_fe {
         value.move< ValueLiteral::Ptr > (std::move (that.value));
         break;
 
+      case symbol_kind::S_VaradicType: // VaradicType
+        value.move< VaradicType::Ptr > (std::move (that.value));
+        break;
+
       case symbol_kind::S_VariableBinding: // VariableBinding
         value.move< VariableBinding::Ptr > (std::move (that.value));
         break;
@@ -1649,7 +1657,6 @@ namespace libcasm_fe {
       case symbol_kind::S_TypedVariable: // TypedVariable
       case symbol_kind::S_AttributedVariable: // AttributedVariable
       case symbol_kind::S_TypedAttributedVariable: // TypedAttributedVariable
-      case symbol_kind::S_TemplateVariable: // TemplateVariable
         value.move< VariableDefinition::Ptr > (std::move (that.value));
         break;
 
@@ -1657,7 +1664,6 @@ namespace libcasm_fe {
       case symbol_kind::S_Parameters: // Parameters
       case symbol_kind::S_AttributedVariables: // AttributedVariables
       case symbol_kind::S_TypedVariables: // TypedVariables
-      case symbol_kind::S_TemplateVariables: // TemplateVariables
         value.move< VariableDefinitions::Ptr > (std::move (that.value));
         break;
 
@@ -1666,7 +1672,7 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_Type: // Type
-        value.move< libcasm_fe::AST::Type::Ptr > (std::move (that.value));
+        value.move< libcasm_fe::CST::Type::Ptr > (std::move (that.value));
         break;
 
       default:
@@ -2295,34 +2301,6 @@ namespace libcasm_fe {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, Initializer::Ptr&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const Initializer::Ptr& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, Initializers::Ptr&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const Initializers::Ptr& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-
-#if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Initially::Ptr&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
@@ -2442,6 +2420,48 @@ namespace libcasm_fe {
       {}
 #else
       basic_symbol (typename Base::kind_type t, const LocalRule::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, MappedExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const MappedExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, MappedExpressions::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const MappedExpressions::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, MappingType::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const MappingType::Ptr& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -2659,13 +2679,13 @@ namespace libcasm_fe {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, Template::Ptr&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, SymbolAttribute::Ptr&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const Template::Ptr& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const SymbolAttribute::Ptr& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -2827,6 +2847,20 @@ namespace libcasm_fe {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, VaradicType::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const VaradicType::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, VariableBinding::Ptr&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
@@ -2897,13 +2931,13 @@ namespace libcasm_fe {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, libcasm_fe::AST::Type::Ptr&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, libcasm_fe::CST::Type::Ptr&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const libcasm_fe::AST::Type::Ptr& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const libcasm_fe::CST::Type::Ptr& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -2948,7 +2982,6 @@ switch (yykind)
       case symbol_kind::S_THIS: // "this"
       case symbol_kind::S_DOMAIN: // "domain"
       case symbol_kind::S_BUILTIN: // "builtin"
-      case symbol_kind::S_TEMPLATE: // "template"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -3004,8 +3037,6 @@ switch (yykind)
       case symbol_kind::S_PERCENT: // "%"
       case symbol_kind::S_CARET: // "^"
       case symbol_kind::S_MARK: // "'"
-      case symbol_kind::S_DOTDOT: // ".."
-      case symbol_kind::S_DOT: // "."
       case symbol_kind::S_MAPS: // "->"
       case symbol_kind::S_ARROW: // "=>"
       case symbol_kind::S_UPDATE: // ":="
@@ -3014,6 +3045,9 @@ switch (yykind)
       case symbol_kind::S_GREATEREQ: // ">="
       case symbol_kind::S_SEQ_BRACKET: // "{|"
       case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOTDOTDOT: // "..."
         value.template destroy< AST::Token::Ptr > ();
         break;
 
@@ -3136,7 +3170,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Term: // Term
-      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_Expression: // Expression
       case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.template destroy< Expression::Ptr > ();
         break;
@@ -3198,14 +3232,6 @@ switch (yykind)
         value.template destroy< InitDefinition::Ptr > ();
         break;
 
-      case symbol_kind::S_Initializer: // Initializer
-        value.template destroy< Initializer::Ptr > ();
-        break;
-
-      case symbol_kind::S_Initializers: // Initializers
-        value.template destroy< Initializers::Ptr > ();
-        break;
-
       case symbol_kind::S_MaybeInitially: // MaybeInitially
         value.template destroy< Initially::Ptr > ();
         break;
@@ -3240,6 +3266,18 @@ switch (yykind)
 
       case symbol_kind::S_LocalRule: // LocalRule
         value.template destroy< LocalRule::Ptr > ();
+        break;
+
+      case symbol_kind::S_MappedExpression: // MappedExpression
+        value.template destroy< MappedExpression::Ptr > ();
+        break;
+
+      case symbol_kind::S_MappedExpressions: // MappedExpressions
+        value.template destroy< MappedExpressions::Ptr > ();
+        break;
+
+      case symbol_kind::S_MappingType: // MappingType
+        value.template destroy< MappingType::Ptr > ();
         break;
 
       case symbol_kind::S_MethodCallExpression: // MethodCallExpression
@@ -3302,9 +3340,8 @@ switch (yykind)
         value.template destroy< StructureDefinition::Ptr > ();
         break;
 
-      case symbol_kind::S_Template: // Template
-      case symbol_kind::S_MaybeTemplate: // MaybeTemplate
-        value.template destroy< Template::Ptr > ();
+      case symbol_kind::S_SymbolAttribute: // SymbolAttribute
+        value.template destroy< SymbolAttribute::Ptr > ();
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -3364,6 +3401,10 @@ switch (yykind)
         value.template destroy< ValueLiteral::Ptr > ();
         break;
 
+      case symbol_kind::S_VaradicType: // VaradicType
+        value.template destroy< VaradicType::Ptr > ();
+        break;
+
       case symbol_kind::S_VariableBinding: // VariableBinding
         value.template destroy< VariableBinding::Ptr > ();
         break;
@@ -3376,7 +3417,6 @@ switch (yykind)
       case symbol_kind::S_TypedVariable: // TypedVariable
       case symbol_kind::S_AttributedVariable: // AttributedVariable
       case symbol_kind::S_TypedAttributedVariable: // TypedAttributedVariable
-      case symbol_kind::S_TemplateVariable: // TemplateVariable
         value.template destroy< VariableDefinition::Ptr > ();
         break;
 
@@ -3384,7 +3424,6 @@ switch (yykind)
       case symbol_kind::S_Parameters: // Parameters
       case symbol_kind::S_AttributedVariables: // AttributedVariables
       case symbol_kind::S_TypedVariables: // TypedVariables
-      case symbol_kind::S_TemplateVariables: // TemplateVariables
         value.template destroy< VariableDefinitions::Ptr > ();
         break;
 
@@ -3393,7 +3432,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Type: // Type
-        value.template destroy< libcasm_fe::AST::Type::Ptr > ();
+        value.template destroy< libcasm_fe::CST::Type::Ptr > ();
         break;
 
       default:
@@ -3502,7 +3541,7 @@ switch (yykind)
         : super_type(token_type (tok), v, l)
 #endif
       {
-        YY_ASSERT ((token::CASM <= tok && tok <= token::ENDSEQ_BRACKET));
+        YY_ASSERT ((token::CASM <= tok && tok <= token::DOTDOTDOT));
       }
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, Identifier::Ptr v, location_type l)
@@ -3855,21 +3894,6 @@ switch (yykind)
       make_BUILTIN (const AST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::BUILTIN, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_TEMPLATE (AST::Token::Ptr v, location_type l)
-      {
-        return symbol_type (token::TEMPLATE, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_TEMPLATE (const AST::Token::Ptr& v, const location_type& l)
-      {
-        return symbol_type (token::TEMPLATE, v, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -4700,36 +4724,6 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_DOTDOT (AST::Token::Ptr v, location_type l)
-      {
-        return symbol_type (token::DOTDOT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_DOTDOT (const AST::Token::Ptr& v, const location_type& l)
-      {
-        return symbol_type (token::DOTDOT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_DOT (AST::Token::Ptr v, location_type l)
-      {
-        return symbol_type (token::DOT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_DOT (const AST::Token::Ptr& v, const location_type& l)
-      {
-        return symbol_type (token::DOT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
       make_MAPS (AST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::MAPS, std::move (v), std::move (l));
@@ -4845,6 +4839,51 @@ switch (yykind)
       make_ENDSEQ_BRACKET (const AST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::ENDSEQ_BRACKET, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOT (AST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DOT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOT (const AST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DOT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOTDOT (AST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DOTDOT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOTDOT (const AST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DOTDOT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOTDOTDOT (AST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DOTDOTDOT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOTDOTDOT (const AST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DOTDOTDOT, v, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -5357,9 +5396,9 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 3286,     ///< Last index in yytable_.
-      yynnts_ = 115,  ///< Number of nonterminal symbols.
-      yyfinal_ = 16 ///< Termination state number.
+      yylast_ = 3129,     ///< Last index in yytable_.
+      yynnts_ = 114,  ///< Number of nonterminal symbols.
+      yyfinal_ = 17 ///< Termination state number.
     };
 
 
@@ -5453,7 +5492,6 @@ switch (yykind)
       case symbol_kind::S_THIS: // "this"
       case symbol_kind::S_DOMAIN: // "domain"
       case symbol_kind::S_BUILTIN: // "builtin"
-      case symbol_kind::S_TEMPLATE: // "template"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -5509,8 +5547,6 @@ switch (yykind)
       case symbol_kind::S_PERCENT: // "%"
       case symbol_kind::S_CARET: // "^"
       case symbol_kind::S_MARK: // "'"
-      case symbol_kind::S_DOTDOT: // ".."
-      case symbol_kind::S_DOT: // "."
       case symbol_kind::S_MAPS: // "->"
       case symbol_kind::S_ARROW: // "=>"
       case symbol_kind::S_UPDATE: // ":="
@@ -5519,6 +5555,9 @@ switch (yykind)
       case symbol_kind::S_GREATEREQ: // ">="
       case symbol_kind::S_SEQ_BRACKET: // "{|"
       case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOTDOTDOT: // "..."
         value.copy< AST::Token::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -5641,7 +5680,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Term: // Term
-      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_Expression: // Expression
       case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.copy< Expression::Ptr > (YY_MOVE (that.value));
         break;
@@ -5703,14 +5742,6 @@ switch (yykind)
         value.copy< InitDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_Initializer: // Initializer
-        value.copy< Initializer::Ptr > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_Initializers: // Initializers
-        value.copy< Initializers::Ptr > (YY_MOVE (that.value));
-        break;
-
       case symbol_kind::S_MaybeInitially: // MaybeInitially
         value.copy< Initially::Ptr > (YY_MOVE (that.value));
         break;
@@ -5745,6 +5776,18 @@ switch (yykind)
 
       case symbol_kind::S_LocalRule: // LocalRule
         value.copy< LocalRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_MappedExpression: // MappedExpression
+        value.copy< MappedExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_MappedExpressions: // MappedExpressions
+        value.copy< MappedExpressions::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_MappingType: // MappingType
+        value.copy< MappingType::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_MethodCallExpression: // MethodCallExpression
@@ -5807,9 +5850,8 @@ switch (yykind)
         value.copy< StructureDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_Template: // Template
-      case symbol_kind::S_MaybeTemplate: // MaybeTemplate
-        value.copy< Template::Ptr > (YY_MOVE (that.value));
+      case symbol_kind::S_SymbolAttribute: // SymbolAttribute
+        value.copy< SymbolAttribute::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -5869,6 +5911,10 @@ switch (yykind)
         value.copy< ValueLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
+      case symbol_kind::S_VaradicType: // VaradicType
+        value.copy< VaradicType::Ptr > (YY_MOVE (that.value));
+        break;
+
       case symbol_kind::S_VariableBinding: // VariableBinding
         value.copy< VariableBinding::Ptr > (YY_MOVE (that.value));
         break;
@@ -5881,7 +5927,6 @@ switch (yykind)
       case symbol_kind::S_TypedVariable: // TypedVariable
       case symbol_kind::S_AttributedVariable: // AttributedVariable
       case symbol_kind::S_TypedAttributedVariable: // TypedAttributedVariable
-      case symbol_kind::S_TemplateVariable: // TemplateVariable
         value.copy< VariableDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -5889,7 +5934,6 @@ switch (yykind)
       case symbol_kind::S_Parameters: // Parameters
       case symbol_kind::S_AttributedVariables: // AttributedVariables
       case symbol_kind::S_TypedVariables: // TypedVariables
-      case symbol_kind::S_TemplateVariables: // TemplateVariables
         value.copy< VariableDefinitions::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -5898,7 +5942,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Type: // Type
-        value.copy< libcasm_fe::AST::Type::Ptr > (YY_MOVE (that.value));
+        value.copy< libcasm_fe::CST::Type::Ptr > (YY_MOVE (that.value));
         break;
 
       default:
@@ -5946,7 +5990,6 @@ switch (yykind)
       case symbol_kind::S_THIS: // "this"
       case symbol_kind::S_DOMAIN: // "domain"
       case symbol_kind::S_BUILTIN: // "builtin"
-      case symbol_kind::S_TEMPLATE: // "template"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -6002,8 +6045,6 @@ switch (yykind)
       case symbol_kind::S_PERCENT: // "%"
       case symbol_kind::S_CARET: // "^"
       case symbol_kind::S_MARK: // "'"
-      case symbol_kind::S_DOTDOT: // ".."
-      case symbol_kind::S_DOT: // "."
       case symbol_kind::S_MAPS: // "->"
       case symbol_kind::S_ARROW: // "=>"
       case symbol_kind::S_UPDATE: // ":="
@@ -6012,6 +6053,9 @@ switch (yykind)
       case symbol_kind::S_GREATEREQ: // ">="
       case symbol_kind::S_SEQ_BRACKET: // "{|"
       case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOTDOTDOT: // "..."
         value.move< AST::Token::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -6134,7 +6178,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Term: // Term
-      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_Expression: // Expression
       case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.move< Expression::Ptr > (YY_MOVE (s.value));
         break;
@@ -6196,14 +6240,6 @@ switch (yykind)
         value.move< InitDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_Initializer: // Initializer
-        value.move< Initializer::Ptr > (YY_MOVE (s.value));
-        break;
-
-      case symbol_kind::S_Initializers: // Initializers
-        value.move< Initializers::Ptr > (YY_MOVE (s.value));
-        break;
-
       case symbol_kind::S_MaybeInitially: // MaybeInitially
         value.move< Initially::Ptr > (YY_MOVE (s.value));
         break;
@@ -6238,6 +6274,18 @@ switch (yykind)
 
       case symbol_kind::S_LocalRule: // LocalRule
         value.move< LocalRule::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_MappedExpression: // MappedExpression
+        value.move< MappedExpression::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_MappedExpressions: // MappedExpressions
+        value.move< MappedExpressions::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_MappingType: // MappingType
+        value.move< MappingType::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_MethodCallExpression: // MethodCallExpression
@@ -6300,9 +6348,8 @@ switch (yykind)
         value.move< StructureDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_Template: // Template
-      case symbol_kind::S_MaybeTemplate: // MaybeTemplate
-        value.move< Template::Ptr > (YY_MOVE (s.value));
+      case symbol_kind::S_SymbolAttribute: // SymbolAttribute
+        value.move< SymbolAttribute::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -6362,6 +6409,10 @@ switch (yykind)
         value.move< ValueLiteral::Ptr > (YY_MOVE (s.value));
         break;
 
+      case symbol_kind::S_VaradicType: // VaradicType
+        value.move< VaradicType::Ptr > (YY_MOVE (s.value));
+        break;
+
       case symbol_kind::S_VariableBinding: // VariableBinding
         value.move< VariableBinding::Ptr > (YY_MOVE (s.value));
         break;
@@ -6374,7 +6425,6 @@ switch (yykind)
       case symbol_kind::S_TypedVariable: // TypedVariable
       case symbol_kind::S_AttributedVariable: // AttributedVariable
       case symbol_kind::S_TypedAttributedVariable: // TypedAttributedVariable
-      case symbol_kind::S_TemplateVariable: // TemplateVariable
         value.move< VariableDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -6382,7 +6432,6 @@ switch (yykind)
       case symbol_kind::S_Parameters: // Parameters
       case symbol_kind::S_AttributedVariables: // AttributedVariables
       case symbol_kind::S_TypedVariables: // TypedVariables
-      case symbol_kind::S_TemplateVariables: // TemplateVariables
         value.move< VariableDefinitions::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -6391,7 +6440,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Type: // Type
-        value.move< libcasm_fe::AST::Type::Ptr > (YY_MOVE (s.value));
+        value.move< libcasm_fe::CST::Type::Ptr > (YY_MOVE (s.value));
         break;
 
       default:
@@ -6457,7 +6506,7 @@ switch (yykind)
 
 #line 51 "../../obj/src/GrammarParser.y"
 } // libcasm_fe
-#line 6461 "GrammarParser.tab.h"
+#line 6510 "GrammarParser.tab.h"
 
 
 

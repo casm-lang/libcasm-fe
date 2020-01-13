@@ -70,7 +70,7 @@ Definition ::= InitDefinition
 
 #+begin_src
 InitDefinition ::= "init" IdentifierPath
-                 | "init" "{" Initializers "}"
+                 | "init" "{" MappedExpressions "}"
 #+end_src
 
 #+html: {{page>.:grammar:InitDefinition&noheader&nofooter}}
@@ -180,7 +180,7 @@ ImportDefinition ::= "import" IdentifierPath
 ** StructureDefinition
 
 #+begin_src
-StructureDefinition ::= MaybeTemplate "structure" Identifier "=" "{" StructureDefinitionList "}"
+StructureDefinition ::= "structure" Identifier "=" "{" StructureDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:StructureDefinition&noheader&nofooter}}
@@ -209,7 +209,7 @@ StructureDefinitionElement ::= Attributes FunctionDefinition
 ** BehaviorDefinition
 
 #+begin_src
-BehaviorDefinition ::= MaybeTemplate "behavior" Type "=" "{" BehaviorDefinitionList "}"
+BehaviorDefinition ::= "behavior" Type "=" "{" BehaviorDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:BehaviorDefinition&noheader&nofooter}}
@@ -239,30 +239,11 @@ BehaviorDefinitionList ::= BehaviorDefinitionList BehaviorDefinitionElement
 #+html: {{page>.:grammar:BehaviorDefinitionList&noheader&nofooter}}
 
 
-** Template
-
-#+begin_src
-Template ::= "template" "<" TemplateVariables ">"
-#+end_src
-
-#+html: {{page>.:grammar:Template&noheader&nofooter}}
-
-
-** MaybeTemplate
-
-#+begin_src
-MaybeTemplate ::= Template
-                | null
-#+end_src
-
-#+html: {{page>.:grammar:MaybeTemplate&noheader&nofooter}}
-
-
 ** ImplementDefinition
 
 #+begin_src
-ImplementDefinition ::= MaybeTemplate "implement" Type "=" "{" ImplementDefinitionList "}"
-                      | MaybeTemplate "implement" Type "for" Type "=" "{" ImplementDefinitionList "}"
+ImplementDefinition ::= "implement" Type "=" "{" ImplementDefinitionList "}"
+                      | "implement" Type "for" Type "=" "{" ImplementDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:ImplementDefinition&noheader&nofooter}}
@@ -301,7 +282,7 @@ ImplementDefinitionAttributedElement ::= DerivedDefinition
 ** DomainDefinition
 
 #+begin_src
-DomainDefinition ::= MaybeTemplate "domain" Type
+DomainDefinition ::= "domain" Type
 #+end_src
 
 #+html: {{page>.:grammar:DomainDefinition&noheader&nofooter}}
@@ -310,7 +291,7 @@ DomainDefinition ::= MaybeTemplate "domain" Type
 ** BuiltinDefinition
 
 #+begin_src
-BuiltinDefinition ::= MaybeTemplate "builtin" RelationType
+BuiltinDefinition ::= "builtin" RelationType
 #+end_src
 
 #+html: {{page>.:grammar:BuiltinDefinition&noheader&nofooter}}
@@ -513,7 +494,7 @@ Terms ::= Terms "," Term
 ** Term
 
 #+begin_src
-Term ::= SimpleOrClaspedTerm
+Term ::= Expression
        | TypeCastingExpression
        | OperatorExpression
        | LetExpression
@@ -527,18 +508,18 @@ Term ::= SimpleOrClaspedTerm
 #+html: {{page>.:grammar:Term&noheader&nofooter}}
 
 
-** SimpleOrClaspedTerm
+** Expression
 
 #+begin_src
-SimpleOrClaspedTerm ::= "(" Term ")"
-                      | CallExpression
-                      | LiteralCallExpression
-                      | Literal
-                      | "+" SimpleOrClaspedTerm
-                      | "-" SimpleOrClaspedTerm
+Expression ::= "(" Term ")"
+             | CallExpression
+             | LiteralCallExpression
+             | Literal
+             | "+" Expression
+             | "-" Expression
 #+end_src
 
-#+html: {{page>.:grammar:SimpleOrClaspedTerm&noheader&nofooter}}
+#+html: {{page>.:grammar:Expression&noheader&nofooter}}
 
 
 ** OperatorExpression
@@ -585,7 +566,6 @@ DirectCallExpression ::= "this"
                        | IdentifierPath
                        | IdentifierPath "(" ")"
                        | IdentifierPath "(" Terms ")"
-                       | Template IdentifierPath "(" Terms ")"
 #+end_src
 
 #+html: {{page>.:grammar:DirectCallExpression&noheader&nofooter}}
@@ -594,9 +574,9 @@ DirectCallExpression ::= "this"
 ** MethodCallExpression
 
 #+begin_src
-MethodCallExpression ::= SimpleOrClaspedTerm "." Identifier
-                       | SimpleOrClaspedTerm "." Identifier "(" ")"
-                       | SimpleOrClaspedTerm "." Identifier "(" Terms ")"
+MethodCallExpression ::= Expression "." Identifier
+                       | Expression "." Identifier "(" ")"
+                       | Expression "." Identifier "(" Terms ")"
 #+end_src
 
 #+html: {{page>.:grammar:MethodCallExpression&noheader&nofooter}}
@@ -605,7 +585,7 @@ MethodCallExpression ::= SimpleOrClaspedTerm "." Identifier
 ** LiteralCallExpression
 
 #+begin_src
-LiteralCallExpression ::= SimpleOrClaspedTerm "." IntegerLiteral
+LiteralCallExpression ::= Expression "." IntegerLiteral
 #+end_src
 
 #+html: {{page>.:grammar:LiteralCallExpression&noheader&nofooter}}
@@ -624,7 +604,7 @@ IndirectCallExpression ::= CallExpression "(" ")"
 ** TypeCastingExpression
 
 #+begin_src
-TypeCastingExpression ::= SimpleOrClaspedTerm "as" Type
+TypeCastingExpression ::= Expression "as" Type
 #+end_src
 
 #+html: {{page>.:grammar:TypeCastingExpression&noheader&nofooter}}
@@ -678,7 +658,7 @@ ExistentialQuantifierExpression ::= "exists" AttributedVariables "in" Term "with
 ** CardinalityExpression
 
 #+begin_src
-CardinalityExpression ::= "|" SimpleOrClaspedTerm "|"
+CardinalityExpression ::= "|" Expression "|"
 #+end_src
 
 #+html: {{page>.:grammar:CardinalityExpression&noheader&nofooter}}
@@ -834,6 +814,27 @@ Assignment ::= Identifier ":" Term
 #+html: {{page>.:grammar:Assignment&noheader&nofooter}}
 
 
+** MappedExpressions
+
+#+begin_src
+MappedExpressions ::= MappedExpressions "," MappedExpression
+                    | MappedExpression
+#+end_src
+
+#+html: {{page>.:grammar:MappedExpressions&noheader&nofooter}}
+
+
+** MappedExpression
+
+#+begin_src
+MappedExpression ::= "->" Term
+                   | "(" Term ")" "->" Term
+                   | TupleLiteral "->" Term
+#+end_src
+
+#+html: {{page>.:grammar:MappedExpression&noheader&nofooter}}
+
+
 ** Types
 
 #+begin_src
@@ -853,6 +854,8 @@ Type ::= BasicType
        | TemplateType
        | RelationType
        | FixedSizedType
+       | MappingType
+       | VaradicType
 #+end_src
 
 #+html: {{page>.:grammar:Type&noheader&nofooter}}
@@ -912,6 +915,24 @@ FixedSizedType ::= IdentifierPath "'" Term
 #+html: {{page>.:grammar:FixedSizedType&noheader&nofooter}}
 
 
+** MappingType
+
+#+begin_src
+MappingType ::= "<" FunctionParameters "->" Type ">"
+#+end_src
+
+#+html: {{page>.:grammar:MappingType&noheader&nofooter}}
+
+
+** VaradicType
+
+#+begin_src
+VaradicType ::= Identifier "..."
+#+end_src
+
+#+html: {{page>.:grammar:VaradicType&noheader&nofooter}}
+
+
 ** FunctionParameters
 
 #+begin_src
@@ -965,32 +986,12 @@ MaybeDefined ::= "defined" "{" Term "}"
 ** MaybeInitially
 
 #+begin_src
-MaybeInitially ::= "=" "{" Initializers "}"
+MaybeInitially ::= "=" "{" Expression "}"
+                 | "=" "{" MappedExpressions "}"
                  | null
 #+end_src
 
 #+html: {{page>.:grammar:MaybeInitially&noheader&nofooter}}
-
-
-** Initializers
-
-#+begin_src
-Initializers ::= Initializers "," Initializer
-               | Initializer
-#+end_src
-
-#+html: {{page>.:grammar:Initializers&noheader&nofooter}}
-
-
-** Initializer
-
-#+begin_src
-Initializer ::= Term
-              | "(" Term ")" "->" Term
-              | TupleLiteral "->" Term
-#+end_src
-
-#+html: {{page>.:grammar:Initializer&noheader&nofooter}}
 
 
 ** Identifier
@@ -1075,25 +1076,6 @@ TypedAttributedVariable ::= Attributes TypedVariable
 #+html: {{page>.:grammar:TypedAttributedVariable&noheader&nofooter}}
 
 
-** TemplateVariables
-
-#+begin_src
-TemplateVariables ::= TemplateVariables "," TemplateVariable
-                    | TemplateVariable
-#+end_src
-
-#+html: {{page>.:grammar:TemplateVariables&noheader&nofooter}}
-
-
-** TemplateVariable
-
-#+begin_src
-TemplateVariable ::= Variable
-#+end_src
-
-#+html: {{page>.:grammar:TemplateVariable&noheader&nofooter}}
-
-
 ** VariableBindings
 
 #+begin_src
@@ -1156,6 +1138,7 @@ Attributes ::= Attributes Attribute
 
 #+begin_src
 Attribute ::= "[" BasicAttribute "]"
+            | "[" SymbolAttribute "]"
             | "[" ExpressionAttribute "]"
 #+end_src
 
@@ -1169,6 +1152,15 @@ BasicAttribute ::= Identifier
 #+end_src
 
 #+html: {{page>.:grammar:BasicAttribute&noheader&nofooter}}
+
+
+** SymbolAttribute
+
+#+begin_src
+SymbolAttribute ::= Identifier TypedVariable
+#+end_src
+
+#+html: {{page>.:grammar:SymbolAttribute&noheader&nofooter}}
 
 
 ** ExpressionAttribute

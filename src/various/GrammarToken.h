@@ -72,72 +72,72 @@ namespace libcasm_fe
             /* 14 */ THIS,
             /* 15 */ DOMAIN,
             /* 16 */ BUILTIN,
-            /* 17 */ TEMPLATE,
-            /* 18 */ FUNCTION,
-            /* 19 */ DEFINED,
-            /* 20 */ SEQ,
-            /* 21 */ ENDSEQ,
-            /* 22 */ PAR,
-            /* 23 */ ENDPAR,
-            /* 24 */ SKIP,
-            /* 25 */ LET,
-            /* 26 */ LOCAL,
-            /* 27 */ IN,
-            /* 28 */ FORALL,
-            /* 29 */ CHOOSE,
-            /* 30 */ ITERATE,
-            /* 31 */ DO,
-            /* 32 */ IF,
-            /* 33 */ THEN,
-            /* 34 */ ELSE,
-            /* 35 */ CASE,
-            /* 36 */ OF,
-            /* 37 */ DEFAULT,
-            /* 38 */ HOLDS,
-            /* 39 */ EXISTS,
-            /* 40 */ WITH,
-            /* 41 */ AS,
-            /* 42 */ WHILE,
-            /* 43 */ UNDEF,
-            /* 44 */ FALSE,
-            /* 45 */ TRUE,
-            /* 46 */ AND,
-            /* 47 */ OR,
-            /* 48 */ XOR,
-            /* 49 */ IMPLIES,
-            /* 50 */ NOT,
-            /* 51 */ PLUS,
-            /* 52 */ MINUS,
-            /* 53 */ EQUAL,
-            /* 54 */ LPAREN,
-            /* 55 */ RPAREN,
-            /* 56 */ LSQPAREN,
-            /* 57 */ RSQPAREN,
-            /* 58 */ LCURPAREN,
-            /* 59 */ RCURPAREN,
-            /* 60 */ COLON,
-            /* 61 */ DOUBLECOLON,
-            /* 62 */ UNDERLINE,
-            /* 63 */ VERTICAL_BAR,
-            /* 64 */ AT,
-            /* 65 */ COMMA,
-            /* 66 */ LESSER,
-            /* 67 */ GREATER,
-            /* 68 */ ASTERIX,
-            /* 69 */ SLASH,
-            /* 70 */ PERCENT,
-            /* 71 */ CARET,
-            /* 72 */ MARK,
-            /* 73 */ DOTDOT,
-            /* 74 */ DOT,
-            /* 75 */ MAPS,
-            /* 76 */ ARROW,
-            /* 77 */ UPDATE,
-            /* 78 */ NEQUAL,
-            /* 79 */ LESSEQ,
-            /* 80 */ GREATEREQ,
-            /* 81 */ SEQ_BRACKET,
-            /* 82 */ ENDSEQ_BRACKET,
+            /* 17 */ FUNCTION,
+            /* 18 */ DEFINED,
+            /* 19 */ SEQ,
+            /* 20 */ ENDSEQ,
+            /* 21 */ PAR,
+            /* 22 */ ENDPAR,
+            /* 23 */ SKIP,
+            /* 24 */ LET,
+            /* 25 */ LOCAL,
+            /* 26 */ IN,
+            /* 27 */ FORALL,
+            /* 28 */ CHOOSE,
+            /* 29 */ ITERATE,
+            /* 30 */ DO,
+            /* 31 */ IF,
+            /* 32 */ THEN,
+            /* 33 */ ELSE,
+            /* 34 */ CASE,
+            /* 35 */ OF,
+            /* 36 */ DEFAULT,
+            /* 37 */ HOLDS,
+            /* 38 */ EXISTS,
+            /* 39 */ WITH,
+            /* 40 */ AS,
+            /* 41 */ WHILE,
+            /* 42 */ UNDEF,
+            /* 43 */ FALSE,
+            /* 44 */ TRUE,
+            /* 45 */ AND,
+            /* 46 */ OR,
+            /* 47 */ XOR,
+            /* 48 */ IMPLIES,
+            /* 49 */ NOT,
+            /* 50 */ PLUS,
+            /* 51 */ MINUS,
+            /* 52 */ EQUAL,
+            /* 53 */ LPAREN,
+            /* 54 */ RPAREN,
+            /* 55 */ LSQPAREN,
+            /* 56 */ RSQPAREN,
+            /* 57 */ LCURPAREN,
+            /* 58 */ RCURPAREN,
+            /* 59 */ COLON,
+            /* 60 */ DOUBLECOLON,
+            /* 61 */ UNDERLINE,
+            /* 62 */ VERTICAL_BAR,
+            /* 63 */ AT,
+            /* 64 */ COMMA,
+            /* 65 */ LESSER,
+            /* 66 */ GREATER,
+            /* 67 */ ASTERIX,
+            /* 68 */ SLASH,
+            /* 69 */ PERCENT,
+            /* 70 */ CARET,
+            /* 71 */ MARK,
+            /* 72 */ MAPS,
+            /* 73 */ ARROW,
+            /* 74 */ UPDATE,
+            /* 75 */ NEQUAL,
+            /* 76 */ LESSEQ,
+            /* 77 */ GREATEREQ,
+            /* 78 */ SEQ_BRACKET,
+            /* 79 */ ENDSEQ_BRACKET,
+            /* 80 */ DOT,
+            /* 81 */ DOTDOT,
+            /* 82 */ DOTDOTDOT,
         };
         
         static std::string tokenAsString( const Token token )
@@ -212,269 +212,269 @@ namespace libcasm_fe
                 {
                     return "builtin";
                 }
-                case /* 17 */ Token::TEMPLATE:
-                {
-                    return "template";
-                }
-                case /* 18 */ Token::FUNCTION:
+                case /* 17 */ Token::FUNCTION:
                 {
                     return "function";
                 }
-                case /* 19 */ Token::DEFINED:
+                case /* 18 */ Token::DEFINED:
                 {
                     return "defined";
                 }
-                case /* 20 */ Token::SEQ:
+                case /* 19 */ Token::SEQ:
                 {
                     return "seq";
                 }
-                case /* 21 */ Token::ENDSEQ:
+                case /* 20 */ Token::ENDSEQ:
                 {
                     return "endseq";
                 }
-                case /* 22 */ Token::PAR:
+                case /* 21 */ Token::PAR:
                 {
                     return "par";
                 }
-                case /* 23 */ Token::ENDPAR:
+                case /* 22 */ Token::ENDPAR:
                 {
                     return "endpar";
                 }
-                case /* 24 */ Token::SKIP:
+                case /* 23 */ Token::SKIP:
                 {
                     return "skip";
                 }
-                case /* 25 */ Token::LET:
+                case /* 24 */ Token::LET:
                 {
                     return "let";
                 }
-                case /* 26 */ Token::LOCAL:
+                case /* 25 */ Token::LOCAL:
                 {
                     return "local";
                 }
-                case /* 27 */ Token::IN:
+                case /* 26 */ Token::IN:
                 {
                     return "in";
                 }
-                case /* 28 */ Token::FORALL:
+                case /* 27 */ Token::FORALL:
                 {
                     return "forall";
                 }
-                case /* 29 */ Token::CHOOSE:
+                case /* 28 */ Token::CHOOSE:
                 {
                     return "choose";
                 }
-                case /* 30 */ Token::ITERATE:
+                case /* 29 */ Token::ITERATE:
                 {
                     return "iterate";
                 }
-                case /* 31 */ Token::DO:
+                case /* 30 */ Token::DO:
                 {
                     return "do";
                 }
-                case /* 32 */ Token::IF:
+                case /* 31 */ Token::IF:
                 {
                     return "if";
                 }
-                case /* 33 */ Token::THEN:
+                case /* 32 */ Token::THEN:
                 {
                     return "then";
                 }
-                case /* 34 */ Token::ELSE:
+                case /* 33 */ Token::ELSE:
                 {
                     return "else";
                 }
-                case /* 35 */ Token::CASE:
+                case /* 34 */ Token::CASE:
                 {
                     return "case";
                 }
-                case /* 36 */ Token::OF:
+                case /* 35 */ Token::OF:
                 {
                     return "of";
                 }
-                case /* 37 */ Token::DEFAULT:
+                case /* 36 */ Token::DEFAULT:
                 {
                     return "default";
                 }
-                case /* 38 */ Token::HOLDS:
+                case /* 37 */ Token::HOLDS:
                 {
                     return "holds";
                 }
-                case /* 39 */ Token::EXISTS:
+                case /* 38 */ Token::EXISTS:
                 {
                     return "exists";
                 }
-                case /* 40 */ Token::WITH:
+                case /* 39 */ Token::WITH:
                 {
                     return "with";
                 }
-                case /* 41 */ Token::AS:
+                case /* 40 */ Token::AS:
                 {
                     return "as";
                 }
-                case /* 42 */ Token::WHILE:
+                case /* 41 */ Token::WHILE:
                 {
                     return "while";
                 }
-                case /* 43 */ Token::UNDEF:
+                case /* 42 */ Token::UNDEF:
                 {
                     return "undef";
                 }
-                case /* 44 */ Token::FALSE:
+                case /* 43 */ Token::FALSE:
                 {
                     return "false";
                 }
-                case /* 45 */ Token::TRUE:
+                case /* 44 */ Token::TRUE:
                 {
                     return "true";
                 }
-                case /* 46 */ Token::AND:
+                case /* 45 */ Token::AND:
                 {
                     return "and";
                 }
-                case /* 47 */ Token::OR:
+                case /* 46 */ Token::OR:
                 {
                     return "or";
                 }
-                case /* 48 */ Token::XOR:
+                case /* 47 */ Token::XOR:
                 {
                     return "xor";
                 }
-                case /* 49 */ Token::IMPLIES:
+                case /* 48 */ Token::IMPLIES:
                 {
                     return "implies";
                 }
-                case /* 50 */ Token::NOT:
+                case /* 49 */ Token::NOT:
                 {
                     return "not";
                 }
-                case /* 51 */ Token::PLUS:
+                case /* 50 */ Token::PLUS:
                 {
                     return "+";
                 }
-                case /* 52 */ Token::MINUS:
+                case /* 51 */ Token::MINUS:
                 {
                     return "-";
                 }
-                case /* 53 */ Token::EQUAL:
+                case /* 52 */ Token::EQUAL:
                 {
                     return "=";
                 }
-                case /* 54 */ Token::LPAREN:
+                case /* 53 */ Token::LPAREN:
                 {
                     return "(";
                 }
-                case /* 55 */ Token::RPAREN:
+                case /* 54 */ Token::RPAREN:
                 {
                     return ")";
                 }
-                case /* 56 */ Token::LSQPAREN:
+                case /* 55 */ Token::LSQPAREN:
                 {
                     return "[";
                 }
-                case /* 57 */ Token::RSQPAREN:
+                case /* 56 */ Token::RSQPAREN:
                 {
                     return "]";
                 }
-                case /* 58 */ Token::LCURPAREN:
+                case /* 57 */ Token::LCURPAREN:
                 {
                     return "{";
                 }
-                case /* 59 */ Token::RCURPAREN:
+                case /* 58 */ Token::RCURPAREN:
                 {
                     return "}";
                 }
-                case /* 60 */ Token::COLON:
+                case /* 59 */ Token::COLON:
                 {
                     return ":";
                 }
-                case /* 61 */ Token::DOUBLECOLON:
+                case /* 60 */ Token::DOUBLECOLON:
                 {
                     return "::";
                 }
-                case /* 62 */ Token::UNDERLINE:
+                case /* 61 */ Token::UNDERLINE:
                 {
                     return "_";
                 }
-                case /* 63 */ Token::VERTICAL_BAR:
+                case /* 62 */ Token::VERTICAL_BAR:
                 {
                     return "|";
                 }
-                case /* 64 */ Token::AT:
+                case /* 63 */ Token::AT:
                 {
                     return "@";
                 }
-                case /* 65 */ Token::COMMA:
+                case /* 64 */ Token::COMMA:
                 {
                     return ",";
                 }
-                case /* 66 */ Token::LESSER:
+                case /* 65 */ Token::LESSER:
                 {
                     return "<";
                 }
-                case /* 67 */ Token::GREATER:
+                case /* 66 */ Token::GREATER:
                 {
                     return ">";
                 }
-                case /* 68 */ Token::ASTERIX:
+                case /* 67 */ Token::ASTERIX:
                 {
                     return "*";
                 }
-                case /* 69 */ Token::SLASH:
+                case /* 68 */ Token::SLASH:
                 {
                     return "/";
                 }
-                case /* 70 */ Token::PERCENT:
+                case /* 69 */ Token::PERCENT:
                 {
                     return "%";
                 }
-                case /* 71 */ Token::CARET:
+                case /* 70 */ Token::CARET:
                 {
                     return "^";
                 }
-                case /* 72 */ Token::MARK:
+                case /* 71 */ Token::MARK:
                 {
                     return "'";
                 }
-                case /* 73 */ Token::DOTDOT:
-                {
-                    return "..";
-                }
-                case /* 74 */ Token::DOT:
-                {
-                    return ".";
-                }
-                case /* 75 */ Token::MAPS:
+                case /* 72 */ Token::MAPS:
                 {
                     return "->";
                 }
-                case /* 76 */ Token::ARROW:
+                case /* 73 */ Token::ARROW:
                 {
                     return "=>";
                 }
-                case /* 77 */ Token::UPDATE:
+                case /* 74 */ Token::UPDATE:
                 {
                     return ":=";
                 }
-                case /* 78 */ Token::NEQUAL:
+                case /* 75 */ Token::NEQUAL:
                 {
                     return "!=";
                 }
-                case /* 79 */ Token::LESSEQ:
+                case /* 76 */ Token::LESSEQ:
                 {
                     return "<=";
                 }
-                case /* 80 */ Token::GREATEREQ:
+                case /* 77 */ Token::GREATEREQ:
                 {
                     return ">=";
                 }
-                case /* 81 */ Token::SEQ_BRACKET:
+                case /* 78 */ Token::SEQ_BRACKET:
                 {
                     return "{|";
                 }
-                case /* 82 */ Token::ENDSEQ_BRACKET:
+                case /* 79 */ Token::ENDSEQ_BRACKET:
                 {
                     return "|}";
+                }
+                case /* 80 */ Token::DOT:
+                {
+                    return ".";
+                }
+                case /* 81 */ Token::DOTDOT:
+                {
+                    return "..";
+                }
+                case /* 82 */ Token::DOTDOTDOT:
+                {
+                    return "...";
                 }
             }
             assert( !"internal error" );
