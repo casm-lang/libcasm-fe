@@ -50,8 +50,7 @@
 
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
-#include <libcasm-fe/ast/Definition>
-#include <libcasm-fe/ast/RecursiveVisitor>
+#include <libcasm-fe/ast/Visitor>
 
 namespace libcasm_fe
 {
@@ -66,39 +65,6 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
-    };
-
-    class SymbolRegistrationVisitor final : public AST::RecursiveVisitor
-    {
-      public:
-        SymbolRegistrationVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
-
-        void visit( AST::InitDefinition& node ) override;
-        void visit( AST::FunctionDefinition& node ) override;
-        void visit( AST::DerivedDefinition& node ) override;
-        void visit( AST::RuleDefinition& node ) override;
-        void visit( AST::EnumeratorDefinition& node ) override;
-        void visit( AST::EnumerationDefinition& node ) override;
-        void visit( AST::UsingDefinition& node ) override;
-        void visit( AST::DomainDefinition& node ) override;
-        void visit( AST::StructureDefinition& node ) override;
-        void visit( AST::BehaviorDefinition& node ) override;
-        void visit( AST::ImplementDefinition& node ) override;
-        void visit( AST::BuiltinDefinition& node ) override;
-        void visit( AST::Declaration& node ) override;
-
-      private:
-        void registerSymbol( AST::Definition& node );
-        void registerSymbolNamespace(
-            AST::TypeDefinition& node, const Namespace::Ptr& symbolNamespace );
-        void registerSymbolNamespace(
-            AST::Definition& node,
-            const std::string& typeName,
-            const Namespace::Ptr& symbolNamespace );
-
-      private:
-        libcasm_fe::Logger& m_log;
-        Namespace& m_symboltable;
     };
 }
 

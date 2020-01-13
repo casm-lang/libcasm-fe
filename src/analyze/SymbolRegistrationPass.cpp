@@ -47,8 +47,9 @@
 
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
-#include <libcasm-fe/analyze/AttributionPass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/ast/Declaration>
+#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/transform/CstToAstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
@@ -69,6 +70,39 @@ static libpass::PassRegistration< SymbolRegistrationPass > PASS(
 //
 // SymbolRegistrationVisitor
 //
+
+namespace libcasm_fe
+{
+    namespace AST
+    {
+        class SymbolRegistrationVisitor final : public RecursiveVisitor
+        {
+          public:
+            SymbolRegistrationVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
+
+            void visit( InitDefinition& node ) override;
+            void visit( FunctionDefinition& node ) override;
+            void visit( DerivedDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
+            void visit( EnumeratorDefinition& node ) override;
+            void visit( EnumerationDefinition& node ) override;
+            void visit( UsingDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
+            void visit( StructureDefinition& node ) override;
+            void visit( BehaviorDefinition& node ) override;
+            void visit( ImplementDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
+            void visit( Declaration& node ) override;
+
+          private:
+            void registerSymbol( Definition& node );
+
+          private:
+            libcasm_fe::Logger& m_log;
+            Namespace& m_symboltable;
+        };
+    }
+}
 
 SymbolRegistrationVisitor::SymbolRegistrationVisitor(
     libcasm_fe::Logger& log, Namespace& symboltable )
@@ -121,171 +155,57 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 {
     registerSymbol( node );
 
-    const auto symbolNamespace = std::make_shared< Namespace >();
-
-    registerSymbolNamespace( node, symbolNamespace );
-
-    const auto& domainName = node.identifier()->name();
-    auto domainNamespace = m_symboltable.findNamespace( domainName );
-    assert( domainNamespace and " inconsistent state @ registerSymbolNamespace " );
-
-    SymbolRegistrationVisitor enumeratorVisitor( m_log, *domainNamespace );
+    SymbolRegistrationVisitor enumeratorVisitor( m_log, *node.symboltable() );
     node.enumerators()->accept( enumeratorVisitor );
 }
 
 void SymbolRegistrationVisitor::visit( UsingDefinition& node )
 {
-    const auto& name = node.identifier()->name();
-    if( name == TypeInfo::TYPE_NAME_AGENT )
-    {
-        return;
-    }
-
     registerSymbol( node );
 }
 
 void SymbolRegistrationVisitor::visit( DomainDefinition& node )
 {
     registerSymbol( node );
-
-    const auto symbolNamespace = std::make_shared< Namespace >();
-
-    registerSymbolNamespace( node, symbolNamespace );
 }
 
 void SymbolRegistrationVisitor::visit( StructureDefinition& node )
 {
-    registerSymbol( node );
-
-    const auto symbolNamespace = std::make_shared< Namespace >();
-    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, *symbolNamespace );
+    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, *node.symboltable() );
     node.functions()->accept( symbolRegistrationVisitor );
 
-    registerSymbolNamespace( node, symbolNamespace );
+    registerSymbol( node );
 }
 
 void SymbolRegistrationVisitor::visit( BehaviorDefinition& node )
 {
-    registerSymbol( node );
-
-    const auto symbolNamespace = std::make_shared< Namespace >();
-    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, *symbolNamespace );
+    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, *node.symboltable() );
     node.definitions()->accept( symbolRegistrationVisitor );
 
-    registerSymbolNamespace( node, symbolNamespace );
+    registerSymbol( node );
 }
 
 void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
 {
-    const auto& domainType = node.domainType();
-    const auto& domainTypeName = domainType->signature();
-    const auto& domainTypePath = domainType->signaturePath();
+    // symbol registration is done during symbol resolving
 
-    // Domain::Type::
-    const auto domainTypeNamespace = m_symboltable.findNamespace( *domainTypePath );
-    if( not domainTypeNamespace )
-    {
-        // domain type not found, delay to SymbolResolverPass
-        return;
-    }
-
-    // Domain::Type::Domain::
-    const auto implementDomainNamespace = std::make_shared< Namespace >();
-    auto implementDomainDefinition = node.ptr< TypeDefinition >();
-    auto implementDomainName = implementDomainDefinition->identifier()->name();
-    auto implementTypeName = implementDomainDefinition->domainType()->signature();
-
-    if( node.hasBehavior() )
-    {
-        const auto& behaviorType = node.behaviorType();
-        const auto& behaviorTypeName = behaviorType->signature();
-        const auto& behaviorTypePath = behaviorType->signaturePath();
-        const auto& behaviorTypeSymbolResult = m_symboltable.findSymbol( *behaviorTypePath );
-        const auto& behaviorTypeSymbol = behaviorTypeSymbolResult.first;
-        if( not behaviorTypeSymbol )
-        {
-            // behavior type not found, delay to SymbolResolverPass
-            return;
-        }
-
-        implementDomainDefinition = behaviorTypeSymbol->ptr< TypeDefinition >();
-        implementDomainName = behaviorType->signature();
-        implementTypeName = behaviorType->signature();
-    }
-
-    try
-    {
-        // Domain::Type::Symbol
-        domainTypeNamespace->registerSymbol( implementDomainName, implementDomainDefinition );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.findSymbol( implementDomainName );
-        m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
-        m_log.info( { symbol->sourceLocation() }, e.what() );
-        return;
-    }
-
-    try
-    {
-        // Domain::Type::Domain::
-        domainTypeNamespace->registerNamespace( implementDomainName, implementDomainNamespace );
-    }
-    catch( const std::domain_error& e )
-    {
-        m_log.debug( { node.sourceLocation() }, e.what() );
-    }
-
-    try
-    {
-        // Domain::Type::Domain::Symbol
-        implementDomainNamespace->registerSymbol( implementTypeName, node.ptr< TypeDefinition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.findSymbol( implementDomainName );
-        m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
-        m_log.info( { symbol->sourceLocation() }, e.what() );
-        return;
-    }
-
-    // Domain::Type::Domain::Type::*
-    const auto implementTypeNamespace = std::make_shared< Namespace >();
-    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, *implementTypeNamespace );
+    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, *node.symboltable() );
     node.definitions()->accept( symbolRegistrationVisitor );
-
-    try
-    {
-        // Domain::Type::Domain::Type::
-        implementDomainNamespace->registerNamespace( implementTypeName, implementTypeNamespace );
-    }
-    catch( const std::domain_error& e )
-    {
-        m_log.debug( { node.sourceLocation() }, e.what() );
-    }
 }
 
 void SymbolRegistrationVisitor::visit( BuiltinDefinition& node )
 {
     registerSymbol( node );
-
-    node.relationType().argumentTypes()->accept( *this );
-    node.relationType().returnType()->accept( *this );
-
-    const auto symbolNamespace = std::make_shared< Namespace >();
-    registerSymbolNamespace( node, symbolNamespace );
 }
 
 void SymbolRegistrationVisitor::visit( Declaration& node )
 {
     registerSymbol( node );
-    RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::registerSymbol( Definition& node )
 {
     const auto& name = node.identifier()->name();
-
     try
     {
         m_symboltable.registerSymbol( name, node.ptr< Definition >() );
@@ -294,103 +214,54 @@ void SymbolRegistrationVisitor::registerSymbol( Definition& node )
     {
         const auto& symbol = m_symboltable.findSymbol( name );
 
-        if( ( node.id() == Node::ID::DOMAIN_DEFINITION and
-              symbol->id() == Node::ID::DOMAIN_DEFINITION ) or
-            ( node.id() == Node::ID::BUILTIN_DEFINITION and
-              symbol->id() == Node::ID::BUILTIN_DEFINITION ) or
-            ( node.id() == Node::ID::BEHAVIOR_DEFINITION and
-              symbol->id() == Node::ID::BEHAVIOR_DEFINITION ) or
-            ( node.id() == Node::ID::STRUCTURE_DEFINITION and
-              symbol->id() == Node::ID::STRUCTURE_DEFINITION ) )
+        if( symbol->abstract() and not node.abstract() )
         {
-            const auto& nodeTTD = static_cast< const TypeDefinition& >( node );
-            const auto& symbolTTD = static_cast< const TypeDefinition& >( *symbol );
-
-            if( nodeTTD.templateNode()->symbols()->size() == 0 and
-                symbolTTD.templateNode()->symbols()->size() != 0 )
-            {
-                // already registered domain template of domain instance
-                return;
-            }
-
-            if( nodeTTD.domainType()->id() == Node::ID::TEMPLATE_TYPE and
-                symbolTTD.domainType()->id() == Node::ID::TEMPLATE_TYPE )
-            {
-                // already registered domain of template type instance
-                return;
-            }
-
-            if( nodeTTD.domainType()->id() == Node::ID::FIXED_SIZED_TYPE and
-                symbolTTD.domainType()->id() == Node::ID::BASIC_TYPE )
-            {
-                // already registered domain of fixed sized type instance
-                return;
-            }
+            symbol->symboltable()->replaceSymbol( name, node.ptr< Definition >() );
+            return;
         }
-
-        m_log.error(
-            { node.sourceLocation() },
-            "registerSymbol@Symbol: " + std::string( e.what() ),
-            Code::IdentifierIsAlreadyUsed );
-        m_log.info( { symbol->sourceLocation() }, e.what() );
-    }
-}
-
-void SymbolRegistrationVisitor::registerSymbolNamespace(
-    TypeDefinition& node, const Namespace::Ptr& symbolNamespace )
-{
-    const auto& typeName = node.domainType()->signature();
-    registerSymbolNamespace( node, typeName, symbolNamespace );
-}
-
-void SymbolRegistrationVisitor::registerSymbolNamespace(
-    Definition& node, const std::string& typeName, const Namespace::Ptr& symbolNamespace )
-{
-    const auto& domainName = node.identifier()->name();
-    auto domainNamespace = m_symboltable.findNamespace( domainName );
-    if( not domainNamespace )
-    {
-        domainNamespace = std::make_shared< Namespace >();
-        try
+        else
         {
-            m_symboltable.registerNamespace( domainName, domainNamespace );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error( { node.sourceLocation() }, e.what() );
+            m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
+            m_log.info( { symbol->sourceLocation() }, e.what() );
             return;
         }
     }
 
-    try
+    if( ( node.id() == Node::ID::DOMAIN_DEFINITION ) or
+        ( node.id() == Node::ID::ENUMERATION_DEFINITION ) or
+        ( node.id() == Node::ID::STRUCTURE_DEFINITION ) )
     {
-        domainNamespace->registerSymbol( typeName, node.ptr< Definition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = domainNamespace->findSymbol( typeName );
-        m_log.debug( { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
-        return;
-    }
+        const auto& typeDefinition = static_cast< TypeDefinition& >( node );
+        const auto& typeName = typeDefinition.domainType()->signature();
 
-    auto typeNamespace = symbolNamespace;
-    if( node.id() == Node::ID::DOMAIN_DEFINITION and domainName == TypeInfo::TYPE_NAME_INTEGER )
-    {
-        const auto& typeDefinition = static_cast< const TypeDefinition& >( node );
-        if( typeDefinition.domainType()->id() == Node::ID::FIXED_SIZED_TYPE )
+        try
         {
-            typeNamespace = domainNamespace->findNamespace( domainName );
-            assert( typeNamespace and " inconsistent state " );
+            node.symboltable()->registerNamespace( name, std::make_shared< Namespace >() );
         }
-    }
+        catch( const std::domain_error& e )
+        {
+            m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
+        }
 
-    try
-    {
-        domainNamespace->registerNamespace( typeName, typeNamespace );
-    }
-    catch( const std::domain_error& e )
-    {
-        m_log.debug( { node.sourceLocation() }, e.what() );
+        try
+        {
+            node.symboltable()->registerSymbol( name, node.ptr< Definition >() );
+        }
+        catch( const std::domain_error& e )
+        {
+            const auto& symbol = node.symboltable()->findSymbol( typeName );
+
+            if( symbol->abstract() and not node.abstract() )
+            {
+                m_symboltable.replaceSymbol( name, node.ptr< Definition >() );
+                return;
+            }
+
+            m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
+            m_log.info( { symbol->sourceLocation() }, e.what() );
+        }
+
+        return;
     }
 }
 
@@ -401,19 +272,18 @@ void SymbolRegistrationVisitor::registerSymbolNamespace(
 
 void SymbolRegistrationPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
-    pu.scheduleAfter< AttributionPass >();
+    pu.require< CstToAstPass >();
 }
 
 u1 SymbolRegistrationPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
-    const auto specification = data->specification();
+    const auto& data = pr.output< CstToAstPass >();
+    const auto& specification = data->specification();
 
     SymbolRegistrationVisitor visitor( log, *specification->symboltable() );
-    specification->definitions()->accept( visitor );
+    specification->ast()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
