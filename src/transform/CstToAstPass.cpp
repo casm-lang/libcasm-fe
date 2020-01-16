@@ -479,6 +479,13 @@ void CstToAstVisitor::visit( StructureDefinition& node )
     const auto& domainType = AST::make< AST::BasicType >(
         identifier->sourceLocation(), AST::IdentifierPath::fromIdentifier( identifier ) );
 
+    // extend relation type of functions by adding the structure domainType as first argument
+    for( const auto& function : *functions )
+    {
+        const auto& functionArgumentTypes = function->argumentTypes();
+        functionArgumentTypes->add( functionArgumentTypes->begin(), domainType );
+    }
+
     const auto& astNode = store< AST::StructureDefinition >( node, domainType, functions );
     astNode->setTemplateSymbols( templateSymbols );
     astNode->setExported( node.exported() );
@@ -919,14 +926,22 @@ void CstToAstVisitor::visit( IdentifierPath& node )
 
 void CstToAstVisitor::visit( ExpressionCase& node )
 {
+    const auto& expression = fetch< AST::Expression >( node.expression() );
+    const auto& rule = fetch< AST::Rule >( node.rule() );
+    store< AST::ExpressionCase >( node, expression, rule );
 }
 
 void CstToAstVisitor::visit( DefaultCase& node )
 {
+    const auto& rule = fetch< AST::Rule >( node.rule() );
+    store< AST::DefaultCase >( node, rule );
 }
 
 void CstToAstVisitor::visit( VariableBinding& node )
 {
+    const auto& variable = fetch< AST::VariableDefinition >( node.variable() );
+    const auto& expression = fetch< AST::Expression >( node.expression() );
+    store< AST::VariableBinding >( node, variable, expression );
 }
 
 void CstToAstVisitor::visit( BasicAttribute& node )
