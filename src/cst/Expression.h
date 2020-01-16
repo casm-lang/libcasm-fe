@@ -403,7 +403,7 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            const Expression::Ptr& m_expression;
+            const Expression::Ptr m_expression;
             const Token::Ptr m_operationToken;
         };
 
@@ -428,8 +428,8 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            const Expression::Ptr& m_left;
-            const Expression::Ptr& m_right;
+            const Expression::Ptr m_left;
+            const Expression::Ptr m_right;
             const Token::Ptr m_operationToken;
         };
 
