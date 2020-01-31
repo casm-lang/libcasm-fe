@@ -337,10 +337,8 @@ behavior Equality = {
     derived equal : Object * Object -> Boolean
 
     [ pure ]
-    derived unequal : Object * Object -> Boolean
-// @ppaulweber: enable default implementation support
-//    derived unequal( this, other : Equality ) -> Boolean =
-//        not this.equal( other )
+    derived unequal( this, other : Equality ) -> Boolean =
+        not this.equal( other )
 }
 
 /**
@@ -535,10 +533,6 @@ implement Equality for Boolean = {
     [ pure ]
     derived equal( this, other : Boolean ) -> Boolean =
         template< Type : Boolean > EquInstruction( this, other )
-
-    [ pure ]
-    derived unequal( this, other : Boolean ) -> Boolean =
-        not template< Type : Boolean > EquInstruction( this, other )
 }
 
 implement TypeCasting< String > for Boolean = {
@@ -643,10 +637,6 @@ implement Equality for Integer = {
     [ pure ]
     derived equal( this, other : Integer ) -> Boolean =
         template< Type : Integer > EquInstruction( this, other )
-
-    [ pure ]
-    derived unequal( this, other : Integer ) -> Boolean =
-        not template< Type : Integer > EquInstruction( this, other )
 }
 
 implement PartialOrder for Integer = {
@@ -783,10 +773,6 @@ implement Equality for Rational = {
     [ pure ]
     derived equal( this, other : Rational ) -> Boolean =
         template< Type : Rational > EquInstruction( this, other )
-
-    [ pure ]
-    derived unequal( this, other : Rational ) -> Boolean =
-        not template< Type : Rational > EquInstruction( this, other )
 }
 
 implement PartialOrder for Rational = {
@@ -840,10 +826,6 @@ implement Equality for String = {
     [ pure ]
     derived equal( this, other : String ) -> Boolean =
         template< Type : String > EquInstruction( this, other )
-
-    [ pure ]
-    derived unequal( this, other : String ) -> Boolean =
-        not template< Type : String > EquInstruction( this, other )
 }
 
 implement TypeCasting< String > for String = {
@@ -865,10 +847,6 @@ implement Equality for enumeration = {
     [ pure ]
     derived equal( this, other : enumeration ) -> Boolean =
         template< Type : enumeration > EquInstruction( this, other )
-
-    [ pure ]
-    derived unequal( this, other : enumeration ) -> Boolean =
-        not template< Type : enumeration > EquInstruction( this, other )
 }
 
 implement Cardinality for enumeration = {
@@ -905,10 +883,6 @@ implement TypeCasting< enumeration > for enumeration = {
 //     [ pure ]
 //     derived equal( this, other : Binary'N ) -> Boolean =
 //         template< Type : Binary'N > EquInstruction( this, other )
-
-//     [ pure ]
-//     derived unequal( this, other : Binary'N ) -> Boolean =
-//         not template< Type : Binary'N > EquInstruction( this, other )
 // }
 
 // template< N : Integer >
@@ -935,10 +909,6 @@ implement Equality for RuleRef< Signature > = {
     [ pure ]
     derived equal( this, other : RuleRef< Signature > ) -> Boolean =
         template< Type : RuleRef< Signature > > EquInstruction( this, other )
-
-    [ pure ]
-    derived unequal( this, other : RuleRef< Signature > ) -> Boolean =
-        not template< Type : RuleRef< Signature > > EquInstruction( this, other )
 }
 
 template< Signature >
@@ -958,10 +928,6 @@ implement Equality for FuncRef< Signature > = {
     [ pure ]
     derived equal( this, other : FuncRef< Signature > ) -> Boolean =
         template< Type : FuncRef< Signature > > EquInstruction( this, other )
-
-    [ pure ]
-    derived unequal( this, other : FuncRef< Signature > ) -> Boolean =
-        not template< Type : FuncRef< Signature > > EquInstruction( this, other )
 }
 
 template< Signature >
@@ -992,10 +958,6 @@ implement Equality for Agent = {
     [ pure ]
     derived equal( this, other : Agent ) -> Boolean =
         template< Type : Agent > EquInstruction( this, other )
-
-    [ pure ]
-    derived unequal( this, other : Agent ) -> Boolean =
-        not template< Type : Agent > EquInstruction( this, other )
 }
 
 //
