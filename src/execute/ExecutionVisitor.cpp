@@ -370,26 +370,15 @@ void ExecutionVisitor::visit( BuiltinDefinition& node )
         return;
     }
 
-    try
-    {
-        const auto& arguments = m_frameStack.top()->locals();
-        IR::Constant result;
+    const auto& arguments = m_frameStack.top()->locals();
+    IR::Constant result;
 
-        IR::Operation::execute( node.targetId(), type, result, arguments.data(), arguments.size() );
+    IR::Operation::execute( node.targetId(), type, result, arguments.data(), arguments.size() );
 
-        const auto& returnType = type->result();
-        if( not returnType.isVoid() )
-        {
-            m_evaluationStack.push( result );
-        }
-    }
-    catch( const std::exception& e )
+    const auto& returnType = type->result();
+    if( not returnType.isVoid() )
     {
-        // throw RuntimeException(
-        //     node.sourceLocation(),
-        //     "builtin has thrown an exception: " + std::string( e.what() ),
-        //     m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-        //     Code::RuntimeException );
+        m_evaluationStack.push( result );
     }
 }
 
@@ -486,9 +475,9 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 {
     switch( node.targetType() )
     {
-        case DirectCallExpression::TargetType::BUILTIN:   // [[fallthrough]]
         case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
-        case DirectCallExpression::TargetType::DERIVED:
+        case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
+        case DirectCallExpression::TargetType::BUILTIN:
         {
             const auto& definition = node.targetDefinition();
             m_frameStack.push(
@@ -503,7 +492,20 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             const auto& definition = node.targetDefinition();
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-            definition->accept( *this );
+
+            try
+            {
+                definition->accept( *this );
+            }
+            catch( const std::exception& e )
+            {
+                throw RuntimeException(
+                    { node.sourceLocation() },
+                    "rule has thrown an exception: " + std::string( e.what() ),
+                    m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                    Code::RuntimeException );
+            }
+
             m_frameStack.pop();
             try
             {
