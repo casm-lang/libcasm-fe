@@ -73,23 +73,6 @@ namespace libcasm_fe
 
         using Expressions = NodeList< Expression >;
 
-        class EmbracedExpression final : public Expression
-        {
-          public:
-            using Ptr = std::shared_ptr< EmbracedExpression >;
-
-            explicit EmbracedExpression( const Expression::Ptr& expression );
-
-            const Expression::Ptr& expression( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-            Node::Ptr clone( void ) const override final;
-
-          private:
-            const Expression::Ptr m_expression;
-        };
-
         class AbstractExpression final : public Expression
         {
           public:

@@ -99,7 +99,6 @@ namespace libcasm_fe
 
                 // expressions
                 ABSTRACT_EXPRESSION,
-                EMBRACED_EXPRESSION,
                 NAMED_EXPRESSION,
                 MAPPED_EXPRESSION,
                 DIRECT_CALL_EXPRESSION,

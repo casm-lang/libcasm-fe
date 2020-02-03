@@ -94,36 +94,6 @@ Node::Ptr AbstractExpression::clone( void ) const
 
 //
 //
-// EmbracedExpression
-//
-
-EmbracedExpression::EmbracedExpression( const Expression::Ptr& expression )
-: Expression( Node::ID::EMBRACED_EXPRESSION )
-, m_expression( expression )
-{
-}
-
-const Expression::Ptr& EmbracedExpression::expression( void ) const
-{
-    return m_expression;
-}
-
-void EmbracedExpression::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-Node::Ptr EmbracedExpression::clone( void ) const
-{
-    auto duplicate =
-        std::make_shared< EmbracedExpression >( expression()->duplicate< Expression >() );
-
-    Expression::clone( *duplicate );
-    return duplicate;
-}
-
-//
-//
 // NamedExpression
 //
 

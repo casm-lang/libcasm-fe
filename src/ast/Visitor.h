@@ -80,7 +80,6 @@ namespace libcasm_fe
         class RecordLiteral;
 
         class AbstractExpression;
-        class EmbracedExpression;
         class NamedExpression;
         class MappedExpression;
         class DirectCallExpression;
@@ -162,7 +161,6 @@ namespace libcasm_fe
             virtual void visit( RecordLiteral& node ) = 0;
 
             virtual void visit( AbstractExpression& node ) = 0;
-            virtual void visit( EmbracedExpression& node ) = 0;
             virtual void visit( NamedExpression& node ) = 0;
             virtual void visit( MappedExpression& node ) = 0;
             virtual void visit( DirectCallExpression& node ) = 0;
@@ -240,7 +238,6 @@ namespace libcasm_fe
             void visit( RecordLiteral& node ) override;
 
             void visit( AbstractExpression& node ) override;
-            void visit( EmbracedExpression& node ) override;
             void visit( NamedExpression& node ) override;
             void visit( MappedExpression& node ) override;
             void visit( DirectCallExpression& node ) override;
@@ -318,7 +315,6 @@ namespace libcasm_fe
             void visit( RecordLiteral& node ) override;
 
             void visit( AbstractExpression& node ) override;
-            void visit( EmbracedExpression& node ) override;
             void visit( NamedExpression& node ) override;
             void visit( MappedExpression& node ) override;
             void visit( DirectCallExpression& node ) override;

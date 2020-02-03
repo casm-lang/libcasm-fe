@@ -225,11 +225,6 @@ void RecursiveVisitor::visit( AbstractExpression& node )
 {
 }
 
-void RecursiveVisitor::visit( EmbracedExpression& node )
-{
-    node.expression()->accept( *this );
-}
-
 void RecursiveVisitor::visit( NamedExpression& node )
 {
     node.identifier()->accept( *this );
@@ -568,10 +563,6 @@ void EmptyVisitor::visit( RecordLiteral& )
 }
 
 void EmptyVisitor::visit( AbstractExpression& )
-{
-}
-
-void EmptyVisitor::visit( EmbracedExpression& )
 {
 }
 

@@ -191,10 +191,6 @@ std::string Node::description( void ) const
         {
             return "abstract expression";
         }
-        case ID::EMBRACED_EXPRESSION:
-        {
-            return "embraced expression";
-        }
         case ID::NAMED_EXPRESSION:
         {
             return "named expression";
