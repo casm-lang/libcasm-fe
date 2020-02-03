@@ -472,7 +472,7 @@ MethodCallExpression::MethodCallExpression(
     const Token::Ptr& dotToken,
     const Identifier::Ptr& methodName,
     const Expressions::Ptr& arguments )
-: TargetCallExpression( Node::ID::METHOD_CALL_EXPRESSION, std::make_shared< Expressions >() )
+: TargetCallExpression( Node::ID::METHOD_CALL_EXPRESSION, arguments )
 , m_object( object )
 , m_methodName( methodName )
 , m_dotToken( dotToken )
