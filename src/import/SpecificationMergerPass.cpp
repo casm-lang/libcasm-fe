@@ -46,7 +46,7 @@
 #include "SpecificationMergerPass.h"
 
 #include <libcasm-fe/Logger>
-#include <libcasm-fe/analyze/SymbolResolverPass>
+#include <libcasm-fe/analyze/TemplatingPass>
 #include <libcasm-fe/import/LibraryLoaderPass>
 #include <libcasm-fe/transform/CstToAstPass>
 
@@ -71,7 +71,7 @@ void SpecificationMergerPass::usage( libpass::PassUsage& pu )
 {
     pu.require< CstToAstPass >();
     pu.require< LibraryLoaderPass >();
-    //    pu.scheduleAfter< SymbolResolverPass >();
+    pu.scheduleAfter< TemplatingPass >();
 }
 
 u1 SpecificationMergerPass::run( libpass::PassResult& pr )
