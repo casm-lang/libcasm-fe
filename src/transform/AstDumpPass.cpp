@@ -143,7 +143,7 @@ namespace libcasm_fe
             void visit( TupleLiteral& node ) override;
             void visit( RecordLiteral& node ) override;
 
-            void visit( EmbracedExpression& node ) override;
+            void visit( AbstractExpression& node ) override;
             void visit( NamedExpression& node ) override;
             void visit( DirectCallExpression& node ) override;
             void visit( MethodCallExpression& node ) override;
@@ -414,10 +414,10 @@ void ASTDumpVisitor::visit( RecordLiteral& node )
     RecursiveVisitor::visit( node );
 }
 
-void ASTDumpVisitor::visit( EmbracedExpression& node )
+void ASTDumpVisitor::visit( AbstractExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "EmbracedExpression" );
+    dumpNode( node, "AbstractExpression" );
 }
 
 void ASTDumpVisitor::visit( NamedExpression& node )
