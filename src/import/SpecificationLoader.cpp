@@ -45,7 +45,7 @@
 
 #include "SpecificationLoader.h"
 
-#include <libcasm-fe/analyze/SymbolResolverPass>
+#include <libcasm-fe/analyze/TemplatingPass>
 #include <libcasm-fe/import/FileLoadingStrategy>
 #include <libcasm-fe/import/ImportError>
 #include <libcasm-fe/import/LibraryLoaderPass>
@@ -167,7 +167,7 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     libpass::PassManager passManager;
     passManager.setStream( m_logStream );
     passManager.setDefaultResult( defaultPassResult );
-    passManager.setDefaultPass< SymbolResolverPass >();
+    passManager.setDefaultPass< TemplatingPass >();
 
     if( not passManager.run() )
     {
