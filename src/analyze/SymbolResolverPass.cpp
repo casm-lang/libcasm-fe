@@ -52,6 +52,7 @@
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
+#include <libcasm-fe/analyze/TemplatingPass>
 #include <libcasm-fe/ast/Declaration>
 #include <libcasm-fe/ast/Literal>
 #include <libcasm-fe/ast/Node>
@@ -225,25 +226,6 @@ void NamespaceResolveVisitor::registerSymbolWithPath(
                 m_log.info( { otherSymbol->sourceLocation() }, e.what() );
             }
             return;
-        }
-    }
-
-    if( definition->id() == Node::ID::ENUMERATION_DEFINITION or
-        definition->id() == Node::ID::STRUCTURE_DEFINITION or
-        definition->id() == Node::ID::BEHAVIOR_DEFINITION or
-        definition->id() == Node::ID::DOMAIN_DEFINITION )
-    {
-        const auto innerNamespace = m_symboltable.findNamespace( path );
-        assert( innerNamespace != nullptr );
-
-        try
-        {
-            m_symboltable.registerNamespace(
-                name, innerNamespace, Namespace::Visibility::Internal );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.debug( { node.sourceLocation() }, std::string( e.what() ) );
         }
     }
 }
@@ -487,39 +469,19 @@ void SymbolResolveVisitor::visit( ImplementDefinition& node )
     }
 
     const auto& typeDefinition = node.domainType()->typeDefinition();
+    if( not typeDefinition )
+    {
+        m_log.error( { node.domainType()->sourceLocation() }, "unknown symbol detected!" );
+        return;
+    }
+
     assert( typeDefinition and " inconsistent state @ SymbolRegistrationPass " );
     m_objectTypeDefinition = typeDefinition;
 
-    node.definitions()->accept( *this );
-
-    popSymbols< VariableDefinition >( node.templateSymbols() );
-    m_objectTypeDefinition = temporaryObjectDefinition;
-
     const auto& implementDefinition = node.ptr< ImplementDefinition >();
-    if( node.forBehaviorType() )
+    if( not node.forBehaviorType() )
     {
-        try
-        {
-            typeDefinition->addExtendedBehavior( implementDefinition );
-        }
-        catch( const std::domain_error& e )
-        {
-            const auto& behaviorTypeName = node.behaviorType()->signature();
-            const auto& domainTypeName = node.domainType()->signature();
-            const auto& symbol =
-                typeDefinition->symboltable()->findNamespace( "+" )->findSymbol( behaviorTypeName );
-            assert( symbol and " inconsistent state " );
-            if( &node != symbol.get() )
-            {
-                const auto msg = node.description() + " of extended behavior '" + behaviorTypeName +
-                                 "' already defined for '" + domainTypeName + "'";
-                m_log.error( { node.sourceLocation() }, msg, Code::IdentifierIsAlreadyUsed );
-                m_log.info( { symbol->sourceLocation() }, msg );
-            }
-        }
-    }
-    else
-    {
+        // implement <type>
         try
         {
             typeDefinition->setBasicBehavior( implementDefinition );
@@ -540,6 +502,59 @@ void SymbolResolveVisitor::visit( ImplementDefinition& node )
             }
         }
     }
+    else
+    {
+        // implement <behavior> for <type>
+        try
+        {
+            typeDefinition->addExtendedBehavior( implementDefinition );
+        }
+        catch( const std::domain_error& e )
+        {
+            const auto& behaviorTypeName = node.behaviorType()->signature();
+            const auto& domainTypeName = node.domainType()->signature();
+            const auto& symbol =
+                typeDefinition->symboltable()->findNamespace( "+" )->findSymbol( behaviorTypeName );
+            assert( symbol and " inconsistent state " );
+            if( &node != symbol.get() )
+            {
+                const auto msg = node.description() + " of extended behavior '" + behaviorTypeName +
+                                 "' already defined for '" + domainTypeName + "'";
+                m_log.error( { node.sourceLocation() }, msg, Code::IdentifierIsAlreadyUsed );
+                m_log.info( { symbol->sourceLocation() }, msg );
+            }
+        }
+
+        const auto& behaviorDefinition =
+            node.behaviorType()->typeDefinition()->ptr< BehaviorDefinition >();
+        for( const auto& definition : *behaviorDefinition->definitions() )
+        {
+            if( definition->id() == Node::ID::DECLARATION )
+            {
+                continue;
+            }
+
+            const auto& definitionInstance = TemplatingPass::duplicate(
+                m_log, definition, node.behaviorType(), node.domainType() );
+
+            const auto& definitionName = definition->identifier()->name();
+            try
+            {
+                node.symboltable()->registerSymbol( definitionName, definitionInstance );
+            }
+            catch( const std::domain_error& e )
+            {
+                continue;
+            }
+
+            node.definitions()->add( definitionInstance );
+        }
+    }
+
+    node.definitions()->accept( *this );
+
+    popSymbols< VariableDefinition >( node.templateSymbols() );
+    m_objectTypeDefinition = temporaryObjectDefinition;
 }
 
 void SymbolResolveVisitor::visit( DomainDefinition& node )
@@ -1110,14 +1125,15 @@ void SymbolResolveVisitor::resolveTypeDefinition( AST::Type& node )
 
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SpecificationMergerPass >();
+    pu.require< CstToAstPass >();
+    pu.scheduleAfter< LibraryLoaderPass >();
 }
 
 u1 SymbolResolverPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SpecificationMergerPass >();
+    const auto data = pr.output< CstToAstPass >();
     const auto specification = data->specification();
     auto& symboltable = *specification->symboltable();
 
