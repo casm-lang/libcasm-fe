@@ -82,7 +82,6 @@ namespace libcasm_fe
             void visit( RecordLiteral& node ) override;
 
             void visit( AbstractExpression& node ) override;
-            void visit( EmbracedExpression& node ) override;
             void visit( NamedExpression& node ) override;
             void visit( DirectCallExpression& node ) override;
             void visit( MethodCallExpression& node ) override;
@@ -163,13 +162,6 @@ void PropertyResolverVisitor::visit( RecordLiteral& node )
 
     const auto properties = intersectPropertiesOf< NamedExpressions >( *node.namedExpressions() );
     node.setProperties( properties );
-}
-
-void PropertyResolverVisitor::visit( EmbracedExpression& node )
-{
-    RecursiveVisitor::visit( node );
-
-    node.setProperties( node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( AbstractExpression& node )
