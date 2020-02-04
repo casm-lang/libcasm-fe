@@ -45,6 +45,10 @@
 #ifndef _LIBCASM_FE_TEMPLATING_PASS_H_
 #define _LIBCASM_FE_TEMPLATING_PASS_H_
 
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/Type>
+
 #include <libpass/Pass>
 
 namespace libcasm_fe
@@ -57,6 +61,13 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
+
+      public:
+        static AST::Definition::Ptr duplicate(
+            libcasm_fe::Logger& log,
+            const AST::Definition::Ptr& node,
+            const AST::Type::Ptr& from,
+            const AST::Type::Ptr& to );
     };
 }
 

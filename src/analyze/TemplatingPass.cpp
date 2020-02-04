@@ -85,7 +85,10 @@ namespace libcasm_fe
         {
           public:
             TemplatingVisitor(
-                libcasm_fe::Logger& log, Namespace& symboltable, const Type::Ptr& templateType );
+                libcasm_fe::Logger& log,
+                const Type::Ptr& templateType,
+                const Type::Ptr& fromType = nullptr,
+                const Type::Ptr& toType = nullptr );
 
             void visit( Root& node ) override;
 
@@ -117,7 +120,6 @@ namespace libcasm_fe
             void visit( RecordLiteral& node ) override;
 
             void visit( AbstractExpression& node ) override;
-            void visit( EmbracedExpression& node ) override;
             void visit( NamedExpression& node ) override;
             void visit( MappedExpression& node ) override;
             void visit( DirectCallExpression& node ) override;
@@ -199,7 +201,7 @@ namespace libcasm_fe
             typename T::Ptr store( Node& node, Args&&... args )
             {
                 const auto& result =
-                    make< T >( node.sourceLocation(), std::forward< Args >( args )... );
+                    AST::make< T >( node.sourceLocation(), std::forward< Args >( args )... );
                 set( node, result );
                 return result;
             }
@@ -216,8 +218,9 @@ namespace libcasm_fe
 
           private:
             libcasm_fe::Logger& m_log;
-            Namespace& m_symboltable;
             const Type::Ptr m_templateType;
+            const Type::Ptr m_fromType;
+            const Type::Ptr m_toType;
             Definitions::Ptr m_definitions;
             TypeDefinition::Ptr m_objectDefinition;
 
@@ -227,10 +230,14 @@ namespace libcasm_fe
 }
 
 TemplatingVisitor::TemplatingVisitor(
-    libcasm_fe::Logger& log, Namespace& symboltable, const Type::Ptr& templateType )
+    libcasm_fe::Logger& log,
+    const Type::Ptr& templateType,
+    const Type::Ptr& fromType,
+    const Type::Ptr& toType )
 : m_log( log )
-, m_symboltable( symboltable )
 , m_templateType( templateType )
+, m_fromType( fromType )
+, m_toType( toType )
 , m_definitions( std::make_shared< Definitions >() )
 , m_objectDefinition()
 {
@@ -246,6 +253,29 @@ void TemplatingVisitor::visit( InitDefinition& node )
 
 void TemplatingVisitor::visit( VariableDefinition& node )
 {
+    const auto& identifier = fetch< Identifier >( node.identifier() );
+
+    Type::Ptr variableType = nullptr;
+    if( m_fromType and m_toType and ( identifier->name() == "this" ) )
+    {
+        variableType = fetch< Type >( m_toType );
+    }
+    else if(
+        m_fromType and m_toType and
+        ( m_fromType->signature() == node.variableType()->signature() ) )
+    {
+        variableType = fetch< Type >( m_toType );
+        m_log.warning(
+            { node.sourceLocation() },
+            "REPLACE?: " + m_fromType->signature() + ", " + m_toType->signature() + ", " +
+                node.variableType()->signature() );
+    }
+    else
+    {
+        variableType = fetch< Type >( node.variableType() );
+    }
+
+    store< VariableDefinition >( node, identifier, variableType );
 }
 
 void TemplatingVisitor::visit( FunctionDefinition& node )
@@ -254,6 +284,15 @@ void TemplatingVisitor::visit( FunctionDefinition& node )
 
 void TemplatingVisitor::visit( DerivedDefinition& node )
 {
+    const auto& identifier = fetch< Identifier >( node.identifier() );
+    const auto& arguments = fetch< VariableDefinitions, VariableDefinition >( node.arguments() );
+    const auto& returnType = fetch< Type >( node.returnType() );
+    const auto& expression = fetch< Expression >( node.expression() );
+    const auto& astNode =
+        store< DerivedDefinition >( node, identifier, arguments, returnType, expression );
+    astNode->setExported( node.exported() );
+
+    m_definitions->add( astNode );
 }
 
 void TemplatingVisitor::visit( RuleDefinition& node )
@@ -264,6 +303,8 @@ void TemplatingVisitor::visit( RuleDefinition& node )
     const auto& rule = fetch< Rule >( node.rule() );
     const auto& astNode = store< RuleDefinition >( node, identifier, arguments, returnType, rule );
     astNode->setExported( node.exported() );
+
+    m_definitions->add( astNode );
 }
 
 void TemplatingVisitor::visit( EnumeratorDefinition& node )
@@ -334,6 +375,16 @@ void TemplatingVisitor::visit( BehaviorDefinition& node )
     const auto& astNode = store< BehaviorDefinition >( node, domainType, definitions );
     // astNode->setTemplateSymbols( templateSymbols );
     astNode->setExported( node.exported() );
+
+    for( const auto& definition : *node.definitions() )
+    {
+        if( definition->id() == Node::ID::DECLARATION )
+        {
+            continue;
+        }
+
+        m_definitions->add( definition );
+    }
 }
 
 void TemplatingVisitor::visit( ImplementDefinition& node )
@@ -365,6 +416,12 @@ void TemplatingVisitor::visit( BuiltinDefinition& node )
 
 void TemplatingVisitor::visit( Declaration& node )
 {
+    const auto& identifier = fetch< Identifier >( node.identifier() );
+    const auto& argumentTypes = fetch< Types, Type >( node.argumentTypes() );
+    const auto& returnType = fetch< Type >( node.returnType() );
+    const auto& kind = node.kind();
+    const auto& astNode = store< Declaration >( node, identifier, argumentTypes, returnType, kind );
+    astNode->setExported( node.exported() );
 }
 
 void TemplatingVisitor::visit( UndefLiteral& node )
@@ -403,10 +460,6 @@ void TemplatingVisitor::visit( AbstractExpression& node )
 {
 }
 
-void TemplatingVisitor::visit( EmbracedExpression& node )
-{
-}
-
 void TemplatingVisitor::visit( NamedExpression& node )
 {
 }
@@ -417,10 +470,17 @@ void TemplatingVisitor::visit( MappedExpression& node )
 
 void TemplatingVisitor::visit( DirectCallExpression& node )
 {
+    const auto& identifier = fetch< IdentifierPath >( node.identifier() );
+    const auto& arguments = fetch< Expressions, Expression >( node.arguments() );
+    store< DirectCallExpression >( node, identifier, arguments );
 }
 
 void TemplatingVisitor::visit( MethodCallExpression& node )
 {
+    const auto& object = fetch< Expression >( node.object() );
+    const auto& methodName = fetch< Identifier >( node.methodName() );
+    const auto& methodArguments = fetch< Expressions, Expression >( node.methodArguments() );
+    store< MethodCallExpression >( node, object, methodName, methodArguments );
 }
 
 void TemplatingVisitor::visit( LiteralCallExpression& node )
@@ -437,10 +497,15 @@ void TemplatingVisitor::visit( TypeCastingExpression& node )
 
 void TemplatingVisitor::visit( UnaryExpression& node )
 {
+    const auto& expression = fetch< Expression >( node.expression() );
+    store< UnaryExpression >( node, node.operationToken(), expression );
 }
 
 void TemplatingVisitor::visit( BinaryExpression& node )
 {
+    const auto& left = fetch< Expression >( node.left() );
+    const auto& right = fetch< Expression >( node.right() );
+    store< BinaryExpression >( node, left, node.operationToken(), right );
 }
 
 void TemplatingVisitor::visit( LetExpression& node )
@@ -549,7 +614,7 @@ void TemplatingVisitor::visit( RecordType& node )
 
 void TemplatingVisitor::visit( TemplateType& node )
 {
-    if( node.name()->baseName() == m_templateType->name()->baseName() and
+    if( m_templateType and node.name()->baseName() == m_templateType->name()->baseName() and
         node.signature() != m_templateType->signature() )
     {
         m_log.warning(
@@ -654,7 +719,7 @@ u1 TemplatingPass::run( libpass::PassResult& pr )
     const auto& definitions = std::make_shared< Definitions >();
     for( const auto& templateType : *templateTypes )
     {
-        TemplatingVisitor visitor( log, symboltable, templateType );
+        TemplatingVisitor visitor( log, templateType );
         templateType->typeDefinition()->accept( visitor );
 
         for( const auto& definition : *visitor.definitions() )
@@ -728,6 +793,7 @@ u1 TemplatingPass::run( libpass::PassResult& pr )
     }
 
     const auto& astDefinitions = specification->ast()->definitions();
+
     for( const auto& definition : *definitions )
     {
         astDefinitions->add( definition );
@@ -747,6 +813,27 @@ u1 TemplatingPass::run( libpass::PassResult& pr )
     const auto& passTemplateTypes = passData->templateTypes();
     log.debug( "remaining templates type size %lu", passTemplateTypes->size() );
     return true;
+}
+
+AST::Definition::Ptr TemplatingPass::duplicate(
+    libcasm_fe::Logger& log,
+    const AST::Definition::Ptr& node,
+    const AST::Type::Ptr& from,
+    const AST::Type::Ptr& to )
+{
+    TemplatingVisitor visitor( log, nullptr, from, to );
+    node->accept( visitor );
+
+    if( visitor.definitions()->size() != 1 )
+    {
+        log.error(
+            { node->sourceLocation() },
+            "unable to duplicate " + node->description(),
+            Code::Unspecified );
+        return nullptr;
+    }
+
+    return visitor.definitions()->front();
 }
 
 //
