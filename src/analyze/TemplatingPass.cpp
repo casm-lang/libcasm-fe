@@ -701,15 +701,15 @@ const Definitions::Ptr& TemplatingVisitor::definitions( void ) const
 
 void TemplatingPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SpecificationMergerPass >();
-    pu.require< SymbolResolverPass >();
+    pu.require< CstToAstPass >();
+    pu.scheduleAfter< SymbolResolverPass >();
 }
 
 u1 TemplatingPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto& data = pr.output< SpecificationMergerPass >();
+    const auto& data = pr.output< CstToAstPass >();
     const auto& specification = data->specification();
     auto& symboltable = *specification->symboltable();
 
@@ -783,7 +783,6 @@ u1 TemplatingPass::run( libpass::PassResult& pr )
 
     libpass::PassResult passResult;
     passResult.setOutput< CstToAstPass >( templateSpecification );
-    passResult.setOutput< SpecificationMergerPass >( templateSpecification );
 
     SymbolRegistrationPass symbolRegistrationPass;
     if( not symbolRegistrationPass.run( passResult ) )
@@ -798,8 +797,6 @@ u1 TemplatingPass::run( libpass::PassResult& pr )
     {
         astDefinitions->add( definition );
     }
-
-    passResult.setOutput< SpecificationMergerPass >( specification );
 
     SymbolResolverPass symbolResolverPass;
     if( not symbolResolverPass.run( passResult ) )
