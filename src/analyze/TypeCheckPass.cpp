@@ -1278,7 +1278,6 @@ void TypeCheckVisitor::popVariableBindings( const VariableBindings::Ptr& variabl
 void TypeCheckPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SpecificationMergerPass >();
-    pu.scheduleAfter< TemplatingPass >();
 }
 
 u1 TypeCheckPass::run( libpass::PassResult& pr )
