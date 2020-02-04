@@ -104,7 +104,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( TupleLiteral& node ) override;
     void visit( RecordLiteral& node ) override;
 
-    void visit( EmbracedExpression& node ) override;
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
@@ -390,17 +389,6 @@ void TypeInferenceVisitor::visit( ReferenceLiteral& node )
     }
 }
 
-void TypeInferenceVisitor::visit( EmbracedExpression& node )
-{
-    for( const auto typeId : m_typeIDs[&node ] )
-    {
-        m_typeIDs[ node.expression().get() ].emplace( typeId );
-    }
-
-    RecursiveVisitor::visit( node );
-    node.setType( node.expression()->type() );
-}
-
 void TypeInferenceVisitor::visit( NamedExpression& node )
 {
     RecursiveVisitor::visit( node );
@@ -590,6 +578,20 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         }
     }
 
+    // search for declarations/definitions inside a behavior
+    if( typeDefinition->id() == Node::ID::BEHAVIOR_DEFINITION )
+    {
+        const auto& defaultBehavior = typeDefinition;
+        const auto& symbol = objectTypeNamespace->findSymbol( methodName );
+        if( symbol )
+        {
+            m_log.debug(
+                { sourceLocation, symbol->sourceLocation() },
+                "found default behavior: " + methodSignature );
+            behaviorTypes.emplace_back( defaultBehavior );
+        }
+    }
+
     // search for possible call symbol in basic behavior
     if( typeDefinition->basicBehavior() )
     {
@@ -600,7 +602,7 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         {
             m_log.debug(
                 { sourceLocation, symbol->sourceLocation() },
-                "found default behavior: " + methodSignature );
+                "found basic behavior: " + methodSignature );
             behaviorTypes.emplace_back( basicBehavior );
         }
     }
@@ -1769,7 +1771,10 @@ void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
                 typeDefinition->symboltable()->findNamespace( "*" );
             assert( basicBehaviorNamespace and " inconsistent state " );
             const auto& basicBehavior = basicBehaviorNamespace->findSymbol( behaviorTypeName );
-            behavior = basicBehavior->ptr< TypeDefinition >();
+            if( basicBehavior )
+            {
+                behavior = basicBehavior->ptr< TypeDefinition >();
+            }
         }
 
         // search if desired behavior is one of the extended behaviors
@@ -1780,7 +1785,10 @@ void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
             assert( extendedBehaviorNamespace and " inconsistent state " );
             const auto& extendedBehavior =
                 extendedBehaviorNamespace->findSymbol( behaviorTypeName );
-            behavior = extendedBehavior->ptr< TypeDefinition >();
+            if( extendedBehavior )
+            {
+                behavior = extendedBehavior->ptr< TypeDefinition >();
+            }
         }
 
         if( not behavior )
@@ -1789,6 +1797,20 @@ void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
                 "the behavior '" + behaviorTypeName + "' is not implemented for " +
                 typeDefinition->description() + " '" + typeDefinition->domainType()->signature() +
                 "'" );
+        }
+    }
+    else
+    {
+        // search for possible call symbol in extended behaviors
+        for( const auto& element : typeDefinition->extendedBehaviors() )
+        {
+            const auto& extendedBehavior = element.second;
+            const auto& extendedBehaviorNamespace = extendedBehavior->symboltable();
+            const auto& symbol = extendedBehaviorNamespace->findSymbol( symbolName );
+            if( symbol )
+            {
+                behavior = extendedBehavior;
+            }
         }
     }
 
@@ -1834,7 +1856,15 @@ void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
 
             if( not relationArgumentType->isObject() and symbolArgumentType->isObject() )
             {
-                // relax passing argument use Integer'[a..b] to def Integer
+                // relax passing argument is concrete type of abstract object
+                continue;
+            }
+
+            if( relationArgumentType->isObject() and
+                relationArgumentType->description() != TypeInfo::TYPE_NAME_OBJECT and
+                symbolArgumentType->isObject() )
+            {
+                // relax passing argument is concrete object of abstract object
                 continue;
             }
 
