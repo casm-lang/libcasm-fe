@@ -231,18 +231,22 @@ namespace libcasm_fe
             MethodCallExpression(
                 const Expression::Ptr& object,
                 const Identifier::Ptr& methodName,
-                const Expressions::Ptr& arguments );
+                const Expressions::Ptr& methodArguments );
 
             const Expression::Ptr& object( void ) const;
 
             const Identifier::Ptr& methodName( void ) const;
+
+            const Expressions::Ptr& methodArguments( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
             Node::Ptr clone( void ) const override final;
 
           private:
-            Identifier::Ptr m_methodName;
+            const Expression::Ptr m_object;
+            const Identifier::Ptr m_methodName;
+            const Expressions::Ptr m_methodArguments;
         };
 
         class LiteralCallExpression final : public TargetCallExpression
@@ -262,7 +266,6 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            const Expression::Ptr m_object;
             const std::shared_ptr< Literal > m_literal;
         };
 

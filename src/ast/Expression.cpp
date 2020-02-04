@@ -359,12 +359,14 @@ Node::Ptr DirectCallExpression::clone( void ) const
 MethodCallExpression::MethodCallExpression(
     const Expression::Ptr& object,
     const Identifier::Ptr& methodName,
-    const Expressions::Ptr& arguments )
+    const Expressions::Ptr& methodArguments )
 : TargetCallExpression( Node::ID::METHOD_CALL_EXPRESSION, std::make_shared< Expressions >() )
+, m_object( object )
 , m_methodName( methodName )
+, m_methodArguments( methodArguments )
 {
     this->arguments()->add( object );
-    for( const auto& argument : *arguments )
+    for( const auto& argument : *methodArguments )
     {
         this->arguments()->add( argument );
     }
@@ -372,13 +374,17 @@ MethodCallExpression::MethodCallExpression(
 
 const Expression::Ptr& MethodCallExpression::object( void ) const
 {
-    assert( arguments()->size() >= 1 );
-    return arguments()->front();
+    return m_object;
 }
 
 const Identifier::Ptr& MethodCallExpression::methodName( void ) const
 {
     return m_methodName;
+}
+
+const Expressions::Ptr& MethodCallExpression::methodArguments( void ) const
+{
+    return m_methodArguments;
 }
 
 void MethodCallExpression::accept( Visitor& visitor )
@@ -391,7 +397,7 @@ Node::Ptr MethodCallExpression::clone( void ) const
     auto duplicate = std::make_shared< MethodCallExpression >(
         object()->duplicate< Expression >(),
         methodName()->duplicate< Identifier >(),
-        arguments()->duplicate< Expressions >() );
+        methodArguments()->duplicate< Expressions >() );
 
     TargetCallExpression::clone( *duplicate );
     return duplicate;
@@ -408,7 +414,7 @@ LiteralCallExpression::LiteralCallExpression(
 , m_literal( literal )
 {
     arguments()->add( object );
-    arguments()->add( m_literal );
+    arguments()->add( literal );
 }
 
 const Expression::Ptr& LiteralCallExpression::object( void ) const
