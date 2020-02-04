@@ -443,7 +443,7 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
 
     if( function->id() == Node::ID::DIRECT_CALL_EXPRESSION )
     {
-        const auto& directCall = std::static_pointer_cast< DirectCallExpression >( function );
+        const auto& directCall = function->ptr< DirectCallExpression >();
         name = directCall->identifier()->path();
 
         if( directCall->targetType() != DirectCallExpression::TargetType::FUNCTION )
@@ -460,7 +460,7 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     }
     else if( function->id() == Node::ID::METHOD_CALL_EXPRESSION )
     {
-        const auto& methodCall = std::static_pointer_cast< MethodCallExpression >( function );
+        const auto& methodCall = function->ptr< MethodCallExpression >();
         name = methodCall->methodName()->name();
 
         if( methodCall->targetType() != TargetCallExpression::TargetType::FUNCTION )
