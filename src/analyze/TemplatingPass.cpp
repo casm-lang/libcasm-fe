@@ -739,30 +739,32 @@ u1 TemplatingPass::run( libpass::PassResult& pr )
     }
 
     const auto& initSymbol = symboltable.findSymbol( "init" );
-    assert( initSymbol and " inconsistent state @ SymbolResolverPass " );
-    assert( initSymbol->id() == Node::ID::INIT_DEFINITION );
-    const auto& initDefinition = initSymbol->ptr< InitDefinition >();
-
-    const auto& agentDomainSymbol = symboltable.findSymbol( TypeInfo::TYPE_NAME_AGENT );
-    assert( agentDomainSymbol and " inconsistent state @ SymbolResolverPass " );
-
-    if( initDefinition->singleAgent() )
+    if( initSymbol )
     {
-        const auto& agentLocation = agentDomainSymbol->sourceLocation();
-        const auto& agentIdentifier =
-            AST::make< Identifier >( agentLocation, TypeInfo::TYPE_NAME_AGENT );
-        const auto& agentDomainType = AST::make< BasicType >(
-            agentLocation,
-            IdentifierPath::fromIdentifier(
-                AST::make< Identifier >( agentLocation, TypeInfo::TYPE_NAME_INTEGER ) ) );
-        const auto& agentUsingDefinition = AST::make< UsingDefinition >(
-            initDefinition->sourceLocation(), agentIdentifier, agentDomainType );
-        definitions->add( agentUsingDefinition );
+        assert( initSymbol->id() == Node::ID::INIT_DEFINITION );
+        const auto& initDefinition = initSymbol->ptr< InitDefinition >();
 
-        log.info(
-            { agentUsingDefinition->sourceLocation() },
-            "AGENT " + agentUsingDefinition->description() + " " +
-                agentUsingDefinition->typeDescription() );
+        const auto& agentDomainSymbol = symboltable.findSymbol( TypeInfo::TYPE_NAME_AGENT );
+        assert( agentDomainSymbol and " inconsistent state @ SymbolResolverPass " );
+
+        if( initDefinition->singleAgent() )
+        {
+            const auto& agentLocation = agentDomainSymbol->sourceLocation();
+            const auto& agentIdentifier =
+                AST::make< Identifier >( agentLocation, TypeInfo::TYPE_NAME_AGENT );
+            const auto& agentDomainType = AST::make< BasicType >(
+                agentLocation,
+                IdentifierPath::fromIdentifier(
+                    AST::make< Identifier >( agentLocation, TypeInfo::TYPE_NAME_INTEGER ) ) );
+            const auto& agentUsingDefinition = AST::make< UsingDefinition >(
+                initDefinition->sourceLocation(), agentIdentifier, agentDomainType );
+            definitions->add( agentUsingDefinition );
+
+            log.info(
+                { agentUsingDefinition->sourceLocation() },
+                "AGENT " + agentUsingDefinition->description() + " " +
+                    agentUsingDefinition->typeDescription() );
+        }
     }
 
     const auto errors = log.errors();
