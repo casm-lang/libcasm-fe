@@ -619,7 +619,7 @@ void CstToAstVisitor::visit( AbstractExpression& node )
 void CstToAstVisitor::visit( EmbracedExpression& node )
 {
     const auto& expression = fetch< AST::Expression >( node.expression() );
-    store< AST::EmbracedExpression >( node, expression );
+    set( node, expression );
 }
 
 void CstToAstVisitor::visit( NamedExpression& node )
@@ -847,6 +847,16 @@ void CstToAstVisitor::visit( WhileRule& node )
     //   else
     //     <Rule>
     //
+
+    const auto& term = fetch< AST::Expression >( node.condition() );
+    const auto& rule = fetch< AST::Rule >( node.rule() );
+
+    const auto& location = node.sourceLocation();
+    const auto& notTerm = AST::make< AST::UnaryExpression >( location, Grammar::Token::NOT, term );
+    const auto& skipRule = AST::make< AST::SkipRule >( location );
+    const auto& conditionalRule =
+        AST::make< AST::ConditionalRule >( location, notTerm, skipRule, rule );
+    store< AST::IterateRule >( node, conditionalRule );
 }
 
 void CstToAstVisitor::visit( UnresolvedType& node )
