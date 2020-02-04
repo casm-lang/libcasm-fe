@@ -113,7 +113,6 @@ namespace libcasm_fe
             void visit( RecordLiteral& node ) override;
 
             void visit( AbstractExpression& node ) override;
-            void visit( EmbracedExpression& node ) override;
             void visit( NamedExpression& node ) override;
             void visit( MappedExpression& node ) override;
             void visit( DirectCallExpression& node ) override;
@@ -156,8 +155,6 @@ namespace libcasm_fe
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
             void visit( VariableBinding& node ) override;
-
-            void transform( TargetCallExpression& node );
 
           private:
             template < typename T >
@@ -271,15 +268,13 @@ void AstToLstVisitor::visit( InitDefinition& node )
 void AstToLstVisitor::visit( VariableDefinition& node )
 {
     const auto& identifier = fetch< LST::Identifier >( node.identifier() );
-    const auto& lstNode = store< LST::VariableDefinition >(
+    store< LST::VariableDefinition >(
         node,
         node.type(),
         node.properties(),
         identifier,
         node.maximumNumberOfLocals(),
         node.localIndex() );
-
-    m_lstDefinitions->add( lstNode );
 }
 
 void AstToLstVisitor::visit( FunctionDefinition& node )
@@ -360,17 +355,16 @@ void AstToLstVisitor::visit( EnumerationDefinition& node )
 
 void AstToLstVisitor::visit( UsingDefinition& node )
 {
-    m_log.error( { node.sourceLocation() }, "invalid transformation", Code::Internal );
+    m_log.error( { node.sourceLocation() }, "invalid transformation 'using'", Code::Internal );
 }
 
 void AstToLstVisitor::visit( UsingPathDefinition& node )
 {
-    m_log.error( { node.sourceLocation() }, "invalid transformation", Code::Internal );
+    m_log.error( { node.sourceLocation() }, "invalid transformation 'using path'", Code::Internal );
 }
 
 void AstToLstVisitor::visit( ImportDefinition& node )
 {
-    m_log.error( { node.sourceLocation() }, "invalid transformation", Code::Internal );
 }
 
 void AstToLstVisitor::visit( InvariantDefinition& node )
@@ -498,10 +492,6 @@ void AstToLstVisitor::visit( AbstractExpression& node )
     m_log.error( { node.sourceLocation() }, "invalid transformation", Code::Internal );
 }
 
-void AstToLstVisitor::visit( EmbracedExpression& node )
-{
-}
-
 void AstToLstVisitor::visit( NamedExpression& node )
 {
 }
@@ -512,12 +502,20 @@ void AstToLstVisitor::visit( MappedExpression& node )
 
 void AstToLstVisitor::visit( DirectCallExpression& node )
 {
-    transform( node );
+    const auto& targetDefinition = fetch< LST::Definition >( node.targetDefinition() );
+    const auto& arguments =
+        fetch< LST::Expressions, LST::Expression, AST::Expression >( node.arguments() );
+    store< LST::DirectCallExpression >(
+        node, node.type(), node.properties(), arguments, targetDefinition, node.targetType() );
 }
 
 void AstToLstVisitor::visit( MethodCallExpression& node )
 {
-    transform( node );
+    const auto& targetDefinition = fetch< LST::Definition >( node.targetDefinition() );
+    const auto& arguments =
+        fetch< LST::Expressions, LST::Expression, AST::Expression >( node.arguments() );
+    store< LST::DirectCallExpression >(
+        node, node.type(), node.properties(), arguments, targetDefinition, node.targetType() );
 }
 
 void AstToLstVisitor::visit( IndirectCallExpression& node )
@@ -526,27 +524,47 @@ void AstToLstVisitor::visit( IndirectCallExpression& node )
 
 void AstToLstVisitor::visit( TypeCastingExpression& node )
 {
-    transform( node );
+    const auto& targetDefinition = fetch< LST::Definition >( node.targetDefinition() );
+    const auto& arguments =
+        fetch< LST::Expressions, LST::Expression, AST::Expression >( node.arguments() );
+    store< LST::DirectCallExpression >(
+        node, node.type(), node.properties(), arguments, targetDefinition, node.targetType() );
 }
 
 void AstToLstVisitor::visit( UnaryExpression& node )
 {
-    transform( node );
+    const auto& targetDefinition = fetch< LST::Definition >( node.targetDefinition() );
+    const auto& arguments =
+        fetch< LST::Expressions, LST::Expression, AST::Expression >( node.arguments() );
+    store< LST::DirectCallExpression >(
+        node, node.type(), node.properties(), arguments, targetDefinition, node.targetType() );
 }
 
 void AstToLstVisitor::visit( BinaryExpression& node )
 {
-    transform( node );
+    const auto& targetDefinition = fetch< LST::Definition >( node.targetDefinition() );
+    const auto& arguments =
+        fetch< LST::Expressions, LST::Expression, AST::Expression >( node.arguments() );
+    store< LST::DirectCallExpression >(
+        node, node.type(), node.properties(), arguments, targetDefinition, node.targetType() );
 }
 
 void AstToLstVisitor::visit( LiteralCallExpression& node )
 {
-    transform( node );
+    const auto& targetDefinition = fetch< LST::Definition >( node.targetDefinition() );
+    const auto& arguments =
+        fetch< LST::Expressions, LST::Expression, AST::Expression >( node.arguments() );
+    store< LST::DirectCallExpression >(
+        node, node.type(), node.properties(), arguments, targetDefinition, node.targetType() );
 }
 
 void AstToLstVisitor::visit( CardinalityExpression& node )
 {
-    transform( node );
+    const auto& targetDefinition = fetch< LST::Definition >( node.targetDefinition() );
+    const auto& arguments =
+        fetch< LST::Expressions, LST::Expression, AST::Expression >( node.arguments() );
+    store< LST::DirectCallExpression >(
+        node, node.type(), node.properties(), arguments, targetDefinition, node.targetType() );
 }
 
 void AstToLstVisitor::visit( LetExpression& node )
@@ -555,6 +573,11 @@ void AstToLstVisitor::visit( LetExpression& node )
 
 void AstToLstVisitor::visit( ConditionalExpression& node )
 {
+    const auto& condition = fetch< LST::Expression >( node.condition() );
+    const auto& thenExpression = fetch< LST::Expression >( node.thenExpression() );
+    const auto& elseExpression = fetch< LST::Expression >( node.elseExpression() );
+    store< LST::ConditionalExpression >(
+        node, node.type(), node.properties(), condition, thenExpression, elseExpression );
 }
 
 void AstToLstVisitor::visit( ChooseExpression& node )
@@ -585,6 +608,11 @@ void AstToLstVisitor::visit( CaseRule& node )
 
 void AstToLstVisitor::visit( LetRule& node )
 {
+    const auto& variableBindings =
+        fetch< LST::VariableBindings, LST::VariableBinding, AST::VariableBinding >(
+            node.variableBindings() );
+    const auto& rule = fetch< LST::Rule >( node.rule() );
+    store< LST::LetRule >( node, variableBindings, rule );
 }
 
 void AstToLstVisitor::visit( LocalRule& node )
@@ -687,15 +715,10 @@ void AstToLstVisitor::visit( DefaultCase& node )
 
 void AstToLstVisitor::visit( VariableBinding& node )
 {
-}
-
-void AstToLstVisitor::transform( TargetCallExpression& node )
-{
-    const auto& targetDefinition = fetch< LST::Definition >( node.targetDefinition() );
-    const auto& arguments =
-        fetch< LST::Expressions, LST::Expression, AST::Expression >( node.arguments() );
-    store< LST::DirectCallExpression >(
-        node, node.type(), node.properties(), arguments, targetDefinition, node.targetType() );
+    const auto& variable = fetch< LST::VariableDefinition >( node.variable() );
+    const auto& expression = fetch< LST::Expression >( node.expression() );
+    store< LST::VariableBinding >(
+        node, node.type(), libcasm_ir::Properties{}, variable, expression );
 }
 
 //
