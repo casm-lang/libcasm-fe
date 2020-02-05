@@ -389,7 +389,16 @@ void TemplatingVisitor::visit( BehaviorDefinition& node )
 
 void TemplatingVisitor::visit( ImplementDefinition& node )
 {
-    const auto& domainType = fetch< Type >( node.domainType() );
+    Type::Ptr domainType = fetch< Type >( node.domainType() );
+    if( m_fromType and m_toType and ( m_fromType->signature() == node.domainType()->signature() ) )
+    {
+        domainType = fetch< Type >( m_toType );
+        m_log.warning(
+            { node.sourceLocation() },
+            "REPLACE?: " + m_fromType->signature() + ", " + m_toType->signature() + ", " +
+                node.domainType()->signature() );
+    }
+
     const auto& definitions = fetch< Definitions, Definition >( node.definitions() );
     // const auto& templateSymbols =
     //     fetch< VariableDefinitions, VariableDefinition >( node.templateSymbols() );
@@ -408,6 +417,8 @@ void TemplatingVisitor::visit( ImplementDefinition& node )
         store< ImplementDefinition >( node, behaviorType, domainType, definitions );
     // astNode->setTemplateSymbols( templateSymbols );
     astNode->setExported( node.exported() );
+
+    m_definitions->add( astNode );
 }
 
 void TemplatingVisitor::visit( BuiltinDefinition& node )
@@ -715,6 +726,7 @@ u1 TemplatingPass::run( libpass::PassResult& pr )
 
     const auto& symbolData = pr.output< SymbolResolverPass >();
     const auto& templateTypes = symbolData->templateTypes();
+    const auto& templateDefinitions = symbolData->templateDefinitions();
 
     const auto& definitions = std::make_shared< Definitions >();
     for( const auto& templateType : *templateTypes )
@@ -735,6 +747,33 @@ u1 TemplatingPass::run( libpass::PassResult& pr )
             }
 
             definitions->add( definition );
+        }
+    }
+
+    const auto& enumerationSymbol = symboltable.findSymbol( TypeInfo::TYPE_NAME_ENUMERATION );
+    assert( enumerationSymbol and " inconsistent state " );
+    assert( enumerationSymbol->id() == Node::ID::DOMAIN_DEFINITION );
+    const auto& enumerationDefinition = enumerationSymbol->ptr< DomainDefinition >();
+
+    for( const auto& templateDefinition : *templateDefinitions )
+    {
+        assert( templateDefinition->id() == Node::ID::ENUMERATION_DEFINITION );
+        const auto templateEnumerationDefinition =
+            templateDefinition->ptr< EnumerationDefinition >();
+
+        for( const auto it : enumerationDefinition->extendedBehaviors() )
+        {
+            const auto& definition = it.second;
+            assert( definition->id() == Node::ID::IMPLEMENT_DEFINITION );
+            const auto& implementDefinition = definition->ptr< ImplementDefinition >();
+
+            const auto& definitionInstance = TemplatingPass::duplicate(
+                log,
+                implementDefinition,
+                implementDefinition->domainType(),
+                templateEnumerationDefinition->domainType() );
+
+            definitions->add( definitionInstance );
         }
     }
 
@@ -823,7 +862,7 @@ AST::Definition::Ptr TemplatingPass::duplicate(
     TemplatingVisitor visitor( log, nullptr, from, to );
     node->accept( visitor );
 
-    if( visitor.definitions()->size() != 1 )
+    if( visitor.definitions()->size() < 1 )
     {
         log.error(
             { node->sourceLocation() },
@@ -832,7 +871,7 @@ AST::Definition::Ptr TemplatingPass::duplicate(
         return nullptr;
     }
 
-    return visitor.definitions()->front();
+    return visitor.definitions()->back();
 }
 
 //
