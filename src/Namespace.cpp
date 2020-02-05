@@ -45,10 +45,12 @@
 
 #include "Namespace.h"
 
+#include "various/GrammarToken.h"
+
 #include <libstdhl/Ansi>
 #include <libstdhl/String>
 
-#include "various/GrammarToken.h"
+#include <iostream>
 
 using namespace libcasm_fe;
 using namespace AST;
@@ -114,44 +116,66 @@ Definition::Ptr Namespace::findSymbol( const std::string& name ) const
     return it->second;
 }
 
-Namespace::Symbol Namespace::findSymbol( const IdentifierPath& path ) const
+Namespace::Symbol Namespace::findSymbol( const IdentifierPath& identifierPath ) const
 {
-    const auto& pathSegments = *path.identifiers();
-
-    u1 externalImport = false;
-    auto* _namespace = this;
-
-    for( u64 i = 0; i < ( pathSegments.size() - 1 ); i++ )
+    std::vector< std::string > path;
+    path.reserve( identifierPath.identifiers()->size() );
+    for( const auto& identifier : *identifierPath.identifiers() )
     {
-        const auto& name = pathSegments[ i ]->name();
+        path.emplace_back( identifier->name() );
+    }
 
-        const auto it = _namespace->m_namespaces.find( name );
-        if( it == _namespace->m_namespaces.end() )
+    return findSymbol( path.data(), path.size(), false );
+}
+
+Namespace::Symbol Namespace::findSymbol(
+    const std::string* path, const std::size_t size, const u1 externalImport ) const
+{
+    assert( path and size > 0 );
+    const auto& name = path[ 0 ];
+    const auto* subPath = &path[ 1 ];
+    const auto subSize = size - 1;
+
+    const auto& definition = findSymbol( name );
+    if( definition )
+    {
+        if( subSize == 0 )
         {
-            return Symbol{ nullptr, false };
+            return Symbol{ definition, not externalImport or definition->exported() };
         }
-
-        _namespace = it->second.first.get();
-        const auto visibility = it->second.second;
-
-        if( visibility == Visibility::External )
+        else
         {
-            externalImport = true;
-        }
-        else if( visibility == Visibility::Internal and externalImport )
-        {
-            externalImport = false;
+            return definition->symboltable()->findSymbol( subPath, subSize, externalImport );
         }
     }
 
-    const auto definition = _namespace->findSymbol( path.baseName() );
-
-    if( not definition )
+    const auto it = m_namespaces.find( name );
+    if( it == m_namespaces.end() )
     {
         return Symbol{ nullptr, false };
     }
 
-    return Symbol{ definition, not externalImport or definition->exported() };
+    const auto& definitionNamespace = it->second.first.get();
+    const auto visibility = it->second.second;
+
+    if( subSize == 0 )
+    {
+        return Symbol{ nullptr, false };
+    }
+    else
+    {
+        auto updatedExternalImport = externalImport;
+        if( visibility == Visibility::External )
+        {
+            updatedExternalImport = true;
+        }
+        else if( visibility == Visibility::Internal and externalImport )
+        {
+            updatedExternalImport = false;
+        }
+
+        return definitionNamespace->findSymbol( subPath, subSize, updatedExternalImport );
+    }
 }
 
 Namespace::Ptr Namespace::findNamespace( const std::string& name ) const
@@ -199,8 +223,6 @@ u1 Namespace::empty( void ) const
 {
     return symbols().size() == 0 and namespaces().size() == 0;
 }
-
-#include <iostream>
 
 void Namespace::registerTypeDefinition( TypeDefinition& node )
 {
@@ -260,9 +282,9 @@ std::string Namespace::dump(
         const auto& name = symbol.first;
         const auto& definition = symbol.second;
         const auto& type = definition->type();
-        const auto prefix = indention + name + Namespace::delimiter();
+        const auto prefix = indention + name;
 
-        stream << prefix
+        stream << prefix << " "
                << libstdhl::Ansi::format< libstdhl::Ansi::Color::MAGENTA >(
                       definition->description() )
                << " "
@@ -280,7 +302,7 @@ std::string Namespace::dump(
         if( not definition->symboltable()->empty() and
             definition->id() != Node::ID::USING_DEFINITION )
         {
-            stream << definition->symboltable()->dump( prefix, visited );
+            stream << definition->symboltable()->dump( prefix + ".", visited );
         }
     }
 

@@ -121,6 +121,9 @@ namespace libcasm_fe
         std::string dump( const std::string& indention = "" ) const;
 
       private:
+        Namespace::Symbol findSymbol(
+            const std::string* path, const std::size_t size, const u1 externalImport ) const;
+
         std::string dump(
             const std::string& indention, std::unordered_set< const Namespace* >& stack ) const;
 
