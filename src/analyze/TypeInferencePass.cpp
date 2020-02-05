@@ -1801,6 +1801,18 @@ void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
     }
     else
     {
+        // search for possible call symbol in basic behaviors
+        if( typeDefinition->basicBehavior() )
+        {
+            const auto& basicBehavior = typeDefinition->basicBehavior();
+            const auto& basicBehaviorNamespace = basicBehavior->symboltable();
+            const auto& symbol = basicBehaviorNamespace->findSymbol( symbolName );
+            if( symbol )
+            {
+                behavior = basicBehavior;
+            }
+        }
+
         // search for possible call symbol in extended behaviors
         for( const auto& element : typeDefinition->extendedBehaviors() )
         {
