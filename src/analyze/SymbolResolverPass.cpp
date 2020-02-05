@@ -213,6 +213,11 @@ void NamespaceResolveVisitor::registerSymbolWithPath(
         {
             if( libstdhl::String::startsWith( pathName, "CASM" + Namespace::delimiter() ) )
             {
+                if( definition->abstract() and not otherSymbol->abstract() )
+                {
+                    return;
+                }
+
                 // using CASM::* ... report issues from current specification
                 m_log.error(
                     { otherSymbol->sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
@@ -274,6 +279,7 @@ namespace libcasm_fe
             void visit( TemplateType& node ) override;
 
             const Types::Ptr& templateTypes( void );
+            const Definitions::Ptr& templateDefinitions( void );
 
           private:
             void pushSymbol( const Definition::Ptr& symbol );
@@ -310,6 +316,7 @@ namespace libcasm_fe
             libcasm_fe::Logger& m_log;
             Namespace& m_symboltable;
             Types::Ptr m_templateTypes;
+            Definitions::Ptr m_templateDefinitions;
 
             std::unordered_map< std::string, Definition::Ptr > m_scopeSymbols;
             TypeDefinition::Ptr m_objectTypeDefinition;
@@ -329,6 +336,7 @@ SymbolResolveVisitor::SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& 
 , m_symboltable( symboltable )
 , m_scopeSymbols()
 , m_templateTypes( std::make_shared< Types >() )
+, m_templateDefinitions( std::make_shared< Definitions >() )
 , m_objectTypeDefinition( nullptr )
 , m_agentDomainDefinition( nullptr )
 {
@@ -414,6 +422,8 @@ void SymbolResolveVisitor::visit( EnumerationDefinition& node )
 
     popSymbols< VariableDefinition >( node.templateSymbols() );
     m_objectTypeDefinition = temporaryObjectDefinition;
+
+    m_templateDefinitions->add( node.ptr< Definition >() );
 }
 
 void SymbolResolveVisitor::visit( StructureDefinition& node )
@@ -960,6 +970,11 @@ const Types::Ptr& SymbolResolveVisitor::templateTypes( void )
     return m_templateTypes;
 }
 
+const Definitions::Ptr& SymbolResolveVisitor::templateDefinitions( void )
+{
+    return m_templateDefinitions;
+}
+
 void SymbolResolveVisitor::pushSymbol( const Definition::Ptr& symbol )
 {
     if( symbol->id() != Node::ID::FUNCTION_DEFINITION )
@@ -1041,6 +1056,8 @@ Definition::Ptr SymbolResolveVisitor::resolveSymbol( const IdentifierPath& node,
                 { node.sourceLocation() },
                 "unknown " + node.description() + " symbol '" + symbolName + "' found",
                 Code::SymbolIsUnknown );
+
+            m_log.info( { node.sourceLocation() }, m_symboltable.dump() );
         }
         return nullptr;
     }
@@ -1159,7 +1176,7 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
     }
     log.info( "symbol table =\n" + symboltable.dump() );
 
-    pr.setOutput< SymbolResolverPass >( visitor.templateTypes() );
+    pr.setOutput< SymbolResolverPass >( visitor.templateTypes(), visitor.templateDefinitions() );
     return true;
 }
 

@@ -46,6 +46,7 @@
 #ifndef _LIBCASM_FE_SYMBOL_RESOLVER_PASS_H_
 #define _LIBCASM_FE_SYMBOL_RESOLVER_PASS_H_
 
+#include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Type>
 
 #include <libpass/Pass>
@@ -73,8 +74,11 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Output >;
 
-            Output( const AST::Types::Ptr& templateTypes )
+            Output(
+                const AST::Types::Ptr& templateTypes,
+                const AST::Definitions::Ptr& templateDefinitions )
             : m_templateTypes( templateTypes )
+            , m_templateDefinitions( templateDefinitions )
             {
             }
 
@@ -83,8 +87,14 @@ namespace libcasm_fe
                 return m_templateTypes;
             }
 
+            AST::Definitions::Ptr templateDefinitions( void ) const
+            {
+                return m_templateDefinitions;
+            }
+
           private:
             const AST::Types::Ptr m_templateTypes;
+            const AST::Definitions::Ptr m_templateDefinitions;
         };
     };
 }
