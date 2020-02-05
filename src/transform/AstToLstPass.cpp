@@ -346,11 +346,26 @@ void AstToLstVisitor::visit( RuleDefinition& node )
 
 void AstToLstVisitor::visit( EnumeratorDefinition& node )
 {
+    const auto& identifier = fetch< LST::Identifier >( node.identifier() );
+    store< LST::EnumeratorDefinition >(
+        node, node.type(), node.properties(), identifier, node.maximumNumberOfLocals() );
 }
 
 void AstToLstVisitor::visit( EnumerationDefinition& node )
 {
-    // astNode->setExported( node.exported() );
+    const auto& identifier = fetch< LST::Identifier >( node.identifier() );
+    const auto& enumerators =
+        fetch< LST::Enumerators, LST::EnumeratorDefinition, AST::EnumeratorDefinition >(
+            node.enumerators() );
+    const auto& lstNode = store< LST::EnumerationDefinition >(
+        node,
+        node.type(),
+        node.properties(),
+        identifier,
+        node.maximumNumberOfLocals(),
+        enumerators );
+
+    m_lstDefinitions->add( lstNode );
 }
 
 void AstToLstVisitor::visit( UsingDefinition& node )
