@@ -1898,6 +1898,11 @@ Identifier
       $$ = CST::make< Identifier >( @$, $1->tokenString() );
       $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
+| STRUCTURE
+  {
+      $$ = CST::make< Identifier >( @$, $1->tokenString() );
+      $$->setSpans( m_lexer.fetchSpansAndReset() );
+  }
 ;
 
 
