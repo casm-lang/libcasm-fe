@@ -1002,6 +1002,7 @@ Identifier ::= "([a-ZA-Z_]|UTF8){([a-zA-Z_0-9]|UTF8)}*"
              | "CASM"
              | "self"
              | "enumeration"
+             | "structure"
 #+end_src
 
 #+html: {{page>.:grammar:Identifier&noheader&nofooter}}
