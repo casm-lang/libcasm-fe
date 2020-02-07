@@ -230,7 +230,6 @@ void TypeDefinition::setBasicBehavior( const ImplementDefinition::Ptr& basicBeha
     }
 
     const auto& implementDefinition = basicBehavior;
-    const auto& typeDefinition = implementDefinition->domainType()->typeDefinition();
     const auto& typeName = implementDefinition->domainType()->signature();
     behaviorNamespace->registerSymbol( typeName, implementDefinition->ptr< Definition >() );
 
@@ -254,14 +253,10 @@ void TypeDefinition::addExtendedBehavior( const ImplementDefinition::Ptr& extend
     }
 
     const auto& implementDefinition = extendedBehavior;
-    const auto& typeDefinition = implementDefinition->behaviorType()->typeDefinition();
     const auto& typeName = implementDefinition->behaviorType()->signature();
     behaviorNamespace->registerSymbol( typeName, implementDefinition->ptr< Definition >() );
 
-    assert( typeDefinition->id() == Node::ID::BEHAVIOR_DEFINITION );
-    const auto& behaviorDefinition = typeDefinition->ptr< BehaviorDefinition >();
     const auto result = m_extendedBehaviors.emplace( typeName, implementDefinition );
-    // assert( result.second and " inconsistent state @ Namespace " );
     if( not result.second )
     {
         throw std::domain_error( " inconsistent state " );
