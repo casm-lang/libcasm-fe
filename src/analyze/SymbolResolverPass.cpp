@@ -535,29 +535,32 @@ void SymbolResolveVisitor::visit( ImplementDefinition& node )
             }
         }
 
-        const auto& behaviorDefinition =
-            node.behaviorType()->typeDefinition()->ptr< BehaviorDefinition >();
-        for( const auto& definition : *behaviorDefinition->definitions() )
+        if( node.behaviorType()->typeDefinition() )
         {
-            if( definition->id() == Node::ID::DECLARATION )
+            const auto& behaviorDefinition =
+                node.behaviorType()->typeDefinition()->ptr< BehaviorDefinition >();
+            for( const auto& definition : *behaviorDefinition->definitions() )
             {
-                continue;
-            }
+                if( definition->id() == Node::ID::DECLARATION )
+                {
+                    continue;
+                }
 
-            const auto& definitionInstance = TemplatingPass::duplicate(
-                m_log, definition, node.behaviorType(), node.domainType() );
+                const auto& definitionInstance = TemplatingPass::duplicate(
+                    m_log, definition, node.behaviorType(), node.domainType() );
 
-            const auto& definitionName = definition->identifier()->name();
-            try
-            {
-                node.symboltable()->registerSymbol( definitionName, definitionInstance );
-            }
-            catch( const std::domain_error& e )
-            {
-                continue;
-            }
+                const auto& definitionName = definition->identifier()->name();
+                try
+                {
+                    node.symboltable()->registerSymbol( definitionName, definitionInstance );
+                }
+                catch( const std::domain_error& e )
+                {
+                    continue;
+                }
 
-            node.definitions()->add( definitionInstance );
+                node.definitions()->add( definitionInstance );
+            }
         }
     }
 
@@ -1045,21 +1048,35 @@ Definition::Ptr SymbolResolveVisitor::resolveSymbol( const IdentifierPath& node,
         return scopeSymbolIt->second;
     }
 
-    const auto& symbolResult = m_symboltable.findSymbol( node );
-    const auto& symbol = symbolResult.first;
-    const auto accessible = symbolResult.second;
+    auto symbolResult = m_symboltable.findSymbol( node );
+    auto symbol = symbolResult.first;
+    auto accessible = symbolResult.second;
     if( not symbol )
     {
-        if( not silent )
+        const auto& casmPath =
+            IdentifierPath::fromIdentifier( std::make_shared< Identifier >( "CASM" ) );
+        for( const auto& identifier : *node.identifiers() )
         {
-            m_log.error(
-                { node.sourceLocation() },
-                "unknown " + node.description() + " symbol '" + symbolName + "' found",
-                Code::SymbolIsUnknown );
-
-            m_log.info( { node.sourceLocation() }, m_symboltable.dump() );
+            casmPath->addIdentifier( identifier );
         }
-        return nullptr;
+
+        symbolResult = m_symboltable.findSymbol( *casmPath );
+        symbol = symbolResult.first;
+        accessible = symbolResult.second;
+
+        if( not symbol )
+        {
+            if( not silent )
+            {
+                m_log.error(
+                    { node.sourceLocation() },
+                    "unknown " + node.description() + " symbol '" + symbolName + "' found",
+                    Code::SymbolIsUnknown );
+
+                m_log.info( { node.sourceLocation() }, m_symboltable.dump() );
+            }
+            return nullptr;
+        }
     }
 
     if( not accessible )
