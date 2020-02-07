@@ -974,11 +974,12 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
               { "TotalOrder", "lessThanOrEqual" } },
             { Grammar::tokenAsString( Grammar::Token::GREATEREQ ),
               { "TotalOrder", "greaterThanOrEqual" } },
-            { Grammar::tokenAsString( Grammar::Token::OR ), { "Logical", "or_" } },
-            { Grammar::tokenAsString( Grammar::Token::XOR ), { "Logical", "xor_" } },
-            { Grammar::tokenAsString( Grammar::Token::AND ), { "Logical", "and_" } },
-            { Grammar::tokenAsString( Grammar::Token::ARROW ), { "Logical", "implies_" } },
-            { Grammar::tokenAsString( Grammar::Token::IMPLIES ), { "Logical", "implies_" } },
+            { Grammar::tokenAsString( Grammar::Token::OR ), { "Logical", "disjunction" } },
+            { Grammar::tokenAsString( Grammar::Token::XOR ),
+              { "Logical", "exclusiveDisjunction" } },
+            { Grammar::tokenAsString( Grammar::Token::AND ), { "Logical", "conjunction" } },
+            { Grammar::tokenAsString( Grammar::Token::ARROW ), { "Logical", "implication" } },
+            { Grammar::tokenAsString( Grammar::Token::IMPLIES ), { "Logical", "implication" } },
         };
 
     const auto operation = behaviorToSymbol.find( operationTokenName );
