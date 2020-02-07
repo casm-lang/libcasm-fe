@@ -222,6 +222,17 @@ rule test =
     lib::foo
     bar::foo
     assert( lib::Color::Red = Color::Red )
+
+    let x = Color::Blue in
+       assert( x.asString = "Blue" )
+
+    assert( true )
+    assert( not false )
+    assert( 0 =  0 )
+    assert( 123 != 321 )
+    assert( 1 as Boolean )
+    assert( not 0 as Boolean )
+    assert( |1| = 1 )
 }
 
 )***";
@@ -234,6 +245,10 @@ CASM
 function qux : -> Integer
 
 [ export ] enumeration Color = { Red, Blue, Green }
+
+implement Color = {
+    derived asString( this ) -> String = this as String
+}
 
 )***";
 
