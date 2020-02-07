@@ -65,6 +65,7 @@ Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 , m_maxNumberOfLocals( 0 )
 , m_abstract( false )
 , m_exported( false )
+, m_operation( Grammar::Token::UNRESOLVED )
 , m_templateSymbols( std::make_shared< VariableDefinitions >() )
 {
 }
@@ -120,14 +121,24 @@ void Definition::setExported( const u1 exported )
     m_exported = exported;
 }
 
-const VariableDefinitions::Ptr& Definition::templateSymbols( void ) const
-{
-    return m_templateSymbols;
-}
-
 u1 Definition::exported( void ) const
 {
     return m_exported;
+}
+
+void Definition::setOperation( const Grammar::Token operation )
+{
+    m_operation = operation;
+}
+
+Grammar::Token Definition::operation( void ) const
+{
+    return m_operation;
+}
+
+const VariableDefinitions::Ptr& Definition::templateSymbols( void ) const
+{
+    return m_templateSymbols;
 }
 
 void Definition::clone( Definition& duplicate ) const
@@ -136,7 +147,9 @@ void Definition::clone( Definition& duplicate ) const
     duplicate.setAttributes( attributes()->duplicate< Attributes >() );
     duplicate.setDelimiterToken( delimiterToken() );
     duplicate.setMaximumNumberOfLocals( maximumNumberOfLocals() );
+    duplicate.setAbstract( abstract() );
     duplicate.setExported( exported() );
+    duplicate.setOperation( operation() );
 }
 
 //

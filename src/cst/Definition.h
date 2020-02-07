@@ -92,6 +92,9 @@ namespace libcasm_fe
             void setExported( const u1 exported );
             u1 exported( void ) const;
 
+            void setOperation( const Grammar::Token operation );
+            Grammar::Token operation( void ) const;
+
             const std::shared_ptr< VariableDefinitions >& templateSymbols( void ) const;
 
             virtual std::string typeDescription( void ) const = 0;
@@ -106,6 +109,7 @@ namespace libcasm_fe
             std::size_t m_maxNumberOfLocals;
             u1 m_abstract;
             u1 m_exported;
+            Grammar::Token m_operation;
             const std::shared_ptr< VariableDefinitions > m_templateSymbols;
         };
 
