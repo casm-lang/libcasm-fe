@@ -286,7 +286,8 @@ namespace libcasm_fe
         // update set errors
         ,
         UpdateSetClash = 0x7000,
-        UpdateSetMergeConflict = 0x7001
+        UpdateSetMergeConflict = 0x7001,
+        UpdateSetInvalidExpression = 0x7002
 
         // --------------------------------------------------------- 9*** ...
         // unsorted run-time errors

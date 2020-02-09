@@ -197,6 +197,11 @@ void AgentScheduler::setSymbolicEnvironment( IR::SymbolicExecutionEnvironment& e
 
 void AgentScheduler::step( void )
 {
+    if(symbolic() && m_environment)
+    {
+        (*m_environment)->incrementTime();
+    }
+
     auto agents = collectAgents();
     selectAgents( agents );
 

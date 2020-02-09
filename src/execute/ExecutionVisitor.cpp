@@ -136,10 +136,12 @@ void Storage::set( const Location& location, const Value& value )
     {
         m_programState.set( location, value );
     }
-    else
+    else if( not location.function()->symbolic() )
     {
+        assert( not value.symbolic() );
         m_functionState.set( location, value );
     }
+    // else: symbolic update is handled in SymbolicExecutionVisitor::visit( UpdateRule& )
 }
 
 void Storage::remove( const Location& location )
@@ -1419,6 +1421,16 @@ void ExecutionVisitor::validateValue(
         throw IR::ValidationException( "value must be defined" );
     }
 
+    if( value.symbolic() )
+    {
+        auto& sym = static_cast< const IR::SymbolicConstant& >( value );
+        if( sym.type() != type )
+        {
+            throw IR::ValidationException( "types do not match" );
+        }
+        return;
+    }
+
     type.validate( value );
 }
 
@@ -1578,15 +1590,8 @@ SymbolicExecutionVisitor::SymbolicExecutionVisitor(
 
 void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
 {
-    return ExecutionVisitor::visit( node );
-    if( node.symbolic() )
-    {
-        m_environment.addFunctionDeclaration( node.identifier()->name(), *node.type() );
-    }
-    else
-    {
-        ExecutionVisitor::visit( node );
-    }
+    // return ExecutionVisitor::visit( node );
+    const auto* frame = m_frameStack.top();
     if( m_evaluateUpdateLocation )
     {
         validateArguments(
@@ -1595,7 +1600,7 @@ void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
             { ValidationFlag::ValueMustBeDefined },
             Code::FunctionArgumentInvalidValueAtUpdate );
 
-        m_updateLocation = m_locationRegistry.get( &node, m_frameStack.top()->locals() );
+        m_updateLocation = m_locationRegistry.get( &node, frame->locals() );
     }
     else
     {
@@ -1605,7 +1610,9 @@ void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
             { ValidationFlag::ValueMustBeDefined },
             Code::FunctionArgumentInvalidValueAtLookup );
 
-        const auto location = m_locationRegistry.lookup( &node, m_frameStack.top()->locals() );
+        const auto location = not node.symbolic()
+                                  ? m_locationRegistry.lookup( &node, m_frameStack.top()->locals() )
+                                  : m_locationRegistry.get( &node, frame->locals() );
         if( location )
         {
             const auto update = m_updateSetManager.lookup( *location );
@@ -1615,17 +1622,26 @@ void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
                 return;
             }
 
-            const auto function = m_globalState.get( *location );
-            if( function )
+            if( not node.isLocal() )
             {
-                m_evaluationStack.push( function.value() );
-                return;
+                const auto function = m_globalState.get( *location );
+                if( node.symbolic() )
+                {
+                    auto sym = m_environment.get(
+                        node.identifier()->name(), node.type(), location->arguments() );
+                    m_evaluationStack.push( sym );
+                    return;
+                }
+                if( function )
+                {
+                    m_evaluationStack.push( function.value() );
+                    return;
+                }
             }
         }
 
         node.defined()->expression()->accept( *this );  // return value already on stack
     }
-    // TODO: here insert symbolic constant creation
 }
 
 void SymbolicExecutionVisitor::visit( DirectCallExpression& node )
@@ -1730,7 +1746,70 @@ void SymbolicExecutionVisitor::visit( SequenceRule& node )
 
 void SymbolicExecutionVisitor::visit( UpdateRule& node )
 {
-    ExecutionVisitor::visit( node );
+    const auto& expression = node.expression();
+    const auto& function = node.function();
+
+    // evalute update value
+    expression->accept( *this );
+    const auto updateValue = m_evaluationStack.pop();
+    try
+    {
+        // validateValue( updateValue, *function->type() );
+    }
+    catch( const IR::ValidationException& e )
+    {
+        throw RuntimeException(
+            { expression->sourceLocation() },
+            e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::FunctionUpdateInvalidValueAtUpdate );
+    }
+
+    {
+        ScopedOverwrite< bool > withLocationEvaluation( m_evaluateUpdateLocation, true );
+        function->accept( *this );
+    }
+    assert( m_updateLocation.isValid() );
+
+    try
+    {
+        const Update update{ updateValue, &node, m_agentId };
+
+        if( !m_updateLocation.function()->symbolic() && updateValue.symbolic() )
+        {
+            throw UpdateException(
+                { node.sourceLocation() },
+                "trying to assign a symbolic value to a numeric function",
+                { m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ) },
+                { updateAsUpdateInfo( { m_updateLocation, update } ) },
+                libcasm_fe::Code::UpdateSetInvalidExpression );
+        }
+
+        m_updateSetManager.add( m_updateLocation, update );
+
+        // TODO: @moosbruggerj add local variable handling
+        if( m_updateLocation.function()->symbolic() )
+        {
+            auto value = m_environment.tptpAtomFromConstant( updateValue );
+            m_environment.set(
+                m_updateLocation.function()->identifier()->name(),
+                m_updateLocation.function()->type(),
+                m_updateLocation.arguments(),
+                value );
+        }
+    }
+    catch( const ExecutionUpdateSet::Conflict& conflict )
+    {
+        throw UpdateException(
+            { node.sourceLocation() },
+            "Conflict while adding an update in agent " + m_agentId.name() + ". Update '" +
+                updateAsString( conflict.conflictingUpdate() ) + "' clashed with update '" +
+                updateAsString( conflict.existingUpdate() ) + "'",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            { updateAsUpdateInfo( conflict.existingUpdate() ),
+              updateAsUpdateInfo( conflict.conflictingUpdate() ) },
+            libcasm_fe::Code::UpdateSetClash );
+    }
 }
 
 void SymbolicExecutionVisitor::visit( CallRule& node )
@@ -1786,7 +1865,10 @@ void SymbolicStateInitializationVisitor::visit( InitDefinition& node )
 void SymbolicStateInitializationVisitor::visit( FunctionDefinition& node )
 {
     Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
-    m_environment.addFunctionDeclaration( node.identifier()->name(), *node.type() );
+    if( node.symbolic() )
+    {
+        m_environment.addFunctionDeclaration( node.identifier()->name(), *node.type() );
+    }
     SymbolicExecutionVisitor executionVisitor(
         m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant(), m_environment );
     node.initially()->accept( executionVisitor );

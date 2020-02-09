@@ -143,7 +143,7 @@ init test
 [symbolic] function b : -> Integer
 [symbolic] function c : -> Integer
 
-rule test = 
+rule test =
 {
 	c := a + b
 	program( self ) := undef
@@ -153,6 +153,49 @@ rule test =
 
 SOURCE_TEST( execute, SymbolicExecutionPass, source_add, true, , );  // TODO: FIXME:
 
+static const auto source_let = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+[symbolic] function b : -> Integer
+[symbolic] function c : -> Integer
+
+rule test =
+{
+	let d = a + b in
+		c := d
+	program( self ) := undef
+}
+
+)***";
+
+SOURCE_TEST( execute_let, SymbolicExecutionPass, source_let, true, , );  // TODO: FIXME:
+
+static const auto source_call_rule = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+[symbolic] function b : -> Integer
+[symbolic] function c : -> Integer
+
+rule test =
+{
+	assign( a + b )
+	program( self ) := undef
+}
+
+rule assign( d: Integer ) =
+{
+	c := d
+}
+
+)***";
+
+SOURCE_TEST( execute_call, SymbolicExecutionPass, source_call_rule, true, , );  // TODO: FIXME:
 static const auto src = R"***(
 CASM init test
 
