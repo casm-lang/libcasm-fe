@@ -50,6 +50,7 @@
 #include <libstdhl/Ansi>
 #include <libstdhl/String>
 
+#include <algorithm>
 #include <iostream>
 
 using namespace libcasm_fe;
