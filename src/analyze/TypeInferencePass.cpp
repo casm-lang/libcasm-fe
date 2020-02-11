@@ -484,11 +484,14 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
 
             if( ( exprArgType->isObject() and
-                  exprArgType->description() == TypeInfo::TYPE_NAME_ENUMERATION ) and
+                  ( libstdhl::String::startsWith(
+                        exprArgType->description(), TypeInfo::TYPE_NAME_RANGE ) or
+                    exprArgType->description() == TypeInfo::TYPE_NAME_AGENT or
+                    exprArgType->description() == TypeInfo::TYPE_NAME_ENUMERATION ) ) and
                 callArgType->isObject() )
             {
-                // relaxing: OK if argument expression 'enumeration' type (Object) passed to
-                // argument call generic type (Object)
+                // relaxing: OK if argument expression 'enumeration'/'Agent'/'Range...' type
+                // (Object) passed to argument call generic type (Object)
                 continue;
             }
         }
@@ -496,6 +499,13 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         if( callArgType->isInteger() and exprArgType->isInteger() )
         {
             // relaxing: OK, if arguments are integer and/or integer ranged types
+            continue;
+        }
+
+        if( ( not exprArgType->isObject() ) and
+            callArgType->description() == TypeInfo::TYPE_NAME_AGENT )
+        {
+            // relaxing: OK if argument expression is not Object passed to 'Agent'
             continue;
         }
 
@@ -519,8 +529,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 "type mismatch: " + node.targetTypeName() + " argument type at position " +
                 std::to_string( pos + 1 ) + " was '" + exprArgType->description() + "', " +
                 node.targetTypeName() + " definition expects '" + callArgType->description() + "'";
-            // m_log.error( { exprArg->sourceLocation() }, msg, code->second );
-            m_log.warning( { exprArg->sourceLocation() }, msg );
+            m_log.error( { exprArg->sourceLocation() }, msg, code->second );
             m_log.info( { symbol->sourceLocation() }, msg );
         }
     }
@@ -571,9 +580,9 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         const auto& symbol = objectTypeNamespace->findSymbol( methodName );
         if( symbol )
         {
-            m_log.debug(
-                { sourceLocation, symbol->sourceLocation() },
-                "found domain behavior: " + methodSignature );
+            // m_log.debug(
+            //     { sourceLocation, symbol->sourceLocation() },
+            //     "found domain behavior: " + methodSignature );
             behaviorTypes.emplace_back( domainBehavior );
         }
     }
@@ -585,9 +594,9 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         const auto& symbol = objectTypeNamespace->findSymbol( methodName );
         if( symbol )
         {
-            m_log.debug(
-                { sourceLocation, symbol->sourceLocation() },
-                "found default behavior: " + methodSignature );
+            // m_log.debug(
+            //     { sourceLocation, symbol->sourceLocation() },
+            //     "found default behavior: " + methodSignature );
             behaviorTypes.emplace_back( defaultBehavior );
         }
     }
@@ -600,9 +609,9 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         const auto& symbol = basicBehaviorNamespace->findSymbol( methodName );
         if( symbol )
         {
-            m_log.debug(
-                { sourceLocation, symbol->sourceLocation() },
-                "found basic behavior: " + methodSignature );
+            // m_log.debug(
+            //     { sourceLocation, symbol->sourceLocation() },
+            //     "found basic behavior: " + methodSignature );
             behaviorTypes.emplace_back( basicBehavior );
         }
     }
@@ -615,9 +624,9 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         const auto& symbol = extendedBehaviorNamespace->findSymbol( methodName );
         if( symbol )
         {
-            m_log.debug(
-                { sourceLocation, symbol->sourceLocation() },
-                "found extended behavior: " + methodSignature );
+            // m_log.debug(
+            //     { sourceLocation, symbol->sourceLocation() },
+            //     "found extended behavior: " + methodSignature );
             behaviorTypes.emplace_back( extendedBehavior );
         }
     }
@@ -1123,8 +1132,6 @@ void TypeInferenceVisitor::visit( TupleLiteral& node )
 
     const auto tupleType = libstdhl::Memory::get< libcasm_ir::TupleType >( expressionTypes );
     node.setType( tupleType );
-
-    m_log.info( { node.sourceLocation() }, "new domain type '" + tupleType->description() + "'" );
 }
 
 void TypeInferenceVisitor::visit( RecordLiteral& node )
@@ -1828,7 +1835,7 @@ void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
     }
 
     const auto& behaviorNamespace = behavior->symboltable();
-    m_log.info( symbolName + "\n" + behaviorNamespace->dump() );
+    // m_log.info( symbolName + "\n" + behaviorNamespace->dump() );
 
     const auto& symbol = behaviorNamespace->findSymbol( symbolName );
     if( not symbol )
