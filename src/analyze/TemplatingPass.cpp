@@ -265,10 +265,6 @@ void TemplatingVisitor::visit( VariableDefinition& node )
         ( m_fromType->signature() == node.variableType()->signature() ) )
     {
         variableType = fetch< Type >( m_toType );
-        m_log.warning(
-            { node.sourceLocation() },
-            "REPLACE?: " + m_fromType->signature() + ", " + m_toType->signature() + ", " +
-                node.variableType()->signature() );
     }
     else
     {
@@ -393,10 +389,6 @@ void TemplatingVisitor::visit( ImplementDefinition& node )
     if( m_fromType and m_toType and ( m_fromType->signature() == node.domainType()->signature() ) )
     {
         domainType = fetch< Type >( m_toType );
-        m_log.warning(
-            { node.sourceLocation() },
-            "REPLACE?: " + m_fromType->signature() + ", " + m_toType->signature() + ", " +
-                node.domainType()->signature() );
     }
 
     const auto& definitions = fetch< Definitions, Definition >( node.definitions() );
@@ -628,11 +620,6 @@ void TemplatingVisitor::visit( TemplateType& node )
     if( m_templateType and node.name()->baseName() == m_templateType->name()->baseName() and
         node.signature() != m_templateType->signature() )
     {
-        m_log.warning(
-            { node.sourceLocation(), m_templateType->sourceLocation() },
-            "TEMPLATING: " + node.name()->baseName() + " : " + node.description() + " '" +
-                node.signature() + "' ==> " + m_templateType->name()->baseName() + " : " +
-                m_templateType->description() + " '" + m_templateType->signature() + "'" );
         if( m_templateType->id() != Node::ID::RELATION_TYPE )
         {
             m_log.error(
@@ -798,11 +785,6 @@ u1 TemplatingPass::run( libpass::PassResult& pr )
             const auto& agentUsingDefinition = AST::make< UsingDefinition >(
                 initDefinition->sourceLocation(), agentIdentifier, agentDomainType );
             definitions->add( agentUsingDefinition );
-
-            log.info(
-                { agentUsingDefinition->sourceLocation() },
-                "AGENT " + agentUsingDefinition->description() + " " +
-                    agentUsingDefinition->typeDescription() );
         }
     }
 
