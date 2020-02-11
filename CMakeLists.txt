@@ -48,7 +48,7 @@ set( PROJECT libcasm-fe )
 cmake_minimum_required( VERSION ${CMAKE_VERSION} )
 
 project( ${PROJECT} LANGUAGES CXX )
-set( CMAKE_CXX_STANDARD 17 )
+set( CMAKE_CXX_STANDARD 14 )
 set( CMAKE_CXX_EXTENSIONS OFF )
 set( CMAKE_VERSION 3.2 )
 set( CMAKE_MODULE_PATH ${${PROJECT}_SOURCE_DIR}/.cmake )
