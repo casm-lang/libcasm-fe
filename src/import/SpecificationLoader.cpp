@@ -56,9 +56,9 @@
 #include <libpass/PassManager>
 #include <libpass/analyze/LoadFilePass>
 
+#include <libstdhl/File>
 #include <libstdhl/String>
 
-#include <filesystem>
 #include <iostream>
 
 #include "CASM.casm.h"
@@ -129,8 +129,8 @@ Specification::Ptr SpecificationLoader::loadSpecification(
             throw SpecificationLoadingError( "Unable to import '" + identifierPathName + "'" );
         }
 
-        const std::string temporaryPath = std::filesystem::temp_directory_path();
-        const std::string temporaryName = temporaryPath + "/" + casmSpecificationPath;
+        const auto temporaryPath = libstdhl::File::Path::temporary();
+        const auto temporaryName = temporaryPath + "/" + casmSpecificationPath;
         auto temporaryFile = libstdhl::File::open( temporaryName, std::fstream::out );
         temporaryFile << casmSpecification->second;
         temporaryFile.close();
