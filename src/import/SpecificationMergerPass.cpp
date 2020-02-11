@@ -91,9 +91,6 @@ u1 SpecificationMergerPass::run( libpass::PassResult& pr )
                 const auto& initDefinition = static_cast< const InitDefinition& >( *definition );
                 if( initDefinition.external() )
                 {
-                    log.debug(
-                        { definition->sourceLocation() },
-                        "omit init definition in merged specification" );
                     continue;
                 }
             }
