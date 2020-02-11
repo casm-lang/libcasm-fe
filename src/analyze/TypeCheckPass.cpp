@@ -324,7 +324,6 @@ void TypeCheckVisitor::visit( EnumerationDefinition& node )
     }
 
     const auto& typeName = node.domainType()->signature();
-    m_log.debug( "creating IR enumeration type '" + typeName + "'" );
     const auto kind = std::make_shared< libcasm_ir::Enumeration >( typeName );
     for( const auto& enumerator : *node.enumerators() )
     {
@@ -402,7 +401,6 @@ void TypeCheckVisitor::visit( StructureDefinition& node )
     }
 
     const auto& typeName = node.domainType()->signature();
-    m_log.debug( "creating IR object type '" + typeName + "' for " + node.description() );
     const auto type = std::make_shared< libcasm_ir::ObjectType >( typeName );
     node.setType( type );
 
@@ -424,7 +422,6 @@ void TypeCheckVisitor::visit( BehaviorDefinition& node )
     }
 
     const auto& typeName = node.domainType()->signature();
-    m_log.debug( "creating IR object type '" + typeName + "' for " + node.description() );
     const auto type = std::make_shared< libcasm_ir::ObjectType >( typeName );
     node.setType( type );
 
@@ -642,16 +639,12 @@ void TypeCheckVisitor::visit( BasicType& node )
             if( TypeInfo::instance().hasType( domainName ) )
             {
                 const auto& type = TypeInfo::instance().getType( domainName );
-                m_log.debug(
-                    "reusing IR primitive type '" + domainName + "' for " + node.description() );
                 node.setType( type );
                 return;
             }
             else
             {
                 const auto type = std::make_shared< libcasm_ir::ObjectType >( typeName );
-                m_log.debug(
-                    "creating IR object type '" + typeName + "' for " + node.description() );
                 node.setType( type );
                 return;
             }
@@ -711,9 +704,6 @@ void TypeCheckVisitor::visit( TupleType& node )
     assert( subTypeList.size() >= 2 and " inconsistent state @ GrammarParser " );
 
     const auto& typeName = node.signature();
-    m_log.debug(
-        "creating IR " + node.description() + " type '" + typeName + "' for " +
-        node.description() );
     const auto type = std::make_shared< libcasm_ir::TupleType >( subTypeList );
     node.setType( type );
 }
@@ -757,9 +747,6 @@ void TypeCheckVisitor::visit( RecordType& node )
     assert( argumentTypeList.size() >= 1 and " inconsistent state @ GrammarParser " );
 
     const auto& typeName = node.signature();
-    m_log.debug(
-        "creating IR " + node.description() + " type '" + typeName + "' for " +
-        node.description() );
     const auto type =
         std::make_shared< libcasm_ir::RecordType >( argumentTypeList, argumentNameList );
     node.setType( type );
@@ -997,7 +984,6 @@ void TypeCheckVisitor::visit( TemplateType& node )
 
     if( node.varadic() )
     {
-        m_log.debug( { node.sourceLocation() }, "omit type check of varadic" );
         return;
     }
 
@@ -1136,7 +1122,6 @@ void TypeCheckVisitor::visit( RelationType& node )
 
     if( node.mapping() )
     {
-        m_log.debug( { node.sourceLocation() }, "omit type check of mapping" );
         return;
     }
 
@@ -1297,7 +1282,6 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
         log.debug( "found %lu error(s) during type checking", errors );
         return false;
     }
-    log.info( "symbol table =\n" + specification->symboltable()->dump() );
 
     return true;
 }
