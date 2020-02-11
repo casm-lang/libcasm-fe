@@ -368,11 +368,11 @@ implement Equality for Rational = {
 implement PartialOrder for Rational = {
     [ pure ]
     derived lessThan( this, other : Rational ) -> Boolean =
-        LthInstruction( this, other )
+        false // LthInstruction( this, other )
 
     [ pure ]
     derived greaterThan( this, other : Rational ) -> Boolean =
-        GthInstruction( this, other )
+        false // GthInstruction( this, other )
 }
 
 implement TotalOrder for Rational = {
