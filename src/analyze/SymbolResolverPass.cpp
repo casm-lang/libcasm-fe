@@ -1110,11 +1110,6 @@ Definition::Ptr SymbolResolveVisitor::resolveAlias( const Definition::Ptr& defin
 
 void SymbolResolveVisitor::resolveTypeDefinition( AST::Type& node )
 {
-    m_log.info(
-        { node.sourceLocation() },
-        "resolving: " + node.signature() +
-            ( node.typeDefinition() ? "\n" + node.typeDefinition()->symboltable()->dump() : "" ) );
-
     if( node.typeDefinition() )
     {
         return;
@@ -1191,7 +1186,6 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
         log.debug( "found %lu error(s) during symbol resolving", errors );
         return false;
     }
-    log.info( "symbol table =\n" + symboltable.dump() );
 
     pr.setOutput< SymbolResolverPass >( visitor.templateTypes(), visitor.templateDefinitions() );
     return true;
