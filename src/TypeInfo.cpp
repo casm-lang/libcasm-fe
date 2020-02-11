@@ -109,6 +109,29 @@ u1 TypeInfo::hasType( const std::string& name ) const
     return it != m_typeName2typePtr.cend();
 }
 
+const std::string TypeInfo::TYPE_NAME_VOID = "Void";
+const std::string TypeInfo::TYPE_NAME_BOOLEAN = "Boolean";
+const std::string TypeInfo::TYPE_NAME_BINARY = "Binary";
+const std::string TypeInfo::TYPE_NAME_INTEGER = "Integer";
+const std::string TypeInfo::TYPE_NAME_STRING = "String";
+const std::string TypeInfo::TYPE_NAME_DECIMAL = "Decimal";
+const std::string TypeInfo::TYPE_NAME_RATIONAL = "Rational";
+
+const std::string TypeInfo::TYPE_NAME_TUPLE = "Tuple";
+const std::string TypeInfo::TYPE_NAME_RECORD = "Record";
+
+const std::string TypeInfo::TYPE_NAME_LIST = "List";
+const std::string TypeInfo::TYPE_NAME_RANGE = "Range";
+const std::string TypeInfo::TYPE_NAME_FILE = "File";
+const std::string TypeInfo::TYPE_NAME_PORT = "Port";
+
+const std::string TypeInfo::TYPE_NAME_RULEREF = "RuleRef";
+const std::string TypeInfo::TYPE_NAME_FUNCREF = "FuncRef";
+
+const std::string TypeInfo::TYPE_NAME_ENUMERATION = "enumeration";
+const std::string TypeInfo::TYPE_NAME_OBJECT = "Object";
+const std::string TypeInfo::TYPE_NAME_AGENT = "Agent";
+
 //
 //  Local variables:
 //  mode: c++
