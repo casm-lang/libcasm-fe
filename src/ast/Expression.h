@@ -155,7 +155,7 @@ namespace libcasm_fe
                 DERIVED,
                 BUILTIN,
                 RULE,
-                DOMAIN,
+                DOMAINTYPE,
                 CONSTANT,
                 VARIABLE,
                 UNKNOWN

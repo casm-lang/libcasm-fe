@@ -269,7 +269,7 @@ std::string TargetCallExpression::targetTypeString( const TargetType targetType 
         {
             return "rule";
         }
-        case TargetType::DOMAIN:
+        case TargetType::DOMAINTYPE:
         {
             return "domain";
         }
