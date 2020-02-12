@@ -788,12 +788,12 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         }
         case Node::ID::ENUMERATION_DEFINITION:
         {
-            node.setTargetType( DirectCallExpression::TargetType::DOMAIN );
+            node.setTargetType( DirectCallExpression::TargetType::DOMAINTYPE );
             break;
         }
         case Node::ID::DOMAIN_DEFINITION:
         {
-            node.setTargetType( DirectCallExpression::TargetType::DOMAIN );
+            node.setTargetType( DirectCallExpression::TargetType::DOMAINTYPE );
             break;
         }
         case Node::ID::BUILTIN_DEFINITION:
