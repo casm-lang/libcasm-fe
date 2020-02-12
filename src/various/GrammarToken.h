@@ -70,7 +70,7 @@ namespace libcasm_fe
             /* 12 */ FOR,
             /* 13 */ SELF,
             /* 14 */ THIS,
-            /* 15 */ DOMAIN,
+            /* 15 */ DOMAINTYPE,
             /* 16 */ BUILTIN,
             /* 17 */ FUNCTION,
             /* 18 */ DEFINED,
@@ -204,7 +204,7 @@ namespace libcasm_fe
                 {
                     return "this";
                 }
-                case /* 15 */ Grammar::Token::DOMAIN:
+                case /* 15 */ Grammar::Token::DOMAINTYPE:
                 {
                     return "domain";
                 }

@@ -861,7 +861,7 @@ namespace libcasm_fe {
     FOR = 269,                     // "for"
     SELF = 270,                    // "self"
     THIS = 271,                    // "this"
-    DOMAIN = 272,                  // "domain"
+    DOMAINTYPE = 272,              // "domain"
     BUILTIN = 273,                 // "builtin"
     FUNCTION = 274,                // "function"
     DEFINED = 275,                 // "defined"
@@ -976,7 +976,7 @@ namespace libcasm_fe {
         S_FOR = 14,                              // "for"
         S_SELF = 15,                             // "self"
         S_THIS = 16,                             // "this"
-        S_DOMAIN = 17,                           // "domain"
+        S_DOMAINTYPE = 17,                       // "domain"
         S_BUILTIN = 18,                          // "builtin"
         S_FUNCTION = 19,                         // "function"
         S_DEFINED = 20,                          // "defined"
@@ -1248,7 +1248,7 @@ namespace libcasm_fe {
       case symbol_kind::S_FOR: // "for"
       case symbol_kind::S_SELF: // "self"
       case symbol_kind::S_THIS: // "this"
-      case symbol_kind::S_DOMAIN: // "domain"
+      case symbol_kind::S_DOMAINTYPE: // "domain"
       case symbol_kind::S_BUILTIN: // "builtin"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
@@ -3008,7 +3008,7 @@ switch (yykind)
       case symbol_kind::S_FOR: // "for"
       case symbol_kind::S_SELF: // "self"
       case symbol_kind::S_THIS: // "this"
-      case symbol_kind::S_DOMAIN: // "domain"
+      case symbol_kind::S_DOMAINTYPE: // "domain"
       case symbol_kind::S_BUILTIN: // "builtin"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
@@ -3869,16 +3869,16 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_DOMAIN (CST::Token::Ptr v, location_type l)
+      make_DOMAINTYPE (CST::Token::Ptr v, location_type l)
       {
-        return symbol_type (token::DOMAIN, std::move (v), std::move (l));
+        return symbol_type (token::DOMAINTYPE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_DOMAIN (const CST::Token::Ptr& v, const location_type& l)
+      make_DOMAINTYPE (const CST::Token::Ptr& v, const location_type& l)
       {
-        return symbol_type (token::DOMAIN, v, l);
+        return symbol_type (token::DOMAINTYPE, v, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -5518,7 +5518,7 @@ switch (yykind)
       case symbol_kind::S_FOR: // "for"
       case symbol_kind::S_SELF: // "self"
       case symbol_kind::S_THIS: // "this"
-      case symbol_kind::S_DOMAIN: // "domain"
+      case symbol_kind::S_DOMAINTYPE: // "domain"
       case symbol_kind::S_BUILTIN: // "builtin"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
@@ -6016,7 +6016,7 @@ switch (yykind)
       case symbol_kind::S_FOR: // "for"
       case symbol_kind::S_SELF: // "self"
       case symbol_kind::S_THIS: // "this"
-      case symbol_kind::S_DOMAIN: // "domain"
+      case symbol_kind::S_DOMAINTYPE: // "domain"
       case symbol_kind::S_BUILTIN: // "builtin"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
