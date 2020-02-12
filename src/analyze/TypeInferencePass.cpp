@@ -416,7 +416,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
         case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
         case DirectCallExpression::TargetType::BUILTIN:   // [[fallthrough]]
-        case DirectCallExpression::TargetType::DOMAIN:
+        case DirectCallExpression::TargetType::DOMAINTYPE:
         {
             break;
         }
