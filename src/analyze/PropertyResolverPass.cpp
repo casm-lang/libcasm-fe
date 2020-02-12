@@ -186,12 +186,12 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
     libcasm_ir::Properties callProperties;
     switch( node.targetType() )
     {
-        case DirectCallExpression::TargetType::BUILTIN:   // [[fallthrough]]
-        case DirectCallExpression::TargetType::VARIABLE:  // [[fallthrough]]
-        case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
-        case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
-        case DirectCallExpression::TargetType::RULE:      // [[fallthrough]]
-        case DirectCallExpression::TargetType::DOMAIN:    // [[fallthrough]]
+        case DirectCallExpression::TargetType::BUILTIN:     // [[fallthrough]]
+        case DirectCallExpression::TargetType::VARIABLE:    // [[fallthrough]]
+        case DirectCallExpression::TargetType::FUNCTION:    // [[fallthrough]]
+        case DirectCallExpression::TargetType::DERIVED:     // [[fallthrough]]
+        case DirectCallExpression::TargetType::RULE:        // [[fallthrough]]
+        case DirectCallExpression::TargetType::DOMAINTYPE:  // [[fallthrough]]
         case DirectCallExpression::TargetType::CONSTANT:
         {
             const auto& definition = node.targetDefinition();
