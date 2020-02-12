@@ -91,6 +91,9 @@ std::string Span::kindName( void ) const
             return "block comment";
         }
     }
+
+    assert( " error! " );
+    return std::string();
 }
 
 const std::size_t Span::length( void ) const
