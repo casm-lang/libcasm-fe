@@ -551,7 +551,7 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
             // resolved at type inference
             return;
         }
-        case DirectCallExpression::TargetType::DOMAIN:
+        case DirectCallExpression::TargetType::DOMAINTYPE:
         {
             const auto& symbol = node.targetDefinition();
             assert( symbol and " inconsistent state @ SymbolResolverPass " );
