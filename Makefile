@@ -127,7 +127,6 @@ src/various/Grammar.org: src/various/GrammarParser.xml src/GrammarLexer.l
 
 
 %/src/CASM.casm.h: lib/CASM.casm
-	echo -n "static const std::string CASM_casm = R\"***(" > $@
+	printf "static const std::string CASM_casm = R\"***(" > $@
 	cat lib/CASM.casm >> $@
-	echo ")***\";" >> $@
-	echo >> $@
+	printf ")***\";\n\n" >> $@
