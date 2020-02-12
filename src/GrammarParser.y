@@ -733,7 +733,7 @@ ImplementDefinitionAttributedElement
 //
 
 DomainDefinition
-: DOMAIN Type
+: DOMAINTYPE Type
   {
       $$ = CST::make< DomainDefinition >( @$, $1, $2 );
   }

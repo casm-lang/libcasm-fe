@@ -59,7 +59,7 @@ IMPLEMENT       "implement"
 FOR             "for"
 SELF            "self"
 THIS            "this"
-DOMAIN          "domain"
+DOMAINTYPE      "domain"
 BUILTIN         "builtin"
 
 FUNCTION        "function"
