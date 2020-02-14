@@ -407,29 +407,50 @@ ALL   = $(TYPES:%=%-all)
 ENV_CMAKE_FLAGS  = -G$(ENV_GEN)
 ENV_CMAKE_FLAGS += -DCMAKE_BUILD_TYPE=$(TYPE)
 
+ENV_CMAKE_CXX_FLAGS =
+ifeq (,$(findstring Visual,$(ENV_GEN)))
+  ifeq ($(ENV_OSYS),Windows)
+    ENV_CMAKE_CXX_FLAGS += -Wa,-mbig-obj
+  endif
+endif
+
 ifeq (,$(findstring Visual,$(ENV_GEN)))
   ENV_CMAKE_FLAGS += -DCMAKE_C_COMPILER=$(ENV_CC)
   ENV_CMAKE_FLAGS += -DCMAKE_CXX_COMPILER=$(ENV_CXX)
 
-  ifeq ("$(TYPE)","sanitize")
-    ENV_CMAKE_FLAGS += -DCMAKE_CXX_FLAGS="\
-      -O1 -g -Wall -Wextra\
-      -fno-omit-frame-pointer -fno-optimize-sibling-calls\
-      -fsanitize=undefined -fsanitize=address\
-    "
+  ifeq ("$(TYPE)","debug")
+    ENV_CMAKE_FLAGS += -DCMAKE_CXX_FLAGS="-O0 -g\
+      $(ENV_CMAKE_CXX_FLAGS)"
   endif
+
+  ifeq ("$(TYPE)","release")
+    ENV_CMAKE_FLAGS += -DCMAKE_CXX_FLAGS="-O3 -DNDEBUG\
+      $(ENV_CMAKE_CXX_FLAGS)"
+  endif
+
+  ifeq ("$(TYPE)","sanitize")
+    ENV_CMAKE_FLAGS += -DCMAKE_CXX_FLAGS="-O1 -g -Wall -Wextra\
+      -fno-omit-frame-pointer\
+      -fno-optimize-sibling-calls\
+      -fsanitize=undefined\
+      -fsanitize=address\
+      $(ENV_CMAKE_CXX_FLAGS)"
+  endif
+
   ifeq ("$(TYPE)","coverage")
-    ENV_CMAKE_FLAGS += -DCMAKE_CXX_FLAGS="\
-      -O0 -g -Wall -Wextra\
-      -fprofile-arcs -ftest-coverage\
-    "
+    ENV_CMAKE_FLAGS += -DCMAKE_CXX_FLAGS="-O0 -g -Wall -Wextra\
+      -fprofile-arcs\
+      -ftest-coverage\
+      $(ENV_CMAKE_CXX_FLAGS)"
+  endif
+
+  ifeq ("$(TYPE)","release")
+      ENV_CMAKE_FLAGS += -DCMAKE_SHARED_LINKER_FLAGS="-s"
   endif
 
   ifeq ($(ENV_OSYS),Windows)
     ifeq ($(ENV_CC),clang)
-      ENV_CMAKE_FLAGS += -DCMAKE_EXE_LINKER_FLAGS="\
-        -Wl,--allow-multiple-definition\
-      "
+      ENV_CMAKE_FLAGS += -DCMAKE_EXE_LINKER_FLAGS="-Wl,--allow-multiple-definition"
     endif
   endif
 else
@@ -763,6 +784,8 @@ info-generators:
 ENV_CI_BUILD  := "n.a."
 ENV_CI_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 ENV_CI_COMMIT := $(shell git rev-parse HEAD)
+ENV_CI_GITTAG := $(shell git describe --tags --always)
+
 
 ifdef CIRRUS_CI
   # https://cirrus-ci.org/guide/writing-tasks/#environment-variables
@@ -829,3 +852,42 @@ ci-benchmark:
 
 ci-install:
 	@$(MAKE) --no-print-directory I=$(I) C=$(C) $(B)-install
+
+ci-bundle:
+	@$(MAKE) --no-print-directory bundle
+
+
+# bundle release
+
+bundle: bundle-$(ENV_CI_GITTAG)
+
+bundle-%:
+	$(eval TAG := $(patsubst bundle-%,%,$@))
+	$(eval BUNDLE := $(TARGET)-$(TAG))
+ifeq ($(ENV_OSYS),Mac)
+	$(eval OSYS := darwin)
+else
+	$(eval OSYS := $(shell echo $(ENV_OSYS) | tr A-Z a-z))
+endif
+	$(eval ARCH := $(shell echo $(ENV_ARCH) | tr A-Z a-z))
+	$(eval ARCHIVE  := $(TARGET)-$(OSYS)-$(ARCH))
+	@echo "-- Bundle   '$(TAG)' for '$(ENV_OSYS)' '$(ENV_ARCH)'"
+	@mkdir -p $(OBJ)
+	@mkdir -p $(OBJ)/bundle
+	@cp -rf $(OBJ)/install $(OBJ)/bundle/$(BUNDLE)
+ifeq ($(ENV_OSYS),Windows)
+	$(eval ARCHIVE  := $(ARCHIVE).zip)
+	@(cd $(OBJ)/bundle; zip -r $(ARCHIVE) $(BUNDLE))
+else
+	$(eval ARCHIVE  := $(ARCHIVE).tar.gz)
+	@(cd $(OBJ)/bundle; tar cfvz $(ARCHIVE) $(BUNDLE))
+endif
+	@rm -rf $(OBJ)/bundle/$(BUNDLE)
+	@echo "-- Archive  '$(ARCHIVE)'"
+	$(eval CHECKSUM := $(ARCHIVE).sha2)
+ifeq ($(ENV_OSYS),Mac)
+	@(cd $(OBJ)/bundle; shasum -a 256 $(ARCHIVE) > $(CHECKSUM))
+else
+	@(cd $(OBJ)/bundle; sha256sum $(ARCHIVE) > $(CHECKSUM))
+endif
+	@echo "-- Checksum '$(CHECKSUM)'"
