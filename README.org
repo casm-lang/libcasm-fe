@@ -46,7 +46,7 @@
 #+options: toc:nil
 
 
-* libcasm-fe: CASM Language, AST, and Front-End Library
+* libcasm-fe: CASM Language Front-End Library
 
 [[https://gitter.im/casm-lang/libcasm-fe][https://img.shields.io/badge/gitter-chat-darkcyan.svg?logo=gitter]]
 [[https://github.com/casm-lang/libcasm-fe/actions?query=workflow%3Abuild][https://github.com/casm-lang/libcasm-fe/workflows/build/badge.svg]]
@@ -55,7 +55,8 @@
 [[https://github.com/casm-lang/libcasm-fe/tags][https://img.shields.io/github/tag/casm-lang/libcasm-fe.svg?logo=github&sort=semver]]
 [[https://github.com/casm-lang/libcasm-fe/blob/master/LICENSE.txt][https://img.shields.io/badge/license-GPLv3%2BLE-blue.svg?logo=gnu]]
 
-TBD
+This repository contains the CASM front-end implementation consisting of the CASM language grammar definition, 
+the Abstract Syntax Tree (AST), various analyses and transformation passes. 
 
 
 ** Copyright and License
