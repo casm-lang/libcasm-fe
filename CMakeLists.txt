@@ -65,6 +65,7 @@ package_git_deps(
   libstdhl>libpass
   libpass>libtptp
   libtptp>libcasm-ir
+  libz3>libstdhl
   )
 
 find_package( Threads REQUIRED )
