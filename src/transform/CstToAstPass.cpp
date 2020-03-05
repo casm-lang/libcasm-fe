@@ -431,6 +431,10 @@ void CstToAstVisitor::visit( UsingPathDefinition& node )
 
 void CstToAstVisitor::visit( InvariantDefinition& node )
 {
+    const auto& identifier = fetch< AST::Identifier >( node.identifier() );
+    const auto& expression = fetch< AST::Expression >( node.expression() );
+    const auto& astNode = store< AST::InvariantDefinition >( node, identifier, expression );
+    astNode->setExported( node.exported() );
 }
 
 void CstToAstVisitor::visit( ImportDefinition& node )
