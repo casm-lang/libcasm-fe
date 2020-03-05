@@ -356,6 +356,11 @@ void LstToIrVisitor::visit( ReferenceLiteral& node )
     // assert( result.second and " reference already exists " );
 }
 
+void LstToIrVisitor::visit( SetLiteral& node )
+{
+    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
+}
+
 void LstToIrVisitor::visit( ListLiteral& node )
 {
     m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
@@ -372,6 +377,11 @@ void LstToIrVisitor::visit( TupleLiteral& node )
 }
 
 void LstToIrVisitor::visit( RecordLiteral& node )
+{
+    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
+}
+
+void LstToIrVisitor::visit( NamedExpression& node )
 {
     m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
@@ -681,12 +691,17 @@ libcasm_ir::Specification::Ptr LstToIrVisitor::specification( void ) const
     return m_specification;
 }
 
+//
+//
+// LstToIrPass
+//
+
 void LstToIrPass::usage( libpass::PassUsage& pu )
 {
     pu.require< AstToLstPass >();
     pu.scheduleAfter< ConsistencyCheckPass >();
 
-    // pu.provide< libcasm_ir::ConsistencyCheckPass >();
+    pu.provide< libcasm_ir::ConsistencyCheckPass >();
 }
 
 bool LstToIrPass::run( libpass::PassResult& pr )
