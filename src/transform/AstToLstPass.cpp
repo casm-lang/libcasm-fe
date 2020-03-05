@@ -263,6 +263,8 @@ void AstToLstVisitor::visit( Root& node )
 
 void AstToLstVisitor::visit( InitDefinition& node )
 {
+    // `init` definition does not get transformed to LST form, because the `program` already
+    // contains the initially setup of the starting agent(s)
 }
 
 void AstToLstVisitor::visit( VariableDefinition& node )
@@ -380,19 +382,33 @@ void AstToLstVisitor::visit( UsingPathDefinition& node )
 
 void AstToLstVisitor::visit( ImportDefinition& node )
 {
+    // `import` does not get lowered to LST form, because all imports are already resolved in
+    // previous passes
 }
 
 void AstToLstVisitor::visit( InvariantDefinition& node )
 {
-    // astNode->setExported( node.exported() );
+    const auto& identifier = fetch< LST::Identifier >( node.identifier() );
+    const auto& expression = fetch< LST::Expression >( node.expression() );
+    const auto& lstNode = store< LST::InvariantDefinition >(
+        node,
+        node.type(),
+        node.properties(),
+        identifier,
+        node.maximumNumberOfLocals(),
+        expression );
+
+    m_lstDefinitions->add( lstNode );
 }
 
 void AstToLstVisitor::visit( DomainDefinition& node )
 {
-    // const auto& templateSymbols =
-    //     fetch< LST::VariableDefinitions, LST::VariableDefinition, AST::VariableDefinition >(
-    //         node.templateNode()->symbols() );
-    // const auto& domainType = node.domainType();
+    if( node.templateSymbols()->size() != 0 )
+    {
+        m_log.debug( { node.sourceLocation() }, "omit transformation of " + node.description() );
+        return;
+    }
+
     const auto& identifier = fetch< LST::Identifier >( node.identifier() );
     const auto& lstNode = store< LST::DomainDefinition >(
         node, node.type(), node.properties(), identifier, node.maximumNumberOfLocals() );
@@ -402,10 +418,11 @@ void AstToLstVisitor::visit( DomainDefinition& node )
 
 void AstToLstVisitor::visit( StructureDefinition& node )
 {
-    // const auto& templateSymbols =
-    //     fetch< LST::VariableDefinitions, LST::VariableDefinition, AST::VariableDefinition >(
-    //         node.templateNode()->symbols() );
-    // const auto& domainType = node.domainType();
+    if( node.templateSymbols()->size() != 0 )
+    {
+        m_log.debug( { node.sourceLocation() }, "omit transformation of " + node.description() );
+        return;
+    }
 
     const auto& lstFunctionDefinitions =
         fetch< LST::FunctionDefinitions, LST::FunctionDefinition, AST::FunctionDefinition >(
@@ -419,6 +436,8 @@ void AstToLstVisitor::visit( StructureDefinition& node )
 
 void AstToLstVisitor::visit( BehaviorDefinition& node )
 {
+    // 'behavior' does not get lowered to LST form, because its type information is only used during
+    // analysis passes of type checking and type inference
 }
 
 void AstToLstVisitor::visit( ImplementDefinition& node )
@@ -427,9 +446,12 @@ void AstToLstVisitor::visit( ImplementDefinition& node )
 
 void AstToLstVisitor::visit( BuiltinDefinition& node )
 {
-    // const auto& templateSymbols =
-    //     fetch< LST::VariableDefinitions, LST::VariableDefinition, AST::VariableDefinition >(
-    //         node.templateNode()->symbols() );
+    if( node.templateSymbols()->size() != 0 )
+    {
+        m_log.debug( { node.sourceLocation() }, "omit transformation of " + node.description() );
+        return;
+    }
+
     const auto& identifier = fetch< LST::Identifier >( node.identifier() );
     const auto& lstNode = store< LST::BuiltinDefinition >(
         node,
@@ -509,10 +531,14 @@ void AstToLstVisitor::visit( AbstractExpression& node )
 
 void AstToLstVisitor::visit( NamedExpression& node )
 {
+    const auto& identifier = fetch< LST::Identifier >( node.identifier() );
+    const auto& expression = fetch< LST::Expression >( node.expression() );
+    store< LST::NamedExpression >( node, node.type(), node.properties(), identifier, expression );
 }
 
 void AstToLstVisitor::visit( MappedExpression& node )
 {
+    // TODO: @ppaulweber
 }
 
 void AstToLstVisitor::visit( DirectCallExpression& node )
@@ -535,6 +561,7 @@ void AstToLstVisitor::visit( MethodCallExpression& node )
 
 void AstToLstVisitor::visit( IndirectCallExpression& node )
 {
+    // TODO: @ppaulweber
 }
 
 void AstToLstVisitor::visit( TypeCastingExpression& node )
@@ -584,6 +611,12 @@ void AstToLstVisitor::visit( CardinalityExpression& node )
 
 void AstToLstVisitor::visit( LetExpression& node )
 {
+    const auto& variableBindings =
+        fetch< LST::VariableBindings, LST::VariableBinding, AST::VariableBinding >(
+            node.variableBindings() );
+    const auto& expression = fetch< LST::Expression >( node.expression() );
+    store< LST::LetExpression >(
+        node, node.type(), node.properties(), variableBindings, expression );
 }
 
 void AstToLstVisitor::visit( ConditionalExpression& node )
@@ -597,14 +630,35 @@ void AstToLstVisitor::visit( ConditionalExpression& node )
 
 void AstToLstVisitor::visit( ChooseExpression& node )
 {
+    const auto& variables =
+        fetch< LST::VariableDefinitions, LST::VariableDefinition, AST::VariableDefinition >(
+            node.variables() );
+    const auto& universe = fetch< LST::Expression >( node.universe() );
+    const auto& expression = fetch< LST::Expression >( node.expression() );
+    store< LST::ChooseExpression >(
+        node, node.type(), node.properties(), variables, universe, expression );
 }
 
 void AstToLstVisitor::visit( UniversalQuantifierExpression& node )
 {
+    const auto& predicateVariables =
+        fetch< LST::VariableDefinitions, LST::VariableDefinition, AST::VariableDefinition >(
+            node.predicateVariables() );
+    const auto& universe = fetch< LST::Expression >( node.universe() );
+    const auto& proposition = fetch< LST::Expression >( node.proposition() );
+    store< LST::UniversalQuantifierExpression >(
+        node, node.type(), node.properties(), predicateVariables, universe, proposition );
 }
 
 void AstToLstVisitor::visit( ExistentialQuantifierExpression& node )
 {
+    const auto& predicateVariables =
+        fetch< LST::VariableDefinitions, LST::VariableDefinition, AST::VariableDefinition >(
+            node.predicateVariables() );
+    const auto& universe = fetch< LST::Expression >( node.universe() );
+    const auto& proposition = fetch< LST::Expression >( node.proposition() );
+    store< LST::ExistentialQuantifierExpression >(
+        node, node.type(), node.properties(), predicateVariables, universe, proposition );
 }
 
 void AstToLstVisitor::visit( SkipRule& node )
@@ -614,11 +668,17 @@ void AstToLstVisitor::visit( SkipRule& node )
 
 void AstToLstVisitor::visit( ConditionalRule& node )
 {
-    // use skip rule for else!
+    const auto& condition = fetch< LST::Expression >( node.condition() );
+    const auto& thenRule = fetch< LST::Rule >( node.thenRule() );
+    const auto& elseRule = fetch< LST::Rule >( node.elseRule() );
+    store< LST::ConditionalRule >( node, condition, thenRule, elseRule );
 }
 
 void AstToLstVisitor::visit( CaseRule& node )
 {
+    const auto& expression = fetch< LST::Expression >( node.expression() );
+    const auto& cases = fetch< LST::Cases, LST::Case, AST::Case >( node.cases() );
+    store< LST::CaseRule >( node, expression, cases );
 }
 
 void AstToLstVisitor::visit( LetRule& node )
@@ -632,20 +692,38 @@ void AstToLstVisitor::visit( LetRule& node )
 
 void AstToLstVisitor::visit( LocalRule& node )
 {
+    const auto& localFunctions =
+        fetch< LST::FunctionDefinitions, LST::FunctionDefinition, AST::FunctionDefinition >(
+            node.localFunctions() );
+    const auto& rule = fetch< LST::Rule >( node.rule() );
+    store< LST::LocalRule >( node, localFunctions, rule );
 }
 
 void AstToLstVisitor::visit( ForallRule& node )
 {
-    // std::make_shared< ValueLiteral >(
-    // libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true ) )
+    const auto& variables =
+        fetch< LST::VariableDefinitions, LST::VariableDefinition, AST::VariableDefinition >(
+            node.variables() );
+    const auto& universe = fetch< LST::Expression >( node.universe() );
+    const auto& condition = fetch< LST::Expression >( node.condition() );
+    const auto& rule = fetch< LST::Rule >( node.rule() );
+    store< LST::ForallRule >( node, variables, universe, condition, rule );
 }
 
 void AstToLstVisitor::visit( ChooseRule& node )
 {
+    const auto& variables =
+        fetch< LST::VariableDefinitions, LST::VariableDefinition, AST::VariableDefinition >(
+            node.variables() );
+    const auto& universe = fetch< LST::Expression >( node.universe() );
+    const auto& rule = fetch< LST::Rule >( node.rule() );
+    store< LST::ChooseRule >( node, variables, universe, rule );
 }
 
 void AstToLstVisitor::visit( IterateRule& node )
 {
+    const auto& rule = fetch< LST::Rule >( node.rule() );
+    store< LST::IterateRule >( node, rule );
 }
 
 void AstToLstVisitor::visit( BlockRule& node )
@@ -722,10 +800,15 @@ void AstToLstVisitor::visit( IdentifierPath& node )
 
 void AstToLstVisitor::visit( ExpressionCase& node )
 {
+    const auto& expression = fetch< LST::Expression >( node.expression() );
+    const auto& rule = fetch< LST::Rule >( node.rule() );
+    store< LST::ExpressionCase >( node, expression, rule );
 }
 
 void AstToLstVisitor::visit( DefaultCase& node )
 {
+    const auto& rule = fetch< LST::Rule >( node.rule() );
+    store< LST::DefaultCase >( node, rule );
 }
 
 void AstToLstVisitor::visit( VariableBinding& node )
