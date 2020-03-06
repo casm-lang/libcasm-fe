@@ -431,7 +431,7 @@ void ExecutionVisitor::visit( RangeLiteral& node )
 void ExecutionVisitor::visit( TupleLiteral& node )
 {
     assert( node.type()->isTuple() );
-    const auto tupleType = std::static_pointer_cast< IR::TupleType >( node.type() );
+    const auto& tupleType = std::static_pointer_cast< IR::TupleType >( node.type() );
 
     const auto tupleSize = node.expressions()->size();
     std::vector< IR::Constant > tupleElements;
@@ -445,24 +445,29 @@ void ExecutionVisitor::visit( TupleLiteral& node )
         tupleElements.emplace_back( constantElement );
     }
 
-    m_evaluationStack.push( IR::TupleConstant( tupleType, tupleElements ) );
+    const auto& tupleConstant = IR::TupleConstant( tupleType, tupleElements );
+    m_evaluationStack.push( tupleConstant );
 }
 
 void ExecutionVisitor::visit( RecordLiteral& node )
 {
     assert( node.type()->isRecord() );
-    const auto recordType = std::static_pointer_cast< IR::RecordType >( node.type() );
+    const auto& recordType = std::static_pointer_cast< IR::RecordType >( node.type() );
 
     // iterate through the in-order, out-of-order, or partial named expressions and assign the
     // element name with the given expression
+    const auto recordSize = node.namedExpressions()->size();
     std::unordered_map< std::string, IR::Constant > recordElements;
+    recordElements.reserve( recordSize );
+
     for( const auto& namedExpression : *node.namedExpressions() )
     {
         namedExpression->accept( *this );
         recordElements.emplace( namedExpression->identifier()->name(), m_evaluationStack.pop() );
     }
 
-    m_evaluationStack.push( IR::RecordConstant( recordType, recordElements ) );
+    const auto& recordConstant = IR::RecordConstant( recordType, recordElements );
+    m_evaluationStack.push( recordConstant );
 }
 
 void ExecutionVisitor::visit( NamedExpression& node )
