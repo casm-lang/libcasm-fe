@@ -244,7 +244,7 @@ namespace libcasm_fe
           public:
             SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
-            void visit( InitDefinition& node ) override;
+            void visit( Root& node ) override;
 
             void visit( FunctionDefinition& node ) override;
             void visit( DerivedDefinition& node ) override;
@@ -322,6 +322,7 @@ namespace libcasm_fe
             TypeDefinition::Ptr m_objectTypeDefinition;
 
             DomainDefinition::Ptr m_agentDomainDefinition;
+            MappedExpressions::Ptr m_initializers;
         };
     }
 }
@@ -339,19 +340,37 @@ SymbolResolveVisitor::SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& 
 , m_templateDefinitions( std::make_shared< Definitions >() )
 , m_objectTypeDefinition( nullptr )
 , m_agentDomainDefinition( nullptr )
+, m_initializers( nullptr )
 {
 }
 
-void SymbolResolveVisitor::visit( InitDefinition& node )
+void SymbolResolveVisitor::visit( Root& node )
 {
-    if( node.external() )
+    RecursiveVisitor::visit( node );
+
+    // determine after the symbol resolving the initialization of the program function
+    // if no init definition is present, use an empty set
+
+    const auto& programSymbol = m_symboltable.findSymbol( "program" );
+    assert( programSymbol and " inconsistent state in prelude specification " );
+    assert( programSymbol->id() == Node::ID::FUNCTION_DEFINITION );
+    const auto& programDefinition = programSymbol->ptr< FunctionDefinition >();
+
+    assert( not m_initializers and " inconsistent state " );
+    const auto& initSymbol = m_symboltable.findSymbol( "init" );
+    if( initSymbol )
     {
-        m_log.debug(
-            { node.sourceLocation() }, "omit symbol resolving for external init definition" );
-        return;
+        assert( initSymbol->id() == Node::ID::INIT_DEFINITION );
+        const auto& initDefinition = initSymbol->ptr< InitDefinition >();
+        m_initializers = initDefinition->initializers();
+    }
+    else
+    {
+        m_initializers = AST::make< MappedExpressions >( programDefinition->sourceLocation() );
     }
 
-    RecursiveVisitor::visit( node );
+    programDefinition->accept( *this );
+    m_initializers = nullptr;
 }
 
 void SymbolResolveVisitor::visit( FunctionDefinition& node )
@@ -363,13 +382,14 @@ void SymbolResolveVisitor::visit( FunctionDefinition& node )
     AST::MappedExpressions::Ptr mappedExpressions = initially;
     if( node.program() )
     {
-        const auto& initSymbol = m_symboltable.findSymbol( "init" );
-        assert( initSymbol and " inconsistent state " );
-        assert( initSymbol->id() == Node::ID::INIT_DEFINITION );
-        const auto& initDefinition = initSymbol->ptr< InitDefinition >();
+        if( not m_initializers )
+        {
+            // no not resolve the program function until the initializers are fetched
+            // see: SymbolResolveVisitor::visit( Root& node )
+            return;
+        }
 
-        // set init definition initializer mapped expressions for program function
-        mappedExpressions = initDefinition->initializers();
+        mappedExpressions = m_initializers;
     }
 
     for( const auto& mappedExpression : *mappedExpressions )
