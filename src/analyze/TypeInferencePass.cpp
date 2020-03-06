@@ -1027,10 +1027,79 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
 void TypeInferenceVisitor::visit( ListLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    m_log.error(
-        { node.sourceLocation() },
-        "UNIMPLEMENTED " + node.description() +
-            " current type: " + ( node.type() ? node.type()->description() : "$unresolved$" ) );
+
+    if( node.type() )
+    {
+        return;
+    }
+
+    filterAnnotationsByKind( node, libcasm_ir::Type::Kind::LIST );
+
+    // propagate type annotation to all list elements
+    for( const auto typeId : m_typeIDs[&node ] )
+    {
+        const auto type = libcasm_ir::Type::fromID( typeId );
+        assert( type->isList() );
+        const auto listType = std::static_pointer_cast< libcasm_ir::ListType >( type );
+        annotateNodes( *node.expressions(), listType->ptr_result()->id() );
+    }
+
+    node.expressions()->accept( *this );
+
+    u1 valid = true;
+    for( const auto& expression : *node.expressions() )
+    {
+        if( not expression->type() )
+        {
+            valid = false;
+            m_log.error(
+                { expression->sourceLocation() },
+                "unable to infer list element type",
+                Code::Unspecified );
+        }
+    }
+
+    if( not valid )
+    {
+        return;
+    }
+
+    inference( "list literal", node );
+
+    if( not node.type() )
+    {
+        // inference failed, use type of first typed expression instead
+        for( const auto& expression : *node.expressions() )
+        {
+            if( expression->type() )
+            {
+                const auto listType =
+                    libstdhl::Memory::get< libcasm_ir::ListType >( expression->type() );
+                node.setType( listType );
+                break;
+            }
+        }
+    }
+
+    if( node.type() )
+    {
+        for( const auto& expression : *node.expressions() )
+        {
+            if( not expression->type() )
+            {
+                continue;
+            }
+
+            if( *expression->type() != node.type()->result() )
+            {
+                m_log.error(
+                    { expression->sourceLocation() },
+                    "list element has invalid type '" + expression->type()->description() +
+                        "', expected '" + node.type()->result().description() + "'",
+                    Code::TypeInferenceListLiteralTypeMismatch );
+            }
+        }
+    }
 }
 
 void TypeInferenceVisitor::visit( RangeLiteral& node )
@@ -1137,57 +1206,53 @@ void TypeInferenceVisitor::visit( TupleLiteral& node )
 void TypeInferenceVisitor::visit( RecordLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    m_log.error(
-        { node.sourceLocation() },
-        "UNIMPLEMENTED " + node.description() +
-            " current type: " + ( node.type() ? node.type()->description() : "$unresolved$" ) );
 
-    // if( node.type() )
-    // {
-    //     return;
-    // }
+    if( node.type() )
+    {
+        return;
+    }
 
-    // filterAnnotationsByKind( node, libcasm_ir::Type::Kind::RECORD );
+    filterAnnotationsByKind( node, libcasm_ir::Type::Kind::RECORD );
 
-    // // propagate type annotation to all record elements
-    // for( const auto typeId : m_typeIDs[&node ] )
-    // {
-    //     const auto type = libcasm_ir::Type::fromID( typeId );
-    //     assert( type->isRecord() );
-    //     const auto recordType = std::static_pointer_cast< libcasm_ir::RecordType >( type );
-    //     const auto& expressionTypes = recordType->arguments();
-    //     if( expressionTypes.size() != node.namedExpressions()->size() )
-    //     {
-    //         continue;
-    //     }
+    // propagate type annotation to all record elements
+    for( const auto typeId : m_typeIDs[&node ] )
+    {
+        const auto type = libcasm_ir::Type::fromID( typeId );
+        assert( type->isRecord() );
+        const auto recordType = std::static_pointer_cast< libcasm_ir::RecordType >( type );
+        const auto& expressionTypes = recordType->arguments();
+        if( expressionTypes.size() != node.namedExpressions()->size() )
+        {
+            continue;
+        }
 
-    //     for( std::size_t i = 0; i < expressionTypes.size(); i++ )
-    //     {
-    //         const auto& expression = node.namedExpressions()->at( i );
-    //         const auto& expressionType = expressionTypes.at( i );
-    //         m_typeIDs[ expression.get() ].emplace( expressionType->id() );
-    //     }
-    // }
+        for( std::size_t i = 0; i < expressionTypes.size(); i++ )
+        {
+            const auto& expression = node.namedExpressions()->at( i );
+            const auto& expressionType = expressionTypes.at( i );
+            m_typeIDs[ expression.get() ].emplace( expressionType->id() );
+        }
+    }
 
-    // RecursiveVisitor::visit( node );
+    RecursiveVisitor::visit( node );
 
-    // std::vector< std::string > expressionNames;
-    // libcasm_ir::Types expressionTypes;
-    // for( const auto& namedExpression : *node.namedExpressions() )
-    // {
-    //     if( not namedExpression->type() )
-    //     {
-    //         // cannot create a record type if not all element types are known, thus the return
-    //         return;
-    //     }
+    std::vector< std::string > expressionNames;
+    libcasm_ir::Types expressionTypes;
+    for( const auto& namedExpression : *node.namedExpressions() )
+    {
+        if( not namedExpression->type() )
+        {
+            // cannot create a record type if not all element types are known, thus the return
+            return;
+        }
 
-    //     expressionTypes.add( namedExpression->type() );
-    //     expressionNames.emplace_back( namedExpression->identifier()->name() );
-    // }
+        expressionTypes.add( namedExpression->type() );
+        expressionNames.emplace_back( namedExpression->identifier()->name() );
+    }
 
-    // const auto recordType =
-    //     libstdhl::Memory::get< libcasm_ir::RecordType >( expressionTypes, expressionNames );
-    // node.setType( recordType );
+    const auto recordType =
+        libstdhl::Memory::get< libcasm_ir::RecordType >( expressionTypes, expressionNames );
+    node.setType( recordType );
 }
 
 void TypeInferenceVisitor::visit( LetExpression& node )
@@ -1862,36 +1927,40 @@ void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
         const auto& symbolArgumentTypes = symbolType->arguments();
         const auto& relationArgumentTypes = relationType->arguments();
 
-        u1 valid = true;
-        for( std::size_t i = 0; i < symbolArgumentTypes.size(); i++ )
+        u1 valid = false;
+        if( symbolArgumentTypes.size() == relationArgumentTypes.size() )
         {
-            const auto& symbolArgumentType = symbolArgumentTypes[ i ];
-            const auto& relationArgumentType = relationArgumentTypes[ i ];
-
-            if( relationArgumentType->isInteger() and symbolArgumentType->isInteger() )
+            valid = true;
+            for( std::size_t i = 0; i < symbolArgumentTypes.size(); i++ )
             {
-                // relax passing argument use Integer'[a..b] to def Integer
-                continue;
-            }
+                const auto& symbolArgumentType = symbolArgumentTypes[ i ];
+                const auto& relationArgumentType = relationArgumentTypes[ i ];
 
-            if( not relationArgumentType->isObject() and symbolArgumentType->isObject() )
-            {
-                // relax passing argument is concrete type of abstract object
-                continue;
-            }
+                if( relationArgumentType->isInteger() and symbolArgumentType->isInteger() )
+                {
+                    // relax passing argument use Integer'[a..b] to def Integer
+                    continue;
+                }
 
-            if( relationArgumentType->isObject() and
-                relationArgumentType->description() != TypeInfo::TYPE_NAME_OBJECT and
-                symbolArgumentType->isObject() )
-            {
-                // relax passing argument is concrete object of abstract object
-                continue;
-            }
+                if( not relationArgumentType->isObject() and symbolArgumentType->isObject() )
+                {
+                    // relax passing argument is concrete type of abstract object
+                    continue;
+                }
 
-            if( symbolArgumentType != relationArgumentType )
-            {
-                valid = false;
-                break;
+                if( relationArgumentType->isObject() and
+                    relationArgumentType->description() != TypeInfo::TYPE_NAME_OBJECT and
+                    symbolArgumentType->isObject() )
+                {
+                    // relax passing argument is concrete object of abstract object
+                    continue;
+                }
+
+                if( symbolArgumentType != relationArgumentType )
+                {
+                    valid = false;
+                    break;
+                }
             }
         }
 
