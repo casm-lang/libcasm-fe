@@ -1714,11 +1714,6 @@ void SymbolicExecutionVisitor::visit( CaseRule& node )
     ExecutionVisitor::visit( node );
 }
 
-void SymbolicExecutionVisitor::visit( LetRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
 void SymbolicExecutionVisitor::visit( ForallRule& node )
 {
     ExecutionVisitor::visit( node );
@@ -1812,17 +1807,7 @@ void SymbolicExecutionVisitor::visit( UpdateRule& node )
     }
 }
 
-void SymbolicExecutionVisitor::visit( CallRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
 void SymbolicExecutionVisitor::visit( WhileRule& node )
-{
-    ExecutionVisitor::visit( node );
-}
-
-void SymbolicExecutionVisitor::visit( VariableBinding& node )
 {
     ExecutionVisitor::visit( node );
 }

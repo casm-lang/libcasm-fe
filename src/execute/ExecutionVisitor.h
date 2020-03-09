@@ -390,17 +390,13 @@ namespace libcasm_fe
 
         void visit( Ast::ConditionalRule& node ) override;
         void visit( Ast::CaseRule& node ) override;
-        void visit( Ast::LetRule& node ) override;
         void visit( Ast::ForallRule& node ) override;
         void visit( Ast::ChooseRule& node ) override;
         void visit( Ast::IterateRule& node ) override;
         void visit( Ast::BlockRule& node ) override;
         void visit( Ast::SequenceRule& node ) override;
         void visit( Ast::UpdateRule& node ) override;
-        void visit( Ast::CallRule& node ) override;
         void visit( Ast::WhileRule& node ) override;
-
-        void visit( Ast::VariableBinding& node ) override;
 
       private:
         IR::SymbolicExecutionEnvironment& m_environment;
