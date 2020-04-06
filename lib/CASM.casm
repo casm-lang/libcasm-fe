@@ -82,7 +82,10 @@ rule print( text : String ) =
 
 [ export ]
 rule println( text : String ) =
-    print( text + "\n" )
+    if text = undef then
+        print( "undef\n" )
+    else
+        print( text + "\n" )
 
 //
 //
@@ -92,6 +95,18 @@ rule println( text : String ) =
 [ export ]
 [ abstract ]
 domain Agent
+
+implement Agent = {
+    rule terminate( this ) =
+        program( this ) := undef
+}
+
+// rule exampleTermination =
+//      forall agent in Agent do
+//          agent.terminate // <=> program( agent ) := undef
+
+
+
 
 implement Equality for Agent = {
     [ pure ]
@@ -270,7 +285,6 @@ implement TypeCasting< Integer > for Integer = {
 }
 
 implement TypeCasting< Boolean > for Integer = {
-    [ pure ]
     derived convertTo( this ) -> Boolean =
         if this = undef then
 	    undef
@@ -713,11 +727,9 @@ domain structure
 
 [ export ]
 behavior Equality = {
-    [ pure ]
     [ operator "=" ]
     derived equal : Object * Object -> Boolean
 
-    [ pure ]
     [ operator "!=" ]
     derived unequal( this, other : Equality ) -> Boolean =
        not this.equal( other )
@@ -725,22 +737,18 @@ behavior Equality = {
 
 [ export ]
 behavior PartialOrder = {
-    [ pure ]
     [ operator "<" ]
     derived less : Equality * Equality -> Boolean
 
-    [ pure ]
     [ operator ">" ]
     derived greater : Equality * Equality -> Boolean
 }
 
 [ export ]
 behavior TotalOrder = {
-    [ pure ]
     [ operator "<=" ]
     derived lessOrEqual : PartialOrder * PartialOrder -> Boolean
 
-    [ pure ]
     [ operator ">=" ]
     derived greaterOrEqual : PartialOrder * PartialOrder -> Boolean
 }
@@ -752,42 +760,36 @@ behavior TotalOrder = {
 
 [ export ]
 behavior Addition = {
-    [ pure ]
     [ operator "+" ]
     derived add : Object * Object -> Object
 }
 
 [ export ]
 behavior Subtraction = {
-    [ pure ]
     [ operator "-" ]
     derived subtract : Object * Object -> Object
 }
 
 [ export ]
 behavior Multiplication  = {
-    [ pure ]
     [ operator "*" ]
     derived multiply : Object * Object -> Object
 }
 
 [ export ]
 behavior Division = {
-    [ pure ]
     [ operator "/" ]
     derived divide : Object * Object -> Object
 }
 
 [ export ]
 behavior Modulus = {
-    [ pure ]
     [ operator "%" ]
     derived modulo : Object * Object -> Object
 }
 
 [ export ]
 behavior Exponentiation = {
-    [ pure ]
     [ operator "^" ]
     derived power : Object * Object -> Object
 }
@@ -799,26 +801,21 @@ behavior Exponentiation = {
 
 [ export ]
 behavior Negation = {
-    [ pure ]
     [ operator "not" ]
     derived negate : Object -> Object
 }
 
 [ export ]
 behavior Logical = {
-    [ pure ]
     [ operator "or" ]
     derived disjunction : Object * Object -> Object
 
-    [ pure ]
     [ operator "xor" ]
     derived exclusiveDisjunction : Object * Object -> Object
 
-    [ pure ]
     [ operator "and" ]
     derived conjunction : Object * Object -> Object
 
-    [ pure ]
     [ operator "implies" ] // alias "->"
     derived implication : Object * Object -> Object
 }
@@ -830,14 +827,12 @@ behavior Logical = {
 
 [ export ]
 behavior Positive = {
-    [ pure ]
     [ operator "+" ]
     derived sign : Object -> Object
 }
 
 [ export ]
 behavior Inversion = {
-    [ pure ]
     [ operator "-" ]
     derived invert : Object -> Object
 }
@@ -850,7 +845,6 @@ behavior Inversion = {
 
 [ export ]
 behavior Cardinality = {
-    [ pure ]
 //  [ syntax "'|' <expr> '|'" ]
     derived size : Object -> Integer
 }
@@ -863,7 +857,6 @@ behavior Cardinality = {
 [ export ]
 [ template Domain : Object ]
 behavior TypeCasting< Domain > = {
-    [ pure ]
 //  [ syntax "<expr> 'as' <type>" ]
     derived convertTo : Object -> Domain
 }
@@ -876,7 +869,6 @@ behavior TypeCasting< Domain > = {
 [ export ]
 [ template Element : Object ]
 behavior ElementAccess< Element > = {
-    [ pure ]
 //  [ syntax "<expr> '.' <literal>" ]
     derived at : Object * Integer -> Element
 }
@@ -889,7 +881,6 @@ behavior ElementAccess< Element > = {
 
 [ export ]
 behavior Symbolic = {
-    [ pure ]
     derived isSymbolic : Object -> Boolean
 }
 
@@ -900,16 +891,12 @@ behavior Symbolic = {
 
 [ export ]
 behavior Stringify = {
-    [ pure ]
     derived bin : Object -> String
 
-    [ pure ]
     derived oct : Object -> String
 
-    [ pure ]
     derived dec : Object -> String
 
-    [ pure ]
     derived hex : Object -> String
 }
 
