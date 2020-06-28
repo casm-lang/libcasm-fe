@@ -196,6 +196,25 @@ rule assign( d: Integer ) =
 )***";
 
 SOURCE_TEST( execute_call, SymbolicExecutionPass, source_call_rule, true, , );  // TODO: FIXME:
+
+static const auto source_consistency = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b: -> Integer
+
+rule test =
+{
+	b := a
+	program( self ) := undef
+}
+
+)***";
+
+SOURCE_TEST( symbolic_consistency, SymbolicConsistencyPass, source_consistency, true, , );  // TODO: FIXME:
+
 static const auto src = R"***(
 CASM init test
 

@@ -91,6 +91,8 @@ add_library( ${PROJECT}-cpp OBJECT
   execute/HashMapBase.cpp
   execute/ReferenceConstant.cpp
   execute/SymbolicExecutionPass.cpp
+  execute/SymbolicConsistencyPass.cpp
+  execute/SymbolicConsistencyVisitor.cpp
   execute/Frame.cpp
   execute/RuntimeException.cpp
   execute/UpdateException.cpp
@@ -203,6 +205,8 @@ ecm_generate_headers( ${PROJECT}_EXECUTE_HEADERS_CPP
     ReferenceConstant
     RobinHoodHashMap
     Stack
+    SymbolicConsistencyPass
+    SymbolicConsistencyVisitor
     SymbolicExecutionPass
     UpdateSet
     RuntimeException

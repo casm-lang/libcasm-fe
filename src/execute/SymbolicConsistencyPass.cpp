@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 2014-2021 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2019 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
@@ -42,39 +42,89 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_H_
-#define _LIBCASM_FE_H_
+#include "SymbolicConsistencyPass.h"
 
-#include <libcasm-fe/Namespace>
-#include <libcasm-fe/Specification>
-#include <libcasm-fe/Version>
-#include <libcasm-fe/analyze/AttributionPass>
-#include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/execute/ExecutionVisitor>
+
+#include <libcasm-fe/Exception.h>
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
-#include <libcasm-fe/analyze/PropertyResolverPass>
-#include <libcasm-fe/analyze/PropertyRevisePass>
-#include <libcasm-fe/analyze/SymbolRegistrationPass>
-#include <libcasm-fe/analyze/SymbolResolverPass>
-#include <libcasm-fe/analyze/TypeCheckPass>
-#include <libcasm-fe/analyze/TypeInferencePass>
-#include <libcasm-fe/ast/Span>
-#include <libcasm-fe/execute/NumericExecutionPass>
-#include <libcasm-fe/execute/SymbolicConsistencyPass>
-#include <libcasm-fe/execute/SymbolicExecutionPass>
-#include <libcasm-fe/execute/UpdateSet>
-#include <libcasm-fe/import/FileLoadingStrategy>
-#include <libcasm-fe/import/ImportError>
-#include <libcasm-fe/import/SpecificationRepository>
-#include <libcasm-fe/transform/AstDumpDotPass>
-#include <libcasm-fe/transform/AstDumpSourcePass>
-#include <libcasm-fe/transform/AstToCasmIRPass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/execute/Agent>
+#include <libcasm-fe/execute/SymbolicConsistencyVisitor>
+#include <libcasm-fe/import/SpecificationMergerPass>
 
-namespace libcasm_fe
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+#include <libstdhl/Enum>
+#include <libstdhl/Hash>
+#include <libstdhl/Random>
+#include <libstdhl/Stack>
+
+#include <libtptp/Node>
+
+#include <libtptp/transform/AstDumpDotPass>
+#include <libtptp/transform/DumpSourcePass>
+
+#include <mutex>
+
+using namespace libcasm_fe;
+using namespace Ast;
+
+namespace IR = libcasm_ir;
+
+char SymbolicConsistencyPass::id = 0;
+
+static libpass::PassRegistration< SymbolicConsistencyPass > PASS(
+    "SymbolicConsistencyPass",
+    "check consistency of symbolic updates on functions",
+    "ast-symbolic-consistency",
+    0 );
+
+void SymbolicConsistencyPass::usage( libpass::PassUsage& pu )
 {
+    pu.require< SpecificationMergerPass >();
+    pu.scheduleAfter< FrameSizeDeterminationPass >();
 }
 
-#endif  // _LIBCASM_FE_H_
+u1 SymbolicConsistencyPass::run( libpass::PassResult& pr )
+{
+    libcasm_fe::Logger log( &id, stream() );
+
+    const auto data = pr.output< SpecificationMergerPass >();
+    const auto specification = data->specification();
+
+    while( true )
+    {
+        try
+        {
+            SymbolicConsistencyVisitor consistencyVisitor( log );
+            consistencyVisitor.visit( *specification );
+            break;
+        }
+        catch( SymbolicConsistencyVisitor::Conflict& e )
+        {
+            auto function = e.conflictingFunction();
+            if( function->isProgram() )
+            {
+                std::stringstream err;
+                err << "Cannot promote 'program' function to symbolic." << std::endl << e.what();
+                log.error( e.locations(), err.str() );
+                return false;
+            }
+            log.info( e.locations(), e.what() );
+            function->setSymbolic( true );
+        }
+        catch( const RuntimeException& e )
+        {
+            log.error( e );
+            return false;
+        }
+    }
+
+    return true;
+}
 
 //
 //  Local variables:
