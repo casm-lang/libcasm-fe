@@ -85,6 +85,7 @@ namespace libcasm_fe
           public:
             BuiltinRule(
                 const std::vector< IR::Value::ID > ids,
+				int nargs,
                 const std::function< FunctionType( const std::vector< FunctionType >& ) >
                     function );
 
@@ -93,6 +94,7 @@ namespace libcasm_fe
 
           private:
             const std::vector< IR::Value::ID > m_ids;
+			const int m_nargs;
             const std::function< FunctionType( const std::vector< FunctionType >& ) > m_function;
         };
 
@@ -265,7 +267,8 @@ namespace libcasm_fe
          */
         bool createContext( const FunctionType condition );
         u1 hasEmptyUpdateSet( void ) const;
-        FunctionType callRule( const Ast::DirectCallExpression::Ptr& call );
+        FunctionType callRule(
+            const Ast::RuleDefinition::Ptr& rule, std::vector< FunctionType > args );
         RuleDependency::Ptr findOrInsert( const Ast::RuleDefinition::Ptr& rule );
         template < class T >
         FunctionType typeOfList( const T& list );

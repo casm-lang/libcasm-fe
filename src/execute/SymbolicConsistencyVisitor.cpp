@@ -67,62 +67,87 @@ class ScopedOverwrite : public libstdhl::RestoreOnScopeExit< T >
 
 std::vector< SCVisitor::BuiltinRule > generateBuiltins( void )
 {
-    return {
-        { {
+    return { { {
+                   IR::Value::OPERATOR_INSTRUCTION, IR::Value::ARITHMETIC_INSTRUCTION,
+                   IR::Value::ADD_INSTRUCTION,      IR::Value::SUB_INSTRUCTION,
+                   IR::Value::MUL_INSTRUCTION,      IR::Value::DIV_INSTRUCTION,
+                   IR::Value::POW_INSTRUCTION,      IR::Value::MOD_INSTRUCTION,
 
-              IR::Value::OPERATOR_BUILTIN, IR::Value::ARITHMETIC_BUILTIN, IR::Value::ADDU_BUILTIN,
-              IR::Value::ADDS_BUILTIN,     IR::Value::SUBU_BUILTIN,       IR::Value::SUBS_BUILTIN,
-              IR::Value::MULU_BUILTIN,     IR::Value::MULS_BUILTIN,
+                   IR::Value::COMPARE_INSTRUCTION,  IR::Value::EQU_INSTRUCTION,
+                   IR::Value::NEQ_INSTRUCTION,      IR::Value::LTH_INSTRUCTION,
+                   IR::Value::LEQ_INSTRUCTION,      IR::Value::GTH_INSTRUCTION,
+                   IR::Value::GEQ_INSTRUCTION,
 
-              IR::Value::COMPARE_BUILTIN,  IR::Value::LESU_BUILTIN,       IR::Value::LESS_BUILTIN,
-              IR::Value::LEQU_BUILTIN,     IR::Value::LEQS_BUILTIN,       IR::Value::GREU_BUILTIN,
-              IR::Value::GRES_BUILTIN,     IR::Value::GEQU_BUILTIN,       IR::Value::GEQS_BUILTIN,
+                   IR::Value::LOGICAL_INSTRUCTION,  IR::Value::OR_INSTRUCTION,
+                   IR::Value::XOR_INSTRUCTION,      IR::Value::AND_INSTRUCTION,
+                   IR::Value::IMP_INSTRUCTION,
 
-              IR::Value::BINARY_BUILTIN,   IR::Value::ZEXT_BUILTIN,       IR::Value::SEXT_BUILTIN,
-              IR::Value::TRUNC_BUILTIN,    IR::Value::SHL_BUILTIN,        IR::Value::SHR_BUILTIN,
-              IR::Value::ASHR_BUILTIN,     IR::Value::CLZ_BUILTIN,        IR::Value::CLO_BUILTIN,
-              IR::Value::CLS_BUILTIN,
-          },
-          [ & ]( const auto& args ) { return args[ 0 ] && args[ 1 ]; } },
-        { {
-              IR::Value::CASTING_BUILTIN,
-              IR::Value::AS_BOOLEAN_BUILTIN,
-              IR::Value::AS_INTEGER_BUILTIN,
-              IR::Value::AS_BINARY_BUILTIN,
-              IR::Value::AS_STRING_BUILTIN,
-              IR::Value::AS_DECIMAL_BUILTIN,
-              IR::Value::AS_RATIONAL_BUILTIN,
-              IR::Value::AS_ENUMERATION_BUILTIN,
+                   IR::Value::OPERATOR_BUILTIN,     IR::Value::ARITHMETIC_BUILTIN,
+                   IR::Value::ADDU_BUILTIN,         IR::Value::ADDS_BUILTIN,
+                   IR::Value::SUBU_BUILTIN,         IR::Value::SUBS_BUILTIN,
+                   IR::Value::MULU_BUILTIN,         IR::Value::MULS_BUILTIN,
 
-              IR::Value::STRINGIFY_BUILTIN,
-              IR::Value::DEC_BUILTIN,
-              IR::Value::HEX_BUILTIN,
-              IR::Value::OCT_BUILTIN,
-              IR::Value::BIN_BUILTIN,
-          },
-          [ & ]( const auto& args ) { return args[ 0 ]; } },
-        { {
-              IR::Value::GENERAL_BUILTIN,
-              IR::Value::IS_SYMBOLIC_BUILTIN,
-              IR::Value::ABORT_BUILTIN,
-              IR::Value::ASSERT_BUILTIN,
-              IR::Value::ASSURE_BUILTIN,
-              IR::Value::SIZE_BUILTIN,
-              IR::Value::AT_BUILTIN,
+                   IR::Value::COMPARE_BUILTIN,      IR::Value::LESU_BUILTIN,
+                   IR::Value::LESS_BUILTIN,         IR::Value::LEQU_BUILTIN,
+                   IR::Value::LEQS_BUILTIN,         IR::Value::GREU_BUILTIN,
+                   IR::Value::GRES_BUILTIN,         IR::Value::GEQU_BUILTIN,
+                   IR::Value::GEQS_BUILTIN,
 
-              IR::Value::OUTPUT_BUILTIN,
-              IR::Value::PRINT_BUILTIN,
-              IR::Value::PRINTLN_BUILTIN,
+                   IR::Value::BINARY_BUILTIN,       IR::Value::ZEXT_BUILTIN,
+                   IR::Value::SEXT_BUILTIN,         IR::Value::TRUNC_BUILTIN,
+                   IR::Value::SHL_BUILTIN,          IR::Value::SHR_BUILTIN,
+                   IR::Value::ASHR_BUILTIN,         IR::Value::CLZ_BUILTIN,
+                   IR::Value::CLO_BUILTIN,          IR::Value::CLS_BUILTIN,
+               },
+               2,
+               [ & ]( const auto& args ) { return args[ 0 ] && args[ 1 ]; } },
+             { {
+                   IR::Value::INV_INSTRUCTION,
+                   IR::Value::NOT_INSTRUCTION,
 
-          },
-          [ & ]( const auto& args ) { return SymbolicConsistencyVisitor::FunctionType::NUMERIC; } }
-    };
+                   IR::Value::CASTING_BUILTIN,
+                   IR::Value::AS_BOOLEAN_BUILTIN,
+                   IR::Value::AS_INTEGER_BUILTIN,
+                   IR::Value::AS_BINARY_BUILTIN,
+                   IR::Value::AS_STRING_BUILTIN,
+                   IR::Value::AS_DECIMAL_BUILTIN,
+                   IR::Value::AS_RATIONAL_BUILTIN,
+                   IR::Value::AS_ENUMERATION_BUILTIN,
+
+                   IR::Value::STRINGIFY_BUILTIN,
+                   IR::Value::DEC_BUILTIN,
+                   IR::Value::HEX_BUILTIN,
+                   IR::Value::OCT_BUILTIN,
+                   IR::Value::BIN_BUILTIN,
+               },
+               1,
+               [ & ]( const auto& args ) { return args[ 0 ]; } },
+             { {
+                   IR::Value::GENERAL_BUILTIN,
+                   IR::Value::IS_SYMBOLIC_BUILTIN,
+                   IR::Value::ABORT_BUILTIN,
+                   IR::Value::ASSERT_BUILTIN,
+                   IR::Value::ASSURE_BUILTIN,
+                   IR::Value::SIZE_BUILTIN,
+                   IR::Value::AT_BUILTIN,
+
+                   IR::Value::OUTPUT_BUILTIN,
+                   IR::Value::PRINT_BUILTIN,
+                   IR::Value::PRINTLN_BUILTIN,
+
+               },
+               -1,
+               [ & ]( const auto& args ) {
+                   return SymbolicConsistencyVisitor::FunctionType::NUMERIC;
+               } } };
 }
 
 SCVisitor::BuiltinRule::BuiltinRule(
     const std::vector< IR::Value::ID > ids,
+    int nargs,
     const std::function< FunctionType( const std::vector< FunctionType >& ) > function )
 : m_ids( ids )
+, m_nargs( nargs )
 , m_function( function )
 {
 }
@@ -130,6 +155,9 @@ SCVisitor::BuiltinRule::BuiltinRule(
 SCVisitor::FunctionType SCVisitor::BuiltinRule::evaluate(
     const std::vector< FunctionType >& args ) const
 {
+    // is guaranteed by type inference pass
+    assert( args.size() == m_nargs || m_nargs == -1 );
+
     return m_function( args );
 }
 
@@ -520,11 +548,13 @@ void SymbolicConsistencyVisitor::visit( Ast::RuleDefinition& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::EnumeratorDefinition& node )
 {
+    m_stack.push( FunctionType::NUMERIC );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::InvariantDefinition& node )
 {
-    // TODO: fix me: access in invariant may produce symblic function
+    node.expression()->accept( *this );
+    m_stack.pop();
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::UndefLiteral& node )
@@ -622,8 +652,12 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
         }
         case TargetType::RULE:
         {
-            // TODO: @moosbruggerj fix me
-            auto result = callRule( node.ptr< Ast::DirectCallExpression >() );
+            assert( node.targetDefinition()->id() == Ast::Node::ID::RULE_DEFINITION );
+
+            const auto rule =
+                std::static_pointer_cast< Ast::RuleDefinition >( node.targetDefinition() );
+            auto args = toTypeList( node.arguments() );
+            auto result = callRule( rule, args );
             if( not node.type()->result().isVoid() )
             {
                 m_stack.push( result );
@@ -685,6 +719,89 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::MethodCallExpression& node )
 {
+    node.object()->accept( *this );
+    auto object = m_stack.pop();
+
+    switch( node.methodType() )
+    {
+        case Ast::MethodCallExpression::MethodType::FUNCTION:  // [[fallthrough]]
+        case Ast::MethodCallExpression::MethodType::DERIVED:
+        {
+            const auto& function =
+                std::static_pointer_cast< Ast::FunctionDefinition >( node.targetDefinition() );
+            function->accept( *this );
+            auto functionType = m_stack.pop();
+
+            assert(
+                functionType != FunctionType::UNKNOWN &&
+                "function type of definition must be symbolic or numeric" );
+
+            if( functionType == FunctionType::SYMBOLIC )
+            {
+                m_stack.push( FunctionType::SYMBOLIC );
+                return;
+            }
+
+            auto type = object && typeOfList( node.arguments() );
+            if( type == FunctionType::SYMBOLIC )
+            {
+                throw SCVisitor::Conflict(
+                    function, { node.sourceLocation() }, Conflict::Cause::CALLED );
+            }
+            m_stack.push( type );
+            break;
+        }
+        case Ast::MethodCallExpression::MethodType::RULE:
+        {
+            assert( node.targetDefinition()->id() == Ast::Node::ID::RULE_DEFINITION );
+
+            const auto rule =
+                std::static_pointer_cast< Ast::RuleDefinition >( node.targetDefinition() );
+            auto args = toTypeList( node.arguments() );
+            args.insert( args.begin(), object );
+
+            auto result = callRule( rule, args );
+            if( not node.type()->result().isVoid() )
+            {
+                m_stack.push( result );
+            }
+            break;
+        }
+        case Ast::MethodCallExpression::MethodType::BUILTIN:
+        {
+            const auto& id = node.targetBuiltinId();
+            const auto& type = node.targetBuiltinType();
+            if( not type->result().isVoid() )
+            {
+                bool found = false;
+                for( const auto& rule : m_builtins )
+                {
+                    if( rule.contains( id ) )
+                    {
+                        auto args = toTypeList( node.arguments() );
+                        args.insert( args.begin(), object );
+                        m_stack.push( rule.evaluate( args ) );
+                        found = true;
+                        break;
+                    }
+                }
+                if( not found )
+                {
+                    // TODO: @moosbruggerj include builtin id
+                    const auto name = IR::Builtin::create( id, type )->description();
+                    m_logger.error( "Unknown Builtin '" + name + "'." );
+                    m_stack.push(
+                        m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
+                }
+            }
+            break;
+        }
+        case Ast::MethodCallExpression::MethodType::UNKNOWN:
+        {
+            assert( !"cannot call an unknown method" );
+            break;
+        }
+    }
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::LiteralCallExpression& node )
@@ -950,21 +1067,13 @@ bool SymbolicConsistencyVisitor::createContext( const FunctionType condition )
 }
 
 SymbolicConsistencyVisitor::FunctionType SymbolicConsistencyVisitor::callRule(
-    const Ast::DirectCallExpression::Ptr& call )
+    const Ast::RuleDefinition::Ptr& rule, std::vector< FunctionType > args )
 {
     auto currentDeps = findOrInsert( m_currentRule );
-    assert( call->targetDefinition()->id() == Ast::Node::ID::RULE_DEFINITION );
 
-    const auto rule = std::static_pointer_cast< Ast::RuleDefinition >( call->targetDefinition() );
     auto ruleDeps = findOrInsert( rule );
     currentDeps->calls( ruleDeps );
 
-    std::vector< FunctionType > args;
-    for( const auto& arg : *call->arguments() )
-    {
-        arg->accept( *this );
-        args.push_back( m_stack.pop() );
-    }
     ruleDeps->isCalledBy( currentDeps, args );
 
     return ruleDeps->returns();

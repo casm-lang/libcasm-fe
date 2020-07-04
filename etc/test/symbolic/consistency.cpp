@@ -273,6 +273,54 @@ SOURCE_TEST(
     "~e",
     "~f" );
 
+static const auto source_methods = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : Integer -> Integer
+function c : Integer -> Integer
+function d : Integer -> Integer
+function e : -> Integer
+function f : Integer -> Integer
+function g : Integer -> Integer
+function h : -> Boolean
+
+rule test =
+{
+    b(1) := a.add(b(1))
+    //only builtin methods are supported for now
+    //b(2) := a.c()
+	//d(2) := d(1).muladd(a, a)
+
+	//f(1) := 1.g()
+    f(2) := f(1).add(1)
+    h := b(1).isSymbolic
+    program( self ) := undef
+}
+
+rule muladd(mul1: Integer, mul2: Integer, add1: Integer) = {
+	e := mul1 * mul2 + add1
+}
+
+)***";
+
+SOURCE_TEST(
+    method_call,
+    SymbolicConsistencyPass,
+    source_methods,
+    true,
+    ,
+    ,
+    "b",
+    //"c",
+    //"d",
+    //"e",
+    "~f",
+    "~g",
+    "~h" );
+
 //
 //  Local variables:
 //  mode: c++
