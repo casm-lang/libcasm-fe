@@ -63,6 +63,7 @@ add_library( ${PROJECT}-test OBJECT
   import/SpecificationRepositoryTest.cpp
 #  numeric/expression_evaluation.cpp  # TODO: FIXME: PPA: EPE we should enable this test ASAP
 #  symbolic/expression_evaluation.cpp # TODO: FIXME: PPA: EPE we should enable this test ASAP
+  symbolic/consistency.cpp
   updateset/UpdateSetManagerTest.cpp
   updateset/UpdateSetTest.cpp
   )

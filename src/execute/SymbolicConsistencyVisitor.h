@@ -58,6 +58,7 @@
 #include <memory>
 #include <stdexcept>
 #include <vector>
+#include "libcasm-ir/Value.h"
 
 namespace libcasm_fe
 {
@@ -65,6 +66,7 @@ namespace libcasm_fe
 
     class SymbolicConsistencyVisitor : public Ast::EmptyVisitor
     {
+      public:
         enum class FunctionType
         {
             UNKNOWN,
@@ -76,6 +78,22 @@ namespace libcasm_fe
         {
             PLAIN,
             CONDITIONAL,
+        };
+
+        class BuiltinRule
+        {
+          public:
+            BuiltinRule(
+                const std::vector< IR::Value::ID > ids,
+                const std::function< FunctionType( const std::vector< FunctionType >& ) >
+                    function );
+
+            FunctionType evaluate( const std::vector< FunctionType >& ) const;
+            bool contains( const IR::Value::ID& ) const;
+
+          private:
+            const std::vector< IR::Value::ID > m_ids;
+            const std::function< FunctionType( const std::vector< FunctionType >& ) > m_function;
         };
 
         using FrameStack = Stack< FunctionType >;
@@ -251,6 +269,8 @@ namespace libcasm_fe
         RuleDependency::Ptr findOrInsert( const Ast::RuleDefinition::Ptr& rule );
         template < class T >
         FunctionType typeOfList( const T& list );
+        template < class T >
+        std::vector< FunctionType > toTypeList( const T& list );
         bool done( void ) const;
         RuleDependency::Ptr nextRule( void );
 
@@ -265,6 +285,7 @@ namespace libcasm_fe
         Ast::FunctionDefinition::Ptr m_updateLocation;
         Ast::RuleDefinition::Ptr m_currentRule;
         Frame::Ptr m_frame;
+        std::vector< BuiltinRule > m_builtins;
 
       public:
     };

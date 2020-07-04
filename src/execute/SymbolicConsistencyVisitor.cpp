@@ -49,6 +49,7 @@
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
+#include "libcasm-ir/Builtin.h"
 
 using namespace libcasm_fe;
 using SCVisitor = SymbolicConsistencyVisitor;
@@ -63,6 +64,80 @@ class ScopedOverwrite : public libstdhl::RestoreOnScopeExit< T >
         target = value;
     }
 };
+
+std::vector< SCVisitor::BuiltinRule > generateBuiltins( void )
+{
+    return {
+        { {
+
+              IR::Value::OPERATOR_BUILTIN, IR::Value::ARITHMETIC_BUILTIN, IR::Value::ADDU_BUILTIN,
+              IR::Value::ADDS_BUILTIN,     IR::Value::SUBU_BUILTIN,       IR::Value::SUBS_BUILTIN,
+              IR::Value::MULU_BUILTIN,     IR::Value::MULS_BUILTIN,
+
+              IR::Value::COMPARE_BUILTIN,  IR::Value::LESU_BUILTIN,       IR::Value::LESS_BUILTIN,
+              IR::Value::LEQU_BUILTIN,     IR::Value::LEQS_BUILTIN,       IR::Value::GREU_BUILTIN,
+              IR::Value::GRES_BUILTIN,     IR::Value::GEQU_BUILTIN,       IR::Value::GEQS_BUILTIN,
+
+              IR::Value::BINARY_BUILTIN,   IR::Value::ZEXT_BUILTIN,       IR::Value::SEXT_BUILTIN,
+              IR::Value::TRUNC_BUILTIN,    IR::Value::SHL_BUILTIN,        IR::Value::SHR_BUILTIN,
+              IR::Value::ASHR_BUILTIN,     IR::Value::CLZ_BUILTIN,        IR::Value::CLO_BUILTIN,
+              IR::Value::CLS_BUILTIN,
+          },
+          [ & ]( const auto& args ) { return args[ 0 ] && args[ 1 ]; } },
+        { {
+              IR::Value::CASTING_BUILTIN,
+              IR::Value::AS_BOOLEAN_BUILTIN,
+              IR::Value::AS_INTEGER_BUILTIN,
+              IR::Value::AS_BINARY_BUILTIN,
+              IR::Value::AS_STRING_BUILTIN,
+              IR::Value::AS_DECIMAL_BUILTIN,
+              IR::Value::AS_RATIONAL_BUILTIN,
+              IR::Value::AS_ENUMERATION_BUILTIN,
+
+              IR::Value::STRINGIFY_BUILTIN,
+              IR::Value::DEC_BUILTIN,
+              IR::Value::HEX_BUILTIN,
+              IR::Value::OCT_BUILTIN,
+              IR::Value::BIN_BUILTIN,
+          },
+          [ & ]( const auto& args ) { return args[ 0 ]; } },
+        { {
+              IR::Value::GENERAL_BUILTIN,
+              IR::Value::IS_SYMBOLIC_BUILTIN,
+              IR::Value::ABORT_BUILTIN,
+              IR::Value::ASSERT_BUILTIN,
+              IR::Value::ASSURE_BUILTIN,
+              IR::Value::SIZE_BUILTIN,
+              IR::Value::AT_BUILTIN,
+
+              IR::Value::OUTPUT_BUILTIN,
+              IR::Value::PRINT_BUILTIN,
+              IR::Value::PRINTLN_BUILTIN,
+
+          },
+          [ & ]( const auto& args ) { return SymbolicConsistencyVisitor::FunctionType::NUMERIC; } }
+    };
+}
+
+SCVisitor::BuiltinRule::BuiltinRule(
+    const std::vector< IR::Value::ID > ids,
+    const std::function< FunctionType( const std::vector< FunctionType >& ) > function )
+: m_ids( ids )
+, m_function( function )
+{
+}
+
+SCVisitor::FunctionType SCVisitor::BuiltinRule::evaluate(
+    const std::vector< FunctionType >& args ) const
+{
+    return m_function( args );
+}
+
+bool SCVisitor::BuiltinRule::contains( const IR::Value::ID& id ) const
+{
+    return std::any_of(
+        m_ids.begin(), m_ids.end(), [ & ]( const auto& _id ) { return _id == id; } );
+}
 
 SCVisitor::RuleDependency::RuleDependency( const Ast::RuleDefinition::Ptr& rule )
 : m_rule( rule )
@@ -258,7 +333,9 @@ SymbolicConsistencyVisitor::SymbolicConsistencyVisitor( Logger& logger )
 , m_updateLocation( nullptr )
 , m_currentRule( nullptr )
 , m_frame( nullptr )
+, m_builtins( generateBuiltins() )
 {
+    m_context.push( Context::PLAIN );
 }
 
 void SymbolicConsistencyVisitor::visit( Specification& specification )
@@ -347,10 +424,58 @@ void SymbolicConsistencyVisitor::visit( Specification& specification )
 
 void SymbolicConsistencyVisitor::visit( Ast::Initially& node )
 {
+    // just evaluate the encapsulated initializers
+    node.initializers()->accept( *this );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::Initializer& node )
 {
+    ScopedOverwrite< Ast::FunctionDefinition::Ptr > withUpdateLocation( m_updateLocation, nullptr );
+    {
+        ScopedOverwrite< bool > withLocationEvaluation( m_evaluateUpdateLocation, true );
+        node.function()->accept( *this );
+
+        assert( m_updateLocation != nullptr && "update location must be defined" );
+    }
+    auto args = typeOfList( node.arguments() );
+
+    auto function = m_stack.pop();
+
+    node.value()->accept( *this );
+    auto value = m_stack.pop();
+
+    if( function == FunctionType::NUMERIC )
+    {
+        if( value == FunctionType::SYMBOLIC )
+        {
+            throw Conflict( m_updateLocation, { node.sourceLocation() }, Conflict::Cause::UPDATE );
+        }
+        if( args == FunctionType::SYMBOLIC )
+        {
+            throw Conflict( m_updateLocation, { node.sourceLocation() }, Conflict::Cause::CALLED );
+        }
+        if( value == FunctionType::UNKNOWN || args == FunctionType::UNKNOWN )
+        {
+            m_unknownUpdate = true;
+            return;
+        }
+        if( m_context.top() == Context::CONDITIONAL )
+        {
+            throw Conflict(
+                m_updateLocation, { node.sourceLocation() }, Conflict::Cause::CONDITION );
+        }
+    }
+    if( function == FunctionType::UNKNOWN )
+    {
+        m_logger.warning(
+            { node.sourceLocation() }, "update location is unknown if symbolic or numeric" );
+        if( value == FunctionType::SYMBOLIC )
+        {
+            m_logger.warning(
+                { node.sourceLocation() }, "function may be numeric with symbolic update" );
+        }
+        m_unknownUpdate = true;
+    }
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::VariableDefinition& node )
@@ -399,6 +524,7 @@ void SymbolicConsistencyVisitor::visit( Ast::EnumeratorDefinition& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::InvariantDefinition& node )
 {
+    // TODO: fix me: access in invariant may produce symblic function
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::UndefLiteral& node )
@@ -506,7 +632,30 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
         }
         case TargetType::BUILTIN:
         {
-            // TODO: @moosbruggerj fix me
+            const auto& id = node.targetBuiltinId();
+            const auto& type = node.targetBuiltinType();
+            if( not type->result().isVoid() )
+            {
+                bool found = false;
+                for( const auto& rule : m_builtins )
+                {
+                    if( rule.contains( id ) )
+                    {
+                        auto args = toTypeList( node.arguments() );
+                        m_stack.push( rule.evaluate( args ) );
+                        found = true;
+                        break;
+                    }
+                }
+                if( not found )
+                {
+                    // TODO: @moosbruggerj include builtin id
+                    const auto name = IR::Builtin::create( id, type )->description();
+                    m_logger.error( "Unknown Builtin '" + name + "'." );
+                    m_stack.push(
+                        m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
+                }
+            }
             break;
         }
         case TargetType::TYPE_DOMAIN:
@@ -607,6 +756,11 @@ void SymbolicConsistencyVisitor::visit( Ast::ConditionalExpression& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::ChooseExpression& node )
 {
+    createContext( FunctionType::SYMBOLIC );
+    for( const auto& variable : *node.variables() )
+    {
+        // TODO: fix me
+    }
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::UniversalQuantifierExpression& node )
@@ -619,6 +773,9 @@ void SymbolicConsistencyVisitor::visit( Ast::ExistentialQuantifierExpression& no
 
 void SymbolicConsistencyVisitor::visit( Ast::CardinalityExpression& node )
 {
+    // TODO: fixme
+    typeOfList( node.arguments() );
+    node.expression()->accept( *this );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::ConditionalRule& node )
@@ -698,27 +855,22 @@ void SymbolicConsistencyVisitor::visit( Ast::UpdateRule& node )
         }
         if( expression == FunctionType::SYMBOLIC )
         {
-            throw Conflict(
-                m_updateLocation, { m_updateLocation->sourceLocation() }, Conflict::Cause::UPDATE );
+            throw Conflict( m_updateLocation, { node.sourceLocation() }, Conflict::Cause::UPDATE );
         }
         if( m_context.top() == Context::CONDITIONAL )
         {
             throw Conflict(
-                m_updateLocation,
-                { m_updateLocation->sourceLocation() },
-                Conflict::Cause::CONDITION );
+                m_updateLocation, { node.sourceLocation() }, Conflict::Cause::CONDITION );
         }
     }
     if( function == FunctionType::UNKNOWN )
     {
         m_logger.warning(
-            { m_updateLocation->sourceLocation() },
-            "update location is unknown if symbolic or numeric" );
+            { node.sourceLocation() }, "update location is unknown if symbolic or numeric" );
         if( expression == FunctionType::SYMBOLIC )
         {
             m_logger.warning(
-                { m_updateLocation->sourceLocation() },
-                "function may be numeric with symbolic update" );
+                { node.sourceLocation() }, "function may be numeric with symbolic update" );
         }
         m_unknownUpdate = true;
     }
@@ -833,6 +985,19 @@ SCVisitor::FunctionType SymbolicConsistencyVisitor::typeOfList( const T& list )
         type = type && value;
     }
     return type;
+}
+
+template < class T >
+std::vector< SCVisitor::FunctionType > SymbolicConsistencyVisitor::toTypeList( const T& list )
+{
+    std::vector< FunctionType > result;
+    for( const auto& el : *list )
+    {
+        el->accept( *this );
+        auto value = m_stack.pop();
+        result.push_back( value );
+    }
+    return result;
 }
 
 bool SymbolicConsistencyVisitor::done( void ) const
