@@ -705,6 +705,67 @@ SOURCE_TEST(
     "~g",
     "~h" );
 
+static const auto source_quantifier = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : -> Boolean
+function c : -> Boolean
+function d : -> Boolean
+function e : -> Boolean
+function f : -> Boolean
+function g : -> Boolean
+function h : Integer -> Integer
+function i : -> Integer
+function j : -> Integer
+function k : -> Integer
+function l : -> Integer
+
+rule test =
+{
+    b := forall x in [0..a] holds x > 0
+    c := forall x in [0..a] holds true
+    d := exists x in [0..a] with x = 10
+    e := exists x in [0..a] with true
+
+    f := exists x in [0..9] with x < 10
+    g := forall x in [0..9] holds x > 0
+
+    forall x in [0..a] do {
+        h(x) := x
+        i := 1
+    }
+    forall x in [0..a] with x < 8 do {
+        j := 1
+    }
+    forall x in [0..a] with k < 8 do {
+        l := 1
+    }
+    program( self ) := undef
+}
+)***";
+
+SOURCE_TEST(
+    symbolic_quantifier,
+    SymbolicConsistencyPass,
+    source_quantifier,
+    true,
+    ,
+    ,
+    "b",
+    "~c",
+    "d",
+    "~e",
+    "~f",
+    "~g",
+    "h",
+    "~i",
+    "j",
+    "~k",
+    "~l" );
+
 //
 //  Local variables:
 //  mode: c++

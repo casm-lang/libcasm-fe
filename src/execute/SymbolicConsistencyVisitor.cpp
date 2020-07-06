@@ -49,7 +49,6 @@
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
-#include "libcasm-ir/Builtin.h"
 
 using namespace libcasm_fe;
 using SCVisitor = SymbolicConsistencyVisitor;
@@ -414,6 +413,9 @@ void SymbolicConsistencyVisitor::visit( Specification& specification )
     using Status = RuleDependency::Status;
     while( not done() )
     {
+        // TODO: if no more progress is made, set m_forceContextCreation = true
+        // with all rules having a return type Void, this condition cannot happen
+
         m_stack.clear();
         m_context.clear();
         m_context.push( Context::PLAIN );
@@ -699,9 +701,7 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
                 }
                 if( not found )
                 {
-                    // TODO: @moosbruggerj include builtin id
-                    const auto name = IR::Builtin::create( id, type )->description();
-                    m_logger.error( "Unknown Builtin '" + name + "'." );
+                    m_logger.error( "Unknown Builtin '" + IR::Value::token( id ) + "'." );
                     m_stack.push(
                         m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
                 }
@@ -803,9 +803,7 @@ void SymbolicConsistencyVisitor::visit( Ast::MethodCallExpression& node )
                 }
                 if( not found )
                 {
-                    // TODO: @moosbruggerj include builtin id
-                    const auto name = IR::Builtin::create( id, type )->description();
-                    m_logger.error( "Unknown Builtin '" + name + "'." );
+                    m_logger.error( "Unknown Builtin '" + IR::Value::token( id ) + "'." );
                     m_stack.push(
                         m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
                 }
@@ -828,6 +826,10 @@ void SymbolicConsistencyVisitor::visit( Ast::LiteralCallExpression& node )
 void SymbolicConsistencyVisitor::visit( Ast::IndirectCallExpression& node )
 {
     // TODO: fix me: needs evaluation of reference
+    m_logger.error(
+        { node.sourceLocation() },
+        "Indirect calls are not supported in symbolic consistency checks. Result may have errors.",
+        Code::Unspecified );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::TypeCastingExpression& node )
@@ -903,10 +905,24 @@ void SymbolicConsistencyVisitor::visit( Ast::ChooseExpression& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::UniversalQuantifierExpression& node )
 {
+    node.universe()->accept( *this );
+    auto universe = m_stack.pop();
+    for( const auto& variable : *node.predicateVariables() )
+    {
+        m_frame->setLocal( variable->localIndex(), universe );
+    }
+    node.proposition()->accept( *this );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::ExistentialQuantifierExpression& node )
 {
+    node.universe()->accept( *this );
+    auto universe = m_stack.pop();
+    for( const auto& variable : *node.predicateVariables() )
+    {
+        m_frame->setLocal( variable->localIndex(), universe );
+    }
+    node.proposition()->accept( *this );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::CardinalityExpression& node )
@@ -994,6 +1010,18 @@ void SymbolicConsistencyVisitor::visit( Ast::LocalRule& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::ForallRule& node )
 {
+    node.universe()->accept( *this );
+    auto universe = m_stack.pop();
+    for( const auto& variable : *node.variables() )
+    {
+        m_frame->setLocal( variable->localIndex(), universe );
+    }
+    node.condition()->accept( *this );
+    auto condition = m_stack.pop();
+
+    createContext( condition );
+    node.rule()->accept( *this );
+    m_context.pop();
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::ChooseRule& node )
@@ -1281,7 +1309,6 @@ void SCStateInitializationVisitor::visit( Ast::FunctionDefinition& node )
     }
     else
     {
-        // TODO: @moosbruggerj check if symbolic checks are done
         SymbolicConsistencyVisitor consistencyVisitor( m_logger );
         node.initially()->accept( consistencyVisitor );
     }

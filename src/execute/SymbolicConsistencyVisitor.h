@@ -58,7 +58,6 @@
 #include <memory>
 #include <stdexcept>
 #include <vector>
-#include "libcasm-ir/Value.h"
 
 namespace libcasm_fe
 {
@@ -268,7 +267,6 @@ namespace libcasm_fe
          * @throws Abort if condition is unknown and cration is not forced
          */
         bool createContext( const FunctionType condition );
-        u1 hasEmptyUpdateSet( void ) const;
         FunctionType callRule(
             const Ast::RuleDefinition::Ptr& rule, std::vector< FunctionType > args );
         RuleDependency::Ptr findOrInsert( const Ast::RuleDefinition::Ptr& rule );
