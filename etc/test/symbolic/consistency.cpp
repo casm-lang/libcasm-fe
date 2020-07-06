@@ -147,17 +147,19 @@ init test
 [symbolic] function a : -> Integer
 function b : -> Integer
 function c : -> Integer
+function d : -> Integer
 
 rule test =
 {
     b := a
     c := 7
+    d := undef
     program( self ) := undef
 }
 
 )***";
 
-SOURCE_TEST( symbolic_update, SymbolicConsistencyPass, source_update, true, , , "b", "~c" );
+SOURCE_TEST( symbolic_update, SymbolicConsistencyPass, source_update, true, , , "b", "~c", "~d" );
 
 static const auto source_condition = R"***(
 CASM
@@ -168,6 +170,10 @@ init test
 function b : -> Integer
 function c : -> Integer
 function d : -> Integer
+function e : -> Integer
+function f : -> Integer
+function g : -> Integer
+function h : -> Integer
 
 rule test =
 {
@@ -176,18 +182,45 @@ rule test =
     else
         b := 2
 
+    case a of {
+        1: e := 1
+        2: e := 2
+        _: e := 0
+    }
+
+    g := if a = 0 then 1 else 2
+
     if c = 0 then
         d := 4
     else
         d := 5
 
+    case c of {
+        1: f := 1
+        2: f := 2
+        _: f := 0
+    }
+
+    h := if c = 0 then 1 else 2
     program( self ) := undef
 }
 
 )***";
 
 SOURCE_TEST(
-    symbolic_from_condition, SymbolicConsistencyPass, source_condition, true, , , "b", "~c", "~d" );
+    symbolic_from_condition,
+    SymbolicConsistencyPass,
+    source_condition,
+    true,
+    ,
+    ,
+    "b",
+    "~c",
+    "~d",
+    "e",
+    "~f",
+    "g",
+    "~h" );
 
 static const auto source_propagate = R"***(
 CASM
@@ -218,6 +251,34 @@ rule test =
 SOURCE_TEST(
     propagate_symbolic, SymbolicConsistencyPass, source_propagate, true, , , "b", "c", "~d", "~e" );
 
+static const auto source_local = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : -> Integer
+function c : -> Integer
+function d : -> Integer
+
+rule test =
+{
+    local e : -> Integer in {|
+        e := a
+        b := e
+    |}
+
+    local e : -> Integer in {|
+        e := c
+        d := e
+    |}
+    program( self ) := undef
+}
+
+)***";
+
+SOURCE_TEST( symbolic_local, SymbolicConsistencyPass, source_local, true, , , "b", "~c", "~d" );
+
 static const auto source_called = R"***(
 CASM
 
@@ -240,6 +301,31 @@ rule test =
 )***";
 
 SOURCE_TEST( called_symbolic, SymbolicConsistencyPass, source_called, true, , , "b", "c", "~d" );
+
+static const auto source_let = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : -> Integer
+function c : -> Integer
+function d : -> Integer
+
+rule test =
+{
+    let x = a in
+        b := x
+
+    let x = c in
+        d := x
+
+    program( self ) := undef
+}
+
+)***";
+
+SOURCE_TEST( symbolic_let, SymbolicConsistencyPass, source_let, true, , , "b", "~c", "~d" );
 
 static const auto source_initializers = R"***(
 CASM
@@ -272,6 +358,304 @@ SOURCE_TEST(
     "d",
     "~e",
     "~f" );
+
+static const auto source_direct_call = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : Integer -> Integer
+function c : -> Integer
+function d : -> Integer
+function e : -> Integer
+function f : Integer -> Integer
+
+derived identity (i: Integer) -> Integer = i
+
+rule test =
+{
+	b(1) := b(a)
+	c := add(a, b(1))
+	d := identity(a)
+	callable(a)
+	f(1) := f(2)
+    f(2) := add(f(1), 2)
+
+    program( self ) := undef
+}
+
+rule callable(p1: Integer) = {
+	e := p1
+}
+
+)***";
+
+SOURCE_TEST(
+    symbolic_direct_calls,
+    SymbolicConsistencyPass,
+    source_direct_call,
+    true,
+    ,
+    ,
+    "b",
+    "c",
+    "d",
+    "e",
+    "~f" );
+
+// TODO: self recursion with return value
+// TODO: alternating recursion with return value
+static const auto source_infinite_recursion = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : -> Integer
+function c : -> Integer
+function d : -> Integer
+function e : -> Integer
+
+rule test =
+{
+    callable1(a)
+    callable3(1)
+
+    program( self ) := undef
+}
+
+rule callable1(p1: Integer) = {
+	b := p1
+    callable2(b)
+}
+
+rule callable2(p1: Integer) = {
+	c := p1
+    callable1(c)
+}
+
+rule callable3(p1: Integer) = {
+	d := p1
+    callable4(d)
+}
+
+rule callable4(p1: Integer) = {
+	e := p1
+    callable3(e)
+}
+)***";
+
+SOURCE_TEST(
+    symbolic_infinite_recursion,
+    SymbolicConsistencyPass,
+    source_infinite_recursion,
+    true,
+    ,
+    ,
+    "b",
+    "c",
+    "~d",
+    "~e" );
+
+static const auto source_iterate = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : -> Integer
+function c : -> Integer
+function d : -> Integer
+function e : -> Integer
+function f : -> Integer
+
+
+rule test =
+{
+	iterate {
+        if a < 10 then {
+            b := b + 2
+            a := a + 1
+        }
+    }
+
+    while a < 10 do {
+        e := e + 1
+    }
+
+	iterate {
+        if c < 10 then {
+            d := d + 2
+            c := c + 1
+        }
+    }
+
+    while c < 10 do {
+        f := f + 1
+    }
+    program( self ) := undef
+}
+)***";
+
+SOURCE_TEST(
+    symbolic_iterate,
+    SymbolicConsistencyPass,
+    source_iterate,
+    true,
+    ,
+    ,
+    "b",
+    "~c",
+    "~d",
+    "e",
+    "~f" );
+
+static const auto source_choose = R"***(
+CASM
+
+init test
+
+function a : -> Integer
+function b : -> Integer
+function c : -> Integer
+function d : -> Integer
+function e : -> Integer
+function f : -> Integer
+
+
+rule test =
+{
+	a := choose x in [0..10] do x + 1
+    choose x in [0..10] do {
+        c := x
+        d := 2
+    }
+
+	b := choose x in [0..10] do 1
+    program( self ) := undef
+}
+)***";
+
+SOURCE_TEST(
+    symbolic_choose, SymbolicConsistencyPass, source_choose, true, , , "a", "~b", "c", "~d" );
+
+static const auto source_type_cast = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : -> String
+function c : -> Integer
+function d : -> String
+
+
+rule test =
+{
+    b := a as String
+    d := c as String
+    program( self ) := undef
+}
+)***";
+
+SOURCE_TEST(
+    symbolic_type_cast, SymbolicConsistencyPass, source_type_cast, true, , , "b", "~c", "~d" );
+
+static const auto source_expressions = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : -> Integer
+function c : -> Integer
+function d : -> Integer
+[symbolic] function e : -> Boolean
+function f : -> Boolean
+function g : -> Boolean
+
+
+rule test =
+{
+    b := a + 1
+    f := not e
+
+    c := 1 + 1
+    d := c * 3
+    g := not true
+
+    program( self ) := undef
+}
+)***";
+
+SOURCE_TEST(
+    symbolic_expressions,
+    SymbolicConsistencyPass,
+    source_expressions,
+    true,
+    ,
+    ,
+    "b",
+    "~c",
+    "~d",
+    "f",
+    "~g" );
+
+static const auto source_collections = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : -> (Integer,Integer)
+function c : -> List< Integer >
+//function d : -> [Integer..Integer]
+function e : -> (Integer, Integer)
+function f : -> List< Integer >
+function g : -> Integer'[0..10]
+function h : -> Integer
+function i : -> Integer
+function j : -> Integer
+
+rule test =
+{
+    b := (a, 1)
+    c := [a, a, 1, 2, 3]
+    //d := [0..a]
+	let x = [0..a] in
+        h := |x|
+    j := b.1
+
+    e := (0, 1)
+    f := [4, 5, 1, 2, 3]
+    //f := []
+    g := 5
+	let x = [0..10] in
+        i := |x|
+    i := e.1
+
+    program( self ) := undef
+}
+
+)***";
+
+SOURCE_TEST(
+    symbolic_collections,
+    SymbolicConsistencyPass,
+    source_collections,
+    true,
+    ,
+    ,
+    "b",
+    "c",
+    //"d",
+    "~e",
+    "~f",
+    "~g",
+    "h",
+    "~i",
+    "j" );
 
 static const auto source_methods = R"***(
 CASM

@@ -85,7 +85,7 @@ namespace libcasm_fe
           public:
             BuiltinRule(
                 const std::vector< IR::Value::ID > ids,
-				int nargs,
+                int nargs,
                 const std::function< FunctionType( const std::vector< FunctionType >& ) >
                     function );
 
@@ -94,7 +94,7 @@ namespace libcasm_fe
 
           private:
             const std::vector< IR::Value::ID > m_ids;
-			const int m_nargs;
+            const int m_nargs;
             const std::function< FunctionType( const std::vector< FunctionType >& ) > m_function;
         };
 
@@ -124,6 +124,8 @@ namespace libcasm_fe
             FunctionType returns( void );
             bool fullyDefined( void ) const;
             void define( void );
+            const std::vector< FunctionType >& arguments() const;
+            FunctionType argumentAt( const size_t index ) const;
 
             Status status( void ) const;
             void setStatus( Status status );

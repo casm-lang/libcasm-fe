@@ -234,6 +234,16 @@ void SCVisitor::RuleDependency::define( void )
     }
 }
 
+const std::vector< SCVisitor::FunctionType >& SCVisitor::RuleDependency::arguments() const
+{
+    return m_arguments;
+}
+
+SCVisitor::FunctionType SCVisitor::RuleDependency::argumentAt( const size_t index ) const
+{
+    return m_arguments[ index ];
+}
+
 SCVisitor::RuleDependency::Status SCVisitor::RuleDependency::status( void ) const
 {
     return m_status;
@@ -414,6 +424,12 @@ void SymbolicConsistencyVisitor::visit( Specification& specification )
 
         m_frame = std::make_shared< Frame >(
             m_currentRule.get(), m_currentRule->maximumNumberOfLocals() );
+
+        for( size_t i = 0; i < m_currentRule->arguments()->size(); ++i )
+        {
+            m_frame->setLocal(
+                m_currentRule->arguments()->at( i )->localIndex(), rule->argumentAt( i ) );
+        }
 
         try
         {
@@ -839,6 +855,8 @@ void SymbolicConsistencyVisitor::visit( Ast::BinaryExpression& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::LetExpression& node )
 {
+    node.variableBindings()->accept( *this );
+    node.expression()->accept( *this );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::ConditionalExpression& node )
@@ -873,11 +891,14 @@ void SymbolicConsistencyVisitor::visit( Ast::ConditionalExpression& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::ChooseExpression& node )
 {
-    createContext( FunctionType::SYMBOLIC );
+    node.universe()->accept( *this );
+    m_stack.pop();
+
     for( const auto& variable : *node.variables() )
     {
-        // TODO: fix me
+        m_frame->setLocal( variable->localIndex(), FunctionType::SYMBOLIC );
     }
+    node.expression()->accept( *this );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::UniversalQuantifierExpression& node )
@@ -890,9 +911,10 @@ void SymbolicConsistencyVisitor::visit( Ast::ExistentialQuantifierExpression& no
 
 void SymbolicConsistencyVisitor::visit( Ast::CardinalityExpression& node )
 {
-    // TODO: fixme
-    typeOfList( node.arguments() );
+    auto args = typeOfList( node.arguments() );
     node.expression()->accept( *this );
+    auto expression = m_stack.pop();
+    m_stack.push( args && expression );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::ConditionalRule& node )
@@ -909,7 +931,6 @@ void SymbolicConsistencyVisitor::visit( Ast::ConditionalRule& node )
 
     node.thenRule()->accept( *this );
 
-    // TODO
     node.elseRule()->accept( *this );
 
     m_context.pop();
@@ -917,14 +938,58 @@ void SymbolicConsistencyVisitor::visit( Ast::ConditionalRule& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::CaseRule& node )
 {
+    node.expression()->accept( *this );
+    const auto expression = m_stack.pop();
+
+    if( not createContext( expression ) )
+    {
+        m_logger.warning(
+            { node.sourceLocation() },
+            "Couldn't determine if case expression is symbolic or numeric. Assumed symbolic." );
+    }
+
+    for( const auto& _case : *node.cases() )
+    {
+        switch( _case->id() )
+        {
+            case Ast::Node::ID::DEFAULT_CASE:
+            {
+                _case->rule()->accept( *this );
+                break;
+            }
+            case Ast::Node::ID::EXPRESSION_CASE:
+            {
+                const auto& exprCase = std::static_pointer_cast< Ast::ExpressionCase >( _case );
+                exprCase->expression()->accept( *this );
+                m_stack.pop();
+
+                _case->rule()->accept( *this );
+                break;
+            }
+            default:
+            {
+                assert( !"unknown case" );
+                break;
+            }
+        }
+    }
+
+    m_context.pop();
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::LetRule& node )
 {
+    node.variableBindings()->accept( *this );
+    node.rule()->accept( *this );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::LocalRule& node )
 {
+    for( const auto& localFunction : *node.localFunctions() )
+    {
+        localFunction->initially()->accept( *this );
+    }
+    node.rule()->accept( *this );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::ForallRule& node )
@@ -933,10 +998,19 @@ void SymbolicConsistencyVisitor::visit( Ast::ForallRule& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::ChooseRule& node )
 {
+    node.universe()->accept( *this );
+    m_stack.pop();
+
+    for( const auto& variable : *node.variables() )
+    {
+        m_frame->setLocal( variable->localIndex(), FunctionType::SYMBOLIC );
+    }
+    node.rule()->accept( *this );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::IterateRule& node )
 {
+    node.rule()->accept( *this );
 }
 
 void SymbolicConsistencyVisitor::visit( Ast::BlockRule& node )
@@ -995,7 +1069,7 @@ void SymbolicConsistencyVisitor::visit( Ast::UpdateRule& node )
 
 void SymbolicConsistencyVisitor::visit( Ast::CallRule& node )
 {
-    node.accept( *this );
+    node.call()->accept( *this );
     const auto& returnType = node.call()->type()->result();
     if( not returnType.isVoid() )
     {
@@ -1087,10 +1161,6 @@ SCVisitor::FunctionType SymbolicConsistencyVisitor::typeOfList( const T& list )
     {
         el->accept( *this );
         auto value = m_stack.pop();
-        if( value == FunctionType::SYMBOLIC )
-        {
-            return FunctionType::SYMBOLIC;
-        }
         type = type && value;
     }
     return type;
