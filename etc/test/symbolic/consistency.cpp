@@ -766,6 +766,27 @@ SOURCE_TEST(
     "~k",
     "~l" );
 
+static const auto source_update_in_arg = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+[symbolic] function b : -> Integer
+function c : Integer -> Integer
+rule test =
+{
+    callable(b, c(a))
+    program( self ) := undef
+}
+
+rule callable(p1: Integer, p2: Integer) = skip
+
+)***";
+
+SOURCE_TEST(
+    symbolic_update_in_arg, SymbolicConsistencyPass, source_update_in_arg, true, , , "b", "c" );
+
 //
 //  Local variables:
 //  mode: c++
