@@ -787,6 +787,30 @@ rule callable(p1: Integer, p2: Integer) = skip
 SOURCE_TEST(
     symbolic_update_in_arg, SymbolicConsistencyPass, source_update_in_arg, true, , , "b", "c" );
 
+static const auto source_cannot_have_symbolic_function = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : Integer -> RuleRef< -> Void >
+rule test =
+{
+	b(0) := @callable
+    program( self ) := b(a)
+}
+
+rule callable = skip
+
+)***";
+
+SOURCE_TEST(
+    symbolic_program_update,
+    SymbolicConsistencyPass,
+    source_cannot_have_symbolic_function,
+    false,
+    , );
+
 //
 //  Local variables:
 //  mode: c++
