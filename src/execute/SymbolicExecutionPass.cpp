@@ -63,6 +63,8 @@
 
 #include <libtptp/Node>
 
+#include <libcasm-fe/execute/SymbolicConsistencyPass>
+
 #include <libtptp/transform/AstDumpDotPass>
 #include <libtptp/transform/DumpSourcePass>
 
@@ -84,7 +86,7 @@ static libpass::PassRegistration< SymbolicExecutionPass > PASS(
 void SymbolicExecutionPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SpecificationMergerPass >();
-    pu.scheduleAfter< FrameSizeDeterminationPass >();
+    pu.scheduleAfter< SymbolicConsistencyPass >();
 }
 
 u1 SymbolicExecutionPass::run( libpass::PassResult& pr )

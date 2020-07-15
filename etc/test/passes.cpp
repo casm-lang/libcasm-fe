@@ -197,6 +197,99 @@ rule assign( d: Integer ) =
 
 SOURCE_TEST( execute_call, SymbolicExecutionPass, source_call_rule, true, , );  // TODO: FIXME:
 
+static const auto source_conditional_rule = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+[symbolic] function b : -> Integer
+
+rule test =
+{
+    if a = 0 then
+        b := 1
+    else
+        b := 2
+
+    program( self ) := undef
+}
+
+)***";
+
+SOURCE_TEST( execute_conditional, SymbolicExecutionPass, source_conditional_rule, true, , );  // TODO: FIXME:
+
+static const auto source_nested_conditional_rule = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+[symbolic] function b : -> Integer
+[symbolic] function c : -> Integer
+
+rule test =
+{
+    if a = 0 then {
+        if c != 0 then
+            if a = 0 then
+                b := 1
+    }
+    else
+        b := 2
+
+    program( self ) := undef
+}
+
+)***";
+
+SOURCE_TEST( execute_nested_conditional, SymbolicExecutionPass, source_nested_conditional_rule, true, , );  // TODO: FIXME:
+
+static const auto source_symbolic_instructions = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+[symbolic] function b : -> Integer
+[symbolic] function c : -> Integer
+[symbolic] function d : -> Integer
+[symbolic] function e : -> Integer
+[symbolic] function f : -> Boolean
+[symbolic] function g : -> Boolean
+
+[symbolic] function y : Integer -> Boolean
+[symbolic] function z : Integer -> Integer
+
+rule test =
+{
+    if a = 0 then
+        z(0) := 1
+    if b > 0 then
+        z(1) := 2
+    if c >= 1 then
+        z(2) := 3
+    if d < 0 then
+        z(3) := 4
+    if e <= 1 then
+        z(4) := 5
+
+    z(5) := 1 + a
+    z(6) := 1 - a
+    z(7) := 1 * a
+    z(8) := 1 / a
+    z(9) := 1 % a
+    y(0) := f and g
+    y(1) := f or g
+    y(2) := f xor g
+    y(3) := f => g
+    program( self ) := undef
+}
+
+)***";
+
+SOURCE_TEST( execute_instructions, SymbolicExecutionPass, source_symbolic_instructions, true, , );  // TODO: FIXME:
+
 static const auto source_consistency = R"***(
 CASM
 

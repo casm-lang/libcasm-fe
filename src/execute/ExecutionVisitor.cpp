@@ -58,9 +58,11 @@
 
 #include <libstdhl/RestoreOnScopeExit>
 
+#include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <thread>
+#include "libtptp/Logic.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -872,7 +874,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
             Code::QuantifierExpressionInvalidUniverse );
     }
 
-    foreachInUniverse( *node.predicateVariables(), universe, [&]() {
+    foreachInUniverse( *node.predicateVariables(), universe, [ & ]() {
         node.proposition()->accept( *this );
         const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
@@ -921,7 +923,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
             Code::QuantifierExpressionInvalidUniverse );
     }
 
-    foreachInUniverse( *node.predicateVariables(), universe, [&]() {
+    foreachInUniverse( *node.predicateVariables(), universe, [ & ]() {
         node.proposition()->accept( *this );
         const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
@@ -1077,7 +1079,7 @@ void ExecutionVisitor::visit( LocalRule& node )
     // ignore local function updates
     auto* updateSet = m_updateSetManager.currentUpdateSet();
     updateSet->setUpdateFilter(
-        [&localFunctions](
+        [ &localFunctions ](
             const UpdateSetDetails::Location& location, const UpdateSetDetails::Value& value ) {
             return localFunctions.find( location.function() ) == localFunctions.cend();
         } );
@@ -1108,7 +1110,7 @@ void ExecutionVisitor::visit( ForallRule& node )
             Code::ForallRuleInvalidUniverse );
     }
 
-    foreachInUniverse( *node.variables(), universe, [&]() {
+    foreachInUniverse( *node.variables(), universe, [ & ]() {
         // check if values satisfy the condition
         node.condition()->accept( *this );
         const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
@@ -1498,14 +1500,14 @@ void ExecutionVisitor::foreachInUniverse(
 
         if( chain == nullptr )
         {
-            chain = [frame, variableIndex, subRule]( const IR::Constant& value ) {
+            chain = [ frame, variableIndex, subRule ]( const IR::Constant& value ) {
                 frame->setLocal( variableIndex, value );
                 subRule();
             };
         }
         else
         {
-            chain = [frame, variableIndex, chain, &universe]( const IR::Constant& value ) {
+            chain = [ frame, variableIndex, chain, &universe ]( const IR::Constant& value ) {
                 frame->setLocal( variableIndex, value );
                 universe.foreach( chain );
             };
@@ -1590,7 +1592,6 @@ SymbolicExecutionVisitor::SymbolicExecutionVisitor(
 
 void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
 {
-    // return ExecutionVisitor::visit( node );
     const auto* frame = m_frameStack.top();
     if( m_evaluateUpdateLocation )
     {
@@ -1681,51 +1682,169 @@ void SymbolicExecutionVisitor::visit( LetExpression& node )
 
 void SymbolicExecutionVisitor::visit( ConditionalExpression& node )
 {
-    ExecutionVisitor::visit( node );
+    node.condition()->accept( *this );
+    const auto condition = m_evaluationStack.pop();
+
+    if( not condition.defined() )
+    {
+        throw RuntimeException(
+            { node.condition()->sourceLocation() },
+            "condition must be true or false but was undefined",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::ConditionalRuleInvalidCondition );
+    }
+
+    if( condition.symbolic() )
+    {
+        // all functions are symbolic, so overwriting updates is irrelevant
+        // then and else branch may create colliding updates
+        Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
+        const auto tptpCondition = m_environment.tptpAtomFromConstant( condition );
+        {
+            // environment crates implications for condition until end of scope
+            auto environment = m_environment.makeEnvironment( tptpCondition );
+            node.thenExpression()->accept( *this );
+        }
+        {
+            const auto inverse = std::make_shared< libtptp::UnaryLogic >(
+                libtptp::UnaryLogic::Connective::NEGATION, tptpCondition );
+            // environment crates implications for condition until end of scope
+            auto environment = m_environment.makeEnvironment( inverse );
+            node.elseExpression()->accept( *this );
+        }
+        try
+        {
+            transaction.merge();
+        }
+        catch( const ExecutionUpdateSet::Conflict& conflict )
+        {
+            handleMergeConflict( node, conflict );
+        }
+    }
+    else
+    {
+        const auto literalCondition = static_cast< const IR::BooleanConstant& >( condition );
+
+        if( literalCondition.value() == true )
+        {
+            node.thenExpression()->accept( *this );
+        }
+        else
+        {
+            node.elseExpression()->accept( *this );
+        }
+    }
 }
 
 void SymbolicExecutionVisitor::visit( ChooseExpression& node )
 {
+    // TODO: if universe is symbolic: create symbolic trace
     ExecutionVisitor::visit( node );
 }
 
 void SymbolicExecutionVisitor::visit( UniversalQuantifierExpression& node )
 {
+    // TODO: visit universe, if symbolic: create quantified expression
     ExecutionVisitor::visit( node );
 }
 
 void SymbolicExecutionVisitor::visit( ExistentialQuantifierExpression& node )
 {
+    // TODO: visit universe, if symbolic: create quantified expression
     ExecutionVisitor::visit( node );
 }
 
 void SymbolicExecutionVisitor::visit( CardinalityExpression& node )
 {
+    // TODO: fix me
     ExecutionVisitor::visit( node );
 }
 
 void SymbolicExecutionVisitor::visit( ConditionalRule& node )
 {
-    ExecutionVisitor::visit( node );
+    /*
+    if(node.symbolic())
+    {...}
+    else {
+        ExecutionVisitor::visit(node);
+    }
+    */
+    node.condition()->accept( *this );
+    const auto condition = m_evaluationStack.pop();
+
+    if( not condition.defined() )
+    {
+        throw RuntimeException(
+            { node.condition()->sourceLocation() },
+            "condition must be true or false but was undefined",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::ConditionalRuleInvalidCondition );
+    }
+
+    if( condition.symbolic() )
+    {
+        // all functions are symbolic, so overwriting updates is irrelevant
+        // then and else branch may create colliding updates
+        Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
+        const auto tptpCondition = m_environment.tptpAtomFromConstant( condition );
+        {
+            // environment crates implications for condition until end of scope
+            auto environment = m_environment.makeEnvironment( tptpCondition );
+            node.thenRule()->accept( *this );
+        }
+        {
+            const auto inverse = std::make_shared< libtptp::UnaryLogic >(
+                libtptp::UnaryLogic::Connective::NEGATION, tptpCondition );
+            // environment crates implications for condition until end of scope
+            auto environment = m_environment.makeEnvironment( inverse );
+            node.elseRule()->accept( *this );
+        }
+        try
+        {
+            transaction.merge();
+        }
+        catch( const ExecutionUpdateSet::Conflict& conflict )
+        {
+            handleMergeConflict( node, conflict );
+        }
+    }
+    else
+    {
+        const auto literalCondition = static_cast< const IR::BooleanConstant& >( condition );
+
+        if( literalCondition.value() == true )
+        {
+            node.thenRule()->accept( *this );
+        }
+        else
+        {
+            node.elseRule()->accept( *this );
+        }
+    }
 }
 
 void SymbolicExecutionVisitor::visit( CaseRule& node )
 {
+    // TODO: similar to ConditionalRule: if condition symbolic: create all cases in trace with
+    // respective environment
     ExecutionVisitor::visit( node );
 }
 
 void SymbolicExecutionVisitor::visit( ForallRule& node )
 {
+    // TODO: if universe symbolic: create quantified logic
     ExecutionVisitor::visit( node );
 }
 
 void SymbolicExecutionVisitor::visit( ChooseRule& node )
 {
+    // TODO: if universe symbolic: create symbolic trace
     ExecutionVisitor::visit( node );
 }
 
 void SymbolicExecutionVisitor::visit( IterateRule& node )
 {
+    // TODO: fix me
     ExecutionVisitor::visit( node );
 }
 
@@ -1809,6 +1928,7 @@ void SymbolicExecutionVisitor::visit( UpdateRule& node )
 
 void SymbolicExecutionVisitor::visit( WhileRule& node )
 {
+    // TODO: fix me
     ExecutionVisitor::visit( node );
 }
 
