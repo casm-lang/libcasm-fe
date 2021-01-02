@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.5.1.
+// A Bison parser, made by GNU Bison 3.7.2.
 
 // Skeleton implementation for Bison LALR(1) parsers in C++
 
@@ -30,8 +30,9 @@
 // This special exception was added by the Free Software Foundation in
 // version 2.2 of Bison.
 
-// Undocumented macros, especially those whose name start with YY_,
-// are private implementation details.  Do not rely on them.
+// DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+// especially those whose name start with YY_ or yy_.  They are
+// private implementation details that can be changed or removed.
 
 
 
@@ -60,7 +61,7 @@
         return node;
     }
 
-#line 64 "GrammarParser.cpp"
+#line 65 "GrammarParser.cpp"
 
 
 #ifndef YY_
@@ -74,6 +75,7 @@
 #  define YY_(msgid) msgid
 # endif
 #endif
+
 
 // Whether we are compiled with exception support.
 #ifndef YY_EXCEPTIONS
@@ -130,7 +132,7 @@
 # define YY_STACK_PRINT()               \
   do {                                  \
     if (yydebug_)                       \
-      yystack_print_ ();                \
+      yy_stack_print_ ();                \
   } while (false)
 
 #else // !YYDEBUG
@@ -152,49 +154,7 @@
 
 #line 50 "../../obj/src/GrammarParser.y"
 namespace libcasm_fe {
-#line 156 "GrammarParser.cpp"
-
-
-  /* Return YYSTR after stripping away unnecessary quotes and
-     backslashes, so that it's suitable for yyerror.  The heuristic is
-     that double-quoting is unnecessary unless the string contains an
-     apostrophe, a comma, or backslash (other than backslash-backslash).
-     YYSTR is taken from yytname.  */
-  std::string
-  Parser::yytnamerr_ (const char *yystr)
-  {
-    if (*yystr == '"')
-      {
-        std::string yyr;
-        char const *yyp = yystr;
-
-        for (;;)
-          switch (*++yyp)
-            {
-            case '\'':
-            case ',':
-              goto do_not_strip_quotes;
-
-            case '\\':
-              if (*++yyp != '\\')
-                goto do_not_strip_quotes;
-              else
-                goto append;
-
-            append:
-            default:
-              yyr += *yyp;
-              break;
-
-            case '"':
-              return yyr;
-            }
-      do_not_strip_quotes: ;
-      }
-
-    return yystr;
-  }
-
+#line 158 "GrammarParser.cpp"
 
   /// Build a parser object.
   Parser::Parser (Logger& m_log_yyarg, Lexer& m_lexer_yyarg, Specification& m_specification_yyarg)
@@ -216,7 +176,7 @@ namespace libcasm_fe {
   {}
 
   /*---------------.
-  | Symbol types.  |
+  | symbol kinds.  |
   `---------------*/
 
 
@@ -247,13 +207,13 @@ namespace libcasm_fe {
     : state (s)
   {}
 
-  Parser::symbol_number_type
-  Parser::by_state::type_get () const YY_NOEXCEPT
+  Parser::symbol_kind_type
+  Parser::by_state::kind () const YY_NOEXCEPT
   {
     if (state == empty_state)
-      return empty_symbol;
+      return symbol_kind::S_YYEMPTY;
     else
-      return yystos_[+state];
+      return YY_CAST (symbol_kind_type, yystos_[+state]);
   }
 
   Parser::stack_symbol_type::stack_symbol_type ()
@@ -262,421 +222,421 @@ namespace libcasm_fe {
   Parser::stack_symbol_type::stack_symbol_type (YY_RVREF (stack_symbol_type) that)
     : super_type (YY_MOVE (that.state), YY_MOVE (that.location))
   {
-    switch (that.type_get ())
+    switch (that.kind ())
     {
-      case 3: // "CASM"
-      case 4: // "init"
-      case 5: // "derived"
-      case 6: // "enumeration"
-      case 7: // "rule"
-      case 8: // "using"
-      case 9: // "invariant"
-      case 10: // "import"
-      case 11: // "function"
-      case 12: // "defined"
-      case 13: // "seq"
-      case 14: // "endseq"
-      case 15: // "par"
-      case 16: // "endpar"
-      case 17: // "skip"
-      case 18: // "let"
-      case 19: // "local"
-      case 20: // "in"
-      case 21: // "forall"
-      case 22: // "choose"
-      case 23: // "iterate"
-      case 24: // "do"
-      case 25: // "if"
-      case 26: // "then"
-      case 27: // "else"
-      case 28: // "case"
-      case 29: // "of"
-      case 30: // "default"
-      case 31: // "holds"
-      case 32: // "exists"
-      case 33: // "with"
-      case 34: // "as"
-      case 35: // "while"
-      case 36: // "undef"
-      case 37: // "false"
-      case 38: // "true"
-      case 39: // "and"
-      case 40: // "or"
-      case 41: // "xor"
-      case 42: // "implies"
-      case 43: // "not"
-      case 44: // "+"
-      case 45: // "-"
-      case 46: // "="
-      case 47: // "("
-      case 48: // ")"
-      case 49: // "["
-      case 50: // "]"
-      case 51: // "{"
-      case 52: // "}"
-      case 53: // ":"
-      case 54: // "::"
-      case 55: // "_"
-      case 56: // "|"
-      case 57: // "@"
-      case 58: // ","
-      case 59: // "<"
-      case 60: // ">"
-      case 61: // "*"
-      case 62: // "/"
-      case 63: // "%"
-      case 64: // "^"
-      case 65: // "'"
-      case 66: // ".."
-      case 67: // "."
-      case 68: // "->"
-      case 69: // "=>"
-      case 70: // ":="
-      case 71: // "!="
-      case 72: // "<="
-      case 73: // ">="
-      case 74: // "{|"
-      case 75: // "|}"
+      case symbol_kind::S_CASM: // "CASM"
+      case symbol_kind::S_INIT: // "init"
+      case symbol_kind::S_DERIVED: // "derived"
+      case symbol_kind::S_ENUMERATION: // "enumeration"
+      case symbol_kind::S_RULE: // "rule"
+      case symbol_kind::S_USING: // "using"
+      case symbol_kind::S_INVARIANT: // "invariant"
+      case symbol_kind::S_IMPORT: // "import"
+      case symbol_kind::S_FUNCTION: // "function"
+      case symbol_kind::S_DEFINED: // "defined"
+      case symbol_kind::S_SEQ: // "seq"
+      case symbol_kind::S_ENDSEQ: // "endseq"
+      case symbol_kind::S_PAR: // "par"
+      case symbol_kind::S_ENDPAR: // "endpar"
+      case symbol_kind::S_SKIP: // "skip"
+      case symbol_kind::S_LET: // "let"
+      case symbol_kind::S_LOCAL: // "local"
+      case symbol_kind::S_IN: // "in"
+      case symbol_kind::S_FORALL: // "forall"
+      case symbol_kind::S_CHOOSE: // "choose"
+      case symbol_kind::S_ITERATE: // "iterate"
+      case symbol_kind::S_DO: // "do"
+      case symbol_kind::S_IF: // "if"
+      case symbol_kind::S_THEN: // "then"
+      case symbol_kind::S_ELSE: // "else"
+      case symbol_kind::S_CASE: // "case"
+      case symbol_kind::S_OF: // "of"
+      case symbol_kind::S_DEFAULT: // "default"
+      case symbol_kind::S_HOLDS: // "holds"
+      case symbol_kind::S_EXISTS: // "exists"
+      case symbol_kind::S_WITH: // "with"
+      case symbol_kind::S_AS: // "as"
+      case symbol_kind::S_WHILE: // "while"
+      case symbol_kind::S_UNDEF: // "undef"
+      case symbol_kind::S_FALSE: // "false"
+      case symbol_kind::S_TRUE: // "true"
+      case symbol_kind::S_AND: // "and"
+      case symbol_kind::S_OR: // "or"
+      case symbol_kind::S_XOR: // "xor"
+      case symbol_kind::S_IMPLIES: // "implies"
+      case symbol_kind::S_NOT: // "not"
+      case symbol_kind::S_PLUS: // "+"
+      case symbol_kind::S_MINUS: // "-"
+      case symbol_kind::S_EQUAL: // "="
+      case symbol_kind::S_LPAREN: // "("
+      case symbol_kind::S_RPAREN: // ")"
+      case symbol_kind::S_LSQPAREN: // "["
+      case symbol_kind::S_RSQPAREN: // "]"
+      case symbol_kind::S_LCURPAREN: // "{"
+      case symbol_kind::S_RCURPAREN: // "}"
+      case symbol_kind::S_COLON: // ":"
+      case symbol_kind::S_DOUBLECOLON: // "::"
+      case symbol_kind::S_UNDERLINE: // "_"
+      case symbol_kind::S_VERTICAL_BAR: // "|"
+      case symbol_kind::S_AT: // "@"
+      case symbol_kind::S_COMMA: // ","
+      case symbol_kind::S_LESSER: // "<"
+      case symbol_kind::S_GREATER: // ">"
+      case symbol_kind::S_ASTERIX: // "*"
+      case symbol_kind::S_SLASH: // "/"
+      case symbol_kind::S_PERCENT: // "%"
+      case symbol_kind::S_CARET: // "^"
+      case symbol_kind::S_MARK: // "'"
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_MAPS: // "->"
+      case symbol_kind::S_ARROW: // "=>"
+      case symbol_kind::S_UPDATE: // ":="
+      case symbol_kind::S_NEQUAL: // "!="
+      case symbol_kind::S_LESSEQ: // "<="
+      case symbol_kind::S_GREATEREQ: // ">="
+      case symbol_kind::S_SEQ_BRACKET: // "{|"
+      case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
         value.YY_MOVE_OR_COPY< Ast::Token::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 182: // Attribute
+      case symbol_kind::S_Attribute: // Attribute
         value.YY_MOVE_OR_COPY< Attribute::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 181: // Attributes
+      case symbol_kind::S_Attributes: // Attributes
         value.YY_MOVE_OR_COPY< Attributes::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 183: // BasicAttribute
+      case symbol_kind::S_BasicAttribute: // BasicAttribute
         value.YY_MOVE_OR_COPY< BasicAttribute::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 155: // BasicType
+      case symbol_kind::S_BasicType: // BasicType
         value.YY_MOVE_OR_COPY< BasicType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 117: // BlockRule
+      case symbol_kind::S_BlockRule: // BlockRule
         value.YY_MOVE_OR_COPY< BlockRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 126: // CallExpression
+      case symbol_kind::S_CallExpression: // CallExpression
         value.YY_MOVE_OR_COPY< CallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 120: // CallRule
+      case symbol_kind::S_CallRule: // CallRule
         value.YY_MOVE_OR_COPY< CallRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 137: // CardinalityExpression
+      case symbol_kind::S_CardinalityExpression: // CardinalityExpression
         value.YY_MOVE_OR_COPY< CardinalityExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 111: // CaseLabel
+      case symbol_kind::S_CaseLabel: // CaseLabel
         value.YY_MOVE_OR_COPY< Case::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 109: // CaseRule
+      case symbol_kind::S_CaseRule: // CaseRule
         value.YY_MOVE_OR_COPY< CaseRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 110: // CaseLabels
+      case symbol_kind::S_CaseLabels: // CaseLabels
         value.YY_MOVE_OR_COPY< Cases::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 134: // ChooseExpression
+      case symbol_kind::S_ChooseExpression: // ChooseExpression
         value.YY_MOVE_OR_COPY< ChooseExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 115: // ChooseRule
+      case symbol_kind::S_ChooseRule: // ChooseRule
         value.YY_MOVE_OR_COPY< ChooseRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 133: // ConditionalExpression
+      case symbol_kind::S_ConditionalExpression: // ConditionalExpression
         value.YY_MOVE_OR_COPY< ConditionalExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 108: // ConditionalRule
+      case symbol_kind::S_ConditionalRule: // ConditionalRule
         value.YY_MOVE_OR_COPY< ConditionalRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 164: // MaybeDefined
+      case symbol_kind::S_MaybeDefined: // MaybeDefined
         value.YY_MOVE_OR_COPY< Defined::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 92: // AttributedDefinition
-      case 93: // Definition
+      case symbol_kind::S_AttributedDefinition: // AttributedDefinition
+      case symbol_kind::S_Definition: // Definition
         value.YY_MOVE_OR_COPY< Definition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 91: // Definitions
+      case symbol_kind::S_Definitions: // Definitions
         value.YY_MOVE_OR_COPY< Definitions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 96: // DerivedDefinition
+      case symbol_kind::S_DerivedDefinition: // DerivedDefinition
         value.YY_MOVE_OR_COPY< DerivedDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 127: // DirectCallExpression
+      case symbol_kind::S_DirectCallExpression: // DirectCallExpression
         value.YY_MOVE_OR_COPY< DirectCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 95: // EnumerationDefinition
+      case symbol_kind::S_EnumerationDefinition: // EnumerationDefinition
         value.YY_MOVE_OR_COPY< EnumerationDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 99: // EnumeratorDefinition
+      case symbol_kind::S_EnumeratorDefinition: // EnumeratorDefinition
         value.YY_MOVE_OR_COPY< EnumeratorDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 100: // Enumerators
+      case symbol_kind::S_Enumerators: // Enumerators
         value.YY_MOVE_OR_COPY< Enumerators::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 136: // ExistentialQuantifierExpression
+      case symbol_kind::S_ExistentialQuantifierExpression: // ExistentialQuantifierExpression
         value.YY_MOVE_OR_COPY< ExistentialQuantifierExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 123: // Term
-      case 124: // SimpleOrClaspedTerm
-      case 125: // OperatorExpression
+      case symbol_kind::S_Term: // Term
+      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.YY_MOVE_OR_COPY< Expression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 184: // ExpressionAttribute
+      case symbol_kind::S_ExpressionAttribute: // ExpressionAttribute
         value.YY_MOVE_OR_COPY< ExpressionAttribute::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 122: // Terms
+      case symbol_kind::S_Terms: // Terms
         value.YY_MOVE_OR_COPY< Expressions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 160: // FixedSizedType
+      case symbol_kind::S_FixedSizedType: // FixedSizedType
         value.YY_MOVE_OR_COPY< FixedSizedType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 114: // ForallRule
+      case symbol_kind::S_ForallRule: // ForallRule
         value.YY_MOVE_OR_COPY< ForallRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 98: // FunctionDefinition
-      case 179: // AttributedLocalFunctionDefinition
-      case 180: // LocalFunctionDefinition
+      case symbol_kind::S_FunctionDefinition: // FunctionDefinition
+      case symbol_kind::S_AttributedLocalFunctionDefinition: // AttributedLocalFunctionDefinition
+      case symbol_kind::S_LocalFunctionDefinition: // LocalFunctionDefinition
         value.YY_MOVE_OR_COPY< FunctionDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 178: // LocalFunctionDefinitions
+      case symbol_kind::S_LocalFunctionDefinitions: // LocalFunctionDefinitions
         value.YY_MOVE_OR_COPY< FunctionDefinitions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 90: // Header
+      case symbol_kind::S_Header: // Header
         value.YY_MOVE_OR_COPY< HeaderDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 82: // "identifier"
-      case 168: // Identifier
+      case symbol_kind::S_IDENTIFIER: // "identifier"
+      case symbol_kind::S_Identifier: // Identifier
         value.YY_MOVE_OR_COPY< Identifier::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 169: // IdentifierPath
+      case symbol_kind::S_IdentifierPath: // IdentifierPath
         value.YY_MOVE_OR_COPY< IdentifierPath::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 104: // ImportDefinition
+      case symbol_kind::S_ImportDefinition: // ImportDefinition
         value.YY_MOVE_OR_COPY< ImportDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 130: // IndirectCallExpression
+      case symbol_kind::S_IndirectCallExpression: // IndirectCallExpression
         value.YY_MOVE_OR_COPY< IndirectCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 94: // InitDefinition
+      case symbol_kind::S_InitDefinition: // InitDefinition
         value.YY_MOVE_OR_COPY< InitDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 167: // Initializer
+      case symbol_kind::S_Initializer: // Initializer
         value.YY_MOVE_OR_COPY< Initializer::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 166: // Initializers
+      case symbol_kind::S_Initializers: // Initializers
         value.YY_MOVE_OR_COPY< Initializers::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 165: // MaybeInitially
+      case symbol_kind::S_MaybeInitially: // MaybeInitially
         value.YY_MOVE_OR_COPY< Initially::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 103: // InvariantDefinition
+      case symbol_kind::S_InvariantDefinition: // InvariantDefinition
         value.YY_MOVE_OR_COPY< InvariantDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 116: // IterateRule
+      case symbol_kind::S_IterateRule: // IterateRule
         value.YY_MOVE_OR_COPY< IterateRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 132: // LetExpression
+      case symbol_kind::S_LetExpression: // LetExpression
         value.YY_MOVE_OR_COPY< LetExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 112: // LetRule
+      case symbol_kind::S_LetRule: // LetRule
         value.YY_MOVE_OR_COPY< LetRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 147: // ListLiteral
+      case symbol_kind::S_ListLiteral: // ListLiteral
         value.YY_MOVE_OR_COPY< ListLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 138: // Literal
+      case symbol_kind::S_Literal: // Literal
         value.YY_MOVE_OR_COPY< Literal::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 129: // LiteralCallExpression
+      case symbol_kind::S_LiteralCallExpression: // LiteralCallExpression
         value.YY_MOVE_OR_COPY< LiteralCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 113: // LocalRule
+      case symbol_kind::S_LocalRule: // LocalRule
         value.YY_MOVE_OR_COPY< LocalRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 128: // MethodCallExpression
+      case symbol_kind::S_MethodCallExpression: // MethodCallExpression
         value.YY_MOVE_OR_COPY< MethodCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 152: // Assignment
+      case symbol_kind::S_Assignment: // Assignment
         value.YY_MOVE_OR_COPY< NamedExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 151: // Assignments
+      case symbol_kind::S_Assignments: // Assignments
         value.YY_MOVE_OR_COPY< NamedExpressions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 148: // RangeLiteral
+      case symbol_kind::S_RangeLiteral: // RangeLiteral
         value.YY_MOVE_OR_COPY< RangeLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 150: // RecordLiteral
+      case symbol_kind::S_RecordLiteral: // RecordLiteral
         value.YY_MOVE_OR_COPY< RecordLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 157: // RecordType
+      case symbol_kind::S_RecordType: // RecordType
         value.YY_MOVE_OR_COPY< RecordType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 146: // ReferenceLiteral
+      case symbol_kind::S_ReferenceLiteral: // ReferenceLiteral
         value.YY_MOVE_OR_COPY< ReferenceLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 159: // RelationType
+      case symbol_kind::S_RelationType: // RelationType
         value.YY_MOVE_OR_COPY< RelationType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 106: // Rule
+      case symbol_kind::S_Rule: // Rule
         value.YY_MOVE_OR_COPY< Rule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 97: // RuleDefinition
+      case symbol_kind::S_RuleDefinition: // RuleDefinition
         value.YY_MOVE_OR_COPY< RuleDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 105: // Rules
+      case symbol_kind::S_Rules: // Rules
         value.YY_MOVE_OR_COPY< Rules::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 118: // SequenceRule
+      case symbol_kind::S_SequenceRule: // SequenceRule
         value.YY_MOVE_OR_COPY< SequenceRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 107: // SkipRule
+      case symbol_kind::S_SkipRule: // SkipRule
         value.YY_MOVE_OR_COPY< SkipRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 89: // Specification
+      case symbol_kind::S_Specification: // Specification
         value.YY_MOVE_OR_COPY< Specification::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 158: // TemplateType
+      case symbol_kind::S_TemplateType: // TemplateType
         value.YY_MOVE_OR_COPY< TemplateType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 149: // TupleLiteral
+      case symbol_kind::S_TupleLiteral: // TupleLiteral
         value.YY_MOVE_OR_COPY< TupleLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 156: // TupleType
+      case symbol_kind::S_TupleType: // TupleType
         value.YY_MOVE_OR_COPY< TupleType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 131: // TypeCastingExpression
+      case symbol_kind::S_TypeCastingExpression: // TypeCastingExpression
         value.YY_MOVE_OR_COPY< TypeCastingExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 153: // Types
-      case 161: // FunctionParameters
-      case 162: // MaybeFunctionParameters
+      case symbol_kind::S_Types: // Types
+      case symbol_kind::S_FunctionParameters: // FunctionParameters
+      case symbol_kind::S_MaybeFunctionParameters: // MaybeFunctionParameters
         value.YY_MOVE_OR_COPY< Types::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 139: // UndefinedLiteral
+      case symbol_kind::S_UndefinedLiteral: // UndefinedLiteral
         value.YY_MOVE_OR_COPY< UndefLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 135: // UniversalQuantifierExpression
+      case symbol_kind::S_UniversalQuantifierExpression: // UniversalQuantifierExpression
         value.YY_MOVE_OR_COPY< UniversalQuantifierExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 119: // UpdateRule
+      case symbol_kind::S_UpdateRule: // UpdateRule
         value.YY_MOVE_OR_COPY< UpdateRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 101: // UsingDefinition
+      case symbol_kind::S_UsingDefinition: // UsingDefinition
         value.YY_MOVE_OR_COPY< UsingDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 102: // UsingPathDefinition
+      case symbol_kind::S_UsingPathDefinition: // UsingPathDefinition
         value.YY_MOVE_OR_COPY< UsingPathDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 76: // "binary"
-      case 77: // "hexadecimal"
-      case 78: // "integer"
-      case 79: // "rational"
-      case 80: // "decimal"
-      case 81: // "string"
-      case 140: // BooleanLiteral
-      case 141: // IntegerLiteral
-      case 142: // RationalLiteral
-      case 143: // DecimalLiteral
-      case 144: // BinaryLiteral
-      case 145: // StringLiteral
+      case symbol_kind::S_BINARY: // "binary"
+      case symbol_kind::S_HEXADECIMAL: // "hexadecimal"
+      case symbol_kind::S_INTEGER: // "integer"
+      case symbol_kind::S_RATIONAL: // "rational"
+      case symbol_kind::S_DECIMAL: // "decimal"
+      case symbol_kind::S_STRING: // "string"
+      case symbol_kind::S_BooleanLiteral: // BooleanLiteral
+      case symbol_kind::S_IntegerLiteral: // IntegerLiteral
+      case symbol_kind::S_RationalLiteral: // RationalLiteral
+      case symbol_kind::S_DecimalLiteral: // DecimalLiteral
+      case symbol_kind::S_BinaryLiteral: // BinaryLiteral
+      case symbol_kind::S_StringLiteral: // StringLiteral
         value.YY_MOVE_OR_COPY< ValueLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 177: // VariableBinding
+      case symbol_kind::S_VariableBinding: // VariableBinding
         value.YY_MOVE_OR_COPY< VariableBinding::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 176: // VariableBindings
+      case symbol_kind::S_VariableBindings: // VariableBindings
         value.YY_MOVE_OR_COPY< VariableBindings::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 170: // Variable
-      case 173: // TypedVariable
-      case 174: // AttributedVariable
-      case 175: // TypedAttributedVariable
+      case symbol_kind::S_Variable: // Variable
+      case symbol_kind::S_TypedVariable: // TypedVariable
+      case symbol_kind::S_AttributedVariable: // AttributedVariable
+      case symbol_kind::S_TypedAttributedVariable: // TypedAttributedVariable
         value.YY_MOVE_OR_COPY< VariableDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 163: // Parameters
-      case 171: // AttributedVariables
-      case 172: // TypedVariables
+      case symbol_kind::S_Parameters: // Parameters
+      case symbol_kind::S_AttributedVariables: // AttributedVariables
+      case symbol_kind::S_TypedVariables: // TypedVariables
         value.YY_MOVE_OR_COPY< VariableDefinitions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 121: // WhileRule
+      case symbol_kind::S_WhileRule: // WhileRule
         value.YY_MOVE_OR_COPY< WhileRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 154: // Type
+      case symbol_kind::S_Type: // Type
         value.YY_MOVE_OR_COPY< libcasm_fe::Ast::Type::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -693,421 +653,421 @@ namespace libcasm_fe {
   Parser::stack_symbol_type::stack_symbol_type (state_type s, YY_MOVE_REF (symbol_type) that)
     : super_type (s, YY_MOVE (that.location))
   {
-    switch (that.type_get ())
+    switch (that.kind ())
     {
-      case 3: // "CASM"
-      case 4: // "init"
-      case 5: // "derived"
-      case 6: // "enumeration"
-      case 7: // "rule"
-      case 8: // "using"
-      case 9: // "invariant"
-      case 10: // "import"
-      case 11: // "function"
-      case 12: // "defined"
-      case 13: // "seq"
-      case 14: // "endseq"
-      case 15: // "par"
-      case 16: // "endpar"
-      case 17: // "skip"
-      case 18: // "let"
-      case 19: // "local"
-      case 20: // "in"
-      case 21: // "forall"
-      case 22: // "choose"
-      case 23: // "iterate"
-      case 24: // "do"
-      case 25: // "if"
-      case 26: // "then"
-      case 27: // "else"
-      case 28: // "case"
-      case 29: // "of"
-      case 30: // "default"
-      case 31: // "holds"
-      case 32: // "exists"
-      case 33: // "with"
-      case 34: // "as"
-      case 35: // "while"
-      case 36: // "undef"
-      case 37: // "false"
-      case 38: // "true"
-      case 39: // "and"
-      case 40: // "or"
-      case 41: // "xor"
-      case 42: // "implies"
-      case 43: // "not"
-      case 44: // "+"
-      case 45: // "-"
-      case 46: // "="
-      case 47: // "("
-      case 48: // ")"
-      case 49: // "["
-      case 50: // "]"
-      case 51: // "{"
-      case 52: // "}"
-      case 53: // ":"
-      case 54: // "::"
-      case 55: // "_"
-      case 56: // "|"
-      case 57: // "@"
-      case 58: // ","
-      case 59: // "<"
-      case 60: // ">"
-      case 61: // "*"
-      case 62: // "/"
-      case 63: // "%"
-      case 64: // "^"
-      case 65: // "'"
-      case 66: // ".."
-      case 67: // "."
-      case 68: // "->"
-      case 69: // "=>"
-      case 70: // ":="
-      case 71: // "!="
-      case 72: // "<="
-      case 73: // ">="
-      case 74: // "{|"
-      case 75: // "|}"
+      case symbol_kind::S_CASM: // "CASM"
+      case symbol_kind::S_INIT: // "init"
+      case symbol_kind::S_DERIVED: // "derived"
+      case symbol_kind::S_ENUMERATION: // "enumeration"
+      case symbol_kind::S_RULE: // "rule"
+      case symbol_kind::S_USING: // "using"
+      case symbol_kind::S_INVARIANT: // "invariant"
+      case symbol_kind::S_IMPORT: // "import"
+      case symbol_kind::S_FUNCTION: // "function"
+      case symbol_kind::S_DEFINED: // "defined"
+      case symbol_kind::S_SEQ: // "seq"
+      case symbol_kind::S_ENDSEQ: // "endseq"
+      case symbol_kind::S_PAR: // "par"
+      case symbol_kind::S_ENDPAR: // "endpar"
+      case symbol_kind::S_SKIP: // "skip"
+      case symbol_kind::S_LET: // "let"
+      case symbol_kind::S_LOCAL: // "local"
+      case symbol_kind::S_IN: // "in"
+      case symbol_kind::S_FORALL: // "forall"
+      case symbol_kind::S_CHOOSE: // "choose"
+      case symbol_kind::S_ITERATE: // "iterate"
+      case symbol_kind::S_DO: // "do"
+      case symbol_kind::S_IF: // "if"
+      case symbol_kind::S_THEN: // "then"
+      case symbol_kind::S_ELSE: // "else"
+      case symbol_kind::S_CASE: // "case"
+      case symbol_kind::S_OF: // "of"
+      case symbol_kind::S_DEFAULT: // "default"
+      case symbol_kind::S_HOLDS: // "holds"
+      case symbol_kind::S_EXISTS: // "exists"
+      case symbol_kind::S_WITH: // "with"
+      case symbol_kind::S_AS: // "as"
+      case symbol_kind::S_WHILE: // "while"
+      case symbol_kind::S_UNDEF: // "undef"
+      case symbol_kind::S_FALSE: // "false"
+      case symbol_kind::S_TRUE: // "true"
+      case symbol_kind::S_AND: // "and"
+      case symbol_kind::S_OR: // "or"
+      case symbol_kind::S_XOR: // "xor"
+      case symbol_kind::S_IMPLIES: // "implies"
+      case symbol_kind::S_NOT: // "not"
+      case symbol_kind::S_PLUS: // "+"
+      case symbol_kind::S_MINUS: // "-"
+      case symbol_kind::S_EQUAL: // "="
+      case symbol_kind::S_LPAREN: // "("
+      case symbol_kind::S_RPAREN: // ")"
+      case symbol_kind::S_LSQPAREN: // "["
+      case symbol_kind::S_RSQPAREN: // "]"
+      case symbol_kind::S_LCURPAREN: // "{"
+      case symbol_kind::S_RCURPAREN: // "}"
+      case symbol_kind::S_COLON: // ":"
+      case symbol_kind::S_DOUBLECOLON: // "::"
+      case symbol_kind::S_UNDERLINE: // "_"
+      case symbol_kind::S_VERTICAL_BAR: // "|"
+      case symbol_kind::S_AT: // "@"
+      case symbol_kind::S_COMMA: // ","
+      case symbol_kind::S_LESSER: // "<"
+      case symbol_kind::S_GREATER: // ">"
+      case symbol_kind::S_ASTERIX: // "*"
+      case symbol_kind::S_SLASH: // "/"
+      case symbol_kind::S_PERCENT: // "%"
+      case symbol_kind::S_CARET: // "^"
+      case symbol_kind::S_MARK: // "'"
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_MAPS: // "->"
+      case symbol_kind::S_ARROW: // "=>"
+      case symbol_kind::S_UPDATE: // ":="
+      case symbol_kind::S_NEQUAL: // "!="
+      case symbol_kind::S_LESSEQ: // "<="
+      case symbol_kind::S_GREATEREQ: // ">="
+      case symbol_kind::S_SEQ_BRACKET: // "{|"
+      case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
         value.move< Ast::Token::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 182: // Attribute
+      case symbol_kind::S_Attribute: // Attribute
         value.move< Attribute::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 181: // Attributes
+      case symbol_kind::S_Attributes: // Attributes
         value.move< Attributes::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 183: // BasicAttribute
+      case symbol_kind::S_BasicAttribute: // BasicAttribute
         value.move< BasicAttribute::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 155: // BasicType
+      case symbol_kind::S_BasicType: // BasicType
         value.move< BasicType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 117: // BlockRule
+      case symbol_kind::S_BlockRule: // BlockRule
         value.move< BlockRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 126: // CallExpression
+      case symbol_kind::S_CallExpression: // CallExpression
         value.move< CallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 120: // CallRule
+      case symbol_kind::S_CallRule: // CallRule
         value.move< CallRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 137: // CardinalityExpression
+      case symbol_kind::S_CardinalityExpression: // CardinalityExpression
         value.move< CardinalityExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 111: // CaseLabel
+      case symbol_kind::S_CaseLabel: // CaseLabel
         value.move< Case::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 109: // CaseRule
+      case symbol_kind::S_CaseRule: // CaseRule
         value.move< CaseRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 110: // CaseLabels
+      case symbol_kind::S_CaseLabels: // CaseLabels
         value.move< Cases::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 134: // ChooseExpression
+      case symbol_kind::S_ChooseExpression: // ChooseExpression
         value.move< ChooseExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 115: // ChooseRule
+      case symbol_kind::S_ChooseRule: // ChooseRule
         value.move< ChooseRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 133: // ConditionalExpression
+      case symbol_kind::S_ConditionalExpression: // ConditionalExpression
         value.move< ConditionalExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 108: // ConditionalRule
+      case symbol_kind::S_ConditionalRule: // ConditionalRule
         value.move< ConditionalRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 164: // MaybeDefined
+      case symbol_kind::S_MaybeDefined: // MaybeDefined
         value.move< Defined::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 92: // AttributedDefinition
-      case 93: // Definition
+      case symbol_kind::S_AttributedDefinition: // AttributedDefinition
+      case symbol_kind::S_Definition: // Definition
         value.move< Definition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 91: // Definitions
+      case symbol_kind::S_Definitions: // Definitions
         value.move< Definitions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 96: // DerivedDefinition
+      case symbol_kind::S_DerivedDefinition: // DerivedDefinition
         value.move< DerivedDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 127: // DirectCallExpression
+      case symbol_kind::S_DirectCallExpression: // DirectCallExpression
         value.move< DirectCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 95: // EnumerationDefinition
+      case symbol_kind::S_EnumerationDefinition: // EnumerationDefinition
         value.move< EnumerationDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 99: // EnumeratorDefinition
+      case symbol_kind::S_EnumeratorDefinition: // EnumeratorDefinition
         value.move< EnumeratorDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 100: // Enumerators
+      case symbol_kind::S_Enumerators: // Enumerators
         value.move< Enumerators::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 136: // ExistentialQuantifierExpression
+      case symbol_kind::S_ExistentialQuantifierExpression: // ExistentialQuantifierExpression
         value.move< ExistentialQuantifierExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 123: // Term
-      case 124: // SimpleOrClaspedTerm
-      case 125: // OperatorExpression
+      case symbol_kind::S_Term: // Term
+      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.move< Expression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 184: // ExpressionAttribute
+      case symbol_kind::S_ExpressionAttribute: // ExpressionAttribute
         value.move< ExpressionAttribute::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 122: // Terms
+      case symbol_kind::S_Terms: // Terms
         value.move< Expressions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 160: // FixedSizedType
+      case symbol_kind::S_FixedSizedType: // FixedSizedType
         value.move< FixedSizedType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 114: // ForallRule
+      case symbol_kind::S_ForallRule: // ForallRule
         value.move< ForallRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 98: // FunctionDefinition
-      case 179: // AttributedLocalFunctionDefinition
-      case 180: // LocalFunctionDefinition
+      case symbol_kind::S_FunctionDefinition: // FunctionDefinition
+      case symbol_kind::S_AttributedLocalFunctionDefinition: // AttributedLocalFunctionDefinition
+      case symbol_kind::S_LocalFunctionDefinition: // LocalFunctionDefinition
         value.move< FunctionDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 178: // LocalFunctionDefinitions
+      case symbol_kind::S_LocalFunctionDefinitions: // LocalFunctionDefinitions
         value.move< FunctionDefinitions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 90: // Header
+      case symbol_kind::S_Header: // Header
         value.move< HeaderDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 82: // "identifier"
-      case 168: // Identifier
+      case symbol_kind::S_IDENTIFIER: // "identifier"
+      case symbol_kind::S_Identifier: // Identifier
         value.move< Identifier::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 169: // IdentifierPath
+      case symbol_kind::S_IdentifierPath: // IdentifierPath
         value.move< IdentifierPath::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 104: // ImportDefinition
+      case symbol_kind::S_ImportDefinition: // ImportDefinition
         value.move< ImportDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 130: // IndirectCallExpression
+      case symbol_kind::S_IndirectCallExpression: // IndirectCallExpression
         value.move< IndirectCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 94: // InitDefinition
+      case symbol_kind::S_InitDefinition: // InitDefinition
         value.move< InitDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 167: // Initializer
+      case symbol_kind::S_Initializer: // Initializer
         value.move< Initializer::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 166: // Initializers
+      case symbol_kind::S_Initializers: // Initializers
         value.move< Initializers::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 165: // MaybeInitially
+      case symbol_kind::S_MaybeInitially: // MaybeInitially
         value.move< Initially::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 103: // InvariantDefinition
+      case symbol_kind::S_InvariantDefinition: // InvariantDefinition
         value.move< InvariantDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 116: // IterateRule
+      case symbol_kind::S_IterateRule: // IterateRule
         value.move< IterateRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 132: // LetExpression
+      case symbol_kind::S_LetExpression: // LetExpression
         value.move< LetExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 112: // LetRule
+      case symbol_kind::S_LetRule: // LetRule
         value.move< LetRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 147: // ListLiteral
+      case symbol_kind::S_ListLiteral: // ListLiteral
         value.move< ListLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 138: // Literal
+      case symbol_kind::S_Literal: // Literal
         value.move< Literal::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 129: // LiteralCallExpression
+      case symbol_kind::S_LiteralCallExpression: // LiteralCallExpression
         value.move< LiteralCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 113: // LocalRule
+      case symbol_kind::S_LocalRule: // LocalRule
         value.move< LocalRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 128: // MethodCallExpression
+      case symbol_kind::S_MethodCallExpression: // MethodCallExpression
         value.move< MethodCallExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 152: // Assignment
+      case symbol_kind::S_Assignment: // Assignment
         value.move< NamedExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 151: // Assignments
+      case symbol_kind::S_Assignments: // Assignments
         value.move< NamedExpressions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 148: // RangeLiteral
+      case symbol_kind::S_RangeLiteral: // RangeLiteral
         value.move< RangeLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 150: // RecordLiteral
+      case symbol_kind::S_RecordLiteral: // RecordLiteral
         value.move< RecordLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 157: // RecordType
+      case symbol_kind::S_RecordType: // RecordType
         value.move< RecordType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 146: // ReferenceLiteral
+      case symbol_kind::S_ReferenceLiteral: // ReferenceLiteral
         value.move< ReferenceLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 159: // RelationType
+      case symbol_kind::S_RelationType: // RelationType
         value.move< RelationType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 106: // Rule
+      case symbol_kind::S_Rule: // Rule
         value.move< Rule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 97: // RuleDefinition
+      case symbol_kind::S_RuleDefinition: // RuleDefinition
         value.move< RuleDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 105: // Rules
+      case symbol_kind::S_Rules: // Rules
         value.move< Rules::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 118: // SequenceRule
+      case symbol_kind::S_SequenceRule: // SequenceRule
         value.move< SequenceRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 107: // SkipRule
+      case symbol_kind::S_SkipRule: // SkipRule
         value.move< SkipRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 89: // Specification
+      case symbol_kind::S_Specification: // Specification
         value.move< Specification::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 158: // TemplateType
+      case symbol_kind::S_TemplateType: // TemplateType
         value.move< TemplateType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 149: // TupleLiteral
+      case symbol_kind::S_TupleLiteral: // TupleLiteral
         value.move< TupleLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 156: // TupleType
+      case symbol_kind::S_TupleType: // TupleType
         value.move< TupleType::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 131: // TypeCastingExpression
+      case symbol_kind::S_TypeCastingExpression: // TypeCastingExpression
         value.move< TypeCastingExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 153: // Types
-      case 161: // FunctionParameters
-      case 162: // MaybeFunctionParameters
+      case symbol_kind::S_Types: // Types
+      case symbol_kind::S_FunctionParameters: // FunctionParameters
+      case symbol_kind::S_MaybeFunctionParameters: // MaybeFunctionParameters
         value.move< Types::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 139: // UndefinedLiteral
+      case symbol_kind::S_UndefinedLiteral: // UndefinedLiteral
         value.move< UndefLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 135: // UniversalQuantifierExpression
+      case symbol_kind::S_UniversalQuantifierExpression: // UniversalQuantifierExpression
         value.move< UniversalQuantifierExpression::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 119: // UpdateRule
+      case symbol_kind::S_UpdateRule: // UpdateRule
         value.move< UpdateRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 101: // UsingDefinition
+      case symbol_kind::S_UsingDefinition: // UsingDefinition
         value.move< UsingDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 102: // UsingPathDefinition
+      case symbol_kind::S_UsingPathDefinition: // UsingPathDefinition
         value.move< UsingPathDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 76: // "binary"
-      case 77: // "hexadecimal"
-      case 78: // "integer"
-      case 79: // "rational"
-      case 80: // "decimal"
-      case 81: // "string"
-      case 140: // BooleanLiteral
-      case 141: // IntegerLiteral
-      case 142: // RationalLiteral
-      case 143: // DecimalLiteral
-      case 144: // BinaryLiteral
-      case 145: // StringLiteral
+      case symbol_kind::S_BINARY: // "binary"
+      case symbol_kind::S_HEXADECIMAL: // "hexadecimal"
+      case symbol_kind::S_INTEGER: // "integer"
+      case symbol_kind::S_RATIONAL: // "rational"
+      case symbol_kind::S_DECIMAL: // "decimal"
+      case symbol_kind::S_STRING: // "string"
+      case symbol_kind::S_BooleanLiteral: // BooleanLiteral
+      case symbol_kind::S_IntegerLiteral: // IntegerLiteral
+      case symbol_kind::S_RationalLiteral: // RationalLiteral
+      case symbol_kind::S_DecimalLiteral: // DecimalLiteral
+      case symbol_kind::S_BinaryLiteral: // BinaryLiteral
+      case symbol_kind::S_StringLiteral: // StringLiteral
         value.move< ValueLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 177: // VariableBinding
+      case symbol_kind::S_VariableBinding: // VariableBinding
         value.move< VariableBinding::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 176: // VariableBindings
+      case symbol_kind::S_VariableBindings: // VariableBindings
         value.move< VariableBindings::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 170: // Variable
-      case 173: // TypedVariable
-      case 174: // AttributedVariable
-      case 175: // TypedAttributedVariable
+      case symbol_kind::S_Variable: // Variable
+      case symbol_kind::S_TypedVariable: // TypedVariable
+      case symbol_kind::S_AttributedVariable: // AttributedVariable
+      case symbol_kind::S_TypedAttributedVariable: // TypedAttributedVariable
         value.move< VariableDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 163: // Parameters
-      case 171: // AttributedVariables
-      case 172: // TypedVariables
+      case symbol_kind::S_Parameters: // Parameters
+      case symbol_kind::S_AttributedVariables: // AttributedVariables
+      case symbol_kind::S_TypedVariables: // TypedVariables
         value.move< VariableDefinitions::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 121: // WhileRule
+      case symbol_kind::S_WhileRule: // WhileRule
         value.move< WhileRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case 154: // Type
+      case symbol_kind::S_Type: // Type
         value.move< libcasm_fe::Ast::Type::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -1116,7 +1076,7 @@ namespace libcasm_fe {
     }
 
     // that is emptied.
-    that.type = empty_symbol;
+    that.kind_ = symbol_kind::S_YYEMPTY;
   }
 
 #if YY_CPLUSPLUS < 201103L
@@ -1124,421 +1084,421 @@ namespace libcasm_fe {
   Parser::stack_symbol_type::operator= (const stack_symbol_type& that)
   {
     state = that.state;
-    switch (that.type_get ())
+    switch (that.kind ())
     {
-      case 3: // "CASM"
-      case 4: // "init"
-      case 5: // "derived"
-      case 6: // "enumeration"
-      case 7: // "rule"
-      case 8: // "using"
-      case 9: // "invariant"
-      case 10: // "import"
-      case 11: // "function"
-      case 12: // "defined"
-      case 13: // "seq"
-      case 14: // "endseq"
-      case 15: // "par"
-      case 16: // "endpar"
-      case 17: // "skip"
-      case 18: // "let"
-      case 19: // "local"
-      case 20: // "in"
-      case 21: // "forall"
-      case 22: // "choose"
-      case 23: // "iterate"
-      case 24: // "do"
-      case 25: // "if"
-      case 26: // "then"
-      case 27: // "else"
-      case 28: // "case"
-      case 29: // "of"
-      case 30: // "default"
-      case 31: // "holds"
-      case 32: // "exists"
-      case 33: // "with"
-      case 34: // "as"
-      case 35: // "while"
-      case 36: // "undef"
-      case 37: // "false"
-      case 38: // "true"
-      case 39: // "and"
-      case 40: // "or"
-      case 41: // "xor"
-      case 42: // "implies"
-      case 43: // "not"
-      case 44: // "+"
-      case 45: // "-"
-      case 46: // "="
-      case 47: // "("
-      case 48: // ")"
-      case 49: // "["
-      case 50: // "]"
-      case 51: // "{"
-      case 52: // "}"
-      case 53: // ":"
-      case 54: // "::"
-      case 55: // "_"
-      case 56: // "|"
-      case 57: // "@"
-      case 58: // ","
-      case 59: // "<"
-      case 60: // ">"
-      case 61: // "*"
-      case 62: // "/"
-      case 63: // "%"
-      case 64: // "^"
-      case 65: // "'"
-      case 66: // ".."
-      case 67: // "."
-      case 68: // "->"
-      case 69: // "=>"
-      case 70: // ":="
-      case 71: // "!="
-      case 72: // "<="
-      case 73: // ">="
-      case 74: // "{|"
-      case 75: // "|}"
+      case symbol_kind::S_CASM: // "CASM"
+      case symbol_kind::S_INIT: // "init"
+      case symbol_kind::S_DERIVED: // "derived"
+      case symbol_kind::S_ENUMERATION: // "enumeration"
+      case symbol_kind::S_RULE: // "rule"
+      case symbol_kind::S_USING: // "using"
+      case symbol_kind::S_INVARIANT: // "invariant"
+      case symbol_kind::S_IMPORT: // "import"
+      case symbol_kind::S_FUNCTION: // "function"
+      case symbol_kind::S_DEFINED: // "defined"
+      case symbol_kind::S_SEQ: // "seq"
+      case symbol_kind::S_ENDSEQ: // "endseq"
+      case symbol_kind::S_PAR: // "par"
+      case symbol_kind::S_ENDPAR: // "endpar"
+      case symbol_kind::S_SKIP: // "skip"
+      case symbol_kind::S_LET: // "let"
+      case symbol_kind::S_LOCAL: // "local"
+      case symbol_kind::S_IN: // "in"
+      case symbol_kind::S_FORALL: // "forall"
+      case symbol_kind::S_CHOOSE: // "choose"
+      case symbol_kind::S_ITERATE: // "iterate"
+      case symbol_kind::S_DO: // "do"
+      case symbol_kind::S_IF: // "if"
+      case symbol_kind::S_THEN: // "then"
+      case symbol_kind::S_ELSE: // "else"
+      case symbol_kind::S_CASE: // "case"
+      case symbol_kind::S_OF: // "of"
+      case symbol_kind::S_DEFAULT: // "default"
+      case symbol_kind::S_HOLDS: // "holds"
+      case symbol_kind::S_EXISTS: // "exists"
+      case symbol_kind::S_WITH: // "with"
+      case symbol_kind::S_AS: // "as"
+      case symbol_kind::S_WHILE: // "while"
+      case symbol_kind::S_UNDEF: // "undef"
+      case symbol_kind::S_FALSE: // "false"
+      case symbol_kind::S_TRUE: // "true"
+      case symbol_kind::S_AND: // "and"
+      case symbol_kind::S_OR: // "or"
+      case symbol_kind::S_XOR: // "xor"
+      case symbol_kind::S_IMPLIES: // "implies"
+      case symbol_kind::S_NOT: // "not"
+      case symbol_kind::S_PLUS: // "+"
+      case symbol_kind::S_MINUS: // "-"
+      case symbol_kind::S_EQUAL: // "="
+      case symbol_kind::S_LPAREN: // "("
+      case symbol_kind::S_RPAREN: // ")"
+      case symbol_kind::S_LSQPAREN: // "["
+      case symbol_kind::S_RSQPAREN: // "]"
+      case symbol_kind::S_LCURPAREN: // "{"
+      case symbol_kind::S_RCURPAREN: // "}"
+      case symbol_kind::S_COLON: // ":"
+      case symbol_kind::S_DOUBLECOLON: // "::"
+      case symbol_kind::S_UNDERLINE: // "_"
+      case symbol_kind::S_VERTICAL_BAR: // "|"
+      case symbol_kind::S_AT: // "@"
+      case symbol_kind::S_COMMA: // ","
+      case symbol_kind::S_LESSER: // "<"
+      case symbol_kind::S_GREATER: // ">"
+      case symbol_kind::S_ASTERIX: // "*"
+      case symbol_kind::S_SLASH: // "/"
+      case symbol_kind::S_PERCENT: // "%"
+      case symbol_kind::S_CARET: // "^"
+      case symbol_kind::S_MARK: // "'"
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_MAPS: // "->"
+      case symbol_kind::S_ARROW: // "=>"
+      case symbol_kind::S_UPDATE: // ":="
+      case symbol_kind::S_NEQUAL: // "!="
+      case symbol_kind::S_LESSEQ: // "<="
+      case symbol_kind::S_GREATEREQ: // ">="
+      case symbol_kind::S_SEQ_BRACKET: // "{|"
+      case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
         value.copy< Ast::Token::Ptr > (that.value);
         break;
 
-      case 182: // Attribute
+      case symbol_kind::S_Attribute: // Attribute
         value.copy< Attribute::Ptr > (that.value);
         break;
 
-      case 181: // Attributes
+      case symbol_kind::S_Attributes: // Attributes
         value.copy< Attributes::Ptr > (that.value);
         break;
 
-      case 183: // BasicAttribute
+      case symbol_kind::S_BasicAttribute: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (that.value);
         break;
 
-      case 155: // BasicType
+      case symbol_kind::S_BasicType: // BasicType
         value.copy< BasicType::Ptr > (that.value);
         break;
 
-      case 117: // BlockRule
+      case symbol_kind::S_BlockRule: // BlockRule
         value.copy< BlockRule::Ptr > (that.value);
         break;
 
-      case 126: // CallExpression
+      case symbol_kind::S_CallExpression: // CallExpression
         value.copy< CallExpression::Ptr > (that.value);
         break;
 
-      case 120: // CallRule
+      case symbol_kind::S_CallRule: // CallRule
         value.copy< CallRule::Ptr > (that.value);
         break;
 
-      case 137: // CardinalityExpression
+      case symbol_kind::S_CardinalityExpression: // CardinalityExpression
         value.copy< CardinalityExpression::Ptr > (that.value);
         break;
 
-      case 111: // CaseLabel
+      case symbol_kind::S_CaseLabel: // CaseLabel
         value.copy< Case::Ptr > (that.value);
         break;
 
-      case 109: // CaseRule
+      case symbol_kind::S_CaseRule: // CaseRule
         value.copy< CaseRule::Ptr > (that.value);
         break;
 
-      case 110: // CaseLabels
+      case symbol_kind::S_CaseLabels: // CaseLabels
         value.copy< Cases::Ptr > (that.value);
         break;
 
-      case 134: // ChooseExpression
+      case symbol_kind::S_ChooseExpression: // ChooseExpression
         value.copy< ChooseExpression::Ptr > (that.value);
         break;
 
-      case 115: // ChooseRule
+      case symbol_kind::S_ChooseRule: // ChooseRule
         value.copy< ChooseRule::Ptr > (that.value);
         break;
 
-      case 133: // ConditionalExpression
+      case symbol_kind::S_ConditionalExpression: // ConditionalExpression
         value.copy< ConditionalExpression::Ptr > (that.value);
         break;
 
-      case 108: // ConditionalRule
+      case symbol_kind::S_ConditionalRule: // ConditionalRule
         value.copy< ConditionalRule::Ptr > (that.value);
         break;
 
-      case 164: // MaybeDefined
+      case symbol_kind::S_MaybeDefined: // MaybeDefined
         value.copy< Defined::Ptr > (that.value);
         break;
 
-      case 92: // AttributedDefinition
-      case 93: // Definition
+      case symbol_kind::S_AttributedDefinition: // AttributedDefinition
+      case symbol_kind::S_Definition: // Definition
         value.copy< Definition::Ptr > (that.value);
         break;
 
-      case 91: // Definitions
+      case symbol_kind::S_Definitions: // Definitions
         value.copy< Definitions::Ptr > (that.value);
         break;
 
-      case 96: // DerivedDefinition
+      case symbol_kind::S_DerivedDefinition: // DerivedDefinition
         value.copy< DerivedDefinition::Ptr > (that.value);
         break;
 
-      case 127: // DirectCallExpression
+      case symbol_kind::S_DirectCallExpression: // DirectCallExpression
         value.copy< DirectCallExpression::Ptr > (that.value);
         break;
 
-      case 95: // EnumerationDefinition
+      case symbol_kind::S_EnumerationDefinition: // EnumerationDefinition
         value.copy< EnumerationDefinition::Ptr > (that.value);
         break;
 
-      case 99: // EnumeratorDefinition
+      case symbol_kind::S_EnumeratorDefinition: // EnumeratorDefinition
         value.copy< EnumeratorDefinition::Ptr > (that.value);
         break;
 
-      case 100: // Enumerators
+      case symbol_kind::S_Enumerators: // Enumerators
         value.copy< Enumerators::Ptr > (that.value);
         break;
 
-      case 136: // ExistentialQuantifierExpression
+      case symbol_kind::S_ExistentialQuantifierExpression: // ExistentialQuantifierExpression
         value.copy< ExistentialQuantifierExpression::Ptr > (that.value);
         break;
 
-      case 123: // Term
-      case 124: // SimpleOrClaspedTerm
-      case 125: // OperatorExpression
+      case symbol_kind::S_Term: // Term
+      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.copy< Expression::Ptr > (that.value);
         break;
 
-      case 184: // ExpressionAttribute
+      case symbol_kind::S_ExpressionAttribute: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (that.value);
         break;
 
-      case 122: // Terms
+      case symbol_kind::S_Terms: // Terms
         value.copy< Expressions::Ptr > (that.value);
         break;
 
-      case 160: // FixedSizedType
+      case symbol_kind::S_FixedSizedType: // FixedSizedType
         value.copy< FixedSizedType::Ptr > (that.value);
         break;
 
-      case 114: // ForallRule
+      case symbol_kind::S_ForallRule: // ForallRule
         value.copy< ForallRule::Ptr > (that.value);
         break;
 
-      case 98: // FunctionDefinition
-      case 179: // AttributedLocalFunctionDefinition
-      case 180: // LocalFunctionDefinition
+      case symbol_kind::S_FunctionDefinition: // FunctionDefinition
+      case symbol_kind::S_AttributedLocalFunctionDefinition: // AttributedLocalFunctionDefinition
+      case symbol_kind::S_LocalFunctionDefinition: // LocalFunctionDefinition
         value.copy< FunctionDefinition::Ptr > (that.value);
         break;
 
-      case 178: // LocalFunctionDefinitions
+      case symbol_kind::S_LocalFunctionDefinitions: // LocalFunctionDefinitions
         value.copy< FunctionDefinitions::Ptr > (that.value);
         break;
 
-      case 90: // Header
+      case symbol_kind::S_Header: // Header
         value.copy< HeaderDefinition::Ptr > (that.value);
         break;
 
-      case 82: // "identifier"
-      case 168: // Identifier
+      case symbol_kind::S_IDENTIFIER: // "identifier"
+      case symbol_kind::S_Identifier: // Identifier
         value.copy< Identifier::Ptr > (that.value);
         break;
 
-      case 169: // IdentifierPath
+      case symbol_kind::S_IdentifierPath: // IdentifierPath
         value.copy< IdentifierPath::Ptr > (that.value);
         break;
 
-      case 104: // ImportDefinition
+      case symbol_kind::S_ImportDefinition: // ImportDefinition
         value.copy< ImportDefinition::Ptr > (that.value);
         break;
 
-      case 130: // IndirectCallExpression
+      case symbol_kind::S_IndirectCallExpression: // IndirectCallExpression
         value.copy< IndirectCallExpression::Ptr > (that.value);
         break;
 
-      case 94: // InitDefinition
+      case symbol_kind::S_InitDefinition: // InitDefinition
         value.copy< InitDefinition::Ptr > (that.value);
         break;
 
-      case 167: // Initializer
+      case symbol_kind::S_Initializer: // Initializer
         value.copy< Initializer::Ptr > (that.value);
         break;
 
-      case 166: // Initializers
+      case symbol_kind::S_Initializers: // Initializers
         value.copy< Initializers::Ptr > (that.value);
         break;
 
-      case 165: // MaybeInitially
+      case symbol_kind::S_MaybeInitially: // MaybeInitially
         value.copy< Initially::Ptr > (that.value);
         break;
 
-      case 103: // InvariantDefinition
+      case symbol_kind::S_InvariantDefinition: // InvariantDefinition
         value.copy< InvariantDefinition::Ptr > (that.value);
         break;
 
-      case 116: // IterateRule
+      case symbol_kind::S_IterateRule: // IterateRule
         value.copy< IterateRule::Ptr > (that.value);
         break;
 
-      case 132: // LetExpression
+      case symbol_kind::S_LetExpression: // LetExpression
         value.copy< LetExpression::Ptr > (that.value);
         break;
 
-      case 112: // LetRule
+      case symbol_kind::S_LetRule: // LetRule
         value.copy< LetRule::Ptr > (that.value);
         break;
 
-      case 147: // ListLiteral
+      case symbol_kind::S_ListLiteral: // ListLiteral
         value.copy< ListLiteral::Ptr > (that.value);
         break;
 
-      case 138: // Literal
+      case symbol_kind::S_Literal: // Literal
         value.copy< Literal::Ptr > (that.value);
         break;
 
-      case 129: // LiteralCallExpression
+      case symbol_kind::S_LiteralCallExpression: // LiteralCallExpression
         value.copy< LiteralCallExpression::Ptr > (that.value);
         break;
 
-      case 113: // LocalRule
+      case symbol_kind::S_LocalRule: // LocalRule
         value.copy< LocalRule::Ptr > (that.value);
         break;
 
-      case 128: // MethodCallExpression
+      case symbol_kind::S_MethodCallExpression: // MethodCallExpression
         value.copy< MethodCallExpression::Ptr > (that.value);
         break;
 
-      case 152: // Assignment
+      case symbol_kind::S_Assignment: // Assignment
         value.copy< NamedExpression::Ptr > (that.value);
         break;
 
-      case 151: // Assignments
+      case symbol_kind::S_Assignments: // Assignments
         value.copy< NamedExpressions::Ptr > (that.value);
         break;
 
-      case 148: // RangeLiteral
+      case symbol_kind::S_RangeLiteral: // RangeLiteral
         value.copy< RangeLiteral::Ptr > (that.value);
         break;
 
-      case 150: // RecordLiteral
+      case symbol_kind::S_RecordLiteral: // RecordLiteral
         value.copy< RecordLiteral::Ptr > (that.value);
         break;
 
-      case 157: // RecordType
+      case symbol_kind::S_RecordType: // RecordType
         value.copy< RecordType::Ptr > (that.value);
         break;
 
-      case 146: // ReferenceLiteral
+      case symbol_kind::S_ReferenceLiteral: // ReferenceLiteral
         value.copy< ReferenceLiteral::Ptr > (that.value);
         break;
 
-      case 159: // RelationType
+      case symbol_kind::S_RelationType: // RelationType
         value.copy< RelationType::Ptr > (that.value);
         break;
 
-      case 106: // Rule
+      case symbol_kind::S_Rule: // Rule
         value.copy< Rule::Ptr > (that.value);
         break;
 
-      case 97: // RuleDefinition
+      case symbol_kind::S_RuleDefinition: // RuleDefinition
         value.copy< RuleDefinition::Ptr > (that.value);
         break;
 
-      case 105: // Rules
+      case symbol_kind::S_Rules: // Rules
         value.copy< Rules::Ptr > (that.value);
         break;
 
-      case 118: // SequenceRule
+      case symbol_kind::S_SequenceRule: // SequenceRule
         value.copy< SequenceRule::Ptr > (that.value);
         break;
 
-      case 107: // SkipRule
+      case symbol_kind::S_SkipRule: // SkipRule
         value.copy< SkipRule::Ptr > (that.value);
         break;
 
-      case 89: // Specification
+      case symbol_kind::S_Specification: // Specification
         value.copy< Specification::Ptr > (that.value);
         break;
 
-      case 158: // TemplateType
+      case symbol_kind::S_TemplateType: // TemplateType
         value.copy< TemplateType::Ptr > (that.value);
         break;
 
-      case 149: // TupleLiteral
+      case symbol_kind::S_TupleLiteral: // TupleLiteral
         value.copy< TupleLiteral::Ptr > (that.value);
         break;
 
-      case 156: // TupleType
+      case symbol_kind::S_TupleType: // TupleType
         value.copy< TupleType::Ptr > (that.value);
         break;
 
-      case 131: // TypeCastingExpression
+      case symbol_kind::S_TypeCastingExpression: // TypeCastingExpression
         value.copy< TypeCastingExpression::Ptr > (that.value);
         break;
 
-      case 153: // Types
-      case 161: // FunctionParameters
-      case 162: // MaybeFunctionParameters
+      case symbol_kind::S_Types: // Types
+      case symbol_kind::S_FunctionParameters: // FunctionParameters
+      case symbol_kind::S_MaybeFunctionParameters: // MaybeFunctionParameters
         value.copy< Types::Ptr > (that.value);
         break;
 
-      case 139: // UndefinedLiteral
+      case symbol_kind::S_UndefinedLiteral: // UndefinedLiteral
         value.copy< UndefLiteral::Ptr > (that.value);
         break;
 
-      case 135: // UniversalQuantifierExpression
+      case symbol_kind::S_UniversalQuantifierExpression: // UniversalQuantifierExpression
         value.copy< UniversalQuantifierExpression::Ptr > (that.value);
         break;
 
-      case 119: // UpdateRule
+      case symbol_kind::S_UpdateRule: // UpdateRule
         value.copy< UpdateRule::Ptr > (that.value);
         break;
 
-      case 101: // UsingDefinition
+      case symbol_kind::S_UsingDefinition: // UsingDefinition
         value.copy< UsingDefinition::Ptr > (that.value);
         break;
 
-      case 102: // UsingPathDefinition
+      case symbol_kind::S_UsingPathDefinition: // UsingPathDefinition
         value.copy< UsingPathDefinition::Ptr > (that.value);
         break;
 
-      case 76: // "binary"
-      case 77: // "hexadecimal"
-      case 78: // "integer"
-      case 79: // "rational"
-      case 80: // "decimal"
-      case 81: // "string"
-      case 140: // BooleanLiteral
-      case 141: // IntegerLiteral
-      case 142: // RationalLiteral
-      case 143: // DecimalLiteral
-      case 144: // BinaryLiteral
-      case 145: // StringLiteral
+      case symbol_kind::S_BINARY: // "binary"
+      case symbol_kind::S_HEXADECIMAL: // "hexadecimal"
+      case symbol_kind::S_INTEGER: // "integer"
+      case symbol_kind::S_RATIONAL: // "rational"
+      case symbol_kind::S_DECIMAL: // "decimal"
+      case symbol_kind::S_STRING: // "string"
+      case symbol_kind::S_BooleanLiteral: // BooleanLiteral
+      case symbol_kind::S_IntegerLiteral: // IntegerLiteral
+      case symbol_kind::S_RationalLiteral: // RationalLiteral
+      case symbol_kind::S_DecimalLiteral: // DecimalLiteral
+      case symbol_kind::S_BinaryLiteral: // BinaryLiteral
+      case symbol_kind::S_StringLiteral: // StringLiteral
         value.copy< ValueLiteral::Ptr > (that.value);
         break;
 
-      case 177: // VariableBinding
+      case symbol_kind::S_VariableBinding: // VariableBinding
         value.copy< VariableBinding::Ptr > (that.value);
         break;
 
-      case 176: // VariableBindings
+      case symbol_kind::S_VariableBindings: // VariableBindings
         value.copy< VariableBindings::Ptr > (that.value);
         break;
 
-      case 170: // Variable
-      case 173: // TypedVariable
-      case 174: // AttributedVariable
-      case 175: // TypedAttributedVariable
+      case symbol_kind::S_Variable: // Variable
+      case symbol_kind::S_TypedVariable: // TypedVariable
+      case symbol_kind::S_AttributedVariable: // AttributedVariable
+      case symbol_kind::S_TypedAttributedVariable: // TypedAttributedVariable
         value.copy< VariableDefinition::Ptr > (that.value);
         break;
 
-      case 163: // Parameters
-      case 171: // AttributedVariables
-      case 172: // TypedVariables
+      case symbol_kind::S_Parameters: // Parameters
+      case symbol_kind::S_AttributedVariables: // AttributedVariables
+      case symbol_kind::S_TypedVariables: // TypedVariables
         value.copy< VariableDefinitions::Ptr > (that.value);
         break;
 
-      case 121: // WhileRule
+      case symbol_kind::S_WhileRule: // WhileRule
         value.copy< WhileRule::Ptr > (that.value);
         break;
 
-      case 154: // Type
+      case symbol_kind::S_Type: // Type
         value.copy< libcasm_fe::Ast::Type::Ptr > (that.value);
         break;
 
@@ -1554,421 +1514,421 @@ namespace libcasm_fe {
   Parser::stack_symbol_type::operator= (stack_symbol_type& that)
   {
     state = that.state;
-    switch (that.type_get ())
+    switch (that.kind ())
     {
-      case 3: // "CASM"
-      case 4: // "init"
-      case 5: // "derived"
-      case 6: // "enumeration"
-      case 7: // "rule"
-      case 8: // "using"
-      case 9: // "invariant"
-      case 10: // "import"
-      case 11: // "function"
-      case 12: // "defined"
-      case 13: // "seq"
-      case 14: // "endseq"
-      case 15: // "par"
-      case 16: // "endpar"
-      case 17: // "skip"
-      case 18: // "let"
-      case 19: // "local"
-      case 20: // "in"
-      case 21: // "forall"
-      case 22: // "choose"
-      case 23: // "iterate"
-      case 24: // "do"
-      case 25: // "if"
-      case 26: // "then"
-      case 27: // "else"
-      case 28: // "case"
-      case 29: // "of"
-      case 30: // "default"
-      case 31: // "holds"
-      case 32: // "exists"
-      case 33: // "with"
-      case 34: // "as"
-      case 35: // "while"
-      case 36: // "undef"
-      case 37: // "false"
-      case 38: // "true"
-      case 39: // "and"
-      case 40: // "or"
-      case 41: // "xor"
-      case 42: // "implies"
-      case 43: // "not"
-      case 44: // "+"
-      case 45: // "-"
-      case 46: // "="
-      case 47: // "("
-      case 48: // ")"
-      case 49: // "["
-      case 50: // "]"
-      case 51: // "{"
-      case 52: // "}"
-      case 53: // ":"
-      case 54: // "::"
-      case 55: // "_"
-      case 56: // "|"
-      case 57: // "@"
-      case 58: // ","
-      case 59: // "<"
-      case 60: // ">"
-      case 61: // "*"
-      case 62: // "/"
-      case 63: // "%"
-      case 64: // "^"
-      case 65: // "'"
-      case 66: // ".."
-      case 67: // "."
-      case 68: // "->"
-      case 69: // "=>"
-      case 70: // ":="
-      case 71: // "!="
-      case 72: // "<="
-      case 73: // ">="
-      case 74: // "{|"
-      case 75: // "|}"
+      case symbol_kind::S_CASM: // "CASM"
+      case symbol_kind::S_INIT: // "init"
+      case symbol_kind::S_DERIVED: // "derived"
+      case symbol_kind::S_ENUMERATION: // "enumeration"
+      case symbol_kind::S_RULE: // "rule"
+      case symbol_kind::S_USING: // "using"
+      case symbol_kind::S_INVARIANT: // "invariant"
+      case symbol_kind::S_IMPORT: // "import"
+      case symbol_kind::S_FUNCTION: // "function"
+      case symbol_kind::S_DEFINED: // "defined"
+      case symbol_kind::S_SEQ: // "seq"
+      case symbol_kind::S_ENDSEQ: // "endseq"
+      case symbol_kind::S_PAR: // "par"
+      case symbol_kind::S_ENDPAR: // "endpar"
+      case symbol_kind::S_SKIP: // "skip"
+      case symbol_kind::S_LET: // "let"
+      case symbol_kind::S_LOCAL: // "local"
+      case symbol_kind::S_IN: // "in"
+      case symbol_kind::S_FORALL: // "forall"
+      case symbol_kind::S_CHOOSE: // "choose"
+      case symbol_kind::S_ITERATE: // "iterate"
+      case symbol_kind::S_DO: // "do"
+      case symbol_kind::S_IF: // "if"
+      case symbol_kind::S_THEN: // "then"
+      case symbol_kind::S_ELSE: // "else"
+      case symbol_kind::S_CASE: // "case"
+      case symbol_kind::S_OF: // "of"
+      case symbol_kind::S_DEFAULT: // "default"
+      case symbol_kind::S_HOLDS: // "holds"
+      case symbol_kind::S_EXISTS: // "exists"
+      case symbol_kind::S_WITH: // "with"
+      case symbol_kind::S_AS: // "as"
+      case symbol_kind::S_WHILE: // "while"
+      case symbol_kind::S_UNDEF: // "undef"
+      case symbol_kind::S_FALSE: // "false"
+      case symbol_kind::S_TRUE: // "true"
+      case symbol_kind::S_AND: // "and"
+      case symbol_kind::S_OR: // "or"
+      case symbol_kind::S_XOR: // "xor"
+      case symbol_kind::S_IMPLIES: // "implies"
+      case symbol_kind::S_NOT: // "not"
+      case symbol_kind::S_PLUS: // "+"
+      case symbol_kind::S_MINUS: // "-"
+      case symbol_kind::S_EQUAL: // "="
+      case symbol_kind::S_LPAREN: // "("
+      case symbol_kind::S_RPAREN: // ")"
+      case symbol_kind::S_LSQPAREN: // "["
+      case symbol_kind::S_RSQPAREN: // "]"
+      case symbol_kind::S_LCURPAREN: // "{"
+      case symbol_kind::S_RCURPAREN: // "}"
+      case symbol_kind::S_COLON: // ":"
+      case symbol_kind::S_DOUBLECOLON: // "::"
+      case symbol_kind::S_UNDERLINE: // "_"
+      case symbol_kind::S_VERTICAL_BAR: // "|"
+      case symbol_kind::S_AT: // "@"
+      case symbol_kind::S_COMMA: // ","
+      case symbol_kind::S_LESSER: // "<"
+      case symbol_kind::S_GREATER: // ">"
+      case symbol_kind::S_ASTERIX: // "*"
+      case symbol_kind::S_SLASH: // "/"
+      case symbol_kind::S_PERCENT: // "%"
+      case symbol_kind::S_CARET: // "^"
+      case symbol_kind::S_MARK: // "'"
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_MAPS: // "->"
+      case symbol_kind::S_ARROW: // "=>"
+      case symbol_kind::S_UPDATE: // ":="
+      case symbol_kind::S_NEQUAL: // "!="
+      case symbol_kind::S_LESSEQ: // "<="
+      case symbol_kind::S_GREATEREQ: // ">="
+      case symbol_kind::S_SEQ_BRACKET: // "{|"
+      case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
         value.move< Ast::Token::Ptr > (that.value);
         break;
 
-      case 182: // Attribute
+      case symbol_kind::S_Attribute: // Attribute
         value.move< Attribute::Ptr > (that.value);
         break;
 
-      case 181: // Attributes
+      case symbol_kind::S_Attributes: // Attributes
         value.move< Attributes::Ptr > (that.value);
         break;
 
-      case 183: // BasicAttribute
+      case symbol_kind::S_BasicAttribute: // BasicAttribute
         value.move< BasicAttribute::Ptr > (that.value);
         break;
 
-      case 155: // BasicType
+      case symbol_kind::S_BasicType: // BasicType
         value.move< BasicType::Ptr > (that.value);
         break;
 
-      case 117: // BlockRule
+      case symbol_kind::S_BlockRule: // BlockRule
         value.move< BlockRule::Ptr > (that.value);
         break;
 
-      case 126: // CallExpression
+      case symbol_kind::S_CallExpression: // CallExpression
         value.move< CallExpression::Ptr > (that.value);
         break;
 
-      case 120: // CallRule
+      case symbol_kind::S_CallRule: // CallRule
         value.move< CallRule::Ptr > (that.value);
         break;
 
-      case 137: // CardinalityExpression
+      case symbol_kind::S_CardinalityExpression: // CardinalityExpression
         value.move< CardinalityExpression::Ptr > (that.value);
         break;
 
-      case 111: // CaseLabel
+      case symbol_kind::S_CaseLabel: // CaseLabel
         value.move< Case::Ptr > (that.value);
         break;
 
-      case 109: // CaseRule
+      case symbol_kind::S_CaseRule: // CaseRule
         value.move< CaseRule::Ptr > (that.value);
         break;
 
-      case 110: // CaseLabels
+      case symbol_kind::S_CaseLabels: // CaseLabels
         value.move< Cases::Ptr > (that.value);
         break;
 
-      case 134: // ChooseExpression
+      case symbol_kind::S_ChooseExpression: // ChooseExpression
         value.move< ChooseExpression::Ptr > (that.value);
         break;
 
-      case 115: // ChooseRule
+      case symbol_kind::S_ChooseRule: // ChooseRule
         value.move< ChooseRule::Ptr > (that.value);
         break;
 
-      case 133: // ConditionalExpression
+      case symbol_kind::S_ConditionalExpression: // ConditionalExpression
         value.move< ConditionalExpression::Ptr > (that.value);
         break;
 
-      case 108: // ConditionalRule
+      case symbol_kind::S_ConditionalRule: // ConditionalRule
         value.move< ConditionalRule::Ptr > (that.value);
         break;
 
-      case 164: // MaybeDefined
+      case symbol_kind::S_MaybeDefined: // MaybeDefined
         value.move< Defined::Ptr > (that.value);
         break;
 
-      case 92: // AttributedDefinition
-      case 93: // Definition
+      case symbol_kind::S_AttributedDefinition: // AttributedDefinition
+      case symbol_kind::S_Definition: // Definition
         value.move< Definition::Ptr > (that.value);
         break;
 
-      case 91: // Definitions
+      case symbol_kind::S_Definitions: // Definitions
         value.move< Definitions::Ptr > (that.value);
         break;
 
-      case 96: // DerivedDefinition
+      case symbol_kind::S_DerivedDefinition: // DerivedDefinition
         value.move< DerivedDefinition::Ptr > (that.value);
         break;
 
-      case 127: // DirectCallExpression
+      case symbol_kind::S_DirectCallExpression: // DirectCallExpression
         value.move< DirectCallExpression::Ptr > (that.value);
         break;
 
-      case 95: // EnumerationDefinition
+      case symbol_kind::S_EnumerationDefinition: // EnumerationDefinition
         value.move< EnumerationDefinition::Ptr > (that.value);
         break;
 
-      case 99: // EnumeratorDefinition
+      case symbol_kind::S_EnumeratorDefinition: // EnumeratorDefinition
         value.move< EnumeratorDefinition::Ptr > (that.value);
         break;
 
-      case 100: // Enumerators
+      case symbol_kind::S_Enumerators: // Enumerators
         value.move< Enumerators::Ptr > (that.value);
         break;
 
-      case 136: // ExistentialQuantifierExpression
+      case symbol_kind::S_ExistentialQuantifierExpression: // ExistentialQuantifierExpression
         value.move< ExistentialQuantifierExpression::Ptr > (that.value);
         break;
 
-      case 123: // Term
-      case 124: // SimpleOrClaspedTerm
-      case 125: // OperatorExpression
+      case symbol_kind::S_Term: // Term
+      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.move< Expression::Ptr > (that.value);
         break;
 
-      case 184: // ExpressionAttribute
+      case symbol_kind::S_ExpressionAttribute: // ExpressionAttribute
         value.move< ExpressionAttribute::Ptr > (that.value);
         break;
 
-      case 122: // Terms
+      case symbol_kind::S_Terms: // Terms
         value.move< Expressions::Ptr > (that.value);
         break;
 
-      case 160: // FixedSizedType
+      case symbol_kind::S_FixedSizedType: // FixedSizedType
         value.move< FixedSizedType::Ptr > (that.value);
         break;
 
-      case 114: // ForallRule
+      case symbol_kind::S_ForallRule: // ForallRule
         value.move< ForallRule::Ptr > (that.value);
         break;
 
-      case 98: // FunctionDefinition
-      case 179: // AttributedLocalFunctionDefinition
-      case 180: // LocalFunctionDefinition
+      case symbol_kind::S_FunctionDefinition: // FunctionDefinition
+      case symbol_kind::S_AttributedLocalFunctionDefinition: // AttributedLocalFunctionDefinition
+      case symbol_kind::S_LocalFunctionDefinition: // LocalFunctionDefinition
         value.move< FunctionDefinition::Ptr > (that.value);
         break;
 
-      case 178: // LocalFunctionDefinitions
+      case symbol_kind::S_LocalFunctionDefinitions: // LocalFunctionDefinitions
         value.move< FunctionDefinitions::Ptr > (that.value);
         break;
 
-      case 90: // Header
+      case symbol_kind::S_Header: // Header
         value.move< HeaderDefinition::Ptr > (that.value);
         break;
 
-      case 82: // "identifier"
-      case 168: // Identifier
+      case symbol_kind::S_IDENTIFIER: // "identifier"
+      case symbol_kind::S_Identifier: // Identifier
         value.move< Identifier::Ptr > (that.value);
         break;
 
-      case 169: // IdentifierPath
+      case symbol_kind::S_IdentifierPath: // IdentifierPath
         value.move< IdentifierPath::Ptr > (that.value);
         break;
 
-      case 104: // ImportDefinition
+      case symbol_kind::S_ImportDefinition: // ImportDefinition
         value.move< ImportDefinition::Ptr > (that.value);
         break;
 
-      case 130: // IndirectCallExpression
+      case symbol_kind::S_IndirectCallExpression: // IndirectCallExpression
         value.move< IndirectCallExpression::Ptr > (that.value);
         break;
 
-      case 94: // InitDefinition
+      case symbol_kind::S_InitDefinition: // InitDefinition
         value.move< InitDefinition::Ptr > (that.value);
         break;
 
-      case 167: // Initializer
+      case symbol_kind::S_Initializer: // Initializer
         value.move< Initializer::Ptr > (that.value);
         break;
 
-      case 166: // Initializers
+      case symbol_kind::S_Initializers: // Initializers
         value.move< Initializers::Ptr > (that.value);
         break;
 
-      case 165: // MaybeInitially
+      case symbol_kind::S_MaybeInitially: // MaybeInitially
         value.move< Initially::Ptr > (that.value);
         break;
 
-      case 103: // InvariantDefinition
+      case symbol_kind::S_InvariantDefinition: // InvariantDefinition
         value.move< InvariantDefinition::Ptr > (that.value);
         break;
 
-      case 116: // IterateRule
+      case symbol_kind::S_IterateRule: // IterateRule
         value.move< IterateRule::Ptr > (that.value);
         break;
 
-      case 132: // LetExpression
+      case symbol_kind::S_LetExpression: // LetExpression
         value.move< LetExpression::Ptr > (that.value);
         break;
 
-      case 112: // LetRule
+      case symbol_kind::S_LetRule: // LetRule
         value.move< LetRule::Ptr > (that.value);
         break;
 
-      case 147: // ListLiteral
+      case symbol_kind::S_ListLiteral: // ListLiteral
         value.move< ListLiteral::Ptr > (that.value);
         break;
 
-      case 138: // Literal
+      case symbol_kind::S_Literal: // Literal
         value.move< Literal::Ptr > (that.value);
         break;
 
-      case 129: // LiteralCallExpression
+      case symbol_kind::S_LiteralCallExpression: // LiteralCallExpression
         value.move< LiteralCallExpression::Ptr > (that.value);
         break;
 
-      case 113: // LocalRule
+      case symbol_kind::S_LocalRule: // LocalRule
         value.move< LocalRule::Ptr > (that.value);
         break;
 
-      case 128: // MethodCallExpression
+      case symbol_kind::S_MethodCallExpression: // MethodCallExpression
         value.move< MethodCallExpression::Ptr > (that.value);
         break;
 
-      case 152: // Assignment
+      case symbol_kind::S_Assignment: // Assignment
         value.move< NamedExpression::Ptr > (that.value);
         break;
 
-      case 151: // Assignments
+      case symbol_kind::S_Assignments: // Assignments
         value.move< NamedExpressions::Ptr > (that.value);
         break;
 
-      case 148: // RangeLiteral
+      case symbol_kind::S_RangeLiteral: // RangeLiteral
         value.move< RangeLiteral::Ptr > (that.value);
         break;
 
-      case 150: // RecordLiteral
+      case symbol_kind::S_RecordLiteral: // RecordLiteral
         value.move< RecordLiteral::Ptr > (that.value);
         break;
 
-      case 157: // RecordType
+      case symbol_kind::S_RecordType: // RecordType
         value.move< RecordType::Ptr > (that.value);
         break;
 
-      case 146: // ReferenceLiteral
+      case symbol_kind::S_ReferenceLiteral: // ReferenceLiteral
         value.move< ReferenceLiteral::Ptr > (that.value);
         break;
 
-      case 159: // RelationType
+      case symbol_kind::S_RelationType: // RelationType
         value.move< RelationType::Ptr > (that.value);
         break;
 
-      case 106: // Rule
+      case symbol_kind::S_Rule: // Rule
         value.move< Rule::Ptr > (that.value);
         break;
 
-      case 97: // RuleDefinition
+      case symbol_kind::S_RuleDefinition: // RuleDefinition
         value.move< RuleDefinition::Ptr > (that.value);
         break;
 
-      case 105: // Rules
+      case symbol_kind::S_Rules: // Rules
         value.move< Rules::Ptr > (that.value);
         break;
 
-      case 118: // SequenceRule
+      case symbol_kind::S_SequenceRule: // SequenceRule
         value.move< SequenceRule::Ptr > (that.value);
         break;
 
-      case 107: // SkipRule
+      case symbol_kind::S_SkipRule: // SkipRule
         value.move< SkipRule::Ptr > (that.value);
         break;
 
-      case 89: // Specification
+      case symbol_kind::S_Specification: // Specification
         value.move< Specification::Ptr > (that.value);
         break;
 
-      case 158: // TemplateType
+      case symbol_kind::S_TemplateType: // TemplateType
         value.move< TemplateType::Ptr > (that.value);
         break;
 
-      case 149: // TupleLiteral
+      case symbol_kind::S_TupleLiteral: // TupleLiteral
         value.move< TupleLiteral::Ptr > (that.value);
         break;
 
-      case 156: // TupleType
+      case symbol_kind::S_TupleType: // TupleType
         value.move< TupleType::Ptr > (that.value);
         break;
 
-      case 131: // TypeCastingExpression
+      case symbol_kind::S_TypeCastingExpression: // TypeCastingExpression
         value.move< TypeCastingExpression::Ptr > (that.value);
         break;
 
-      case 153: // Types
-      case 161: // FunctionParameters
-      case 162: // MaybeFunctionParameters
+      case symbol_kind::S_Types: // Types
+      case symbol_kind::S_FunctionParameters: // FunctionParameters
+      case symbol_kind::S_MaybeFunctionParameters: // MaybeFunctionParameters
         value.move< Types::Ptr > (that.value);
         break;
 
-      case 139: // UndefinedLiteral
+      case symbol_kind::S_UndefinedLiteral: // UndefinedLiteral
         value.move< UndefLiteral::Ptr > (that.value);
         break;
 
-      case 135: // UniversalQuantifierExpression
+      case symbol_kind::S_UniversalQuantifierExpression: // UniversalQuantifierExpression
         value.move< UniversalQuantifierExpression::Ptr > (that.value);
         break;
 
-      case 119: // UpdateRule
+      case symbol_kind::S_UpdateRule: // UpdateRule
         value.move< UpdateRule::Ptr > (that.value);
         break;
 
-      case 101: // UsingDefinition
+      case symbol_kind::S_UsingDefinition: // UsingDefinition
         value.move< UsingDefinition::Ptr > (that.value);
         break;
 
-      case 102: // UsingPathDefinition
+      case symbol_kind::S_UsingPathDefinition: // UsingPathDefinition
         value.move< UsingPathDefinition::Ptr > (that.value);
         break;
 
-      case 76: // "binary"
-      case 77: // "hexadecimal"
-      case 78: // "integer"
-      case 79: // "rational"
-      case 80: // "decimal"
-      case 81: // "string"
-      case 140: // BooleanLiteral
-      case 141: // IntegerLiteral
-      case 142: // RationalLiteral
-      case 143: // DecimalLiteral
-      case 144: // BinaryLiteral
-      case 145: // StringLiteral
+      case symbol_kind::S_BINARY: // "binary"
+      case symbol_kind::S_HEXADECIMAL: // "hexadecimal"
+      case symbol_kind::S_INTEGER: // "integer"
+      case symbol_kind::S_RATIONAL: // "rational"
+      case symbol_kind::S_DECIMAL: // "decimal"
+      case symbol_kind::S_STRING: // "string"
+      case symbol_kind::S_BooleanLiteral: // BooleanLiteral
+      case symbol_kind::S_IntegerLiteral: // IntegerLiteral
+      case symbol_kind::S_RationalLiteral: // RationalLiteral
+      case symbol_kind::S_DecimalLiteral: // DecimalLiteral
+      case symbol_kind::S_BinaryLiteral: // BinaryLiteral
+      case symbol_kind::S_StringLiteral: // StringLiteral
         value.move< ValueLiteral::Ptr > (that.value);
         break;
 
-      case 177: // VariableBinding
+      case symbol_kind::S_VariableBinding: // VariableBinding
         value.move< VariableBinding::Ptr > (that.value);
         break;
 
-      case 176: // VariableBindings
+      case symbol_kind::S_VariableBindings: // VariableBindings
         value.move< VariableBindings::Ptr > (that.value);
         break;
 
-      case 170: // Variable
-      case 173: // TypedVariable
-      case 174: // AttributedVariable
-      case 175: // TypedAttributedVariable
+      case symbol_kind::S_Variable: // Variable
+      case symbol_kind::S_TypedVariable: // TypedVariable
+      case symbol_kind::S_AttributedVariable: // AttributedVariable
+      case symbol_kind::S_TypedAttributedVariable: // TypedAttributedVariable
         value.move< VariableDefinition::Ptr > (that.value);
         break;
 
-      case 163: // Parameters
-      case 171: // AttributedVariables
-      case 172: // TypedVariables
+      case symbol_kind::S_Parameters: // Parameters
+      case symbol_kind::S_AttributedVariables: // AttributedVariables
+      case symbol_kind::S_TypedVariables: // TypedVariables
         value.move< VariableDefinitions::Ptr > (that.value);
         break;
 
-      case 121: // WhileRule
+      case symbol_kind::S_WhileRule: // WhileRule
         value.move< WhileRule::Ptr > (that.value);
         break;
 
-      case 154: // Type
+      case symbol_kind::S_Type: // Type
         value.move< libcasm_fe::Ast::Type::Ptr > (that.value);
         break;
 
@@ -1994,23 +1954,21 @@ namespace libcasm_fe {
 #if YYDEBUG
   template <typename Base>
   void
-  Parser::yy_print_ (std::ostream& yyo,
-                                     const basic_symbol<Base>& yysym) const
+  Parser::yy_print_ (std::ostream& yyo, const basic_symbol<Base>& yysym) const
   {
     std::ostream& yyoutput = yyo;
     YYUSE (yyoutput);
-    symbol_number_type yytype = yysym.type_get ();
-#if defined __GNUC__ && ! defined __clang__ && ! defined __ICC && __GNUC__ * 100 + __GNUC_MINOR__ <= 408
-    // Avoid a (spurious) G++ 4.8 warning about "array subscript is
-    // below array bounds".
     if (yysym.empty ())
-      std::abort ();
-#endif
-    yyo << (yytype < yyntokens_ ? "token" : "nterm")
-        << ' ' << yytname_[yytype] << " ("
-        << yysym.location << ": ";
-    YYUSE (yytype);
-    yyo << ')';
+      yyo << "empty symbol";
+    else
+      {
+        symbol_kind_type yykind = yysym.kind ();
+        yyo << (yykind < YYNTOKENS ? "token" : "nterm")
+            << ' ' << yysym.name () << " ("
+            << yysym.location << ": ";
+        YYUSE (yykind);
+        yyo << ')';
+      }
   }
 #endif
 
@@ -2069,11 +2027,11 @@ namespace libcasm_fe {
   Parser::state_type
   Parser::yy_lr_goto_state_ (state_type yystate, int yysym)
   {
-    int yyr = yypgoto_[yysym - yyntokens_] + yystate;
+    int yyr = yypgoto_[yysym - YYNTOKENS] + yystate;
     if (0 <= yyr && yyr <= yylast_ && yycheck_[yyr] == yystate)
       return yytable_[yyr];
     else
-      return yydefgoto_[yysym - yyntokens_];
+      return yydefgoto_[yysym - YYNTOKENS];
   }
 
   bool
@@ -2133,6 +2091,7 @@ namespace libcasm_fe {
   `-----------------------------------------------*/
   yynewstate:
     YYCDEBUG << "Entering state " << int (yystack_[0].state) << '\n';
+    YY_STACK_PRINT ();
 
     // Accept?
     if (yystack_[0].state == yyfinal_)
@@ -2153,7 +2112,7 @@ namespace libcasm_fe {
     // Read a lookahead token.
     if (yyla.empty ())
       {
-        YYCDEBUG << "Reading a token: ";
+        YYCDEBUG << "Reading a token\n";
 #if YY_EXCEPTIONS
         try
 #endif // YY_EXCEPTIONS
@@ -2172,10 +2131,20 @@ namespace libcasm_fe {
       }
     YY_SYMBOL_PRINT ("Next token is", yyla);
 
+    if (yyla.kind () == symbol_kind::S_YYerror)
+    {
+      // The scanner already issued an error message, process directly
+      // to error recovery.  But do not keep the error token as
+      // lookahead, it is too special and may lead us to an endless
+      // loop in error recovery. */
+      yyla.kind_ = symbol_kind::S_YYUNDEF;
+      goto yyerrlab1;
+    }
+
     /* If the proper action on seeing token YYLA.TYPE is to reduce or
        to detect an error, take that action.  */
-    yyn += yyla.type_get ();
-    if (yyn < 0 || yylast_ < yyn || yycheck_[yyn] != yyla.type_get ())
+    yyn += yyla.kind ();
+    if (yyn < 0 || yylast_ < yyn || yycheck_[yyn] != yyla.kind ())
       {
         goto yydefault;
       }
@@ -2222,419 +2191,419 @@ namespace libcasm_fe {
          when using variants.  */
       switch (yyr1_[yyn])
     {
-      case 3: // "CASM"
-      case 4: // "init"
-      case 5: // "derived"
-      case 6: // "enumeration"
-      case 7: // "rule"
-      case 8: // "using"
-      case 9: // "invariant"
-      case 10: // "import"
-      case 11: // "function"
-      case 12: // "defined"
-      case 13: // "seq"
-      case 14: // "endseq"
-      case 15: // "par"
-      case 16: // "endpar"
-      case 17: // "skip"
-      case 18: // "let"
-      case 19: // "local"
-      case 20: // "in"
-      case 21: // "forall"
-      case 22: // "choose"
-      case 23: // "iterate"
-      case 24: // "do"
-      case 25: // "if"
-      case 26: // "then"
-      case 27: // "else"
-      case 28: // "case"
-      case 29: // "of"
-      case 30: // "default"
-      case 31: // "holds"
-      case 32: // "exists"
-      case 33: // "with"
-      case 34: // "as"
-      case 35: // "while"
-      case 36: // "undef"
-      case 37: // "false"
-      case 38: // "true"
-      case 39: // "and"
-      case 40: // "or"
-      case 41: // "xor"
-      case 42: // "implies"
-      case 43: // "not"
-      case 44: // "+"
-      case 45: // "-"
-      case 46: // "="
-      case 47: // "("
-      case 48: // ")"
-      case 49: // "["
-      case 50: // "]"
-      case 51: // "{"
-      case 52: // "}"
-      case 53: // ":"
-      case 54: // "::"
-      case 55: // "_"
-      case 56: // "|"
-      case 57: // "@"
-      case 58: // ","
-      case 59: // "<"
-      case 60: // ">"
-      case 61: // "*"
-      case 62: // "/"
-      case 63: // "%"
-      case 64: // "^"
-      case 65: // "'"
-      case 66: // ".."
-      case 67: // "."
-      case 68: // "->"
-      case 69: // "=>"
-      case 70: // ":="
-      case 71: // "!="
-      case 72: // "<="
-      case 73: // ">="
-      case 74: // "{|"
-      case 75: // "|}"
+      case symbol_kind::S_CASM: // "CASM"
+      case symbol_kind::S_INIT: // "init"
+      case symbol_kind::S_DERIVED: // "derived"
+      case symbol_kind::S_ENUMERATION: // "enumeration"
+      case symbol_kind::S_RULE: // "rule"
+      case symbol_kind::S_USING: // "using"
+      case symbol_kind::S_INVARIANT: // "invariant"
+      case symbol_kind::S_IMPORT: // "import"
+      case symbol_kind::S_FUNCTION: // "function"
+      case symbol_kind::S_DEFINED: // "defined"
+      case symbol_kind::S_SEQ: // "seq"
+      case symbol_kind::S_ENDSEQ: // "endseq"
+      case symbol_kind::S_PAR: // "par"
+      case symbol_kind::S_ENDPAR: // "endpar"
+      case symbol_kind::S_SKIP: // "skip"
+      case symbol_kind::S_LET: // "let"
+      case symbol_kind::S_LOCAL: // "local"
+      case symbol_kind::S_IN: // "in"
+      case symbol_kind::S_FORALL: // "forall"
+      case symbol_kind::S_CHOOSE: // "choose"
+      case symbol_kind::S_ITERATE: // "iterate"
+      case symbol_kind::S_DO: // "do"
+      case symbol_kind::S_IF: // "if"
+      case symbol_kind::S_THEN: // "then"
+      case symbol_kind::S_ELSE: // "else"
+      case symbol_kind::S_CASE: // "case"
+      case symbol_kind::S_OF: // "of"
+      case symbol_kind::S_DEFAULT: // "default"
+      case symbol_kind::S_HOLDS: // "holds"
+      case symbol_kind::S_EXISTS: // "exists"
+      case symbol_kind::S_WITH: // "with"
+      case symbol_kind::S_AS: // "as"
+      case symbol_kind::S_WHILE: // "while"
+      case symbol_kind::S_UNDEF: // "undef"
+      case symbol_kind::S_FALSE: // "false"
+      case symbol_kind::S_TRUE: // "true"
+      case symbol_kind::S_AND: // "and"
+      case symbol_kind::S_OR: // "or"
+      case symbol_kind::S_XOR: // "xor"
+      case symbol_kind::S_IMPLIES: // "implies"
+      case symbol_kind::S_NOT: // "not"
+      case symbol_kind::S_PLUS: // "+"
+      case symbol_kind::S_MINUS: // "-"
+      case symbol_kind::S_EQUAL: // "="
+      case symbol_kind::S_LPAREN: // "("
+      case symbol_kind::S_RPAREN: // ")"
+      case symbol_kind::S_LSQPAREN: // "["
+      case symbol_kind::S_RSQPAREN: // "]"
+      case symbol_kind::S_LCURPAREN: // "{"
+      case symbol_kind::S_RCURPAREN: // "}"
+      case symbol_kind::S_COLON: // ":"
+      case symbol_kind::S_DOUBLECOLON: // "::"
+      case symbol_kind::S_UNDERLINE: // "_"
+      case symbol_kind::S_VERTICAL_BAR: // "|"
+      case symbol_kind::S_AT: // "@"
+      case symbol_kind::S_COMMA: // ","
+      case symbol_kind::S_LESSER: // "<"
+      case symbol_kind::S_GREATER: // ">"
+      case symbol_kind::S_ASTERIX: // "*"
+      case symbol_kind::S_SLASH: // "/"
+      case symbol_kind::S_PERCENT: // "%"
+      case symbol_kind::S_CARET: // "^"
+      case symbol_kind::S_MARK: // "'"
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_MAPS: // "->"
+      case symbol_kind::S_ARROW: // "=>"
+      case symbol_kind::S_UPDATE: // ":="
+      case symbol_kind::S_NEQUAL: // "!="
+      case symbol_kind::S_LESSEQ: // "<="
+      case symbol_kind::S_GREATEREQ: // ">="
+      case symbol_kind::S_SEQ_BRACKET: // "{|"
+      case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
         yylhs.value.emplace< Ast::Token::Ptr > ();
         break;
 
-      case 182: // Attribute
+      case symbol_kind::S_Attribute: // Attribute
         yylhs.value.emplace< Attribute::Ptr > ();
         break;
 
-      case 181: // Attributes
+      case symbol_kind::S_Attributes: // Attributes
         yylhs.value.emplace< Attributes::Ptr > ();
         break;
 
-      case 183: // BasicAttribute
+      case symbol_kind::S_BasicAttribute: // BasicAttribute
         yylhs.value.emplace< BasicAttribute::Ptr > ();
         break;
 
-      case 155: // BasicType
+      case symbol_kind::S_BasicType: // BasicType
         yylhs.value.emplace< BasicType::Ptr > ();
         break;
 
-      case 117: // BlockRule
+      case symbol_kind::S_BlockRule: // BlockRule
         yylhs.value.emplace< BlockRule::Ptr > ();
         break;
 
-      case 126: // CallExpression
+      case symbol_kind::S_CallExpression: // CallExpression
         yylhs.value.emplace< CallExpression::Ptr > ();
         break;
 
-      case 120: // CallRule
+      case symbol_kind::S_CallRule: // CallRule
         yylhs.value.emplace< CallRule::Ptr > ();
         break;
 
-      case 137: // CardinalityExpression
+      case symbol_kind::S_CardinalityExpression: // CardinalityExpression
         yylhs.value.emplace< CardinalityExpression::Ptr > ();
         break;
 
-      case 111: // CaseLabel
+      case symbol_kind::S_CaseLabel: // CaseLabel
         yylhs.value.emplace< Case::Ptr > ();
         break;
 
-      case 109: // CaseRule
+      case symbol_kind::S_CaseRule: // CaseRule
         yylhs.value.emplace< CaseRule::Ptr > ();
         break;
 
-      case 110: // CaseLabels
+      case symbol_kind::S_CaseLabels: // CaseLabels
         yylhs.value.emplace< Cases::Ptr > ();
         break;
 
-      case 134: // ChooseExpression
+      case symbol_kind::S_ChooseExpression: // ChooseExpression
         yylhs.value.emplace< ChooseExpression::Ptr > ();
         break;
 
-      case 115: // ChooseRule
+      case symbol_kind::S_ChooseRule: // ChooseRule
         yylhs.value.emplace< ChooseRule::Ptr > ();
         break;
 
-      case 133: // ConditionalExpression
+      case symbol_kind::S_ConditionalExpression: // ConditionalExpression
         yylhs.value.emplace< ConditionalExpression::Ptr > ();
         break;
 
-      case 108: // ConditionalRule
+      case symbol_kind::S_ConditionalRule: // ConditionalRule
         yylhs.value.emplace< ConditionalRule::Ptr > ();
         break;
 
-      case 164: // MaybeDefined
+      case symbol_kind::S_MaybeDefined: // MaybeDefined
         yylhs.value.emplace< Defined::Ptr > ();
         break;
 
-      case 92: // AttributedDefinition
-      case 93: // Definition
+      case symbol_kind::S_AttributedDefinition: // AttributedDefinition
+      case symbol_kind::S_Definition: // Definition
         yylhs.value.emplace< Definition::Ptr > ();
         break;
 
-      case 91: // Definitions
+      case symbol_kind::S_Definitions: // Definitions
         yylhs.value.emplace< Definitions::Ptr > ();
         break;
 
-      case 96: // DerivedDefinition
+      case symbol_kind::S_DerivedDefinition: // DerivedDefinition
         yylhs.value.emplace< DerivedDefinition::Ptr > ();
         break;
 
-      case 127: // DirectCallExpression
+      case symbol_kind::S_DirectCallExpression: // DirectCallExpression
         yylhs.value.emplace< DirectCallExpression::Ptr > ();
         break;
 
-      case 95: // EnumerationDefinition
+      case symbol_kind::S_EnumerationDefinition: // EnumerationDefinition
         yylhs.value.emplace< EnumerationDefinition::Ptr > ();
         break;
 
-      case 99: // EnumeratorDefinition
+      case symbol_kind::S_EnumeratorDefinition: // EnumeratorDefinition
         yylhs.value.emplace< EnumeratorDefinition::Ptr > ();
         break;
 
-      case 100: // Enumerators
+      case symbol_kind::S_Enumerators: // Enumerators
         yylhs.value.emplace< Enumerators::Ptr > ();
         break;
 
-      case 136: // ExistentialQuantifierExpression
+      case symbol_kind::S_ExistentialQuantifierExpression: // ExistentialQuantifierExpression
         yylhs.value.emplace< ExistentialQuantifierExpression::Ptr > ();
         break;
 
-      case 123: // Term
-      case 124: // SimpleOrClaspedTerm
-      case 125: // OperatorExpression
+      case symbol_kind::S_Term: // Term
+      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_OperatorExpression: // OperatorExpression
         yylhs.value.emplace< Expression::Ptr > ();
         break;
 
-      case 184: // ExpressionAttribute
+      case symbol_kind::S_ExpressionAttribute: // ExpressionAttribute
         yylhs.value.emplace< ExpressionAttribute::Ptr > ();
         break;
 
-      case 122: // Terms
+      case symbol_kind::S_Terms: // Terms
         yylhs.value.emplace< Expressions::Ptr > ();
         break;
 
-      case 160: // FixedSizedType
+      case symbol_kind::S_FixedSizedType: // FixedSizedType
         yylhs.value.emplace< FixedSizedType::Ptr > ();
         break;
 
-      case 114: // ForallRule
+      case symbol_kind::S_ForallRule: // ForallRule
         yylhs.value.emplace< ForallRule::Ptr > ();
         break;
 
-      case 98: // FunctionDefinition
-      case 179: // AttributedLocalFunctionDefinition
-      case 180: // LocalFunctionDefinition
+      case symbol_kind::S_FunctionDefinition: // FunctionDefinition
+      case symbol_kind::S_AttributedLocalFunctionDefinition: // AttributedLocalFunctionDefinition
+      case symbol_kind::S_LocalFunctionDefinition: // LocalFunctionDefinition
         yylhs.value.emplace< FunctionDefinition::Ptr > ();
         break;
 
-      case 178: // LocalFunctionDefinitions
+      case symbol_kind::S_LocalFunctionDefinitions: // LocalFunctionDefinitions
         yylhs.value.emplace< FunctionDefinitions::Ptr > ();
         break;
 
-      case 90: // Header
+      case symbol_kind::S_Header: // Header
         yylhs.value.emplace< HeaderDefinition::Ptr > ();
         break;
 
-      case 82: // "identifier"
-      case 168: // Identifier
+      case symbol_kind::S_IDENTIFIER: // "identifier"
+      case symbol_kind::S_Identifier: // Identifier
         yylhs.value.emplace< Identifier::Ptr > ();
         break;
 
-      case 169: // IdentifierPath
+      case symbol_kind::S_IdentifierPath: // IdentifierPath
         yylhs.value.emplace< IdentifierPath::Ptr > ();
         break;
 
-      case 104: // ImportDefinition
+      case symbol_kind::S_ImportDefinition: // ImportDefinition
         yylhs.value.emplace< ImportDefinition::Ptr > ();
         break;
 
-      case 130: // IndirectCallExpression
+      case symbol_kind::S_IndirectCallExpression: // IndirectCallExpression
         yylhs.value.emplace< IndirectCallExpression::Ptr > ();
         break;
 
-      case 94: // InitDefinition
+      case symbol_kind::S_InitDefinition: // InitDefinition
         yylhs.value.emplace< InitDefinition::Ptr > ();
         break;
 
-      case 167: // Initializer
+      case symbol_kind::S_Initializer: // Initializer
         yylhs.value.emplace< Initializer::Ptr > ();
         break;
 
-      case 166: // Initializers
+      case symbol_kind::S_Initializers: // Initializers
         yylhs.value.emplace< Initializers::Ptr > ();
         break;
 
-      case 165: // MaybeInitially
+      case symbol_kind::S_MaybeInitially: // MaybeInitially
         yylhs.value.emplace< Initially::Ptr > ();
         break;
 
-      case 103: // InvariantDefinition
+      case symbol_kind::S_InvariantDefinition: // InvariantDefinition
         yylhs.value.emplace< InvariantDefinition::Ptr > ();
         break;
 
-      case 116: // IterateRule
+      case symbol_kind::S_IterateRule: // IterateRule
         yylhs.value.emplace< IterateRule::Ptr > ();
         break;
 
-      case 132: // LetExpression
+      case symbol_kind::S_LetExpression: // LetExpression
         yylhs.value.emplace< LetExpression::Ptr > ();
         break;
 
-      case 112: // LetRule
+      case symbol_kind::S_LetRule: // LetRule
         yylhs.value.emplace< LetRule::Ptr > ();
         break;
 
-      case 147: // ListLiteral
+      case symbol_kind::S_ListLiteral: // ListLiteral
         yylhs.value.emplace< ListLiteral::Ptr > ();
         break;
 
-      case 138: // Literal
+      case symbol_kind::S_Literal: // Literal
         yylhs.value.emplace< Literal::Ptr > ();
         break;
 
-      case 129: // LiteralCallExpression
+      case symbol_kind::S_LiteralCallExpression: // LiteralCallExpression
         yylhs.value.emplace< LiteralCallExpression::Ptr > ();
         break;
 
-      case 113: // LocalRule
+      case symbol_kind::S_LocalRule: // LocalRule
         yylhs.value.emplace< LocalRule::Ptr > ();
         break;
 
-      case 128: // MethodCallExpression
+      case symbol_kind::S_MethodCallExpression: // MethodCallExpression
         yylhs.value.emplace< MethodCallExpression::Ptr > ();
         break;
 
-      case 152: // Assignment
+      case symbol_kind::S_Assignment: // Assignment
         yylhs.value.emplace< NamedExpression::Ptr > ();
         break;
 
-      case 151: // Assignments
+      case symbol_kind::S_Assignments: // Assignments
         yylhs.value.emplace< NamedExpressions::Ptr > ();
         break;
 
-      case 148: // RangeLiteral
+      case symbol_kind::S_RangeLiteral: // RangeLiteral
         yylhs.value.emplace< RangeLiteral::Ptr > ();
         break;
 
-      case 150: // RecordLiteral
+      case symbol_kind::S_RecordLiteral: // RecordLiteral
         yylhs.value.emplace< RecordLiteral::Ptr > ();
         break;
 
-      case 157: // RecordType
+      case symbol_kind::S_RecordType: // RecordType
         yylhs.value.emplace< RecordType::Ptr > ();
         break;
 
-      case 146: // ReferenceLiteral
+      case symbol_kind::S_ReferenceLiteral: // ReferenceLiteral
         yylhs.value.emplace< ReferenceLiteral::Ptr > ();
         break;
 
-      case 159: // RelationType
+      case symbol_kind::S_RelationType: // RelationType
         yylhs.value.emplace< RelationType::Ptr > ();
         break;
 
-      case 106: // Rule
+      case symbol_kind::S_Rule: // Rule
         yylhs.value.emplace< Rule::Ptr > ();
         break;
 
-      case 97: // RuleDefinition
+      case symbol_kind::S_RuleDefinition: // RuleDefinition
         yylhs.value.emplace< RuleDefinition::Ptr > ();
         break;
 
-      case 105: // Rules
+      case symbol_kind::S_Rules: // Rules
         yylhs.value.emplace< Rules::Ptr > ();
         break;
 
-      case 118: // SequenceRule
+      case symbol_kind::S_SequenceRule: // SequenceRule
         yylhs.value.emplace< SequenceRule::Ptr > ();
         break;
 
-      case 107: // SkipRule
+      case symbol_kind::S_SkipRule: // SkipRule
         yylhs.value.emplace< SkipRule::Ptr > ();
         break;
 
-      case 89: // Specification
+      case symbol_kind::S_Specification: // Specification
         yylhs.value.emplace< Specification::Ptr > ();
         break;
 
-      case 158: // TemplateType
+      case symbol_kind::S_TemplateType: // TemplateType
         yylhs.value.emplace< TemplateType::Ptr > ();
         break;
 
-      case 149: // TupleLiteral
+      case symbol_kind::S_TupleLiteral: // TupleLiteral
         yylhs.value.emplace< TupleLiteral::Ptr > ();
         break;
 
-      case 156: // TupleType
+      case symbol_kind::S_TupleType: // TupleType
         yylhs.value.emplace< TupleType::Ptr > ();
         break;
 
-      case 131: // TypeCastingExpression
+      case symbol_kind::S_TypeCastingExpression: // TypeCastingExpression
         yylhs.value.emplace< TypeCastingExpression::Ptr > ();
         break;
 
-      case 153: // Types
-      case 161: // FunctionParameters
-      case 162: // MaybeFunctionParameters
+      case symbol_kind::S_Types: // Types
+      case symbol_kind::S_FunctionParameters: // FunctionParameters
+      case symbol_kind::S_MaybeFunctionParameters: // MaybeFunctionParameters
         yylhs.value.emplace< Types::Ptr > ();
         break;
 
-      case 139: // UndefinedLiteral
+      case symbol_kind::S_UndefinedLiteral: // UndefinedLiteral
         yylhs.value.emplace< UndefLiteral::Ptr > ();
         break;
 
-      case 135: // UniversalQuantifierExpression
+      case symbol_kind::S_UniversalQuantifierExpression: // UniversalQuantifierExpression
         yylhs.value.emplace< UniversalQuantifierExpression::Ptr > ();
         break;
 
-      case 119: // UpdateRule
+      case symbol_kind::S_UpdateRule: // UpdateRule
         yylhs.value.emplace< UpdateRule::Ptr > ();
         break;
 
-      case 101: // UsingDefinition
+      case symbol_kind::S_UsingDefinition: // UsingDefinition
         yylhs.value.emplace< UsingDefinition::Ptr > ();
         break;
 
-      case 102: // UsingPathDefinition
+      case symbol_kind::S_UsingPathDefinition: // UsingPathDefinition
         yylhs.value.emplace< UsingPathDefinition::Ptr > ();
         break;
 
-      case 76: // "binary"
-      case 77: // "hexadecimal"
-      case 78: // "integer"
-      case 79: // "rational"
-      case 80: // "decimal"
-      case 81: // "string"
-      case 140: // BooleanLiteral
-      case 141: // IntegerLiteral
-      case 142: // RationalLiteral
-      case 143: // DecimalLiteral
-      case 144: // BinaryLiteral
-      case 145: // StringLiteral
+      case symbol_kind::S_BINARY: // "binary"
+      case symbol_kind::S_HEXADECIMAL: // "hexadecimal"
+      case symbol_kind::S_INTEGER: // "integer"
+      case symbol_kind::S_RATIONAL: // "rational"
+      case symbol_kind::S_DECIMAL: // "decimal"
+      case symbol_kind::S_STRING: // "string"
+      case symbol_kind::S_BooleanLiteral: // BooleanLiteral
+      case symbol_kind::S_IntegerLiteral: // IntegerLiteral
+      case symbol_kind::S_RationalLiteral: // RationalLiteral
+      case symbol_kind::S_DecimalLiteral: // DecimalLiteral
+      case symbol_kind::S_BinaryLiteral: // BinaryLiteral
+      case symbol_kind::S_StringLiteral: // StringLiteral
         yylhs.value.emplace< ValueLiteral::Ptr > ();
         break;
 
-      case 177: // VariableBinding
+      case symbol_kind::S_VariableBinding: // VariableBinding
         yylhs.value.emplace< VariableBinding::Ptr > ();
         break;
 
-      case 176: // VariableBindings
+      case symbol_kind::S_VariableBindings: // VariableBindings
         yylhs.value.emplace< VariableBindings::Ptr > ();
         break;
 
-      case 170: // Variable
-      case 173: // TypedVariable
-      case 174: // AttributedVariable
-      case 175: // TypedAttributedVariable
+      case symbol_kind::S_Variable: // Variable
+      case symbol_kind::S_TypedVariable: // TypedVariable
+      case symbol_kind::S_AttributedVariable: // AttributedVariable
+      case symbol_kind::S_TypedAttributedVariable: // TypedAttributedVariable
         yylhs.value.emplace< VariableDefinition::Ptr > ();
         break;
 
-      case 163: // Parameters
-      case 171: // AttributedVariables
-      case 172: // TypedVariables
+      case symbol_kind::S_Parameters: // Parameters
+      case symbol_kind::S_AttributedVariables: // AttributedVariables
+      case symbol_kind::S_TypedVariables: // TypedVariables
         yylhs.value.emplace< VariableDefinitions::Ptr > ();
         break;
 
-      case 121: // WhileRule
+      case symbol_kind::S_WhileRule: // WhileRule
         yylhs.value.emplace< WhileRule::Ptr > ();
         break;
 
-      case 154: // Type
+      case symbol_kind::S_Type: // Type
         yylhs.value.emplace< libcasm_fe::Ast::Type::Ptr > ();
         break;
 
@@ -2658,223 +2627,223 @@ namespace libcasm_fe {
         {
           switch (yyn)
             {
-  case 2:
+  case 2: // Specification: Header Definitions
 #line 413 "../../obj/src/GrammarParser.y"
   {
       m_specification.setHeader( yystack_[1].value.as < HeaderDefinition::Ptr > () );
       m_specification.setDefinitions( yystack_[0].value.as < Definitions::Ptr > () );
       m_specification.setSpans( m_lexer.fetchSpansAndReset() );
   }
-#line 2669 "GrammarParser.cpp"
+#line 2638 "GrammarParser.cpp"
     break;
 
-  case 3:
+  case 3: // Header: Attributes "CASM"
 #line 423 "../../obj/src/GrammarParser.y"
   {
       auto definition = Ast::make< HeaderDefinition >( yylhs.location, yystack_[0].value.as < Ast::Token::Ptr > () );
       definition->setAttributes( yystack_[1].value.as < Attributes::Ptr > () );
       yylhs.value.as < HeaderDefinition::Ptr > () = definition;
   }
-#line 2679 "GrammarParser.cpp"
+#line 2648 "GrammarParser.cpp"
     break;
 
-  case 4:
+  case 4: // Header: "CASM"
 #line 429 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < HeaderDefinition::Ptr > () = Ast::make< HeaderDefinition >( yylhs.location, yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 2687 "GrammarParser.cpp"
+#line 2656 "GrammarParser.cpp"
     break;
 
-  case 5:
+  case 5: // Definitions: Definitions AttributedDefinition
 #line 437 "../../obj/src/GrammarParser.y"
   {
       auto definitions = yystack_[1].value.as < Definitions::Ptr > ();
       definitions->add( yystack_[0].value.as < Definition::Ptr > () );
       yylhs.value.as < Definitions::Ptr > () = definitions;
   }
-#line 2697 "GrammarParser.cpp"
+#line 2666 "GrammarParser.cpp"
     break;
 
-  case 6:
+  case 6: // Definitions: AttributedDefinition
 #line 443 "../../obj/src/GrammarParser.y"
   {
       auto definitions = Ast::make< Definitions >( yylhs.location );
       definitions->add( yystack_[0].value.as < Definition::Ptr > () );
       yylhs.value.as < Definitions::Ptr > () = definitions;
   }
-#line 2707 "GrammarParser.cpp"
+#line 2676 "GrammarParser.cpp"
     break;
 
-  case 7:
+  case 7: // AttributedDefinition: Attributes Definition
 #line 453 "../../obj/src/GrammarParser.y"
   {
       auto definition = yystack_[0].value.as < Definition::Ptr > ();
       definition->setAttributes( yystack_[1].value.as < Attributes::Ptr > () );
       yylhs.value.as < Definition::Ptr > () = definition;
   }
-#line 2717 "GrammarParser.cpp"
+#line 2686 "GrammarParser.cpp"
     break;
 
-  case 8:
+  case 8: // AttributedDefinition: Definition
 #line 459 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < Definition::Ptr > ();
   }
-#line 2725 "GrammarParser.cpp"
+#line 2694 "GrammarParser.cpp"
     break;
 
-  case 9:
+  case 9: // AttributedDefinition: error
 #line 463 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = nullptr;
   }
-#line 2733 "GrammarParser.cpp"
+#line 2702 "GrammarParser.cpp"
     break;
 
-  case 10:
+  case 10: // Definition: InitDefinition
 #line 471 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < InitDefinition::Ptr > ();
   }
-#line 2741 "GrammarParser.cpp"
+#line 2710 "GrammarParser.cpp"
     break;
 
-  case 11:
+  case 11: // Definition: EnumerationDefinition
 #line 475 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < EnumerationDefinition::Ptr > ();
   }
-#line 2749 "GrammarParser.cpp"
+#line 2718 "GrammarParser.cpp"
     break;
 
-  case 12:
+  case 12: // Definition: DerivedDefinition
 #line 479 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < DerivedDefinition::Ptr > ();
   }
-#line 2757 "GrammarParser.cpp"
+#line 2726 "GrammarParser.cpp"
     break;
 
-  case 13:
+  case 13: // Definition: RuleDefinition
 #line 483 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < RuleDefinition::Ptr > ();
   }
-#line 2765 "GrammarParser.cpp"
+#line 2734 "GrammarParser.cpp"
     break;
 
-  case 14:
+  case 14: // Definition: FunctionDefinition
 #line 487 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < FunctionDefinition::Ptr > ();
   }
-#line 2773 "GrammarParser.cpp"
+#line 2742 "GrammarParser.cpp"
     break;
 
-  case 15:
+  case 15: // Definition: UsingDefinition
 #line 491 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < UsingDefinition::Ptr > ();
   }
-#line 2781 "GrammarParser.cpp"
+#line 2750 "GrammarParser.cpp"
     break;
 
-  case 16:
+  case 16: // Definition: UsingPathDefinition
 #line 495 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < UsingPathDefinition::Ptr > ();
   }
-#line 2789 "GrammarParser.cpp"
+#line 2758 "GrammarParser.cpp"
     break;
 
-  case 17:
+  case 17: // Definition: InvariantDefinition
 #line 499 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < InvariantDefinition::Ptr > ();
   }
-#line 2797 "GrammarParser.cpp"
+#line 2766 "GrammarParser.cpp"
     break;
 
-  case 18:
+  case 18: // Definition: ImportDefinition
 #line 503 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < ImportDefinition::Ptr > ();
   }
-#line 2805 "GrammarParser.cpp"
+#line 2774 "GrammarParser.cpp"
     break;
 
-  case 19:
+  case 19: // InitDefinition: "init" IdentifierPath
 #line 511 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < InitDefinition::Ptr > () = Ast::make< InitDefinition >( yylhs.location, yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < IdentifierPath::Ptr > () );
   }
-#line 2813 "GrammarParser.cpp"
+#line 2782 "GrammarParser.cpp"
     break;
 
-  case 20:
+  case 20: // InitDefinition: "init" "{" Initializers "}"
 #line 515 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < InitDefinition::Ptr > () = Ast::make< InitDefinition >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Initializers::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 2821 "GrammarParser.cpp"
+#line 2790 "GrammarParser.cpp"
     break;
 
-  case 21:
+  case 21: // EnumerationDefinition: "enumeration" Identifier "=" "{" Enumerators "}"
 #line 523 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < EnumerationDefinition::Ptr > () = Ast::make< EnumerationDefinition >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < Identifier::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Enumerators::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 2829 "GrammarParser.cpp"
+#line 2798 "GrammarParser.cpp"
     break;
 
-  case 22:
+  case 22: // DerivedDefinition: "derived" Identifier "->" Type "=" Term
 #line 531 "../../obj/src/GrammarParser.y"
   {
       const auto params = Ast::make< NodeList< VariableDefinition > >( yylhs.location );
       yylhs.value.as < DerivedDefinition::Ptr > () = Ast::make< DerivedDefinition >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < Identifier::Ptr > (), params, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 2838 "GrammarParser.cpp"
+#line 2807 "GrammarParser.cpp"
     break;
 
-  case 23:
+  case 23: // DerivedDefinition: "derived" Identifier "(" Parameters ")" "->" Type "=" Term
 #line 536 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < DerivedDefinition::Ptr > () = Ast::make< DerivedDefinition >( yylhs.location, yystack_[8].value.as < Ast::Token::Ptr > (), yystack_[7].value.as < Identifier::Ptr > (), yystack_[5].value.as < VariableDefinitions::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
       yylhs.value.as < DerivedDefinition::Ptr > ()->setLeftBracketToken( yystack_[6].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < DerivedDefinition::Ptr > ()->setRightBracketToken( yystack_[4].value.as < Ast::Token::Ptr > () );
   }
-#line 2848 "GrammarParser.cpp"
+#line 2817 "GrammarParser.cpp"
     break;
 
-  case 24:
+  case 24: // DerivedDefinition: "derived" Identifier "(" error ")" "->" Type "=" Term
 #line 542 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < DerivedDefinition::Ptr > () = nullptr;
   }
-#line 2856 "GrammarParser.cpp"
+#line 2825 "GrammarParser.cpp"
     break;
 
-  case 25:
+  case 25: // RuleDefinition: "rule" Identifier "=" Rule
 #line 550 "../../obj/src/GrammarParser.y"
   {
       const auto params = Ast::make< NodeList< VariableDefinition > >( yylhs.location );
       const auto vType = createVoidType( yylhs.location );
       yylhs.value.as < RuleDefinition::Ptr > () = Ast::make< RuleDefinition >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Identifier::Ptr > (), params, Token::unresolved(), vType, yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 2866 "GrammarParser.cpp"
+#line 2835 "GrammarParser.cpp"
     break;
 
-  case 26:
+  case 26: // RuleDefinition: "rule" Identifier "->" Type "=" Rule
 #line 556 "../../obj/src/GrammarParser.y"
   {
       const auto params = Ast::make< NodeList< VariableDefinition > >( yylhs.location );
       yylhs.value.as < RuleDefinition::Ptr > () = Ast::make< RuleDefinition >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < Identifier::Ptr > (), params, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 2875 "GrammarParser.cpp"
+#line 2844 "GrammarParser.cpp"
     break;
 
-  case 27:
+  case 27: // RuleDefinition: "rule" Identifier "(" Parameters ")" "=" Rule
 #line 561 "../../obj/src/GrammarParser.y"
   {
       const auto vType = createVoidType( yylhs.location );
@@ -2882,36 +2851,36 @@ namespace libcasm_fe {
       yylhs.value.as < RuleDefinition::Ptr > ()->setLeftBracketToken( yystack_[4].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < RuleDefinition::Ptr > ()->setRightBracketToken( yystack_[2].value.as < Ast::Token::Ptr > () );
   }
-#line 2886 "GrammarParser.cpp"
+#line 2855 "GrammarParser.cpp"
     break;
 
-  case 28:
+  case 28: // RuleDefinition: "rule" Identifier "(" Parameters ")" "->" Type "=" Rule
 #line 568 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < RuleDefinition::Ptr > () = Ast::make< RuleDefinition >( yylhs.location, yystack_[8].value.as < Ast::Token::Ptr > (), yystack_[7].value.as < Identifier::Ptr > (), yystack_[5].value.as < VariableDefinitions::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
       yylhs.value.as < RuleDefinition::Ptr > ()->setLeftBracketToken( yystack_[6].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < RuleDefinition::Ptr > ()->setRightBracketToken( yystack_[4].value.as < Ast::Token::Ptr > () );
   }
-#line 2896 "GrammarParser.cpp"
+#line 2865 "GrammarParser.cpp"
     break;
 
-  case 29:
+  case 29: // RuleDefinition: "rule" Identifier "(" error ")" "=" Rule
 #line 574 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < RuleDefinition::Ptr > () = nullptr;
   }
-#line 2904 "GrammarParser.cpp"
+#line 2873 "GrammarParser.cpp"
     break;
 
-  case 30:
+  case 30: // RuleDefinition: "rule" Identifier "(" error ")" "->" Type "=" Rule
 #line 578 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < RuleDefinition::Ptr > () = nullptr;
   }
-#line 2912 "GrammarParser.cpp"
+#line 2881 "GrammarParser.cpp"
     break;
 
-  case 31:
+  case 31: // FunctionDefinition: "function" Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially
 #line 586 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < FunctionDefinition::Ptr > () = Ast::make< FunctionDefinition >( yylhs.location, yystack_[7].value.as < Ast::Token::Ptr > (), yystack_[6].value.as < Identifier::Ptr > (), yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < Types::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as < Defined::Ptr > (), yystack_[0].value.as < Initially::Ptr > () );
@@ -2923,36 +2892,36 @@ namespace libcasm_fe {
           initializer->setFunction( yylhs.value.as < FunctionDefinition::Ptr > () );
       }
   }
-#line 2927 "GrammarParser.cpp"
+#line 2896 "GrammarParser.cpp"
     break;
 
-  case 32:
+  case 32: // EnumeratorDefinition: Identifier
 #line 601 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < EnumeratorDefinition::Ptr > () = Ast::make< EnumeratorDefinition >( yylhs.location, yystack_[0].value.as < Identifier::Ptr > () );
   }
-#line 2935 "GrammarParser.cpp"
+#line 2904 "GrammarParser.cpp"
     break;
 
-  case 33:
+  case 33: // EnumeratorDefinition: Attributes Identifier
 #line 605 "../../obj/src/GrammarParser.y"
   {
       auto enumerator = Ast::make< EnumeratorDefinition >( yylhs.location, yystack_[0].value.as < Identifier::Ptr > () );
       enumerator->setAttributes( yystack_[1].value.as < Attributes::Ptr > () );
       yylhs.value.as < EnumeratorDefinition::Ptr > () = enumerator;
   }
-#line 2945 "GrammarParser.cpp"
+#line 2914 "GrammarParser.cpp"
     break;
 
-  case 34:
+  case 34: // EnumeratorDefinition: error
 #line 611 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < EnumeratorDefinition::Ptr > () = nullptr;
   }
-#line 2953 "GrammarParser.cpp"
+#line 2922 "GrammarParser.cpp"
     break;
 
-  case 35:
+  case 35: // Enumerators: Enumerators "," EnumeratorDefinition
 #line 619 "../../obj/src/GrammarParser.y"
   {
       auto enumerators = yystack_[2].value.as < Enumerators::Ptr > ();
@@ -2960,416 +2929,416 @@ namespace libcasm_fe {
       enumerators->add( yystack_[0].value.as < EnumeratorDefinition::Ptr > () );
       yylhs.value.as < Enumerators::Ptr > () = enumerators;
   }
-#line 2964 "GrammarParser.cpp"
+#line 2933 "GrammarParser.cpp"
     break;
 
-  case 36:
+  case 36: // Enumerators: EnumeratorDefinition
 #line 626 "../../obj/src/GrammarParser.y"
   {
       auto enumerators = Ast::make< Enumerators >( yylhs.location );
       enumerators->add( yystack_[0].value.as < EnumeratorDefinition::Ptr > () );
       yylhs.value.as < Enumerators::Ptr > () = enumerators;
   }
-#line 2974 "GrammarParser.cpp"
+#line 2943 "GrammarParser.cpp"
     break;
 
-  case 37:
+  case 37: // UsingDefinition: "using" Identifier "=" Type
 #line 636 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < UsingDefinition::Ptr > () = Ast::make< UsingDefinition >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Identifier::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > () );
   }
-#line 2982 "GrammarParser.cpp"
+#line 2951 "GrammarParser.cpp"
     break;
 
-  case 38:
+  case 38: // UsingPathDefinition: "using" IdentifierPath
 #line 644 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < UsingPathDefinition::Ptr > () = Ast::make< UsingPathDefinition >( yylhs.location, yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < IdentifierPath::Ptr > () );
   }
-#line 2990 "GrammarParser.cpp"
+#line 2959 "GrammarParser.cpp"
     break;
 
-  case 39:
+  case 39: // UsingPathDefinition: "using" IdentifierPath "::" "*"
 #line 648 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < UsingPathDefinition::Ptr > () = Ast::make< UsingPathDefinition >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < IdentifierPath::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 2998 "GrammarParser.cpp"
+#line 2967 "GrammarParser.cpp"
     break;
 
-  case 40:
+  case 40: // InvariantDefinition: "invariant" Identifier "=" Term
 #line 656 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < InvariantDefinition::Ptr > () = Ast::make< InvariantDefinition >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Identifier::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 3006 "GrammarParser.cpp"
+#line 2975 "GrammarParser.cpp"
     break;
 
-  case 41:
+  case 41: // ImportDefinition: "import" IdentifierPath
 #line 664 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ImportDefinition::Ptr > () = Ast::make< ImportDefinition >( yylhs.location, yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < IdentifierPath::Ptr > () );
   }
-#line 3014 "GrammarParser.cpp"
+#line 2983 "GrammarParser.cpp"
     break;
 
-  case 42:
+  case 42: // ImportDefinition: "import" IdentifierPath "as" Identifier
 #line 668 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ImportDefinition::Ptr > () = Ast::make< ImportDefinition >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < IdentifierPath::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Identifier::Ptr > () );
   }
-#line 3022 "GrammarParser.cpp"
+#line 2991 "GrammarParser.cpp"
     break;
 
-  case 43:
+  case 43: // Rules: Rules Rule
 #line 680 "../../obj/src/GrammarParser.y"
   {
       auto rules = yystack_[1].value.as < Rules::Ptr > ();
       rules->add( yystack_[0].value.as < Rule::Ptr > () );
       yylhs.value.as < Rules::Ptr > () = rules;
   }
-#line 3032 "GrammarParser.cpp"
+#line 3001 "GrammarParser.cpp"
     break;
 
-  case 44:
+  case 44: // Rules: Rule
 #line 686 "../../obj/src/GrammarParser.y"
   {
       auto rules = Ast::make< Rules >( yylhs.location );
       rules->add( yystack_[0].value.as < Rule::Ptr > () );
       yylhs.value.as < Rules::Ptr > () = rules;
   }
-#line 3042 "GrammarParser.cpp"
+#line 3011 "GrammarParser.cpp"
     break;
 
-  case 45:
+  case 45: // Rule: SkipRule
 #line 696 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < SkipRule::Ptr > ();
   }
-#line 3050 "GrammarParser.cpp"
+#line 3019 "GrammarParser.cpp"
     break;
 
-  case 46:
+  case 46: // Rule: ConditionalRule
 #line 700 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < ConditionalRule::Ptr > ();
   }
-#line 3058 "GrammarParser.cpp"
+#line 3027 "GrammarParser.cpp"
     break;
 
-  case 47:
+  case 47: // Rule: CaseRule
 #line 704 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < CaseRule::Ptr > ();
   }
-#line 3066 "GrammarParser.cpp"
+#line 3035 "GrammarParser.cpp"
     break;
 
-  case 48:
+  case 48: // Rule: LetRule
 #line 708 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < LetRule::Ptr > ();
   }
-#line 3074 "GrammarParser.cpp"
+#line 3043 "GrammarParser.cpp"
     break;
 
-  case 49:
+  case 49: // Rule: LocalRule
 #line 712 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < LocalRule::Ptr > ();
   }
-#line 3082 "GrammarParser.cpp"
+#line 3051 "GrammarParser.cpp"
     break;
 
-  case 50:
+  case 50: // Rule: ForallRule
 #line 716 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < ForallRule::Ptr > ();
   }
-#line 3090 "GrammarParser.cpp"
+#line 3059 "GrammarParser.cpp"
     break;
 
-  case 51:
+  case 51: // Rule: ChooseRule
 #line 720 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < ChooseRule::Ptr > ();
   }
-#line 3098 "GrammarParser.cpp"
+#line 3067 "GrammarParser.cpp"
     break;
 
-  case 52:
+  case 52: // Rule: IterateRule
 #line 724 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < IterateRule::Ptr > ();
   }
-#line 3106 "GrammarParser.cpp"
+#line 3075 "GrammarParser.cpp"
     break;
 
-  case 53:
+  case 53: // Rule: BlockRule
 #line 728 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < BlockRule::Ptr > ();
   }
-#line 3114 "GrammarParser.cpp"
+#line 3083 "GrammarParser.cpp"
     break;
 
-  case 54:
+  case 54: // Rule: SequenceRule
 #line 732 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < SequenceRule::Ptr > ();
   }
-#line 3122 "GrammarParser.cpp"
+#line 3091 "GrammarParser.cpp"
     break;
 
-  case 55:
+  case 55: // Rule: UpdateRule
 #line 736 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < UpdateRule::Ptr > ();
   }
-#line 3130 "GrammarParser.cpp"
+#line 3099 "GrammarParser.cpp"
     break;
 
-  case 56:
+  case 56: // Rule: CallRule
 #line 740 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < CallRule::Ptr > ();
   }
-#line 3138 "GrammarParser.cpp"
+#line 3107 "GrammarParser.cpp"
     break;
 
-  case 57:
+  case 57: // Rule: WhileRule
 #line 744 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Rule::Ptr > () = yystack_[0].value.as < WhileRule::Ptr > ();
   }
-#line 3146 "GrammarParser.cpp"
+#line 3115 "GrammarParser.cpp"
     break;
 
-  case 58:
+  case 58: // SkipRule: "skip"
 #line 752 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < SkipRule::Ptr > () = Ast::make< SkipRule >( yylhs.location, yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3154 "GrammarParser.cpp"
+#line 3123 "GrammarParser.cpp"
     break;
 
-  case 59:
+  case 59: // ConditionalRule: "if" Term "then" Rule
 #line 760 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ConditionalRule::Ptr > () = Ast::make< ConditionalRule >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3162 "GrammarParser.cpp"
+#line 3131 "GrammarParser.cpp"
     break;
 
-  case 60:
+  case 60: // ConditionalRule: "if" Term "then" Rule "else" Rule
 #line 764 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ConditionalRule::Ptr > () = Ast::make< ConditionalRule >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < Expression::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Rule::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3170 "GrammarParser.cpp"
+#line 3139 "GrammarParser.cpp"
     break;
 
-  case 61:
+  case 61: // CaseRule: "case" Term "of" "{" CaseLabels "}"
 #line 772 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < CaseRule::Ptr > () = Ast::make< CaseRule >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < Expression::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Cases::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3178 "GrammarParser.cpp"
+#line 3147 "GrammarParser.cpp"
     break;
 
-  case 62:
+  case 62: // CaseRule: "case" Term "of" "{" error "}"
 #line 776 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < CaseRule::Ptr > () = nullptr;
   }
-#line 3186 "GrammarParser.cpp"
+#line 3155 "GrammarParser.cpp"
     break;
 
-  case 63:
+  case 63: // CaseLabels: CaseLabels CaseLabel
 #line 784 "../../obj/src/GrammarParser.y"
   {
       auto cases = yystack_[1].value.as < Cases::Ptr > ();
       cases->add( yystack_[0].value.as < Case::Ptr > () );
       yylhs.value.as < Cases::Ptr > () = cases;
   }
-#line 3196 "GrammarParser.cpp"
+#line 3165 "GrammarParser.cpp"
     break;
 
-  case 64:
+  case 64: // CaseLabels: CaseLabel
 #line 790 "../../obj/src/GrammarParser.y"
   {
       auto cases = Ast::make< Cases >( yylhs.location );
       cases->add( yystack_[0].value.as < Case::Ptr > () );
       yylhs.value.as < Cases::Ptr > () = cases;
   }
-#line 3206 "GrammarParser.cpp"
+#line 3175 "GrammarParser.cpp"
     break;
 
-  case 65:
+  case 65: // CaseLabel: "default" ":" Rule
 #line 800 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Case::Ptr > () = Ast::make< DefaultCase >( yylhs.location, yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3214 "GrammarParser.cpp"
+#line 3183 "GrammarParser.cpp"
     break;
 
-  case 66:
+  case 66: // CaseLabel: "_" ":" Rule
 #line 804 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Case::Ptr > () = Ast::make< DefaultCase >( yylhs.location, yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3222 "GrammarParser.cpp"
+#line 3191 "GrammarParser.cpp"
     break;
 
-  case 67:
+  case 67: // CaseLabel: Term ":" Rule
 #line 808 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Case::Ptr > () = Ast::make< ExpressionCase >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3230 "GrammarParser.cpp"
+#line 3199 "GrammarParser.cpp"
     break;
 
-  case 68:
+  case 68: // LetRule: "let" VariableBindings "in" Rule
 #line 816 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < LetRule::Ptr > () = Ast::make< LetRule >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < VariableBindings::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3238 "GrammarParser.cpp"
+#line 3207 "GrammarParser.cpp"
     break;
 
-  case 69:
+  case 69: // LocalRule: "local" LocalFunctionDefinitions "in" Rule
 #line 824 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < LocalRule::Ptr > () = Ast::make< LocalRule >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < FunctionDefinitions::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3246 "GrammarParser.cpp"
+#line 3215 "GrammarParser.cpp"
     break;
 
-  case 70:
+  case 70: // ForallRule: "forall" AttributedVariables "in" Term "do" Rule
 #line 832 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ForallRule::Ptr > () = Ast::make< ForallRule >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < VariableDefinitions::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3254 "GrammarParser.cpp"
+#line 3223 "GrammarParser.cpp"
     break;
 
-  case 71:
+  case 71: // ForallRule: "forall" AttributedVariables "in" Term "with" Term "do" Rule
 #line 836 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ForallRule::Ptr > () = Ast::make< ForallRule >( yylhs.location, yystack_[7].value.as < Ast::Token::Ptr > (), yystack_[6].value.as < VariableDefinitions::Ptr > (), yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < Expression::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3262 "GrammarParser.cpp"
+#line 3231 "GrammarParser.cpp"
     break;
 
-  case 72:
+  case 72: // ChooseRule: "choose" AttributedVariables "in" Term "do" Rule
 #line 844 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ChooseRule::Ptr > () = Ast::make< ChooseRule >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < VariableDefinitions::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3270 "GrammarParser.cpp"
+#line 3239 "GrammarParser.cpp"
     break;
 
-  case 73:
+  case 73: // IterateRule: "iterate" Rule
 #line 852 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < IterateRule::Ptr > () = Ast::make< IterateRule >( yylhs.location, yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3278 "GrammarParser.cpp"
+#line 3247 "GrammarParser.cpp"
     break;
 
-  case 74:
+  case 74: // BlockRule: "{" Rules "}"
 #line 860 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < BlockRule::Ptr > () = Ast::make< BlockRule >( yylhs.location, yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Rules::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3286 "GrammarParser.cpp"
+#line 3255 "GrammarParser.cpp"
     break;
 
-  case 75:
+  case 75: // BlockRule: "par" Rules "endpar"
 #line 864 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < BlockRule::Ptr > () = Ast::make< BlockRule >( yylhs.location, yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Rules::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3294 "GrammarParser.cpp"
+#line 3263 "GrammarParser.cpp"
     break;
 
-  case 76:
+  case 76: // BlockRule: "{" error "}"
 #line 868 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < BlockRule::Ptr > () = nullptr;
       yyerrok;
   }
-#line 3303 "GrammarParser.cpp"
+#line 3272 "GrammarParser.cpp"
     break;
 
-  case 77:
+  case 77: // BlockRule: "par" error "endpar"
 #line 873 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < BlockRule::Ptr > () = nullptr;
       yyerrok;
   }
-#line 3312 "GrammarParser.cpp"
+#line 3281 "GrammarParser.cpp"
     break;
 
-  case 78:
+  case 78: // SequenceRule: "{|" Rules "|}"
 #line 882 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < SequenceRule::Ptr > () = Ast::make< SequenceRule >( yylhs.location, yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Rules::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3320 "GrammarParser.cpp"
+#line 3289 "GrammarParser.cpp"
     break;
 
-  case 79:
+  case 79: // SequenceRule: "seq" Rules "endseq"
 #line 886 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < SequenceRule::Ptr > () = Ast::make< SequenceRule >( yylhs.location, yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Rules::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3328 "GrammarParser.cpp"
+#line 3297 "GrammarParser.cpp"
     break;
 
-  case 80:
+  case 80: // SequenceRule: "{|" error "|}"
 #line 890 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < SequenceRule::Ptr > () = nullptr;
       yyerrok;
   }
-#line 3337 "GrammarParser.cpp"
+#line 3306 "GrammarParser.cpp"
     break;
 
-  case 81:
+  case 81: // SequenceRule: "seq" error "endseq"
 #line 895 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < SequenceRule::Ptr > () = nullptr;
       yyerrok;
   }
-#line 3346 "GrammarParser.cpp"
+#line 3315 "GrammarParser.cpp"
     break;
 
-  case 82:
+  case 82: // UpdateRule: DirectCallExpression ":=" Term
 #line 904 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < UpdateRule::Ptr > () = Ast::make< UpdateRule >( yylhs.location, yystack_[2].value.as < DirectCallExpression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 3354 "GrammarParser.cpp"
+#line 3323 "GrammarParser.cpp"
     break;
 
-  case 83:
+  case 83: // CallRule: CallExpression
 #line 912 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < CallRule::Ptr > () = Ast::make< CallRule >( yylhs.location, yystack_[0].value.as < CallExpression::Ptr > () );
   }
-#line 3362 "GrammarParser.cpp"
+#line 3331 "GrammarParser.cpp"
     break;
 
-  case 84:
+  case 84: // WhileRule: "while" Term "do" Rule
 #line 920 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < WhileRule::Ptr > () = Ast::make< WhileRule >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Rule::Ptr > () );
   }
-#line 3370 "GrammarParser.cpp"
+#line 3339 "GrammarParser.cpp"
     break;
 
-  case 85:
+  case 85: // Terms: Terms "," Term
 #line 932 "../../obj/src/GrammarParser.y"
   {
       auto expressions = yystack_[2].value.as < Expressions::Ptr > ();
@@ -3377,325 +3346,325 @@ namespace libcasm_fe {
       expressions->add( yystack_[0].value.as < Expression::Ptr > () );
       yylhs.value.as < Expressions::Ptr > () = expressions;
   }
-#line 3381 "GrammarParser.cpp"
+#line 3350 "GrammarParser.cpp"
     break;
 
-  case 86:
+  case 86: // Terms: Term
 #line 939 "../../obj/src/GrammarParser.y"
   {
       const auto expressions = Ast::make< Expressions >( yylhs.location );
       expressions->add( yystack_[0].value.as < Expression::Ptr > () );
       yylhs.value.as < Expressions::Ptr > () = expressions;
   }
-#line 3391 "GrammarParser.cpp"
+#line 3360 "GrammarParser.cpp"
     break;
 
-  case 87:
+  case 87: // Term: SimpleOrClaspedTerm
 #line 949 "../../obj/src/GrammarParser.y"
   {
      yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < Expression::Ptr > ();
   }
-#line 3399 "GrammarParser.cpp"
+#line 3368 "GrammarParser.cpp"
     break;
 
-  case 88:
+  case 88: // Term: TypeCastingExpression
 #line 953 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < TypeCastingExpression::Ptr > ();
   }
-#line 3407 "GrammarParser.cpp"
+#line 3376 "GrammarParser.cpp"
     break;
 
-  case 89:
+  case 89: // Term: OperatorExpression
 #line 957 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < Expression::Ptr > ();
   }
-#line 3415 "GrammarParser.cpp"
+#line 3384 "GrammarParser.cpp"
     break;
 
-  case 90:
+  case 90: // Term: LetExpression
 #line 961 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < LetExpression::Ptr > ();
   }
-#line 3423 "GrammarParser.cpp"
+#line 3392 "GrammarParser.cpp"
     break;
 
-  case 91:
+  case 91: // Term: ConditionalExpression
 #line 965 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < ConditionalExpression::Ptr > ();
   }
-#line 3431 "GrammarParser.cpp"
+#line 3400 "GrammarParser.cpp"
     break;
 
-  case 92:
+  case 92: // Term: ChooseExpression
 #line 969 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < ChooseExpression::Ptr > ();
   }
-#line 3439 "GrammarParser.cpp"
+#line 3408 "GrammarParser.cpp"
     break;
 
-  case 93:
+  case 93: // Term: UniversalQuantifierExpression
 #line 973 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < UniversalQuantifierExpression::Ptr > ();
   }
-#line 3447 "GrammarParser.cpp"
+#line 3416 "GrammarParser.cpp"
     break;
 
-  case 94:
+  case 94: // Term: ExistentialQuantifierExpression
 #line 977 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < ExistentialQuantifierExpression::Ptr > ();
   }
-#line 3455 "GrammarParser.cpp"
+#line 3424 "GrammarParser.cpp"
     break;
 
-  case 95:
+  case 95: // Term: CardinalityExpression
 #line 981 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < CardinalityExpression::Ptr > ();
   }
-#line 3463 "GrammarParser.cpp"
+#line 3432 "GrammarParser.cpp"
     break;
 
-  case 96:
+  case 96: // SimpleOrClaspedTerm: "(" Term ")"
 #line 989 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< Ast::EmbracedExpression >( yylhs.location, yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Expression::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3471 "GrammarParser.cpp"
+#line 3440 "GrammarParser.cpp"
     break;
 
-  case 97:
+  case 97: // SimpleOrClaspedTerm: "(" error ")"
 #line 993 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = nullptr;
   }
-#line 3479 "GrammarParser.cpp"
+#line 3448 "GrammarParser.cpp"
     break;
 
-  case 98:
+  case 98: // SimpleOrClaspedTerm: CallExpression
 #line 997 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < CallExpression::Ptr > ();
   }
-#line 3487 "GrammarParser.cpp"
+#line 3456 "GrammarParser.cpp"
     break;
 
-  case 99:
+  case 99: // SimpleOrClaspedTerm: LiteralCallExpression
 #line 1001 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < LiteralCallExpression::Ptr > ();
   }
-#line 3495 "GrammarParser.cpp"
+#line 3464 "GrammarParser.cpp"
     break;
 
-  case 100:
+  case 100: // SimpleOrClaspedTerm: Literal
 #line 1005 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = yystack_[0].value.as < Literal::Ptr > ();
   }
-#line 3503 "GrammarParser.cpp"
+#line 3472 "GrammarParser.cpp"
     break;
 
-  case 101:
+  case 101: // SimpleOrClaspedTerm: "+" SimpleOrClaspedTerm
 #line 1009 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< UnaryExpression >( yylhs.location, yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::ADD_INSTRUCTION );
   }
-#line 3511 "GrammarParser.cpp"
+#line 3480 "GrammarParser.cpp"
     break;
 
-  case 102:
+  case 102: // SimpleOrClaspedTerm: "-" SimpleOrClaspedTerm
 #line 1013 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< UnaryExpression >( yylhs.location, yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::INV_INSTRUCTION );
   }
-#line 3519 "GrammarParser.cpp"
+#line 3488 "GrammarParser.cpp"
     break;
 
-  case 103:
+  case 103: // OperatorExpression: Term "+" Term
 #line 1025 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::ADD_INSTRUCTION );
   }
-#line 3527 "GrammarParser.cpp"
+#line 3496 "GrammarParser.cpp"
     break;
 
-  case 104:
+  case 104: // OperatorExpression: Term "-" Term
 #line 1029 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::SUB_INSTRUCTION );
   }
-#line 3535 "GrammarParser.cpp"
+#line 3504 "GrammarParser.cpp"
     break;
 
-  case 105:
+  case 105: // OperatorExpression: Term "*" Term
 #line 1033 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::MUL_INSTRUCTION );
   }
-#line 3543 "GrammarParser.cpp"
+#line 3512 "GrammarParser.cpp"
     break;
 
-  case 106:
+  case 106: // OperatorExpression: Term "/" Term
 #line 1037 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::DIV_INSTRUCTION );
   }
-#line 3551 "GrammarParser.cpp"
+#line 3520 "GrammarParser.cpp"
     break;
 
-  case 107:
+  case 107: // OperatorExpression: Term "%" Term
 #line 1041 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::MOD_INSTRUCTION );
   }
-#line 3559 "GrammarParser.cpp"
+#line 3528 "GrammarParser.cpp"
     break;
 
-  case 108:
+  case 108: // OperatorExpression: Term "^" Term
 #line 1045 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::POW_INSTRUCTION );
   }
-#line 3567 "GrammarParser.cpp"
+#line 3536 "GrammarParser.cpp"
     break;
 
-  case 109:
+  case 109: // OperatorExpression: Term "!=" Term
 #line 1049 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::NEQ_INSTRUCTION );
   }
-#line 3575 "GrammarParser.cpp"
+#line 3544 "GrammarParser.cpp"
     break;
 
-  case 110:
+  case 110: // OperatorExpression: Term "=" Term
 #line 1053 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::EQU_INSTRUCTION );
   }
-#line 3583 "GrammarParser.cpp"
+#line 3552 "GrammarParser.cpp"
     break;
 
-  case 111:
+  case 111: // OperatorExpression: Term "<" Term
 #line 1057 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::LTH_INSTRUCTION );
   }
-#line 3591 "GrammarParser.cpp"
+#line 3560 "GrammarParser.cpp"
     break;
 
-  case 112:
+  case 112: // OperatorExpression: Term ">" Term
 #line 1061 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::GTH_INSTRUCTION );
   }
-#line 3599 "GrammarParser.cpp"
+#line 3568 "GrammarParser.cpp"
     break;
 
-  case 113:
+  case 113: // OperatorExpression: Term "<=" Term
 #line 1065 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::LEQ_INSTRUCTION );
   }
-#line 3607 "GrammarParser.cpp"
+#line 3576 "GrammarParser.cpp"
     break;
 
-  case 114:
+  case 114: // OperatorExpression: Term ">=" Term
 #line 1069 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::GEQ_INSTRUCTION );
   }
-#line 3615 "GrammarParser.cpp"
+#line 3584 "GrammarParser.cpp"
     break;
 
-  case 115:
+  case 115: // OperatorExpression: Term "or" Term
 #line 1073 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::OR_INSTRUCTION );
   }
-#line 3623 "GrammarParser.cpp"
+#line 3592 "GrammarParser.cpp"
     break;
 
-  case 116:
+  case 116: // OperatorExpression: Term "xor" Term
 #line 1077 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::XOR_INSTRUCTION );
   }
-#line 3631 "GrammarParser.cpp"
+#line 3600 "GrammarParser.cpp"
     break;
 
-  case 117:
+  case 117: // OperatorExpression: Term "and" Term
 #line 1081 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::AND_INSTRUCTION );
   }
-#line 3639 "GrammarParser.cpp"
+#line 3608 "GrammarParser.cpp"
     break;
 
-  case 118:
+  case 118: // OperatorExpression: Term "=>" Term
 #line 1085 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::IMP_INSTRUCTION );
   }
-#line 3647 "GrammarParser.cpp"
+#line 3616 "GrammarParser.cpp"
     break;
 
-  case 119:
+  case 119: // OperatorExpression: Term "implies" Term
 #line 1089 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::IMP_INSTRUCTION );
   }
-#line 3655 "GrammarParser.cpp"
+#line 3624 "GrammarParser.cpp"
     break;
 
-  case 120:
+  case 120: // OperatorExpression: "not" Term
 #line 1093 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Expression::Ptr > () = Ast::make< UnaryExpression >( yylhs.location, yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > (), libcasm_ir::Value::NOT_INSTRUCTION );
   }
-#line 3663 "GrammarParser.cpp"
+#line 3632 "GrammarParser.cpp"
     break;
 
-  case 121:
+  case 121: // CallExpression: DirectCallExpression
 #line 1101 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < CallExpression::Ptr > () = yystack_[0].value.as < DirectCallExpression::Ptr > ();
   }
-#line 3671 "GrammarParser.cpp"
+#line 3640 "GrammarParser.cpp"
     break;
 
-  case 122:
+  case 122: // CallExpression: MethodCallExpression
 #line 1105 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < CallExpression::Ptr > () = yystack_[0].value.as < MethodCallExpression::Ptr > ();
   }
-#line 3679 "GrammarParser.cpp"
+#line 3648 "GrammarParser.cpp"
     break;
 
-  case 123:
+  case 123: // CallExpression: IndirectCallExpression
 #line 1109 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < CallExpression::Ptr > () = yystack_[0].value.as < IndirectCallExpression::Ptr > ();
   }
-#line 3687 "GrammarParser.cpp"
+#line 3656 "GrammarParser.cpp"
     break;
 
-  case 124:
+  case 124: // DirectCallExpression: IdentifierPath
 #line 1117 "../../obj/src/GrammarParser.y"
   {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
       yylhs.value.as < DirectCallExpression::Ptr > () = Ast::make< DirectCallExpression >( yylhs.location, yystack_[0].value.as < IdentifierPath::Ptr > (), arguments );
   }
-#line 3696 "GrammarParser.cpp"
+#line 3665 "GrammarParser.cpp"
     break;
 
-  case 125:
+  case 125: // DirectCallExpression: IdentifierPath "(" ")"
 #line 1122 "../../obj/src/GrammarParser.y"
   {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
@@ -3703,37 +3672,37 @@ namespace libcasm_fe {
       yylhs.value.as < DirectCallExpression::Ptr > ()->setLeftBracketToken( yystack_[1].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < DirectCallExpression::Ptr > ()->setRightBracketToken( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3707 "GrammarParser.cpp"
+#line 3676 "GrammarParser.cpp"
     break;
 
-  case 126:
+  case 126: // DirectCallExpression: IdentifierPath "(" Terms ")"
 #line 1129 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < DirectCallExpression::Ptr > () = Ast::make< DirectCallExpression >( yylhs.location, yystack_[3].value.as < IdentifierPath::Ptr > (), yystack_[1].value.as < Expressions::Ptr > () );
       yylhs.value.as < DirectCallExpression::Ptr > ()->setLeftBracketToken( yystack_[2].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < DirectCallExpression::Ptr > ()->setRightBracketToken( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3717 "GrammarParser.cpp"
+#line 3686 "GrammarParser.cpp"
     break;
 
-  case 127:
+  case 127: // DirectCallExpression: IdentifierPath "(" error ")"
 #line 1135 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < DirectCallExpression::Ptr > () = nullptr;
   }
-#line 3725 "GrammarParser.cpp"
+#line 3694 "GrammarParser.cpp"
     break;
 
-  case 128:
+  case 128: // MethodCallExpression: SimpleOrClaspedTerm "." Identifier
 #line 1143 "../../obj/src/GrammarParser.y"
   {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
       yylhs.value.as < MethodCallExpression::Ptr > () = Ast::make< MethodCallExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Identifier::Ptr > (), arguments );
   }
-#line 3734 "GrammarParser.cpp"
+#line 3703 "GrammarParser.cpp"
     break;
 
-  case 129:
+  case 129: // MethodCallExpression: SimpleOrClaspedTerm "." Identifier "(" ")"
 #line 1148 "../../obj/src/GrammarParser.y"
   {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
@@ -3741,36 +3710,36 @@ namespace libcasm_fe {
       yylhs.value.as < MethodCallExpression::Ptr > ()->setLeftBracketToken( yystack_[1].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < MethodCallExpression::Ptr > ()->setRightBracketToken( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3745 "GrammarParser.cpp"
+#line 3714 "GrammarParser.cpp"
     break;
 
-  case 130:
+  case 130: // MethodCallExpression: SimpleOrClaspedTerm "." Identifier "(" Terms ")"
 #line 1155 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < MethodCallExpression::Ptr > () = Ast::make< MethodCallExpression >( yylhs.location, yystack_[5].value.as < Expression::Ptr > (), yystack_[4].value.as < Ast::Token::Ptr > (), yystack_[3].value.as < Identifier::Ptr > (), yystack_[1].value.as < Expressions::Ptr > () );
       yylhs.value.as < MethodCallExpression::Ptr > ()->setLeftBracketToken( yystack_[2].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < MethodCallExpression::Ptr > ()->setRightBracketToken( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3755 "GrammarParser.cpp"
+#line 3724 "GrammarParser.cpp"
     break;
 
-  case 131:
+  case 131: // MethodCallExpression: SimpleOrClaspedTerm "." Identifier "(" error ")"
 #line 1161 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < MethodCallExpression::Ptr > () = nullptr;
   }
-#line 3763 "GrammarParser.cpp"
+#line 3732 "GrammarParser.cpp"
     break;
 
-  case 132:
+  case 132: // LiteralCallExpression: SimpleOrClaspedTerm "." IntegerLiteral
 #line 1169 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < LiteralCallExpression::Ptr > () = Ast::make< LiteralCallExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < ValueLiteral::Ptr > () );
   }
-#line 3771 "GrammarParser.cpp"
+#line 3740 "GrammarParser.cpp"
     break;
 
-  case 133:
+  case 133: // IndirectCallExpression: CallExpression "(" ")"
 #line 1177 "../../obj/src/GrammarParser.y"
   {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
@@ -3778,265 +3747,265 @@ namespace libcasm_fe {
       yylhs.value.as < IndirectCallExpression::Ptr > ()->setLeftBracketToken( yystack_[1].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < IndirectCallExpression::Ptr > ()->setRightBracketToken( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3782 "GrammarParser.cpp"
+#line 3751 "GrammarParser.cpp"
     break;
 
-  case 134:
+  case 134: // IndirectCallExpression: CallExpression "(" Terms ")"
 #line 1184 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < IndirectCallExpression::Ptr > () = Ast::make< IndirectCallExpression >( yylhs.location, yystack_[3].value.as < CallExpression::Ptr > (), yystack_[1].value.as < Expressions::Ptr > () );
       yylhs.value.as < IndirectCallExpression::Ptr > ()->setLeftBracketToken( yystack_[2].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < IndirectCallExpression::Ptr > ()->setRightBracketToken( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3792 "GrammarParser.cpp"
+#line 3761 "GrammarParser.cpp"
     break;
 
-  case 135:
+  case 135: // IndirectCallExpression: CallExpression "(" error ")"
 #line 1190 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < IndirectCallExpression::Ptr > () = nullptr;
   }
-#line 3800 "GrammarParser.cpp"
+#line 3769 "GrammarParser.cpp"
     break;
 
-  case 136:
+  case 136: // TypeCastingExpression: SimpleOrClaspedTerm "as" Type
 #line 1198 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < TypeCastingExpression::Ptr > () = Ast::make< TypeCastingExpression >( yylhs.location, yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > () );
   }
-#line 3808 "GrammarParser.cpp"
+#line 3777 "GrammarParser.cpp"
     break;
 
-  case 137:
+  case 137: // LetExpression: "let" VariableBindings "in" Term
 #line 1206 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < LetExpression::Ptr > () = Ast::make< LetExpression >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < VariableBindings::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 3816 "GrammarParser.cpp"
+#line 3785 "GrammarParser.cpp"
     break;
 
-  case 138:
+  case 138: // ConditionalExpression: "if" Term "then" Term "else" Term
 #line 1214 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ConditionalExpression::Ptr > () = Ast::make< ConditionalExpression >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < Expression::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 3824 "GrammarParser.cpp"
+#line 3793 "GrammarParser.cpp"
     break;
 
-  case 139:
+  case 139: // ChooseExpression: "choose" AttributedVariables "in" Term "do" Term
 #line 1222 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ChooseExpression::Ptr > () = Ast::make< ChooseExpression >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < VariableDefinitions::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 3832 "GrammarParser.cpp"
+#line 3801 "GrammarParser.cpp"
     break;
 
-  case 140:
+  case 140: // UniversalQuantifierExpression: "forall" AttributedVariables "in" Term "holds" Term
 #line 1230 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < UniversalQuantifierExpression::Ptr > () = Ast::make< UniversalQuantifierExpression >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < VariableDefinitions::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 3840 "GrammarParser.cpp"
+#line 3809 "GrammarParser.cpp"
     break;
 
-  case 141:
+  case 141: // ExistentialQuantifierExpression: "exists" AttributedVariables "in" Term "with" Term
 #line 1238 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ExistentialQuantifierExpression::Ptr > () = Ast::make< ExistentialQuantifierExpression >( yylhs.location, yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < VariableDefinitions::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Expression::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 3848 "GrammarParser.cpp"
+#line 3817 "GrammarParser.cpp"
     break;
 
-  case 142:
+  case 142: // CardinalityExpression: "|" SimpleOrClaspedTerm "|"
 #line 1246 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < CardinalityExpression::Ptr > () = Ast::make< CardinalityExpression >( yylhs.location, yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Expression::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 3856 "GrammarParser.cpp"
+#line 3825 "GrammarParser.cpp"
     break;
 
-  case 143:
+  case 143: // Literal: UndefinedLiteral
 #line 1259 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < UndefLiteral::Ptr > ();
   }
-#line 3864 "GrammarParser.cpp"
+#line 3833 "GrammarParser.cpp"
     break;
 
-  case 144:
+  case 144: // Literal: BooleanLiteral
 #line 1263 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 3872 "GrammarParser.cpp"
+#line 3841 "GrammarParser.cpp"
     break;
 
-  case 145:
+  case 145: // Literal: IntegerLiteral
 #line 1267 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 3880 "GrammarParser.cpp"
+#line 3849 "GrammarParser.cpp"
     break;
 
-  case 146:
+  case 146: // Literal: RationalLiteral
 #line 1271 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 3888 "GrammarParser.cpp"
+#line 3857 "GrammarParser.cpp"
     break;
 
-  case 147:
+  case 147: // Literal: DecimalLiteral
 #line 1275 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 3896 "GrammarParser.cpp"
+#line 3865 "GrammarParser.cpp"
     break;
 
-  case 148:
+  case 148: // Literal: BinaryLiteral
 #line 1279 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 3904 "GrammarParser.cpp"
+#line 3873 "GrammarParser.cpp"
     break;
 
-  case 149:
+  case 149: // Literal: StringLiteral
 #line 1283 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 3912 "GrammarParser.cpp"
+#line 3881 "GrammarParser.cpp"
     break;
 
-  case 150:
+  case 150: // Literal: ReferenceLiteral
 #line 1287 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < ReferenceLiteral::Ptr > ();
   }
-#line 3920 "GrammarParser.cpp"
+#line 3889 "GrammarParser.cpp"
     break;
 
-  case 151:
+  case 151: // Literal: ListLiteral
 #line 1291 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < ListLiteral::Ptr > ();
   }
-#line 3928 "GrammarParser.cpp"
+#line 3897 "GrammarParser.cpp"
     break;
 
-  case 152:
+  case 152: // Literal: RangeLiteral
 #line 1295 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < RangeLiteral::Ptr > ();
   }
-#line 3936 "GrammarParser.cpp"
+#line 3905 "GrammarParser.cpp"
     break;
 
-  case 153:
+  case 153: // Literal: TupleLiteral
 #line 1299 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < TupleLiteral::Ptr > ();
   }
-#line 3944 "GrammarParser.cpp"
+#line 3913 "GrammarParser.cpp"
     break;
 
-  case 154:
+  case 154: // Literal: RecordLiteral
 #line 1303 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Literal::Ptr > () = yystack_[0].value.as < RecordLiteral::Ptr > ();
   }
-#line 3952 "GrammarParser.cpp"
+#line 3921 "GrammarParser.cpp"
     break;
 
-  case 155:
+  case 155: // UndefinedLiteral: "undef"
 #line 1311 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < UndefLiteral::Ptr > () = Ast::make< UndefLiteral >( yylhs.location );
       yylhs.value.as < UndefLiteral::Ptr > ()->setSpans( yystack_[0].value.as < Ast::Token::Ptr > ()->spans() );
   }
-#line 3961 "GrammarParser.cpp"
+#line 3930 "GrammarParser.cpp"
     break;
 
-  case 156:
+  case 156: // BooleanLiteral: "true"
 #line 1320 "../../obj/src/GrammarParser.y"
   {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
       yylhs.value.as < ValueLiteral::Ptr > () = Ast::make< ValueLiteral >( yylhs.location, value );
       yylhs.value.as < ValueLiteral::Ptr > ()->setSpans( yystack_[0].value.as < Ast::Token::Ptr > ()->spans() );
   }
-#line 3971 "GrammarParser.cpp"
+#line 3940 "GrammarParser.cpp"
     break;
 
-  case 157:
+  case 157: // BooleanLiteral: "false"
 #line 1326 "../../obj/src/GrammarParser.y"
   {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( false );
       yylhs.value.as < ValueLiteral::Ptr > () = Ast::make< ValueLiteral >( yylhs.location, value );
       yylhs.value.as < ValueLiteral::Ptr > ()->setSpans( yystack_[0].value.as < Ast::Token::Ptr > ()->spans() );
   }
-#line 3981 "GrammarParser.cpp"
+#line 3950 "GrammarParser.cpp"
     break;
 
-  case 158:
+  case 158: // IntegerLiteral: "integer"
 #line 1336 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ValueLiteral::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 3989 "GrammarParser.cpp"
+#line 3958 "GrammarParser.cpp"
     break;
 
-  case 159:
+  case 159: // RationalLiteral: "rational"
 #line 1344 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ValueLiteral::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 3997 "GrammarParser.cpp"
+#line 3966 "GrammarParser.cpp"
     break;
 
-  case 160:
+  case 160: // DecimalLiteral: "decimal"
 #line 1352 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ValueLiteral::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 4005 "GrammarParser.cpp"
+#line 3974 "GrammarParser.cpp"
     break;
 
-  case 161:
+  case 161: // BinaryLiteral: "binary"
 #line 1360 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ValueLiteral::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 4013 "GrammarParser.cpp"
+#line 3982 "GrammarParser.cpp"
     break;
 
-  case 162:
+  case 162: // BinaryLiteral: "hexadecimal"
 #line 1364 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ValueLiteral::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 4021 "GrammarParser.cpp"
+#line 3990 "GrammarParser.cpp"
     break;
 
-  case 163:
+  case 163: // StringLiteral: "string"
 #line 1372 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ValueLiteral::Ptr > () = yystack_[0].value.as < ValueLiteral::Ptr > ();
   }
-#line 4029 "GrammarParser.cpp"
+#line 3998 "GrammarParser.cpp"
     break;
 
-  case 164:
+  case 164: // ReferenceLiteral: "@" IdentifierPath
 #line 1380 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ReferenceLiteral::Ptr > () = Ast::make< ReferenceLiteral >( yylhs.location, yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < IdentifierPath::Ptr > () );
   }
-#line 4037 "GrammarParser.cpp"
+#line 4006 "GrammarParser.cpp"
     break;
 
-  case 165:
+  case 165: // ListLiteral: "[" "]"
 #line 1388 "../../obj/src/GrammarParser.y"
   {
       const auto expressions = Ast::make< Expressions >( yylhs.location );
@@ -4044,38 +4013,38 @@ namespace libcasm_fe {
       yylhs.value.as < ListLiteral::Ptr > ()->setLeftBracket( yystack_[1].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < ListLiteral::Ptr > ()->setRightBracket( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4048 "GrammarParser.cpp"
+#line 4017 "GrammarParser.cpp"
     break;
 
-  case 166:
+  case 166: // ListLiteral: "[" Terms "]"
 #line 1395 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ListLiteral::Ptr > () = Ast::make< ListLiteral >( yylhs.location, yystack_[1].value.as < Expressions::Ptr > () );
       yylhs.value.as < ListLiteral::Ptr > ()->setLeftBracket( yystack_[2].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < ListLiteral::Ptr > ()->setRightBracket( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4058 "GrammarParser.cpp"
+#line 4027 "GrammarParser.cpp"
     break;
 
-  case 167:
+  case 167: // ListLiteral: "[" error "]"
 #line 1401 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ListLiteral::Ptr > () = nullptr;
   }
-#line 4066 "GrammarParser.cpp"
+#line 4035 "GrammarParser.cpp"
     break;
 
-  case 168:
+  case 168: // RangeLiteral: "[" Term ".." Term "]"
 #line 1409 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < RangeLiteral::Ptr > () = Ast::make< RangeLiteral >( yylhs.location, yystack_[3].value.as < Expression::Ptr > (), yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Expression::Ptr > () );
       yylhs.value.as < RangeLiteral::Ptr > ()->setLeftBracket( yystack_[4].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < RangeLiteral::Ptr > ()->setRightBracket( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4076 "GrammarParser.cpp"
+#line 4045 "GrammarParser.cpp"
     break;
 
-  case 169:
+  case 169: // TupleLiteral: "(" Terms "," Term ")"
 #line 1418 "../../obj/src/GrammarParser.y"
   {
       const auto expressions = yystack_[3].value.as < Expressions::Ptr > ();
@@ -4085,20 +4054,20 @@ namespace libcasm_fe {
       yylhs.value.as < TupleLiteral::Ptr > ()->setLeftBracket( yystack_[4].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < TupleLiteral::Ptr > ()->setRightBracket( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4089 "GrammarParser.cpp"
+#line 4058 "GrammarParser.cpp"
     break;
 
-  case 170:
+  case 170: // RecordLiteral: "(" Assignments ")"
 #line 1429 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < RecordLiteral::Ptr > () = Ast::make< RecordLiteral >( yylhs.location, yystack_[1].value.as < NamedExpressions::Ptr > () );
       yylhs.value.as < RecordLiteral::Ptr > ()->setLeftBracket( yystack_[2].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < RecordLiteral::Ptr > ()->setRightBracket( yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4099 "GrammarParser.cpp"
+#line 4068 "GrammarParser.cpp"
     break;
 
-  case 171:
+  case 171: // Assignments: Assignments "," Assignment
 #line 1438 "../../obj/src/GrammarParser.y"
   {
       auto assignments = yystack_[2].value.as < NamedExpressions::Ptr > ();
@@ -4106,28 +4075,28 @@ namespace libcasm_fe {
       assignments->add( yystack_[0].value.as < NamedExpression::Ptr > () );
       yylhs.value.as < NamedExpressions::Ptr > () = assignments;
   }
-#line 4110 "GrammarParser.cpp"
+#line 4079 "GrammarParser.cpp"
     break;
 
-  case 172:
+  case 172: // Assignments: Assignment
 #line 1445 "../../obj/src/GrammarParser.y"
   {
       auto assignments = Ast::make< NamedExpressions >( yylhs.location );
       assignments->add( yystack_[0].value.as < NamedExpression::Ptr > () );
       yylhs.value.as < NamedExpressions::Ptr > () = assignments;
   }
-#line 4120 "GrammarParser.cpp"
+#line 4089 "GrammarParser.cpp"
     break;
 
-  case 173:
+  case 173: // Assignment: Identifier ":" Term
 #line 1454 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < NamedExpression::Ptr > () = Ast::make< NamedExpression >( yylhs.location, yystack_[2].value.as < Identifier::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 4128 "GrammarParser.cpp"
+#line 4097 "GrammarParser.cpp"
     break;
 
-  case 174:
+  case 174: // Types: Types "," Type
 #line 1466 "../../obj/src/GrammarParser.y"
   {
       auto types = yystack_[2].value.as < Types::Ptr > ();
@@ -4135,76 +4104,76 @@ namespace libcasm_fe {
       types->add( yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > () );
       yylhs.value.as < Types::Ptr > () = types;
   }
-#line 4139 "GrammarParser.cpp"
+#line 4108 "GrammarParser.cpp"
     break;
 
-  case 175:
+  case 175: // Types: Type
 #line 1473 "../../obj/src/GrammarParser.y"
   {
       auto types = Ast::make< Types >( yylhs.location );
       types->add( yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > () );
       yylhs.value.as < Types::Ptr > () = types;
   }
-#line 4149 "GrammarParser.cpp"
+#line 4118 "GrammarParser.cpp"
     break;
 
-  case 176:
+  case 176: // Type: BasicType
 #line 1482 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as < BasicType::Ptr > ();
   }
-#line 4157 "GrammarParser.cpp"
+#line 4126 "GrammarParser.cpp"
     break;
 
-  case 177:
+  case 177: // Type: TupleType
 #line 1486 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as < TupleType::Ptr > ();
   }
-#line 4165 "GrammarParser.cpp"
+#line 4134 "GrammarParser.cpp"
     break;
 
-  case 178:
+  case 178: // Type: RecordType
 #line 1490 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as < RecordType::Ptr > ();
   }
-#line 4173 "GrammarParser.cpp"
+#line 4142 "GrammarParser.cpp"
     break;
 
-  case 179:
+  case 179: // Type: TemplateType
 #line 1494 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as < TemplateType::Ptr > ();
   }
-#line 4181 "GrammarParser.cpp"
+#line 4150 "GrammarParser.cpp"
     break;
 
-  case 180:
+  case 180: // Type: RelationType
 #line 1498 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as < RelationType::Ptr > ();
   }
-#line 4189 "GrammarParser.cpp"
+#line 4158 "GrammarParser.cpp"
     break;
 
-  case 181:
+  case 181: // Type: FixedSizedType
 #line 1502 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as < FixedSizedType::Ptr > ();
   }
-#line 4197 "GrammarParser.cpp"
+#line 4166 "GrammarParser.cpp"
     break;
 
-  case 182:
+  case 182: // BasicType: IdentifierPath
 #line 1510 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < BasicType::Ptr > () = Ast::make< BasicType >( yylhs.location, yystack_[0].value.as < IdentifierPath::Ptr > () );
   }
-#line 4205 "GrammarParser.cpp"
+#line 4174 "GrammarParser.cpp"
     break;
 
-  case 183:
+  case 183: // TupleType: "(" Types "," Type ")"
 #line 1518 "../../obj/src/GrammarParser.y"
   {
       auto subTypes = yystack_[3].value.as < Types::Ptr > ();
@@ -4212,10 +4181,10 @@ namespace libcasm_fe {
       subTypes->add( yystack_[1].value.as < libcasm_fe::Ast::Type::Ptr > () );
       yylhs.value.as < TupleType::Ptr > () = Ast::make< TupleType >( yylhs.location, yystack_[4].value.as < Ast::Token::Ptr > (), subTypes, yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4216 "GrammarParser.cpp"
+#line 4185 "GrammarParser.cpp"
     break;
 
-  case 184:
+  case 184: // RecordType: "(" TypedVariables "," TypedVariable ")"
 #line 1529 "../../obj/src/GrammarParser.y"
   {
       auto namedSubTypes = yystack_[3].value.as < VariableDefinitions::Ptr > ();
@@ -4223,34 +4192,34 @@ namespace libcasm_fe {
       namedSubTypes->add( yystack_[1].value.as < VariableDefinition::Ptr > () );
       yylhs.value.as < RecordType::Ptr > () = Ast::make< RecordType >( yylhs.location, yystack_[4].value.as < Ast::Token::Ptr > (), namedSubTypes, yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4227 "GrammarParser.cpp"
+#line 4196 "GrammarParser.cpp"
     break;
 
-  case 185:
+  case 185: // TemplateType: IdentifierPath "<" Types ">"
 #line 1540 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < TemplateType::Ptr > () = Ast::make< TemplateType >( yylhs.location, yystack_[3].value.as < IdentifierPath::Ptr > (), yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Types::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4235 "GrammarParser.cpp"
+#line 4204 "GrammarParser.cpp"
     break;
 
-  case 186:
+  case 186: // RelationType: IdentifierPath "<" MaybeFunctionParameters "->" Type ">"
 #line 1548 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < RelationType::Ptr > () = Ast::make< RelationType >( yylhs.location, yystack_[5].value.as < IdentifierPath::Ptr > (), yystack_[4].value.as < Ast::Token::Ptr > (), yystack_[3].value.as < Types::Ptr > (), yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < libcasm_fe::Ast::Type::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4243 "GrammarParser.cpp"
+#line 4212 "GrammarParser.cpp"
     break;
 
-  case 187:
+  case 187: // FixedSizedType: IdentifierPath "'" Term
 #line 1556 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < FixedSizedType::Ptr > () = Ast::make< FixedSizedType >( yylhs.location, yystack_[2].value.as < IdentifierPath::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 4251 "GrammarParser.cpp"
+#line 4220 "GrammarParser.cpp"
     break;
 
-  case 188:
+  case 188: // FunctionParameters: FunctionParameters "*" Type
 #line 1568 "../../obj/src/GrammarParser.y"
   {
       auto types = yystack_[2].value.as < Types::Ptr > ();
@@ -4258,36 +4227,36 @@ namespace libcasm_fe {
       types->add( yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > () );
       yylhs.value.as < Types::Ptr > () = types;
   }
-#line 4262 "GrammarParser.cpp"
+#line 4231 "GrammarParser.cpp"
     break;
 
-  case 189:
+  case 189: // FunctionParameters: Type
 #line 1575 "../../obj/src/GrammarParser.y"
   {
       auto types = Ast::make< Types >( yylhs.location );
       types->add( yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > () );
       yylhs.value.as < Types::Ptr > () = types;
   }
-#line 4272 "GrammarParser.cpp"
+#line 4241 "GrammarParser.cpp"
     break;
 
-  case 190:
+  case 190: // MaybeFunctionParameters: FunctionParameters
 #line 1585 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Types::Ptr > () = yystack_[0].value.as < Types::Ptr > ();
   }
-#line 4280 "GrammarParser.cpp"
+#line 4249 "GrammarParser.cpp"
     break;
 
-  case 191:
+  case 191: // MaybeFunctionParameters: %empty
 #line 1589 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Types::Ptr > () = Ast::make< Types >( yylhs.location );
   }
-#line 4288 "GrammarParser.cpp"
+#line 4257 "GrammarParser.cpp"
     break;
 
-  case 192:
+  case 192: // Parameters: Parameters "," TypedAttributedVariable
 #line 1597 "../../obj/src/GrammarParser.y"
   {
       auto parameters = yystack_[2].value.as < VariableDefinitions::Ptr > ();
@@ -4295,53 +4264,53 @@ namespace libcasm_fe {
       parameters->add( yystack_[0].value.as < VariableDefinition::Ptr > () );
       yylhs.value.as < VariableDefinitions::Ptr > () = parameters;
   }
-#line 4299 "GrammarParser.cpp"
+#line 4268 "GrammarParser.cpp"
     break;
 
-  case 193:
+  case 193: // Parameters: TypedAttributedVariable
 #line 1604 "../../obj/src/GrammarParser.y"
   {
       auto parameters = Ast::make< NodeList< VariableDefinition > >( yylhs.location );
       parameters->add( yystack_[0].value.as < VariableDefinition::Ptr > () );
       yylhs.value.as < VariableDefinitions::Ptr > () = parameters;
   }
-#line 4309 "GrammarParser.cpp"
+#line 4278 "GrammarParser.cpp"
     break;
 
-  case 194:
+  case 194: // MaybeDefined: "defined" "{" Term "}"
 #line 1618 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Defined::Ptr > () = Ast::make< Defined >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Expression::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4317 "GrammarParser.cpp"
+#line 4286 "GrammarParser.cpp"
     break;
 
-  case 195:
+  case 195: // MaybeDefined: %empty
 #line 1622 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Defined::Ptr > () = Ast::make< Defined >( yylhs.location, Token::unresolved(), Token::unresolved(), Ast::make< UndefLiteral >( yylhs.location ), Token::unresolved() );
   }
-#line 4325 "GrammarParser.cpp"
+#line 4294 "GrammarParser.cpp"
     break;
 
-  case 196:
+  case 196: // MaybeInitially: "=" "{" Initializers "}"
 #line 1630 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Initially::Ptr > () = Ast::make< Initially >( yylhs.location, yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Initializers::Ptr > (), yystack_[0].value.as < Ast::Token::Ptr > () );
   }
-#line 4333 "GrammarParser.cpp"
+#line 4302 "GrammarParser.cpp"
     break;
 
-  case 197:
+  case 197: // MaybeInitially: %empty
 #line 1634 "../../obj/src/GrammarParser.y"
   {
       const auto initializers = Ast::make< Initializers >( yylhs.location );
       yylhs.value.as < Initially::Ptr > () = Ast::make< Initially >( yylhs.location, Token::unresolved(), Token::unresolved(), initializers, Token::unresolved() );
   }
-#line 4342 "GrammarParser.cpp"
+#line 4311 "GrammarParser.cpp"
     break;
 
-  case 198:
+  case 198: // Initializers: Initializers "," Initializer
 #line 1643 "../../obj/src/GrammarParser.y"
   {
       auto initializers = yystack_[2].value.as < Initializers::Ptr > ();
@@ -4349,39 +4318,39 @@ namespace libcasm_fe {
       initializers->add( yystack_[0].value.as < Initializer::Ptr > () );
       yylhs.value.as < Initializers::Ptr > () = initializers;
   }
-#line 4353 "GrammarParser.cpp"
+#line 4322 "GrammarParser.cpp"
     break;
 
-  case 199:
+  case 199: // Initializers: Initializer
 #line 1650 "../../obj/src/GrammarParser.y"
   {
       auto initializers = Ast::make< Initializers >( yylhs.location );
       initializers->add( yystack_[0].value.as < Initializer::Ptr > () );
       yylhs.value.as < Initializers::Ptr > () = initializers;
   }
-#line 4363 "GrammarParser.cpp"
+#line 4332 "GrammarParser.cpp"
     break;
 
-  case 200:
+  case 200: // Initializer: Term
 #line 1660 "../../obj/src/GrammarParser.y"
   {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
       yylhs.value.as < Initializer::Ptr > () = Ast::make< Initializer >( yylhs.location, Token::unresolved(), arguments, Token::unresolved(), Token::unresolved(), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 4372 "GrammarParser.cpp"
+#line 4341 "GrammarParser.cpp"
     break;
 
-  case 201:
+  case 201: // Initializer: "(" Term ")" "->" Term
 #line 1665 "../../obj/src/GrammarParser.y"
   {
       auto arguments = Ast::make< Expressions >( yylhs.location );
       arguments->add( yystack_[3].value.as < Expression::Ptr > () );
       yylhs.value.as < Initializer::Ptr > () = Ast::make< Initializer >( yylhs.location, yystack_[4].value.as < Ast::Token::Ptr > (), arguments, yystack_[2].value.as < Ast::Token::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 4382 "GrammarParser.cpp"
+#line 4351 "GrammarParser.cpp"
     break;
 
-  case 202:
+  case 202: // Initializer: TupleLiteral "->" Term
 #line 1671 "../../obj/src/GrammarParser.y"
   {
       const auto arguments = yystack_[2].value.as < TupleLiteral::Ptr > ()->expressions();
@@ -4389,27 +4358,27 @@ namespace libcasm_fe {
       const auto rbToken = yystack_[2].value.as < TupleLiteral::Ptr > ()->rightBracket();
       yylhs.value.as < Initializer::Ptr > () = Ast::make< Initializer >( yylhs.location, lbToken, arguments, rbToken, yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 4393 "GrammarParser.cpp"
+#line 4362 "GrammarParser.cpp"
     break;
 
-  case 203:
+  case 203: // Identifier: "identifier"
 #line 1686 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Identifier::Ptr > () = yystack_[0].value.as < Identifier::Ptr > ();
   }
-#line 4401 "GrammarParser.cpp"
+#line 4370 "GrammarParser.cpp"
     break;
 
-  case 204:
+  case 204: // Identifier: "in"
 #line 1690 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Identifier::Ptr > () = Ast::make< Identifier >( yylhs.location, "in" );
       yylhs.value.as < Identifier::Ptr > ()->setSpans( m_lexer.fetchSpansAndReset() );
   }
-#line 4410 "GrammarParser.cpp"
+#line 4379 "GrammarParser.cpp"
     break;
 
-  case 205:
+  case 205: // IdentifierPath: IdentifierPath "::" Identifier
 #line 1699 "../../obj/src/GrammarParser.y"
   {
       auto path = yystack_[2].value.as < IdentifierPath::Ptr > ();
@@ -4417,35 +4386,35 @@ namespace libcasm_fe {
       path->addIdentifier( yystack_[0].value.as < Identifier::Ptr > () );
       yylhs.value.as < IdentifierPath::Ptr > () = path;
   }
-#line 4421 "GrammarParser.cpp"
+#line 4390 "GrammarParser.cpp"
     break;
 
-  case 206:
+  case 206: // IdentifierPath: Identifier
 #line 1706 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < IdentifierPath::Ptr > () = Ast::make< IdentifierPath >( yylhs.location, yystack_[0].value.as < Identifier::Ptr > () );
   }
-#line 4429 "GrammarParser.cpp"
+#line 4398 "GrammarParser.cpp"
     break;
 
-  case 207:
+  case 207: // Variable: TypedVariable
 #line 1718 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < VariableDefinition::Ptr > () = yystack_[0].value.as < VariableDefinition::Ptr > ();
   }
-#line 4437 "GrammarParser.cpp"
+#line 4406 "GrammarParser.cpp"
     break;
 
-  case 208:
+  case 208: // Variable: Identifier
 #line 1722 "../../obj/src/GrammarParser.y"
   {
       const auto unresolvedType = Ast::make< UnresolvedType >( yylhs.location );
       yylhs.value.as < VariableDefinition::Ptr > () = Ast::make< VariableDefinition >( yylhs.location, yystack_[0].value.as < Identifier::Ptr > (), Token::unresolved(), unresolvedType );
   }
-#line 4446 "GrammarParser.cpp"
+#line 4415 "GrammarParser.cpp"
     break;
 
-  case 209:
+  case 209: // AttributedVariables: AttributedVariables "," AttributedVariable
 #line 1731 "../../obj/src/GrammarParser.y"
   {
       auto variables = yystack_[2].value.as < VariableDefinitions::Ptr > ();
@@ -4453,20 +4422,20 @@ namespace libcasm_fe {
       variables->add( yystack_[0].value.as < VariableDefinition::Ptr > () );
       yylhs.value.as < VariableDefinitions::Ptr > () = variables;
   }
-#line 4457 "GrammarParser.cpp"
+#line 4426 "GrammarParser.cpp"
     break;
 
-  case 210:
+  case 210: // AttributedVariables: AttributedVariable
 #line 1738 "../../obj/src/GrammarParser.y"
   {
       auto variables = Ast::make< VariableDefinitions >( yylhs.location );
       variables->add( yystack_[0].value.as < VariableDefinition::Ptr > () );
       yylhs.value.as < VariableDefinitions::Ptr > () = variables;
   }
-#line 4467 "GrammarParser.cpp"
+#line 4436 "GrammarParser.cpp"
     break;
 
-  case 211:
+  case 211: // TypedVariables: TypedVariables "," TypedVariable
 #line 1748 "../../obj/src/GrammarParser.y"
   {
       auto typedVariables = yystack_[2].value.as < VariableDefinitions::Ptr > ();
@@ -4474,65 +4443,65 @@ namespace libcasm_fe {
       typedVariables->add( yystack_[0].value.as < VariableDefinition::Ptr > () );
       yylhs.value.as < VariableDefinitions::Ptr > () = typedVariables;
   }
-#line 4478 "GrammarParser.cpp"
+#line 4447 "GrammarParser.cpp"
     break;
 
-  case 212:
+  case 212: // TypedVariables: TypedVariable
 #line 1755 "../../obj/src/GrammarParser.y"
   {
       auto typedVariables = Ast::make< VariableDefinitions >( yylhs.location );
       typedVariables->add( yystack_[0].value.as < VariableDefinition::Ptr > () );
       yylhs.value.as < VariableDefinitions::Ptr > () = typedVariables;
   }
-#line 4488 "GrammarParser.cpp"
+#line 4457 "GrammarParser.cpp"
     break;
 
-  case 213:
+  case 213: // TypedVariable: Identifier ":" Type
 #line 1765 "../../obj/src/GrammarParser.y"
   {
       auto variable = Ast::make< VariableDefinition >( yylhs.location, yystack_[2].value.as < Identifier::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > () );
       yylhs.value.as < VariableDefinition::Ptr > () = variable;
   }
-#line 4497 "GrammarParser.cpp"
+#line 4466 "GrammarParser.cpp"
     break;
 
-  case 214:
+  case 214: // AttributedVariable: Attributes Variable
 #line 1774 "../../obj/src/GrammarParser.y"
   {
       auto variable = yystack_[0].value.as < VariableDefinition::Ptr > ();
       variable->setAttributes( yystack_[1].value.as < Attributes::Ptr > () );
       yylhs.value.as < VariableDefinition::Ptr > () = variable;
   }
-#line 4507 "GrammarParser.cpp"
+#line 4476 "GrammarParser.cpp"
     break;
 
-  case 215:
+  case 215: // AttributedVariable: Variable
 #line 1780 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < VariableDefinition::Ptr > () = yystack_[0].value.as < VariableDefinition::Ptr > ();
   }
-#line 4515 "GrammarParser.cpp"
+#line 4484 "GrammarParser.cpp"
     break;
 
-  case 216:
+  case 216: // TypedAttributedVariable: Attributes TypedVariable
 #line 1788 "../../obj/src/GrammarParser.y"
   {
       auto variable = yystack_[0].value.as < VariableDefinition::Ptr > ();
       variable->setAttributes( yystack_[1].value.as < Attributes::Ptr > () );
       yylhs.value.as < VariableDefinition::Ptr > () = variable;
   }
-#line 4525 "GrammarParser.cpp"
+#line 4494 "GrammarParser.cpp"
     break;
 
-  case 217:
+  case 217: // TypedAttributedVariable: TypedVariable
 #line 1794 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < VariableDefinition::Ptr > () = yystack_[0].value.as < VariableDefinition::Ptr > ();
   }
-#line 4533 "GrammarParser.cpp"
+#line 4502 "GrammarParser.cpp"
     break;
 
-  case 218:
+  case 218: // VariableBindings: VariableBindings "," VariableBinding
 #line 1806 "../../obj/src/GrammarParser.y"
   {
       auto variableBindings = yystack_[2].value.as < VariableBindings::Ptr > ();
@@ -4540,28 +4509,28 @@ namespace libcasm_fe {
       variableBindings->add( yystack_[0].value.as < VariableBinding::Ptr > () );
       yylhs.value.as < VariableBindings::Ptr > () = variableBindings;
   }
-#line 4544 "GrammarParser.cpp"
+#line 4513 "GrammarParser.cpp"
     break;
 
-  case 219:
+  case 219: // VariableBindings: VariableBinding
 #line 1813 "../../obj/src/GrammarParser.y"
   {
       auto variableBindings = Ast::make< VariableBindings >( yylhs.location );
       variableBindings->add( yystack_[0].value.as < VariableBinding::Ptr > () );
       yylhs.value.as < VariableBindings::Ptr > () = variableBindings;
   }
-#line 4554 "GrammarParser.cpp"
+#line 4523 "GrammarParser.cpp"
     break;
 
-  case 220:
+  case 220: // VariableBinding: AttributedVariable "=" Term
 #line 1822 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < VariableBinding::Ptr > () = Ast::make< VariableBinding >( yylhs.location, yystack_[2].value.as < VariableDefinition::Ptr > (), yystack_[1].value.as < Ast::Token::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 4562 "GrammarParser.cpp"
+#line 4531 "GrammarParser.cpp"
     break;
 
-  case 221:
+  case 221: // LocalFunctionDefinitions: LocalFunctionDefinitions "," AttributedLocalFunctionDefinition
 #line 1834 "../../obj/src/GrammarParser.y"
   {
       auto definitions = yystack_[2].value.as < FunctionDefinitions::Ptr > ();
@@ -4569,46 +4538,46 @@ namespace libcasm_fe {
       definitions->add( yystack_[0].value.as < FunctionDefinition::Ptr > () );
       yylhs.value.as < FunctionDefinitions::Ptr > () = definitions;
   }
-#line 4573 "GrammarParser.cpp"
+#line 4542 "GrammarParser.cpp"
     break;
 
-  case 222:
+  case 222: // LocalFunctionDefinitions: AttributedLocalFunctionDefinition
 #line 1841 "../../obj/src/GrammarParser.y"
   {
       auto definitions = Ast::make< FunctionDefinitions >( yylhs.location );
       definitions->add( yystack_[0].value.as < FunctionDefinition::Ptr > () );
       yylhs.value.as < FunctionDefinitions::Ptr > () = definitions;
   }
-#line 4583 "GrammarParser.cpp"
+#line 4552 "GrammarParser.cpp"
     break;
 
-  case 223:
+  case 223: // AttributedLocalFunctionDefinition: Attributes LocalFunctionDefinition
 #line 1850 "../../obj/src/GrammarParser.y"
   {
       auto definition = yystack_[0].value.as < FunctionDefinition::Ptr > ();
       definition->setAttributes( yystack_[1].value.as < Attributes::Ptr > () );
       yylhs.value.as < FunctionDefinition::Ptr > () = definition;
   }
-#line 4593 "GrammarParser.cpp"
+#line 4562 "GrammarParser.cpp"
     break;
 
-  case 224:
+  case 224: // AttributedLocalFunctionDefinition: LocalFunctionDefinition
 #line 1856 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < FunctionDefinition::Ptr > () = yystack_[0].value.as < FunctionDefinition::Ptr > ();
   }
-#line 4601 "GrammarParser.cpp"
+#line 4570 "GrammarParser.cpp"
     break;
 
-  case 225:
+  case 225: // AttributedLocalFunctionDefinition: error
 #line 1860 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < FunctionDefinition::Ptr > () = nullptr;
   }
-#line 4609 "GrammarParser.cpp"
+#line 4578 "GrammarParser.cpp"
     break;
 
-  case 226:
+  case 226: // LocalFunctionDefinition: Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially
 #line 1867 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < FunctionDefinition::Ptr > () = Ast::make< FunctionDefinition >( yylhs.location, Token::unresolved(), yystack_[6].value.as < Identifier::Ptr > (), yystack_[5].value.as < Ast::Token::Ptr > (), yystack_[4].value.as < Types::Ptr > (), yystack_[3].value.as < Ast::Token::Ptr > (), yystack_[2].value.as < libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as < Defined::Ptr > (), yystack_[0].value.as < Initially::Ptr > () );
@@ -4621,30 +4590,30 @@ namespace libcasm_fe {
           initializer->setFunction( yylhs.value.as < FunctionDefinition::Ptr > () );
       }
   }
-#line 4625 "GrammarParser.cpp"
+#line 4594 "GrammarParser.cpp"
     break;
 
-  case 227:
+  case 227: // Attributes: Attributes Attribute
 #line 1887 "../../obj/src/GrammarParser.y"
   {
       auto attributes = yystack_[1].value.as < Attributes::Ptr > ();
       attributes->add( yystack_[0].value.as < Attribute::Ptr > () );
       yylhs.value.as < Attributes::Ptr > () = attributes;
   }
-#line 4635 "GrammarParser.cpp"
+#line 4604 "GrammarParser.cpp"
     break;
 
-  case 228:
+  case 228: // Attributes: Attribute
 #line 1893 "../../obj/src/GrammarParser.y"
   {
       auto attributes = Ast::make< Attributes >( yylhs.location );
       attributes->add( yystack_[0].value.as < Attribute::Ptr > () );
       yylhs.value.as < Attributes::Ptr > () = attributes;
   }
-#line 4645 "GrammarParser.cpp"
+#line 4614 "GrammarParser.cpp"
     break;
 
-  case 229:
+  case 229: // Attribute: "[" BasicAttribute "]"
 #line 1902 "../../obj/src/GrammarParser.y"
   {
       auto attribute = yystack_[1].value.as < BasicAttribute::Ptr > ();
@@ -4652,10 +4621,10 @@ namespace libcasm_fe {
       yystack_[1].value.as < BasicAttribute::Ptr > ()->setRightBrace( yystack_[0].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < Attribute::Ptr > () = attribute;
   }
-#line 4656 "GrammarParser.cpp"
+#line 4625 "GrammarParser.cpp"
     break;
 
-  case 230:
+  case 230: // Attribute: "[" ExpressionAttribute "]"
 #line 1909 "../../obj/src/GrammarParser.y"
   {
       auto attribute = yystack_[1].value.as < ExpressionAttribute::Ptr > ();
@@ -4663,35 +4632,35 @@ namespace libcasm_fe {
       yystack_[1].value.as < ExpressionAttribute::Ptr > ()->setRightBrace( yystack_[0].value.as < Ast::Token::Ptr > () );
       yylhs.value.as < Attribute::Ptr > () = attribute;
   }
-#line 4667 "GrammarParser.cpp"
+#line 4636 "GrammarParser.cpp"
     break;
 
-  case 231:
+  case 231: // Attribute: "[" error "]"
 #line 1916 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < Attribute::Ptr > () = nullptr;
   }
-#line 4675 "GrammarParser.cpp"
+#line 4644 "GrammarParser.cpp"
     break;
 
-  case 232:
+  case 232: // BasicAttribute: Identifier
 #line 1923 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < BasicAttribute::Ptr > () = Ast::make< BasicAttribute >( yylhs.location, yystack_[0].value.as < Identifier::Ptr > () );
   }
-#line 4683 "GrammarParser.cpp"
+#line 4652 "GrammarParser.cpp"
     break;
 
-  case 233:
+  case 233: // ExpressionAttribute: Identifier Term
 #line 1930 "../../obj/src/GrammarParser.y"
   {
       yylhs.value.as < ExpressionAttribute::Ptr > () = Ast::make< ExpressionAttribute >( yylhs.location, yystack_[1].value.as < Identifier::Ptr > (), yystack_[0].value.as < Expression::Ptr > () );
   }
-#line 4691 "GrammarParser.cpp"
+#line 4660 "GrammarParser.cpp"
     break;
 
 
-#line 4695 "GrammarParser.cpp"
+#line 4664 "GrammarParser.cpp"
 
             default:
               break;
@@ -4708,7 +4677,6 @@ namespace libcasm_fe {
       YY_SYMBOL_PRINT ("-> $$ =", yylhs);
       yypop_ (yylen);
       yylen = 0;
-      YY_STACK_PRINT ();
 
       // Shift the result of the reduction.
       yypush_ (YY_NULLPTR, YY_MOVE (yylhs));
@@ -4724,7 +4692,9 @@ namespace libcasm_fe {
     if (!yyerrstatus_)
       {
         ++yynerrs_;
-        error (yyla.location, yysyntax_error_ (yystack_[0].state, yyla));
+        context yyctx (*this, yyla);
+        std::string msg = yysyntax_error_ (yyctx);
+        error (yyla.location, YY_MOVE (msg));
       }
 
 
@@ -4735,7 +4705,7 @@ namespace libcasm_fe {
            error, discard it.  */
 
         // Return failure if at end of input.
-        if (yyla.type_get () == yyeof_)
+        if (yyla.kind () == symbol_kind::S_YYEOF)
           YYABORT;
         else if (!yyla.empty ())
           {
@@ -4761,6 +4731,7 @@ namespace libcasm_fe {
        this YYERROR.  */
     yypop_ (yylen);
     yylen = 0;
+    YY_STACK_PRINT ();
     goto yyerrlab1;
 
 
@@ -4769,31 +4740,33 @@ namespace libcasm_fe {
   `-------------------------------------------------------------*/
   yyerrlab1:
     yyerrstatus_ = 3;   // Each real token shifted decrements this.
+    // Pop stack until we find a state that shifts the error token.
+    for (;;)
+      {
+        yyn = yypact_[+yystack_[0].state];
+        if (!yy_pact_value_is_default_ (yyn))
+          {
+            yyn += symbol_kind::S_YYerror;
+            if (0 <= yyn && yyn <= yylast_
+                && yycheck_[yyn] == symbol_kind::S_YYerror)
+              {
+                yyn = yytable_[yyn];
+                if (0 < yyn)
+                  break;
+              }
+          }
+
+        // Pop the current state because it cannot handle the error token.
+        if (yystack_.size () == 1)
+          YYABORT;
+
+        yyerror_range[1].location = yystack_[0].location;
+        yy_destroy_ ("Error: popping", yystack_[0]);
+        yypop_ ();
+        YY_STACK_PRINT ();
+      }
     {
       stack_symbol_type error_token;
-      for (;;)
-        {
-          yyn = yypact_[+yystack_[0].state];
-          if (!yy_pact_value_is_default_ (yyn))
-            {
-              yyn += yy_error_token_;
-              if (0 <= yyn && yyn <= yylast_ && yycheck_[yyn] == yy_error_token_)
-                {
-                  yyn = yytable_[yyn];
-                  if (0 < yyn)
-                    break;
-                }
-            }
-
-          // Pop the current state because it cannot handle the error token.
-          if (yystack_.size () == 1)
-            YYABORT;
-
-          yyerror_range[1].location = yystack_[0].location;
-          yy_destroy_ ("Error: popping", yystack_[0]);
-          yypop_ ();
-          YY_STACK_PRINT ();
-        }
 
       yyerror_range[2].location = yyla.location;
       YYLLOC_DEFAULT (error_token.location, yyerror_range, 2);
@@ -4831,6 +4804,7 @@ namespace libcasm_fe {
     /* Do not reclaim the symbols of the rule whose action triggered
        this YYABORT or YYACCEPT.  */
     yypop_ (yylen);
+    YY_STACK_PRINT ();
     while (1 < yystack_.size ())
       {
         yy_destroy_ ("Cleanup: popping", yystack_[0]);
@@ -4864,18 +4838,100 @@ namespace libcasm_fe {
     error (yyexc.location, yyexc.what ());
   }
 
-  // Generate an error message.
+  /* Return YYSTR after stripping away unnecessary quotes and
+     backslashes, so that it's suitable for yyerror.  The heuristic is
+     that double-quoting is unnecessary unless the string contains an
+     apostrophe, a comma, or backslash (other than backslash-backslash).
+     YYSTR is taken from yytname.  */
   std::string
-  Parser::yysyntax_error_ (state_type yystate, const symbol_type& yyla) const
+  Parser::yytnamerr_ (const char *yystr)
   {
-    // Number of reported tokens (one for the "unexpected", one per
-    // "expected").
-    std::ptrdiff_t yycount = 0;
-    // Its maximum.
-    enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
-    // Arguments of yyformat.
-    char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
+    if (*yystr == '"')
+      {
+        std::string yyr;
+        char const *yyp = yystr;
 
+        for (;;)
+          switch (*++yyp)
+            {
+            case '\'':
+            case ',':
+              goto do_not_strip_quotes;
+
+            case '\\':
+              if (*++yyp != '\\')
+                goto do_not_strip_quotes;
+              else
+                goto append;
+
+            append:
+            default:
+              yyr += *yyp;
+              break;
+
+            case '"':
+              return yyr;
+            }
+      do_not_strip_quotes: ;
+      }
+
+    return yystr;
+  }
+
+  std::string
+  Parser::symbol_name (symbol_kind_type yysymbol)
+  {
+    return yytnamerr_ (yytname_[yysymbol]);
+  }
+
+
+
+  // Parser::context.
+  Parser::context::context (const Parser& yyparser, const symbol_type& yyla)
+    : yyparser_ (yyparser)
+    , yyla_ (yyla)
+  {}
+
+  int
+  Parser::context::expected_tokens (symbol_kind_type yyarg[], int yyargn) const
+  {
+    // Actual number of expected tokens
+    int yycount = 0;
+
+    int yyn = yypact_[+yyparser_.yystack_[0].state];
+    if (!yy_pact_value_is_default_ (yyn))
+      {
+        /* Start YYX at -YYN if negative to avoid negative indexes in
+           YYCHECK.  In other words, skip the first -YYN actions for
+           this state because they are default actions.  */
+        int yyxbegin = yyn < 0 ? -yyn : 0;
+        // Stay within bounds of both yycheck and yytname.
+        int yychecklim = yylast_ - yyn + 1;
+        int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+        for (int yyx = yyxbegin; yyx < yyxend; ++yyx)
+          if (yycheck_[yyx + yyn] == yyx && yyx != symbol_kind::S_YYerror
+              && !yy_table_value_is_error_ (yytable_[yyx + yyn]))
+            {
+              if (!yyarg)
+                ++yycount;
+              else if (yycount == yyargn)
+                return 0;
+              else
+                yyarg[yycount++] = YY_CAST (symbol_kind_type, yyx);
+            }
+      }
+
+    if (yyarg && yycount == 0 && 0 < yyargn)
+      yyarg[0] = symbol_kind::S_YYEMPTY;
+    return yycount;
+  }
+
+
+
+  int
+  Parser::yy_syntax_error_arguments_ (const context& yyctx,
+                                                 symbol_kind_type yyarg[], int yyargn) const
+  {
     /* There are many possibilities here to consider:
        - If this state is a consistent state with a default action, then
          the only way this function was invoked is if the default action
@@ -4900,35 +4956,26 @@ namespace libcasm_fe {
          one exception: it will still contain any token that will not be
          accepted due to an error action in a later state.
     */
-    if (!yyla.empty ())
-      {
-        symbol_number_type yytoken = yyla.type_get ();
-        yyarg[yycount++] = yytname_[yytoken];
 
-        int yyn = yypact_[+yystate];
-        if (!yy_pact_value_is_default_ (yyn))
-          {
-            /* Start YYX at -YYN if negative to avoid negative indexes in
-               YYCHECK.  In other words, skip the first -YYN actions for
-               this state because they are default actions.  */
-            int yyxbegin = yyn < 0 ? -yyn : 0;
-            // Stay within bounds of both yycheck and yytname.
-            int yychecklim = yylast_ - yyn + 1;
-            int yyxend = yychecklim < yyntokens_ ? yychecklim : yyntokens_;
-            for (int yyx = yyxbegin; yyx < yyxend; ++yyx)
-              if (yycheck_[yyx + yyn] == yyx && yyx != yy_error_token_
-                  && !yy_table_value_is_error_ (yytable_[yyx + yyn]))
-                {
-                  if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-                    {
-                      yycount = 1;
-                      break;
-                    }
-                  else
-                    yyarg[yycount++] = yytname_[yyx];
-                }
-          }
+    if (!yyctx.lookahead ().empty ())
+      {
+        if (yyarg)
+          yyarg[0] = yyctx.token ();
+        int yyn = yyctx.expected_tokens (yyarg ? yyarg + 1 : yyarg, yyargn - 1);
+        return yyn + 1;
       }
+    return 0;
+  }
+
+  // Generate an error message.
+  std::string
+  Parser::yysyntax_error_ (const context& yyctx) const
+  {
+    // Its maximum.
+    enum { YYARGS_MAX = 5 };
+    // Arguments of yyformat.
+    symbol_kind_type yyarg[YYARGS_MAX];
+    int yycount = yy_syntax_error_arguments_ (yyctx, yyarg, YYARGS_MAX);
 
     char const* yyformat = YY_NULLPTR;
     switch (yycount)
@@ -4953,7 +5000,7 @@ namespace libcasm_fe {
     for (char const* yyp = yyformat; *yyp; ++yyp)
       if (yyp[0] == '%' && yyp[1] == 's' && yyi < yycount)
         {
-          yyres += yytnamerr_ (yyarg[yyi++]);
+          yyres += symbol_name (yyarg[yyi++]);
           ++yyp;
         }
       else
@@ -5762,13 +5809,13 @@ namespace libcasm_fe {
   };
 
 
-
+#if YYDEBUG || 1
   // YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
-  // First, the terminals, then, starting at \a yyntokens_, nonterminals.
+  // First, the terminals, then, starting at \a YYNTOKENS, nonterminals.
   const char*
   const Parser::yytname_[] =
   {
-  "\"end of file\"", "error", "$undefined", "\"CASM\"", "\"init\"",
+  "\"end of file\"", "error", "\"invalid token\"", "\"CASM\"", "\"init\"",
   "\"derived\"", "\"enumeration\"", "\"rule\"", "\"using\"",
   "\"invariant\"", "\"import\"", "\"function\"", "\"defined\"", "\"seq\"",
   "\"endseq\"", "\"par\"", "\"endpar\"", "\"skip\"", "\"let\"",
@@ -5811,6 +5858,8 @@ namespace libcasm_fe {
   "AttributedLocalFunctionDefinition", "LocalFunctionDefinition",
   "Attributes", "Attribute", "BasicAttribute", "ExpressionAttribute", YY_NULLPTR
   };
+#endif
+
 
 #if YYDEBUG
   const short
@@ -5842,9 +5891,8 @@ namespace libcasm_fe {
     1908,  1915,  1922,  1929
   };
 
-  // Print the state stack on the debug stream.
   void
-  Parser::yystack_print_ ()
+  Parser::yy_stack_print_ () const
   {
     *yycdebug_ << "Stack now";
     for (stack_type::const_iterator
@@ -5855,9 +5903,8 @@ namespace libcasm_fe {
     *yycdebug_ << '\n';
   }
 
-  // Report on the debug stream that the rule \a yyrule is going to be reduced.
   void
-  Parser::yy_reduce_print_ (int yyrule)
+  Parser::yy_reduce_print_ (int yyrule) const
   {
     int yylno = yyrline_[yyrule];
     int yynrhs = yyr2_[yyrule];
@@ -5874,7 +5921,7 @@ namespace libcasm_fe {
 
 #line 50 "../../obj/src/GrammarParser.y"
 } // libcasm_fe
-#line 5878 "GrammarParser.cpp"
+#line 5925 "GrammarParser.cpp"
 
 #line 1935 "../../obj/src/GrammarParser.y"
 
