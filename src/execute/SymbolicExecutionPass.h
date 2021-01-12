@@ -46,6 +46,7 @@
 #define _LIBCASM_FE_SYMBOLIC_EXECUTION_PASS_H_
 
 #include <libpass/Pass>
+#include <libtptp/transform/SourceToAstPass>
 
 namespace libcasm_fe
 {
@@ -55,6 +56,8 @@ namespace libcasm_fe
     class SymbolicExecutionPass final : public libpass::Pass
     {
       public:
+        using Output = libtptp::SourceToAstPass::Output;
+
         static char id;
 
         void usage( libpass::PassUsage& pu ) override;

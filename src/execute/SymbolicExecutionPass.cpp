@@ -69,6 +69,7 @@
 #include <libtptp/transform/DumpSourcePass>
 
 #include <mutex>
+#include "libtptp/transform/SourceToAstPass.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -174,16 +175,7 @@ u1 SymbolicExecutionPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    auto tptpSpec = std::make_shared< libtptp::SourceToAstPass::Output >( environment.finalize() );
-    libpass::PassResult tptpSpecPR;
-    tptpSpecPR.setOutputData< libtptp::SourceToAstPass >( tptpSpec );
-
-    libtptp::AstDumpDotPass dotPass;
-    dotPass.run( tptpSpecPR );
-
-    libtptp::DumpSourcePass dumpPass;
-    dumpPass.run( tptpSpecPR );
-
+    pr.setOutput< SymbolicExecutionPass >( environment.finalize() );
     return true;
 }
 
