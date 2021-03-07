@@ -162,6 +162,10 @@ jobs:
         Copy-Item -Path   C:\z3-4.8.6-x64-win\bin     -Destination     C:\ProgramData\chocolatey -Recurse -Force
         Copy-Item -Path   C:\z3-4.8.6-x64-win\include -Destination     C:\ProgramData\chocolatey -Recurse -Force
         make ci-tools
+    - name: Setup-Z3
+      uses: pavpanchekha/setup-z3
+        version: 4.8.8
+        architecture: x64
     - name: Fetching
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
