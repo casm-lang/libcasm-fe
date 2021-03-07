@@ -49,6 +49,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <stdexcept>
 
 template < size_t BlockSize >
 class BlockAllocator
