@@ -63,6 +63,12 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         u1 run( libpass::PassResult& pr ) override;
+
+        void setOutputPath( const std::string& outputPath );
+        const std::string& outputPath( void ) const;
+
+      private:
+        std::string m_outputPath;
     };
 }
 

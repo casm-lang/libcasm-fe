@@ -82,7 +82,7 @@ static libpass::PassRegistration< SymbolicExecutionPass > PASS(
     "SymbolicExecutionPass",
     "execute symbolically over the AST input specification",
     "ast-symbolic",
-    0 );
+    's' );
 
 void SymbolicExecutionPass::usage( libpass::PassUsage& pu )
 {
@@ -175,8 +175,53 @@ u1 SymbolicExecutionPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setOutput< SymbolicExecutionPass >( environment.finalize() );
+    const auto& tptpTrace = environment.finalize();
+    pr.setOutput< SymbolicExecutionPass >( tptpTrace );
+
+    libpass::PassResult tptpPassResult;
+    tptpPassResult.setOutput< libtptp::SourceToAstPass >( tptpTrace );
+    libtptp::DumpSourcePass dumpPass;
+    dumpPass.run( tptpPassResult );
+    const auto& tptpOutput = tptpPassResult.output< libtptp::DumpSourcePass >()->stream().str();
+
+    if( outputPath() == "" )
+    {
+        log.debug( "writing TPTP trace to 'stdout'" );
+        std::cout << tptpOutput;
+    }
+    else
+    {
+        const std::string outputFile = specification->name() + ".tptp";
+
+        if( not libstdhl::File::Path::exists( outputPath() ) )
+        {
+            try
+            {
+                libstdhl::File::Path::create( outputPath() );
+            }
+            catch( const std::domain_error& e )
+            {
+                log.error( e.what() );
+            }
+        }
+
+        const auto outputFilePath = outputPath() + "/" + outputFile;
+        std::ofstream tptpFile( outputFilePath );
+
+        tptpFile << tptpOutput;
+    }
+
     return true;
+}
+
+void SymbolicExecutionPass::setOutputPath( const std::string& outputPath )
+{
+    m_outputPath = outputPath;
+}
+
+const std::string& SymbolicExecutionPass::outputPath( void ) const
+{
+    return m_outputPath;
 }
 
 //
