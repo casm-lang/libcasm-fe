@@ -812,6 +812,35 @@ SOURCE_TEST(
     false,
     , );
 
+static const auto source_derived_call = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b : -> Integer
+function c : -> Integer
+
+derived identity (i: Integer) -> Integer = i
+
+rule test =
+{
+	b := identity(a)
+	c := identity(1)
+
+    program( self ) := undef
+}
+)***";
+
+SOURCE_TEST(
+    symbolic_derived_calls,
+    SymbolicConsistencyPass,
+    source_derived_call,
+    true,
+    ,
+    ,
+    "b",
+    "~c" );
 //
 //  Local variables:
 //  mode: c++
