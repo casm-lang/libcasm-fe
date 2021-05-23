@@ -671,18 +671,18 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
         case TargetType::DERIVED:
         {
             const auto& definition = node.targetDefinition();
-			// derived function needs its own frame
+            // derived function needs its own frame
             auto oldFrame = m_frame;
             m_frame =
                 std::make_shared< Frame >( definition.get(), definition->maximumNumberOfLocals() );
-			std::size_t localIndex = 0;
-			for( const auto& argument : *node.arguments() )
-			{
-				argument->accept( *this );
-				const auto value = m_stack.pop();
-				m_frame->setLocal( localIndex, value );
-				++localIndex;
-			}
+            std::size_t localIndex = 0;
+            for( const auto& argument : *node.arguments() )
+            {
+                argument->accept( *this );
+                const auto value = m_stack.pop();
+                m_frame->setLocal( localIndex, value );
+                ++localIndex;
+            }
 
             definition->accept( *this );
             m_frame = oldFrame;
