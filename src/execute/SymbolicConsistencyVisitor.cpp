@@ -642,8 +642,7 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
     using TargetType = Ast::DirectCallExpression::TargetType;
     switch( node.targetType() )
     {
-        case TargetType::FUNCTION:  // [[fallthrough]]
-        case TargetType::DERIVED:
+        case TargetType::FUNCTION:
         {
             const auto& function =
                 std::static_pointer_cast< Ast::FunctionDefinition >( node.targetDefinition() );
@@ -667,6 +666,26 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
                     function, { node.sourceLocation() }, Conflict::Cause::CALLED );
             }
             m_stack.push( type );
+            break;
+        }
+        case TargetType::DERIVED:
+        {
+            const auto& definition = node.targetDefinition();
+            // derived function needs its own frame
+            auto oldFrame = m_frame;
+            m_frame =
+                std::make_shared< Frame >( definition.get(), definition->maximumNumberOfLocals() );
+            std::size_t localIndex = 0;
+            for( const auto& argument : *node.arguments() )
+            {
+                argument->accept( *this );
+                const auto value = m_stack.pop();
+                m_frame->setLocal( localIndex, value );
+                ++localIndex;
+            }
+
+            definition->accept( *this );
+            m_frame = oldFrame;
             break;
         }
         case TargetType::RULE:
