@@ -4,6 +4,7 @@
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -122,7 +123,7 @@ SOURCE_TEST( transform, SourceToAstPass, source, true, , { pass.setDebug( false 
 SOURCE_TEST( transform, AstDumpSourcePass, source, true, , );
 SOURCE_TEST( transform, AstDumpDotPass, source, true, , );
 
-// SOURCE_TEST( execute, NumericExecutionPass, source, true, , ); // TODO: FIXME:
+SOURCE_TEST( execute, NumericExecutionPass, source, true, , );  // TODO: FIXME:
 // https://github.com/casm-lang/casm/issues/93
 //
 // static const auto source_with_no_init = R"***(
@@ -133,6 +134,61 @@ SOURCE_TEST( transform, AstDumpDotPass, source, true, , );
 // )***";
 //
 // SOURCE_TEST( execute, NumericExecutionPass, source_with_no_init, true, _noInitDefinition, );
+
+static const auto source_add = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+[symbolic] function b : -> Integer
+[symbolic] function c : -> Integer
+
+rule test =
+{
+	c := a + b
+	program( self ) := undef
+}
+
+)***";
+
+SOURCE_TEST( execute, SymbolicExecutionPass, source_add, true, , );  // TODO: FIXME:
+
+static const auto source_let = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+[symbolic] function b : -> Integer
+[symbolic] function c : -> Integer
+
+rule test =
+{
+	let d = a + b in
+		c := d
+	program( self ) := undef
+}
+
+)***";
+
+static const auto source_consistency = R"***(
+CASM
+
+init test
+
+[symbolic] function a : -> Integer
+function b: -> Integer
+
+rule test =
+{
+	b := a
+	program( self ) := undef
+}
+
+)***";
+
+SOURCE_TEST( symbolic_consistency, SymbolicConsistencyPass, source_consistency, true, , );  // TODO: FIXME:
 
 static const auto src = R"***(
 CASM init test

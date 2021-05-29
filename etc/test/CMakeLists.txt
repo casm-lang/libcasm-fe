@@ -4,6 +4,7 @@
 #
 #   Developed by: Philipp Paulweber
 #                 Emmanuel Pescosta
+#                 Jakob Moosbrugger
 #                 Florian Hahn
 #                 Ioan Molnar
 #                 <https://github.com/casm-lang/libcasm-fe>
@@ -63,6 +64,11 @@ add_library( ${PROJECT}-test OBJECT
   import/SpecificationRepositoryTest.cpp
 #  numeric/expression_evaluation.cpp  # TODO: FIXME: PPA: EPE we should enable this test ASAP
 #  symbolic/expression_evaluation.cpp # TODO: FIXME: PPA: EPE we should enable this test ASAP
+  symbolic/branch.cpp
+  symbolic/consistency.cpp
+  symbolic/numeric_execution.cpp
+  symbolic/testhelper.cpp
+  symbolic/transformation.cpp
   updateset/UpdateSetManagerTest.cpp
   updateset/UpdateSetTest.cpp
   )

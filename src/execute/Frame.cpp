@@ -4,6 +4,7 @@
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -53,10 +54,13 @@ using namespace Ast;
 
 namespace ir = libcasm_ir;
 
+std::size_t Frame::id = 0;
+
 Frame::Frame( CallExpression* call, Node* callee, std::size_t numberOfLocals )
 : m_call( call )
 , m_callee( callee )
 , m_locals( numberOfLocals )
+, m_frameId( id++ )
 {
 }
 

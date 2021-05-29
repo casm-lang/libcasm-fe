@@ -4,6 +4,7 @@
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -58,6 +59,7 @@
 
 #include <libstdhl/RestoreOnScopeExit>
 
+#include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <thread>
@@ -78,7 +80,7 @@ class ScopedOverwrite : public libstdhl::RestoreOnScopeExit< T >
     }
 };
 
-static std::string updateAsString( const ExecutionUpdateSet::Update& update )
+std::string ExecutionVisitor::updateAsString( const ExecutionUpdateSet::Update& update )
 {
     const auto& location = update.location;
     const auto& value = update.value;
@@ -104,7 +106,8 @@ static std::string updateAsString( const ExecutionUpdateSet::Update& update )
     return locationStr + " := " + value.value.name();
 }
 
-static UpdateException::UpdateInfo updateAsUpdateInfo( const ExecutionUpdateSet::Update& update )
+UpdateException::UpdateInfo ExecutionVisitor::updateAsUpdateInfo(
+    const ExecutionUpdateSet::Update& update )
 {
     return { update.value.producer->ptr< Node >(),
              update.location.function()->ptr< FunctionDefinition >(),
@@ -172,7 +175,7 @@ const Storage::ExecutionFunctionState& Storage::programState( void ) const
 
 ExecutionVisitor::ExecutionVisitor(
     ExecutionLocationRegistry& locationRegistry,
-    const Storage& globalState,
+    Storage& globalState,
     UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
     const IR::Constant& agentId )
 : m_globalState( globalState )
@@ -869,7 +872,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
             Code::QuantifierExpressionInvalidUniverse );
     }
 
-    foreachInUniverse( *node.predicateVariables(), universe, [&]() {
+    foreachInUniverse( *node.predicateVariables(), universe, [ & ]() {
         node.proposition()->accept( *this );
         const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
@@ -918,7 +921,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
             Code::QuantifierExpressionInvalidUniverse );
     }
 
-    foreachInUniverse( *node.predicateVariables(), universe, [&]() {
+    foreachInUniverse( *node.predicateVariables(), universe, [ & ]() {
         node.proposition()->accept( *this );
         const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
@@ -1074,7 +1077,7 @@ void ExecutionVisitor::visit( LocalRule& node )
     // ignore local function updates
     auto* updateSet = m_updateSetManager.currentUpdateSet();
     updateSet->setUpdateFilter(
-        [&localFunctions](
+        [ &localFunctions ](
             const UpdateSetDetails::Location& location, const UpdateSetDetails::Value& value ) {
             return localFunctions.find( location.function() ) == localFunctions.cend();
         } );
@@ -1105,7 +1108,7 @@ void ExecutionVisitor::visit( ForallRule& node )
             Code::ForallRuleInvalidUniverse );
     }
 
-    foreachInUniverse( *node.variables(), universe, [&]() {
+    foreachInUniverse( *node.variables(), universe, [ & ]() {
         // check if values satisfy the condition
         node.condition()->accept( *this );
         const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
@@ -1418,6 +1421,16 @@ void ExecutionVisitor::validateValue(
         throw IR::ValidationException( "value must be defined" );
     }
 
+    if( value.symbolic() )
+    {
+        auto& sym = static_cast< const IR::SymbolicConstant& >( value );
+        if( sym.type() != type )
+        {
+            throw IR::ValidationException( "types do not match" );
+        }
+        return;
+    }
+
     type.validate( value );
 }
 
@@ -1485,14 +1498,14 @@ void ExecutionVisitor::foreachInUniverse(
 
         if( chain == nullptr )
         {
-            chain = [frame, variableIndex, subRule]( const IR::Constant& value ) {
+            chain = [ frame, variableIndex, subRule ]( const IR::Constant& value ) {
                 frame->setLocal( variableIndex, value );
                 subRule();
             };
         }
         else
         {
-            chain = [frame, variableIndex, chain, &universe]( const IR::Constant& value ) {
+            chain = [ frame, variableIndex, chain, &universe ]( const IR::Constant& value ) {
                 frame->setLocal( variableIndex, value );
                 universe.foreach( chain );
             };
@@ -1540,235 +1553,8 @@ void StateInitializationVisitor::visit( FunctionDefinition& node )
     transaction.merge();
 }
 
-Agent::Agent(
-    ExecutionLocationRegistry& locationRegistry,
-    const Storage& globalState,
-    const IR::Constant& agentId,
-    const ReferenceConstant& rule )
-: m_globalState( globalState )
-, m_locationRegistry( locationRegistry )
-, m_agentId( agentId )
-, m_rule( rule )
-, m_updateSetManager()
-{
-}
-
-void Agent::run( void )
-{
-    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
-    ExecutionVisitor executionVisitor(
-        m_locationRegistry, m_globalState, m_updateSetManager, m_agentId );
-    executionVisitor.execute( m_rule );
-    transaction.merge();
-}
-
-ExecutionUpdateSet* Agent::updateSet( void ) const
-{
-    return m_updateSetManager.currentUpdateSet();
-}
-
-void ParallelDispatchStrategy::dispatch( std::vector< Agent >& agents )
-{
-    if( agents.size() == 1 )
-    {
-        agents.at( 0 ).run();
-    }
-    else
-    {
-        std::vector< std::thread > threads;
-        threads.reserve( agents.size() );
-        for( auto& agent : agents )
-        {
-            threads.emplace_back( [&] { agent.run(); } );
-        }
-        for( auto& thread : threads )
-        {
-            thread.join();
-        }
-    }
-}
-
-void SequentialDispatchStrategy::dispatch( std::vector< Agent >& agents )
-{
-    for( auto& agent : agents )
-    {
-        agent.run();
-    }
-}
-
-void AllAgentsSelectionStrategy::selectAgents( std::vector< Agent >& agents ) const
-{
-}
-
-void SingleRandomAgentSelectionStrategy::selectAgents( std::vector< Agent >& agents ) const
-{
-    if( agents.size() < 2 )
-    {
-        return;
-    }
-
-    const auto randomIndex = libstdhl::Random::uniform< std::size_t >( 0, agents.size() - 1 );
-    auto selectedAgent = std::move( agents[ randomIndex ] );
-    agents.clear();
-    agents.push_back( std::move( selectedAgent ) );
-}
-
-AgentScheduler::AgentScheduler( ExecutionLocationRegistry& locationRegistry, Storage& globalState )
-: m_dispatchStrategy( libstdhl::Memory::make_unique< SequentialDispatchStrategy >() )
-, m_selectionStrategy( nullptr )
-, m_globalState( globalState )
-, m_locationRegistry( locationRegistry )
-, m_collectedUpdates()
-, m_done( false )
-, m_stepCounter( 0 )
-{
-}
-
-void AgentScheduler::setDispatchStrategy( std::unique_ptr< DispatchStrategy > dispatchStrategy )
-{
-    m_dispatchStrategy = std::move( dispatchStrategy );
-}
-
-void AgentScheduler::setAgentSelectionStrategy(
-    std::unique_ptr< SelectionStrategy > selectionStrategy )
-{
-    m_selectionStrategy = std::move( selectionStrategy );
-}
-
-void AgentScheduler::step( void )
-{
-    auto agents = collectAgents();
-    selectAgents( agents );
-
-    if( agents.empty() )
-    {
-        m_done = true;
-        return;
-    }
-
-    dispatch( agents );
-
-    collectUpdates( agents );
-    m_done = m_collectedUpdates.empty();
-    fireUpdates();
-
-    ++m_stepCounter;
-}
-
-bool AgentScheduler::done( void ) const
-{
-    return m_done;
-}
-
-std::size_t AgentScheduler::numberOfSteps( void ) const
-{
-    return m_stepCounter;
-}
-
-u1 AgentScheduler::check( void )
-{
-    u1 foundAtLeastOneDefinedAgent = false;
-
-    const auto& programs = m_globalState.programState();
-    const auto end = programs.end();
-    for( auto it = programs.begin(); it != end; ++it )
-    {
-        const auto& location = it.key();
-        const auto& value = it.value();
-
-        const auto& agentId = location.arguments().at( 0 );
-
-        if( value.defined() )
-        {
-            foundAtLeastOneDefinedAgent = true;
-        }
-    }
-
-    if( not foundAtLeastOneDefinedAgent )
-    {
-        m_done = true;
-    }
-
-    return foundAtLeastOneDefinedAgent;
-}
-
-std::vector< Agent > AgentScheduler::collectAgents( void ) const
-{
-    std::vector< Agent > agents;
-
-    const auto& programs = m_globalState.programState();
-    const auto end = programs.end();
-    for( auto it = programs.begin(); it != end; ++it )
-    {
-        const auto& location = it.key();
-        const auto& value = it.value();
-
-        const auto& agentId = location.arguments().at( 0 );
-
-        assert( IR::isa< ReferenceConstant >( value ) );
-        const auto& rule = static_cast< const ReferenceConstant& >( value );
-
-        if( rule.defined() )
-        {
-            agents.emplace_back( m_locationRegistry, m_globalState, agentId, rule );
-        }
-    }
-
-    return agents;
-}
-
-void AgentScheduler::selectAgents( std::vector< Agent >& agents )
-{
-    assert( m_selectionStrategy && "agent selection strategy must be set" );
-    m_selectionStrategy->selectAgents( agents );
-}
-
-void AgentScheduler::dispatch( std::vector< Agent >& agents )
-{
-    assert( m_dispatchStrategy );
-    m_dispatchStrategy->dispatch( agents );
-}
-
-void AgentScheduler::collectUpdates( const std::vector< Agent >& agents )
-{
-    for( const auto& agent : agents )
-    {
-        try
-        {
-            agent.updateSet()->mergeInto( &m_collectedUpdates );
-        }
-        catch( const ExecutionUpdateSet::Conflict& conflict )
-        {
-            // existing
-            const auto& updateA = conflict.existingUpdate();
-            const auto updateStrA = updateAsString( updateA );
-            const auto agentStrA = updateA.value.agent.name();
-
-            // conflicting
-            const auto& updateB = conflict.conflictingUpdate();
-            const auto updateStrB = updateAsString( updateB );
-            const auto agentStrB = updateB.value.agent.name();
-
-            throw UpdateException(
-                {},
-                "Conflict while collection updates from agents. Update '" + updateStrA +
-                    "' produced by agent " + agentStrA + " clashed with update '" + updateStrB +
-                    "' produced by agent " + agentStrB,
-                {},
-                { updateAsUpdateInfo( updateA ), updateAsUpdateInfo( updateB ) },
-                libcasm_fe::Code::UpdateSetMergeConflict );
-        }
-    }
-}
-
-void AgentScheduler::fireUpdates( void )
-{
-    m_globalState.fireUpdateSet( &m_collectedUpdates );
-    m_collectedUpdates.clear();
-}
-
 InvariantChecker::InvariantChecker(
-    ExecutionLocationRegistry& locationRegistry, const Storage& globalState )
+    ExecutionLocationRegistry& locationRegistry, Storage& globalState )
 : m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
 {
@@ -1789,6 +1575,487 @@ void InvariantChecker::check( const Specification& specification )
 
         visitor.execute( definition );
     }
+}
+
+SymbolicExecutionVisitor::SymbolicExecutionVisitor(
+    ExecutionLocationRegistry& locationRegistry,
+    Storage& globalState,
+    UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
+    const IR::Constant& agentId,
+    IR::SymbolicExecutionEnvironment& environment )
+: ExecutionVisitor( locationRegistry, globalState, updateSetManager, agentId )
+, m_environment( environment )
+{
+}
+
+void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
+{
+    const auto* frame = m_frameStack.top();
+    if( m_evaluateUpdateLocation )
+    {
+        validateArguments(
+            node,
+            node.type()->arguments(),
+            { ValidationFlag::ValueMustBeDefined },
+            Code::FunctionArgumentInvalidValueAtUpdate );
+
+        m_updateLocation = m_locationRegistry.get( &node, frame->locals() );
+    }
+    else
+    {
+        validateArguments(
+            node,
+            node.type()->arguments(),
+            { ValidationFlag::ValueMustBeDefined },
+            Code::FunctionArgumentInvalidValueAtLookup );
+
+        const auto location = not node.symbolic()
+                                  ? m_locationRegistry.lookup( &node, m_frameStack.top()->locals() )
+                                  : m_locationRegistry.get( &node, frame->locals() );
+        if( location )
+        {
+            const auto update = m_updateSetManager.lookup( *location );
+            if( update )
+            {
+                m_evaluationStack.push( update->value );
+                return;
+            }
+
+            if( not node.isLocal() )
+            {
+                const auto function = m_globalState.get( *location );
+                if( node.symbolic() )
+                {
+                    if( function && function.value().symbolic() )
+                    {
+                        m_evaluationStack.push( function.value() );
+                        return;
+                    }
+                    auto sym = m_environment.get(
+                        node.identifier()->name(), node.type(), location->arguments() );
+                    m_evaluationStack.push( sym );
+                    m_globalState.set( *location, sym );
+                    return;
+                }
+                if( function )
+                {
+                    m_evaluationStack.push( function.value() );
+                    return;
+                }
+            }
+        }
+
+        node.defined()->expression()->accept( *this );  // return value already on stack
+    }
+}
+
+void SymbolicExecutionVisitor::visit( DirectCallExpression& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( MethodCallExpression& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( LiteralCallExpression& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( IndirectCallExpression& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( UnaryExpression& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( BinaryExpression& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( LetExpression& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( ConditionalExpression& node )
+{
+    node.condition()->accept( *this );
+    const auto condition = m_evaluationStack.pop();
+
+    if( not condition.defined() )
+    {
+        throw RuntimeException(
+            { node.condition()->sourceLocation() },
+            "condition must be true or false but was undefined",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::ConditionalRuleInvalidCondition );
+    }
+
+    if( condition.symbolic() )
+    {
+        const auto tptpCondition = m_environment.tptpAtomFromConstant( condition );
+        {
+            // environment crates implications for condition until end of scope
+            auto environment = m_environment.makeEnvironment( tptpCondition );
+
+            node.thenExpression()->accept( *this );
+        }
+        auto thenVal = m_evaluationStack.pop();
+        {
+            const auto inverse = std::make_shared< libtptp::UnaryLogic >(
+                libtptp::UnaryLogic::Connective::NEGATION, tptpCondition );
+            // environment crates implications for condition until end of scope
+            auto environment = m_environment.makeEnvironment( inverse );
+            node.elseExpression()->accept( *this );
+        }
+        auto elseVal = m_evaluationStack.pop();
+        auto mergedSym = m_environment.mergeSymbolPaths( tptpCondition, thenVal, elseVal );
+        m_evaluationStack.push( mergedSym );
+    }
+    else
+    {
+        const auto literalCondition = static_cast< const IR::BooleanConstant& >( condition );
+
+        if( literalCondition.value() == true )
+        {
+            node.thenExpression()->accept( *this );
+        }
+        else
+        {
+            node.elseExpression()->accept( *this );
+        }
+    }
+}
+
+void SymbolicExecutionVisitor::visit( ChooseExpression& node )
+{
+    // TODO: if universe is symbolic: create symbolic trace
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( UniversalQuantifierExpression& node )
+{
+    // TODO: visit universe, if symbolic: create quantified expression
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( ExistentialQuantifierExpression& node )
+{
+    // TODO: visit universe, if symbolic: create quantified expression
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( CardinalityExpression& node )
+{
+    // TODO: fix me
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( ConditionalRule& node )
+{
+    /*
+    if(node.symbolic())
+    {...}
+    else {
+        ExecutionVisitor::visit(node);
+    }
+    */
+    node.condition()->accept( *this );
+    const auto condition = m_evaluationStack.pop();
+
+    if( not condition.defined() )
+    {
+        throw RuntimeException(
+            { node.condition()->sourceLocation() },
+            "condition must be true or false but was undefined",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::ConditionalRuleInvalidCondition );
+    }
+
+    if( condition.symbolic() )
+    {
+        // all functions are symbolic, so overwriting updates is irrelevant
+        // then and else branch may create colliding updates
+        Transaction thenTransaction( &m_updateSetManager, Semantics::Parallel, 100 );
+        const auto tptpCondition = m_environment.tptpAtomFromConstant( condition );
+        {
+            // environment crates implications for condition until end of scope
+            auto environment = m_environment.makeEnvironment( tptpCondition );
+            node.thenRule()->accept( *this );
+        }
+        auto thenSet = thenTransaction.rollback();
+        Transaction elseTransaction( &m_updateSetManager, Semantics::Parallel, 100 );
+        {
+            const auto inverse = std::make_shared< libtptp::UnaryLogic >(
+                libtptp::UnaryLogic::Connective::NEGATION, tptpCondition );
+            // environment crates implications for condition until end of scope
+            auto environment = m_environment.makeEnvironment( inverse );
+            node.elseRule()->accept( *this );
+        }
+        auto elseSet = elseTransaction.rollback();
+        Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+        std::vector< std::pair< UpdateSetDetails::Location, Update > > mergedUpdates;
+        for( auto it = thenSet->begin(); it != thenSet->end(); ++it )
+        {
+            auto elseValue = elseSet->get( it.key() );
+            if( elseValue )
+            {
+                auto mergedSym = m_environment.mergeSymbolPaths(
+                    tptpCondition, it.value().value, elseValue->value );
+                const Update newUpdate{ mergedSym, &node, m_agentId };
+                m_updateSetManager.add( it.key(), newUpdate );
+            }
+            else
+            {
+                IR::Constant value;
+                auto update = m_updateSetManager.lookup( it.key() );
+                if( !update )
+                {
+                    auto function = m_globalState.get( it.key() );
+                    if( !function || not function->symbolic() )
+                    {
+                        auto sym = m_environment.get(
+                            it.key().function()->identifier()->name(),
+                            it.key().function()->type(),
+                            it.key().arguments() );
+                        m_globalState.set( it.key(), sym );
+                        value = sym;
+                    }
+                    else
+                    {
+                        value = function.value();
+                    }
+                }
+                else
+                {
+                    value = update->value;
+                }
+                auto mergedSym =
+                    m_environment.mergeSymbolPaths( tptpCondition, it.value().value, value );
+                const Update newUpdate{ mergedSym, it.value().producer, m_agentId };
+                m_updateSetManager.add( it.key(), newUpdate );
+            }
+        }
+        for( auto it = elseSet->begin(); it != elseSet->end(); ++it )
+        {
+            auto thenValue = thenSet->get( it.key() );
+            if( !thenValue )
+            {
+                IR::Constant value;
+                auto update = m_updateSetManager.lookup( it.key() );
+                if( !update )
+                {
+                    auto function = m_globalState.get( it.key() );
+                    if( !function || not function->symbolic() )
+                    {
+                        auto sym = m_environment.get(
+                            it.key().function()->identifier()->name(),
+                            it.key().function()->type(),
+                            it.key().arguments() );
+                        m_globalState.set( it.key(), sym );
+                        value = sym;
+                    }
+                    else
+                    {
+                        value = function.value();
+                    }
+                }
+                else
+                {
+                    value = update->value;
+                }
+                auto mergedSym =
+                    m_environment.mergeSymbolPaths( tptpCondition, value, it.value().value );
+                const Update newUpdate{ mergedSym, it.value().producer, m_agentId };
+                m_updateSetManager.add( it.key(), newUpdate );
+            }
+        }
+        try
+        {
+            transaction.merge();
+        }
+        catch( const ExecutionUpdateSet::Conflict& conflict )
+        {
+            handleMergeConflict( node, conflict );
+        }
+    }
+    else
+    {
+        const auto literalCondition = static_cast< const IR::BooleanConstant& >( condition );
+
+        if( literalCondition.value() == true )
+        {
+            node.thenRule()->accept( *this );
+        }
+        else
+        {
+            node.elseRule()->accept( *this );
+        }
+    }
+}
+
+void SymbolicExecutionVisitor::visit( CaseRule& node )
+{
+    // TODO: similar to ConditionalRule: if condition symbolic: create all cases in trace with
+    // respective environment
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( ForallRule& node )
+{
+    // TODO: if universe symbolic: create quantified logic
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( ChooseRule& node )
+{
+    // TODO: if universe symbolic: create symbolic trace
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( IterateRule& node )
+{
+    // TODO: fix me
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( BlockRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( SequenceRule& node )
+{
+    ExecutionVisitor::visit( node );
+}
+
+void SymbolicExecutionVisitor::visit( UpdateRule& node )
+{
+    const auto& expression = node.expression();
+    const auto& function = node.function();
+
+    // evalute update value
+    expression->accept( *this );
+    const auto updateValue = m_evaluationStack.pop();
+    try
+    {
+        // validateValue( updateValue, *function->type() );
+    }
+    catch( const IR::ValidationException& e )
+    {
+        throw RuntimeException(
+            { expression->sourceLocation() },
+            e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::FunctionUpdateInvalidValueAtUpdate );
+    }
+
+    {
+        ScopedOverwrite< bool > withLocationEvaluation( m_evaluateUpdateLocation, true );
+        function->accept( *this );
+    }
+    assert( m_updateLocation.isValid() );
+
+    try
+    {
+        const Update update{ updateValue, &node, m_agentId };
+
+        if( !m_updateLocation.function()->symbolic() && updateValue.symbolic() )
+        {
+            throw UpdateException(
+                { node.sourceLocation() },
+                "trying to assign a symbolic value to a numeric function",
+                { m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ) },
+                { updateAsUpdateInfo( { m_updateLocation, update } ) },
+                libcasm_fe::Code::UpdateSetInvalidExpression );
+        }
+
+        m_updateSetManager.add( m_updateLocation, update );
+
+        // TODO: @moosbruggerj add local variable handling
+        if( m_updateLocation.function()->symbolic() )
+        {
+            auto value = m_environment.tptpAtomFromConstant( updateValue );
+            m_environment.set(
+                m_updateLocation.function()->identifier()->name(),
+                m_updateLocation.function()->type(),
+                m_updateLocation.arguments(),
+                value );
+        }
+    }
+    catch( const ExecutionUpdateSet::Conflict& conflict )
+    {
+        throw UpdateException(
+            { node.sourceLocation() },
+            "Conflict while adding an update in agent " + m_agentId.name() + ". Update '" +
+                updateAsString( conflict.conflictingUpdate() ) + "' clashed with update '" +
+                updateAsString( conflict.existingUpdate() ) + "'",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            { updateAsUpdateInfo( conflict.existingUpdate() ),
+              updateAsUpdateInfo( conflict.conflictingUpdate() ) },
+            libcasm_fe::Code::UpdateSetClash );
+    }
+}
+
+void SymbolicExecutionVisitor::visit( WhileRule& node )
+{
+    // TODO: fix me
+    ExecutionVisitor::visit( node );
+}
+
+IR::SymbolicExecutionEnvironment& SymbolicExecutionVisitor::environment()
+{
+    return m_environment;
+}
+
+SymbolicStateInitializationVisitor::SymbolicStateInitializationVisitor(
+    ExecutionLocationRegistry& locationRegistry,
+    Storage& globalState,
+    IR::SymbolicExecutionEnvironment& environment )
+: EmptyVisitor()
+, m_globalState( globalState )
+, m_locationRegistry( locationRegistry )
+, m_updateSetManager()
+, m_environment( environment )
+{
+}
+
+void SymbolicStateInitializationVisitor::visit( Specification& node )
+{
+    m_updateSetManager.fork( Semantics::Sequential, 100 );
+
+    node.header()->accept( *this );
+    node.definitions()->accept( *this );
+
+    auto updateSet = m_updateSetManager.currentUpdateSet();
+    m_globalState.fireUpdateSet( updateSet );
+    m_updateSetManager.clear();
+}
+
+void SymbolicStateInitializationVisitor::visit( InitDefinition& node )
+{
+    assert( node.programFunction() and "checked during frame size determination pass!" );
+    node.programFunction()->accept( *this );
+}
+
+void SymbolicStateInitializationVisitor::visit( FunctionDefinition& node )
+{
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+    if( node.symbolic() )
+    {
+        m_environment.addFunctionDeclaration( node.identifier()->name(), *node.type() );
+    }
+    SymbolicExecutionVisitor executionVisitor(
+        m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant(), m_environment );
+    node.initially()->accept( executionVisitor );
+    transaction.merge();
 }
 
 //

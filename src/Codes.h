@@ -4,6 +4,7 @@
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -286,7 +287,8 @@ namespace libcasm_fe
         // update set errors
         ,
         UpdateSetClash = 0x7000,
-        UpdateSetMergeConflict = 0x7001
+        UpdateSetMergeConflict = 0x7001,
+        UpdateSetInvalidExpression = 0x7002
 
         // --------------------------------------------------------- 9*** ...
         // unsorted run-time errors

@@ -4,6 +4,7 @@
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -679,10 +680,12 @@ class UpdateSetManager
      * @post If a rollback has been performed the size of the update-set manager
      *       is decreased by one
      */
-    void rollback()
+    std::unique_ptr< UpdateSet > rollback()
     {
         assert( not m_updateSets.empty() );
+        auto set = std::move( m_updateSets.back() );
         m_updateSets.pop_back();
+        return set;
     }
 
     /**
@@ -759,15 +762,15 @@ class UpdateSetTransaction
         m_dangling = false;
     }
 
-    void rollback( void )
+    std::unique_ptr< UpdateSet > rollback( void )
     {
         if( not m_dangling )
         {
-            return;
+            return std::make_unique< ParallelUpdateSet< typename UpdateSet::Details > >();
         }
 
-        m_manager->rollback();
         m_dangling = false;
+        return m_manager->rollback();
     }
 
   private:

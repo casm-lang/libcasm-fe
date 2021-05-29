@@ -4,6 +4,7 @@
 #
 #   Developed by: Philipp Paulweber
 #                 Emmanuel Pescosta
+#                 Jakob Moosbrugger
 #                 Florian Hahn
 #                 Ioan Molnar
 #                 <https://github.com/casm-lang/libcasm-fe>
@@ -85,10 +86,14 @@ add_library( ${PROJECT}-cpp OBJECT
   analyze/PropertyResolverPass.cpp
   analyze/PropertyRevisePass.cpp
 
+  execute/Agent.cpp
   execute/ExecutionVisitor.cpp
   execute/NumericExecutionPass.cpp
   execute/HashMapBase.cpp
   execute/ReferenceConstant.cpp
+  execute/SymbolicExecutionPass.cpp
+  execute/SymbolicConsistencyPass.cpp
+  execute/SymbolicConsistencyVisitor.cpp
   execute/Frame.cpp
   execute/RuntimeException.cpp
   execute/UpdateException.cpp
@@ -189,6 +194,7 @@ ecm_generate_headers( ${PROJECT}_EXECUTE_HEADERS_CPP
   ORIGINAL
     CAMELCASE
   HEADER_NAMES
+    Agent
     ChainedHashMap
     ExecutionVisitor
     Frame
@@ -200,6 +206,9 @@ ecm_generate_headers( ${PROJECT}_EXECUTE_HEADERS_CPP
     ReferenceConstant
     RobinHoodHashMap
     Stack
+    SymbolicConsistencyPass
+    SymbolicConsistencyVisitor
+    SymbolicExecutionPass
     UpdateSet
     RuntimeException
     UpdateException

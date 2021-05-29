@@ -4,6 +4,7 @@
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -103,7 +104,7 @@ void Specification::setLocation( const libstdhl::Standard::RFC3986::URI::Ptr& lo
     lastPointPos = ( lastPointPos == std::string::npos ) ? fileName.size() - 1 : lastPointPos - 1;
 
     // extract sub-string with start position and length (delta) characters and set member
-    m_name = fileName.substr( lastSlashPos, lastPointPos - lastSlashPos );
+    m_name = fileName.substr( lastSlashPos, lastPointPos - lastSlashPos + 1 );
 }
 
 const libstdhl::Standard::RFC3986::URI::Ptr& Specification::location( void ) const
