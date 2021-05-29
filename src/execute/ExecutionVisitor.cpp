@@ -139,12 +139,10 @@ void Storage::set( const Location& location, const Value& value )
     {
         m_programState.set( location, value );
     }
-    else if( not location.function()->symbolic() )
+    else
     {
-        assert( not value.symbolic() );
         m_functionState.set( location, value );
     }
-    // else: symbolic update is handled in SymbolicExecutionVisitor::visit( UpdateRule& )
 }
 
 void Storage::remove( const Location& location )
