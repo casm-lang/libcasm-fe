@@ -63,7 +63,6 @@
 #include <mutex>
 #include <stdexcept>
 #include <thread>
-#include "libtptp/Logic.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -1630,7 +1629,7 @@ void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
                     if( function && function.value().symbolic() )
                     {
                         m_evaluationStack.push( function.value() );
-						return;
+                        return;
                     }
                     auto sym = m_environment.get(
                         node.identifier()->name(), node.type(), location->arguments() );
@@ -1701,15 +1700,14 @@ void SymbolicExecutionVisitor::visit( ConditionalExpression& node )
 
     if( condition.symbolic() )
     {
-        // all functions are symbolic, so overwriting updates is irrelevant
-        // then and else branch may create colliding updates
-        Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
         const auto tptpCondition = m_environment.tptpAtomFromConstant( condition );
         {
             // environment crates implications for condition until end of scope
             auto environment = m_environment.makeEnvironment( tptpCondition );
+
             node.thenExpression()->accept( *this );
         }
+        auto thenVal = m_evaluationStack.pop();
         {
             const auto inverse = std::make_shared< libtptp::UnaryLogic >(
                 libtptp::UnaryLogic::Connective::NEGATION, tptpCondition );
@@ -1717,14 +1715,9 @@ void SymbolicExecutionVisitor::visit( ConditionalExpression& node )
             auto environment = m_environment.makeEnvironment( inverse );
             node.elseExpression()->accept( *this );
         }
-        try
-        {
-            transaction.merge();
-        }
-        catch( const ExecutionUpdateSet::Conflict& conflict )
-        {
-            handleMergeConflict( node, conflict );
-        }
+        auto elseVal = m_evaluationStack.pop();
+        auto mergedSym = m_environment.mergeSymbolPaths( tptpCondition, thenVal, elseVal );
+        m_evaluationStack.push( mergedSym );
     }
     else
     {
@@ -1790,19 +1783,99 @@ void SymbolicExecutionVisitor::visit( ConditionalRule& node )
     {
         // all functions are symbolic, so overwriting updates is irrelevant
         // then and else branch may create colliding updates
-        Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
+        Transaction thenTransaction( &m_updateSetManager, Semantics::Parallel, 100 );
         const auto tptpCondition = m_environment.tptpAtomFromConstant( condition );
         {
             // environment crates implications for condition until end of scope
             auto environment = m_environment.makeEnvironment( tptpCondition );
             node.thenRule()->accept( *this );
         }
+        auto thenSet = thenTransaction.rollback();
+        Transaction elseTransaction( &m_updateSetManager, Semantics::Parallel, 100 );
         {
             const auto inverse = std::make_shared< libtptp::UnaryLogic >(
                 libtptp::UnaryLogic::Connective::NEGATION, tptpCondition );
             // environment crates implications for condition until end of scope
             auto environment = m_environment.makeEnvironment( inverse );
             node.elseRule()->accept( *this );
+        }
+        auto elseSet = elseTransaction.rollback();
+        Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+        std::vector< std::pair< UpdateSetDetails::Location, Update > > mergedUpdates;
+        for( auto it = thenSet->begin(); it != thenSet->end(); ++it )
+        {
+            auto elseValue = elseSet->get( it.key() );
+            if( elseValue )
+            {
+                auto mergedSym = m_environment.mergeSymbolPaths(
+                    tptpCondition, it.value().value, elseValue->value );
+                const Update newUpdate{ mergedSym, &node, m_agentId };
+                m_updateSetManager.add( it.key(), newUpdate );
+            }
+            else
+            {
+                IR::Constant value;
+                auto update = m_updateSetManager.lookup( it.key() );
+                if( !update )
+                {
+                    auto function = m_globalState.get( it.key() );
+                    if( !function || not function->symbolic() )
+                    {
+                        auto sym = m_environment.get(
+                            it.key().function()->identifier()->name(),
+                            it.key().function()->type(),
+                            it.key().arguments() );
+                        m_globalState.set( it.key(), sym );
+                        value = sym;
+                    }
+                    else
+                    {
+                        value = function.value();
+                    }
+                }
+                else
+                {
+                    value = update->value;
+                }
+                auto mergedSym =
+                    m_environment.mergeSymbolPaths( tptpCondition, it.value().value, value );
+                const Update newUpdate{ mergedSym, it.value().producer, m_agentId };
+                m_updateSetManager.add( it.key(), newUpdate );
+            }
+        }
+        for( auto it = elseSet->begin(); it != elseSet->end(); ++it )
+        {
+            auto thenValue = thenSet->get( it.key() );
+            if( !thenValue )
+            {
+                IR::Constant value;
+                auto update = m_updateSetManager.lookup( it.key() );
+                if( !update )
+                {
+                    auto function = m_globalState.get( it.key() );
+                    if( !function || not function->symbolic() )
+                    {
+                        auto sym = m_environment.get(
+                            it.key().function()->identifier()->name(),
+                            it.key().function()->type(),
+                            it.key().arguments() );
+                        m_globalState.set( it.key(), sym );
+                        value = sym;
+                    }
+                    else
+                    {
+                        value = function.value();
+                    }
+                }
+                else
+                {
+                    value = update->value;
+                }
+                auto mergedSym =
+                    m_environment.mergeSymbolPaths( tptpCondition, value, it.value().value );
+                const Update newUpdate{ mergedSym, it.value().producer, m_agentId };
+                m_updateSetManager.add( it.key(), newUpdate );
+            }
         }
         try
         {
