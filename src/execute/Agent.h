@@ -71,7 +71,7 @@ namespace libcasm_fe
       public:
         Agent(
             ExecutionLocationRegistry& locationRegistry,
-            const Storage& globalState,
+            Storage& globalState,
             const IR::Constant& agentId,
             const ReferenceConstant& rule,
             bool symbolic,
@@ -86,7 +86,7 @@ namespace libcasm_fe
         bool symbolic( void ) const;
 
       private:
-        const Storage& m_globalState;
+        Storage& m_globalState;
         ExecutionLocationRegistry& m_locationRegistry;
         const IR::Constant& m_agentId;
         const ReferenceConstant& m_rule;

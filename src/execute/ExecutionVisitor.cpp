@@ -176,7 +176,7 @@ const Storage::ExecutionFunctionState& Storage::programState( void ) const
 
 ExecutionVisitor::ExecutionVisitor(
     ExecutionLocationRegistry& locationRegistry,
-    const Storage& globalState,
+    Storage& globalState,
     UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
     const IR::Constant& agentId )
 : m_globalState( globalState )
@@ -1555,7 +1555,7 @@ void StateInitializationVisitor::visit( FunctionDefinition& node )
 }
 
 InvariantChecker::InvariantChecker(
-    ExecutionLocationRegistry& locationRegistry, const Storage& globalState )
+    ExecutionLocationRegistry& locationRegistry, Storage& globalState )
 : m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
 {
@@ -1580,7 +1580,7 @@ void InvariantChecker::check( const Specification& specification )
 
 SymbolicExecutionVisitor::SymbolicExecutionVisitor(
     ExecutionLocationRegistry& locationRegistry,
-    const Storage& globalState,
+    Storage& globalState,
     UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
     const IR::Constant& agentId,
     IR::SymbolicExecutionEnvironment& environment )
@@ -1627,9 +1627,15 @@ void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
                 const auto function = m_globalState.get( *location );
                 if( node.symbolic() )
                 {
+                    if( function && function.value().symbolic() )
+                    {
+                        m_evaluationStack.push( function.value() );
+						return;
+                    }
                     auto sym = m_environment.get(
                         node.identifier()->name(), node.type(), location->arguments() );
                     m_evaluationStack.push( sym );
+                    m_globalState.set( *location, sym );
                     return;
                 }
                 if( function )
