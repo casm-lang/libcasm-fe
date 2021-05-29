@@ -68,7 +68,7 @@ namespace IR = libcasm_ir;
 
 Agent::Agent(
     ExecutionLocationRegistry& locationRegistry,
-    const Storage& globalState,
+    Storage& globalState,
     const IR::Constant& agentId,
     const ReferenceConstant& rule,
     bool symbolic,

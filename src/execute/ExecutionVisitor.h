@@ -175,7 +175,7 @@ namespace libcasm_fe
       public:
         ExecutionVisitor(
             ExecutionLocationRegistry& locationRegistry,
-            const Storage& globalState,
+            Storage& globalState,
             UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
             const IR::Constant& agentId );
 
@@ -321,7 +321,7 @@ namespace libcasm_fe
             const std::function< void() >& subRule ) const;
 
       protected:
-        const Storage& m_globalState;
+        Storage& m_globalState;
         ExecutionLocationRegistry& m_locationRegistry;
         UpdateSetManager< ExecutionUpdateSet >& m_updateSetManager;
         const IR::Constant& m_agentId;
@@ -353,12 +353,12 @@ namespace libcasm_fe
     class InvariantChecker
     {
       public:
-        InvariantChecker( ExecutionLocationRegistry& locationRegistry, const Storage& globalState );
+        InvariantChecker( ExecutionLocationRegistry& locationRegistry, Storage& globalState );
 
         void check( const Specification& specification );
 
       private:
-        const Storage& m_globalState;
+        Storage& m_globalState;
         ExecutionLocationRegistry& m_locationRegistry;
     };
     class SymbolicExecutionVisitor final : public ExecutionVisitor
@@ -369,7 +369,7 @@ namespace libcasm_fe
       public:
         SymbolicExecutionVisitor(
             ExecutionLocationRegistry& locationRegistry,
-            const Storage& globalState,
+            Storage& globalState,
             UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
             const IR::Constant& agentId,
             IR::SymbolicExecutionEnvironment& environment );
