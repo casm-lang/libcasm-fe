@@ -49,7 +49,7 @@
 
 * libcasm-fe: CASM Language Front-End Library
 
-[[https://gitter.im/casm-lang/libcasm-fe][https://img.shields.io/badge/gitter-chat-darkcyan.svg?logo=gitter]]
+[[https://github.com/casm-lang/casm/discussions/categories/q-a][https://img.shields.io/badge/discussion-Q&A-blue.svg?logo=github]]
 [[https://github.com/casm-lang/libcasm-fe/actions?query=workflow%3Abuild][https://github.com/casm-lang/libcasm-fe/workflows/build/badge.svg]]
 [[https://github.com/casm-lang/libcasm-fe/actions?query=workflow%3Anightly][https://github.com/casm-lang/libcasm-fe/workflows/nightly/badge.svg]]
 [[https://codecov.io/gh/casm-lang/libcasm-fe][https://codecov.io/gh/casm-lang/libcasm-fe/badge.svg]]
