@@ -287,6 +287,7 @@ void TemplatingVisitor::visit( DerivedDefinition& node )
     const auto& astNode =
         store< DerivedDefinition >( node, identifier, arguments, returnType, expression );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 
     m_definitions->add( astNode );
 }
@@ -299,6 +300,7 @@ void TemplatingVisitor::visit( RuleDefinition& node )
     const auto& rule = fetch< Rule >( node.rule() );
     const auto& astNode = store< RuleDefinition >( node, identifier, arguments, returnType, rule );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 
     m_definitions->add( astNode );
 }
@@ -337,6 +339,7 @@ void TemplatingVisitor::visit( DomainDefinition& node )
     // astNode->setTemplateSymbols( templateSymbols );
     astNode->setAbstract( node.abstract() );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 
     m_definitions->add( astNode );
 
@@ -371,6 +374,7 @@ void TemplatingVisitor::visit( BehaviorDefinition& node )
     const auto& astNode = store< BehaviorDefinition >( node, domainType, definitions );
     // astNode->setTemplateSymbols( templateSymbols );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 
     for( const auto& definition : *node.definitions() )
     {
@@ -409,6 +413,7 @@ void TemplatingVisitor::visit( ImplementDefinition& node )
         store< ImplementDefinition >( node, behaviorType, domainType, definitions );
     // astNode->setTemplateSymbols( templateSymbols );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 
     m_definitions->add( astNode );
 }
@@ -425,6 +430,7 @@ void TemplatingVisitor::visit( Declaration& node )
     const auto& kind = node.kind();
     const auto& astNode = store< Declaration >( node, identifier, argumentTypes, returnType, kind );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void TemplatingVisitor::visit( UndefLiteral& node )
