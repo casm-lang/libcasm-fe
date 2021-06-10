@@ -367,6 +367,7 @@ void CstToAstVisitor::visit( FunctionDefinition& node )
         node.classification(),
         node.symbolic() );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( DerivedDefinition& node )
@@ -380,6 +381,7 @@ void CstToAstVisitor::visit( DerivedDefinition& node )
     const auto& astNode =
         store< AST::DerivedDefinition >( node, identifier, arguments, returnType, expression );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( RuleDefinition& node )
@@ -393,6 +395,7 @@ void CstToAstVisitor::visit( RuleDefinition& node )
     const auto& astNode =
         store< AST::RuleDefinition >( node, identifier, arguments, returnType, rule );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( EnumeratorDefinition& node )
@@ -400,6 +403,7 @@ void CstToAstVisitor::visit( EnumeratorDefinition& node )
     const auto& identifier = fetch< AST::Identifier >( node.identifier() );
     const auto& astNode = store< AST::EnumeratorDefinition >( node, identifier );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( EnumerationDefinition& node )
@@ -411,6 +415,7 @@ void CstToAstVisitor::visit( EnumerationDefinition& node )
 
     const auto& astNode = store< AST::EnumerationDefinition >( node, identifier, enumerators );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( UsingDefinition& node )
@@ -419,6 +424,7 @@ void CstToAstVisitor::visit( UsingDefinition& node )
     const auto& aliasType = fetch< AST::Type >( node.aliasType() );
     const auto& astNode = store< AST::UsingDefinition >( node, identifier, aliasType );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( UsingPathDefinition& node )
@@ -427,6 +433,7 @@ void CstToAstVisitor::visit( UsingPathDefinition& node )
     const auto explicitSymbol = node.explicitSymbol();
     const auto& astNode = store< AST::UsingPathDefinition >( node, path, explicitSymbol );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( InvariantDefinition& node )
@@ -435,6 +442,7 @@ void CstToAstVisitor::visit( InvariantDefinition& node )
     const auto& expression = fetch< AST::Expression >( node.expression() );
     const auto& astNode = store< AST::InvariantDefinition >( node, identifier, expression );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( ImportDefinition& node )
@@ -455,6 +463,7 @@ void CstToAstVisitor::visit( ImportDefinition& node )
 
     const auto& astNode = store< AST::ImportDefinition >( node, path, identifier );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( DomainDefinition& node )
@@ -467,6 +476,7 @@ void CstToAstVisitor::visit( DomainDefinition& node )
     astNode->setTemplateSymbols( templateSymbols );
     astNode->setAbstract( node.abstract() );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( StructureDefinition& node )
@@ -493,6 +503,7 @@ void CstToAstVisitor::visit( StructureDefinition& node )
     const auto& astNode = store< AST::StructureDefinition >( node, domainType, functions );
     astNode->setTemplateSymbols( templateSymbols );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( BehaviorDefinition& node )
@@ -507,6 +518,7 @@ void CstToAstVisitor::visit( BehaviorDefinition& node )
     const auto& astNode = store< AST::BehaviorDefinition >( node, domainType, definitions );
     astNode->setTemplateSymbols( templateSymbols );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( ImplementDefinition& node )
@@ -532,6 +544,7 @@ void CstToAstVisitor::visit( ImplementDefinition& node )
         store< AST::ImplementDefinition >( node, behaviorType, domainType, definitions );
     astNode->setTemplateSymbols( templateSymbols );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( BuiltinDefinition& node )
@@ -550,6 +563,7 @@ void CstToAstVisitor::visit( BuiltinDefinition& node )
         store< AST::BuiltinDefinition >( node, identifier, argumentTypes, returnType );
     astNode->setTemplateSymbols( templateSymbols );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( Declaration& node )
@@ -561,6 +575,7 @@ void CstToAstVisitor::visit( Declaration& node )
     const auto& astNode =
         store< AST::Declaration >( node, identifier, argumentTypes, returnType, kind );
     astNode->setExported( node.exported() );
+    astNode->setProperties( node.properties() );
 }
 
 void CstToAstVisitor::visit( UndefLiteral& node )
