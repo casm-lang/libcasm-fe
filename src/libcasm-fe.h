@@ -71,6 +71,7 @@
 #include <libcasm-fe/transform/CstEmitPass>
 #include <libcasm-fe/transform/CstToAstPass>
 #include <libcasm-fe/transform/LstDumpPass>
+#include <libcasm-fe/transform/LstToIrPass>
 #include <libcasm-fe/transform/SourceToCstPass>
 
 namespace libcasm_fe
