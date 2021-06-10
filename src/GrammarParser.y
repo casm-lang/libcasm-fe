@@ -1217,6 +1217,7 @@ DirectCallExpression
 : THIS %prec CALL_WITHOUT_ARGS
   {
       const auto identifier = CST::make< Identifier >( @1, $1->tokenString() );
+      identifier->setSpans( m_lexer.fetchSpansAndReset() );
       const auto identifierPath = IdentifierPath::fromIdentifier( identifier );
       $$ = CST::make< DirectCallExpression >( @$, identifierPath );
   }
@@ -1791,17 +1792,18 @@ MaybeFunctionParameters
 MethodParameters
 : MethodParameters COMMA TypedAttributedVariable
   {
-      auto parameters = $1;
+      const auto parameters = $1;
       $3->setDelimiterToken( $2 );
       parameters->add( $3 );
       $$ = parameters;
   }
 | THIS
   {
-      auto parameters = CST::make< NodeList< VariableDefinition > >( @$ );
+      const auto parameters = CST::make< NodeList< VariableDefinition > >( @$ );
       const auto identifier = CST::make< Identifier >( @1, $1->tokenString() );
+      identifier->setSpans( m_lexer.fetchSpansAndReset() );
       const auto unresolvedType = CST::make< UnresolvedType >( @$ );
-      auto variable = CST::make< VariableDefinition >( @$, identifier, Token::unresolved(), unresolvedType );
+      const auto variable = CST::make< VariableDefinition >( @$, identifier, Token::unresolved(), unresolvedType );
       parameters->add( variable );
       $$ = parameters;
   }
