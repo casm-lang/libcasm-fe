@@ -452,7 +452,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     assert( node.type() and " inconsistent state @ TypeCheckPass " );
     assert(
         *node.type() == *symbol->type()->ptr_result() and " inconsistent state @ TypeCheckPass " );
-    m_typeIDs[&node ].emplace( node.type()->id() );
+    m_typeIDs[ &node ].emplace( node.type()->id() );
 
     assert( arguments.size() == argumentTypes.size() );
 
@@ -1036,7 +1036,7 @@ void TypeInferenceVisitor::visit( ListLiteral& node )
     filterAnnotationsByKind( node, libcasm_ir::Type::Kind::LIST );
 
     // propagate type annotation to all list elements
-    for( const auto typeId : m_typeIDs[&node ] )
+    for( const auto typeId : m_typeIDs[ &node ] )
     {
         const auto type = libcasm_ir::Type::fromID( typeId );
         assert( type->isList() );
@@ -1166,7 +1166,7 @@ void TypeInferenceVisitor::visit( TupleLiteral& node )
     filterAnnotationsByKind( node, libcasm_ir::Type::Kind::TUPLE );
 
     // propagate type annotation to all tuple elements
-    for( const auto typeId : m_typeIDs[&node ] )
+    for( const auto typeId : m_typeIDs[ &node ] )
     {
         const auto type = libcasm_ir::Type::fromID( typeId );
         assert( type->isTuple() );
@@ -1215,7 +1215,7 @@ void TypeInferenceVisitor::visit( RecordLiteral& node )
     filterAnnotationsByKind( node, libcasm_ir::Type::Kind::RECORD );
 
     // propagate type annotation to all record elements
-    for( const auto typeId : m_typeIDs[&node ] )
+    for( const auto typeId : m_typeIDs[ &node ] )
     {
         const auto type = libcasm_ir::Type::fromID( typeId );
         assert( type->isRecord() );
@@ -1262,7 +1262,7 @@ void TypeInferenceVisitor::visit( LetExpression& node )
         return;
     }
 
-    m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
+    m_typeIDs[ node.expression().get() ] = m_typeIDs[ &node ];
 
     node.variableBindings()->accept( *this );
 
@@ -1281,8 +1281,8 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
         return;
     }
 
-    m_typeIDs[ node.thenExpression().get() ] = m_typeIDs[&node ];
-    m_typeIDs[ node.elseExpression().get() ] = m_typeIDs[&node ];
+    m_typeIDs[ node.thenExpression().get() ] = m_typeIDs[ &node ];
+    m_typeIDs[ node.elseExpression().get() ] = m_typeIDs[ &node ];
 
     const auto& condExpr = *node.condition();
     const auto& thenExpr = *node.thenExpression();
@@ -1292,14 +1292,14 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
     if( thenExpr.type() )
     {
-        m_typeIDs[&elseExpr ].emplace( thenExpr.type()->id() );
+        m_typeIDs[ &elseExpr ].emplace( thenExpr.type()->id() );
     }
 
     node.elseExpression()->accept( *this );
 
     if( elseExpr.type() )
     {
-        m_typeIDs[&thenExpr ].emplace( elseExpr.type()->id() );
+        m_typeIDs[ &thenExpr ].emplace( elseExpr.type()->id() );
     }
 
     node.thenExpression()->accept( *this );
@@ -1338,7 +1338,7 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
         return;
     }
 
-    m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
+    m_typeIDs[ node.expression().get() ] = m_typeIDs[ &node ];
 
     node.variables()->accept( *this );
 
@@ -1481,7 +1481,7 @@ void TypeInferenceVisitor::visit( CaseRule& node )
 
 void TypeInferenceVisitor::visit( ExpressionCase& node )
 {
-    m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
+    m_typeIDs[ node.expression().get() ] = m_typeIDs[ &node ];
     RecursiveVisitor::visit( node );
 }
 
@@ -1610,7 +1610,7 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
     {
         func.setType( func.type()->ptr_result() );
 
-        m_typeIDs[&expr ].emplace( func.type()->id() );
+        m_typeIDs[ &expr ].emplace( func.type()->id() );
     }
 
     node.expression()->accept( *this );
@@ -1830,7 +1830,14 @@ void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
     const libcasm_ir::Type::Ptr& resultType )
 {
     const auto& typeDefinition = m_symboltable.findTypeDefinition( domainType->id() );
-    assert( typeDefinition and " inconsistent state @ TypeCheckPass " );
+    if( not typeDefinition )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "internal: '" + domainType->description() + "'\n" + m_symboltable.dump() );
+        // assert( typeDefinition and " inconsistent state @ TypeCheckPass " );
+        return;
+    }
 
     auto behavior = behaviorType->typeDefinition();
     if( not behavior )
@@ -2035,7 +2042,7 @@ void TypeInferenceVisitor::inference(
         return;
     }
 
-    auto& typeIDs = m_typeIDs[&node ];
+    auto& typeIDs = m_typeIDs[ &node ];
 
     std::vector< libcasm_ir::Type::Ptr > argTypes = {};
     std::vector< libcasm_ir::Value::Ptr > argValues = {};
@@ -2180,7 +2187,7 @@ void TypeInferenceVisitor::annotateNodes(
 void TypeInferenceVisitor::filterAnnotationsByKind(
     const Node& node, const libcasm_ir::Type::Kind kind )
 {
-    auto& annotations = m_typeIDs[&node ];
+    auto& annotations = m_typeIDs[ &node ];
 
     for( auto it = annotations.begin(); it != annotations.end(); )
     {
