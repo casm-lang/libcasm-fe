@@ -1303,14 +1303,14 @@ SCStateInitializationVisitor::SCStateInitializationVisitor(
 
 void SCStateInitializationVisitor::visit( Specification& node )
 {
-    m_updateSetManager.fork( Semantics::Sequential, 100 );
+    // m_updateSetManager.fork( Semantics::Sequential, 100 );
 
-    // node.header()->accept( *this );
-    node.lst()->definitions()->accept( *this );
+    // // node.header()->accept( *this );
+    // node.lst()->definitions()->accept( *this );
 
-    auto updateSet = m_updateSetManager.currentUpdateSet();
-    m_globalState.fireUpdateSet( updateSet );
-    m_updateSetManager.clear();
+    // auto updateSet = m_updateSetManager.currentUpdateSet();
+    // m_globalState.fireUpdateSet( updateSet );
+    // m_updateSetManager.clear();
 }
 
 // void SCStateInitializationVisitor::visit( LST::InitDefinition& node )

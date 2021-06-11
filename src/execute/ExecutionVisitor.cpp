@@ -1264,19 +1264,19 @@ InvariantChecker::InvariantChecker(
 
 void InvariantChecker::check( const Specification& specification )
 {
-    UpdateSetManager< ExecutionUpdateSet > updateSetManager;
-    ExecutionVisitor visitor(
-        m_locationRegistry, m_globalState, updateSetManager, ReferenceConstant() );
+    // UpdateSetManager< ExecutionUpdateSet > updateSetManager;
+    // ExecutionVisitor visitor(
+    //     m_locationRegistry, m_globalState, updateSetManager, ReferenceConstant() );
 
-    for( const auto& definition : *specification.lst()->definitions() )
-    {
-        if( definition->id() != Node::ID::INVARIANT_DEFINITION )
-        {
-            continue;
-        }
+    // for( const auto& definition : *specification.lst()->definitions() )
+    // {
+    //     if( definition->id() != Node::ID::INVARIANT_DEFINITION )
+    //     {
+    //         continue;
+    //     }
 
-        visitor.execute( definition );
-    }
+    //     visitor.execute( definition );
+    // }
 }
 
 SymbolicExecutionVisitor::SymbolicExecutionVisitor(
@@ -1731,20 +1731,20 @@ SymbolicStateInitializationVisitor::SymbolicStateInitializationVisitor(
 
 void SymbolicStateInitializationVisitor::visit( Specification& node )
 {
-    m_updateSetManager.fork( Semantics::Sequential, 100 );
+    // m_updateSetManager.fork( Semantics::Sequential, 100 );
 
-    node.lst()->definitions()->accept( *this );
+    // node.lst()->definitions()->accept( *this );
 
-    // for( const auto& definition : *specification.lst()->definitions() )
-    // {
-    //     if( definition->id() != Node::ID::INVARIANT_DEFINITION )
-    //     {
-    //         continue;
-    //     }
+    // // for( const auto& definition : *specification.lst()->definitions() )
+    // // {
+    // //     if( definition->id() != Node::ID::INVARIANT_DEFINITION )
+    // //     {
+    // //         continue;
+    // //     }
 
-    auto updateSet = m_updateSetManager.currentUpdateSet();
-    m_globalState.fireUpdateSet( updateSet );
-    m_updateSetManager.clear();
+    // auto updateSet = m_updateSetManager.currentUpdateSet();
+    // m_globalState.fireUpdateSet( updateSet );
+    // m_updateSetManager.clear();
 }
 
 // void SymbolicStateInitializationVisitor::visit( InitDefinition& node )

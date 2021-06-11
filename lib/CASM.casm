@@ -559,31 +559,31 @@ implement Cardinality for Range< Type > = {
 //     derived convertTo( this ) -> String =
 //         StrInstruction( this )
 // }
-// 
+
 // implement ElementAccess< Boolean > for Tuple< Types > = {
 //     [ pure ]
 //     derived at( this, position : Integer ) -> Boolean =
 //         NthInstruction( this, position )
 // }
-// 
+
 // implement ElementAccess< Integer > for Tuple< Types > = {
 //     [ pure ]
 //     derived at( this, position : Integer ) -> Integer =
 //         NthInstruction( this, position )
 // }
-// 
+
 // implement ElementAccess< String > for Tuple< Types > = {
 //     [ pure ]
 //     derived at( this, position : Integer ) -> String =
 //         NthInstruction( this, position )
 // }
-// 
+
 // implement ElementAccess< Agent > for Tuple< Types > = {
 //     [ pure ]
 //     derived at( this, position : Integer ) -> Agent =
 //         NthInstruction( this, position )
 // }
-// 
+
 // implement ElementAccess< enumeration > for Tuple< Types > = {
 //     [ pure ]
 //     derived at( this, position : Integer ) -> enumeration =
@@ -601,17 +601,18 @@ implement Cardinality for Range< Type > = {
 [ template Signature : < Arguments... -> Result > ]
 domain RuleRef< Signature >
 
-// implement Equality for RuleRef< Signature > = {
-//     [ pure ]
-//     derived equal( this, other : RuleRef< Signature > ) -> Boolean =
-//         EquInstruction( this, other )
-// }
-// 
-// implement TypeCasting< String > for RuleRef< Signature > = {
-//     [ pure ]
-//     derived convertTo( this ) -> String =
-//         StrInstruction( this )
-// }
+implement Equality for RuleRef< Signature > = {
+    [ pure ]
+    derived equal( this, other : RuleRef< Signature > ) -> Boolean =
+    // derived equal( this, other : RuleRef< -> Void > ) -> Boolean =
+        EquInstruction( this, other )
+}
+
+implement TypeCasting< String > for RuleRef< Signature > = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        StrInstruction( this )
+}
 
 //
 //
@@ -629,7 +630,7 @@ domain FuncRef< Signature >
 //     derived equal( this, other : FuncRef< Signature > ) -> Boolean =
 //         EquInstruction( this, other )
 // }
-// 
+
 // implement TypeCasting< String > for FuncRef< Signature > = {
 //     [ pure ]
 //     derived convertTo( this ) -> String =
