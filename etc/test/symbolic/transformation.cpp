@@ -101,7 +101,7 @@
     }
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace LST;
 static const auto source_add = R"***(
 CASM
 

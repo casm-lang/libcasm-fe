@@ -54,7 +54,7 @@
 #include "testhelper.h"
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace LST;
 
 #define SOURCE( PASS, CONTENT, STATUS, CONFIG, RESULT )                                           \
     {                                                                                             \
