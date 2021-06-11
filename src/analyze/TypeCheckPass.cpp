@@ -288,10 +288,10 @@ void TypeCheckVisitor::visit( RuleDefinition& node )
 
 void TypeCheckVisitor::visit( DomainDefinition& node )
 {
-    if( node.type() )
-    {
-        return;
-    }
+    // if( node.type() ) // TODO: @ppaulweber: RE-ENABLE?
+    // {
+    //     return;
+    // }
 
     const auto& domainType = node.domainType();
 
@@ -302,6 +302,15 @@ void TypeCheckVisitor::visit( DomainDefinition& node )
     popSymbols( node.templateSymbols() );
 
     node.setType( domainType->type() );
+
+    const auto& result = m_symboltable.findTypeDefinition( node.type()->id() );
+    if( result ) // TODO: @ppaulweber: REMOVE?
+    {
+        m_log.debug(
+            { node.sourceLocation() },
+            "already registered type/id/def '" + node.type()->description() + "'" );
+        return;
+    }
 
     if( node.type() )
     {
