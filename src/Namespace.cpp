@@ -257,6 +257,21 @@ AST::TypeDefinition::Ptr Namespace::findTypeDefinition( const libcasm_ir::Type::
     return definitionResult->second;
 }
 
+AST::TypeDefinition::Ptr Namespace::findTypeDefinition( const std::string& typeName ) const
+{
+    for( const auto& entry : m_typeIdToTypeDefinition )
+    {
+        const auto& typeId = entry.first;
+        const auto& typeDefinition = entry.second;
+        if( typeDefinition->type()->description() == typeName )
+        {
+            return typeDefinition;
+        }
+    }
+
+    return nullptr;
+}
+
 std::string Namespace::dump( const std::string& indention ) const
 {
     std::unordered_set< const Namespace* > visited;
@@ -320,6 +335,16 @@ std::string Namespace::dump(
             _namespace.second.second == Visibility::Internal ? "-" : "+" );
         const auto prefix = indention + name + Namespace::delimiter() + visibility;
         stream << space->dump( prefix, visited );
+    }
+
+    for( const auto& entry : m_typeIdToTypeDefinition )
+    {
+        const auto& typeId = entry.first;
+        const auto& typeDefinition = entry.second;
+        const auto dName = typeDefinition->identifier()->name();
+        const auto tName = typeId;
+
+        stream << std::to_string( tName ) << ": " << dName << "\n";
     }
 
     if( indention == "" )

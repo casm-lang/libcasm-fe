@@ -118,6 +118,8 @@ namespace libcasm_fe
 
         AST::TypeDefinition::Ptr findTypeDefinition( const libcasm_ir::Type::ID typeID ) const;
 
+        AST::TypeDefinition::Ptr findTypeDefinition( const std::string& typeName ) const;
+
         std::string dump( const std::string& indention = "" ) const;
 
       private:
