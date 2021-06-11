@@ -48,9 +48,9 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
-
 #include <libcasm-fe/analyze/TypeInferencePass>
+#include <libcasm-fe/ast/Literal>
+#include <libcasm-fe/ast/Visitor>
 #include <libcasm-fe/import/SpecificationMergerPass>
 
 #include <libcasm-ir/Annotation>
@@ -60,42 +60,48 @@
 #include <libpass/PassUsage>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char PropertyResolverPass::id = 0;
 
 static libpass::PassRegistration< PropertyResolverPass > PASS(
-    "ASTPropertyResolverPass", "property resolving of AST representation", "ast-prop-res", 0 );
+    "Property Resolver Pass", "property resolving of AST representation", "ast-prop-res", 0 );
 
-class PropertyResolverVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    PropertyResolverVisitor( libcasm_fe::Logger& log );
+    namespace AST
+    {
+        class PropertyResolverVisitor final : public RecursiveVisitor
+        {
+          public:
+            PropertyResolverVisitor( libcasm_fe::Logger& log );
 
-    void visit( ListLiteral& node ) override;
-    void visit( RangeLiteral& node ) override;
-    void visit( TupleLiteral& node ) override;
-    void visit( RecordLiteral& node ) override;
+            void visit( ListLiteral& node ) override;
+            void visit( RangeLiteral& node ) override;
+            void visit( TupleLiteral& node ) override;
+            void visit( RecordLiteral& node ) override;
 
-    void visit( EmbracedExpression& node ) override;
-    void visit( NamedExpression& node ) override;
-    void visit( DirectCallExpression& node ) override;
-    void visit( MethodCallExpression& node ) override;
-    void visit( LiteralCallExpression& node ) override;
-    void visit( IndirectCallExpression& node ) override;
-    void visit( TypeCastingExpression& node ) override;
-    void visit( UnaryExpression& node ) override;
-    void visit( BinaryExpression& node ) override;
-    void visit( LetExpression& node ) override;
-    void visit( ConditionalExpression& node ) override;
-    void visit( ChooseExpression& node ) override;
-    void visit( UniversalQuantifierExpression& node ) override;
-    void visit( ExistentialQuantifierExpression& node ) override;
-    void visit( CardinalityExpression& node ) override;
+            void visit( AbstractExpression& node ) override;
+            void visit( NamedExpression& node ) override;
+            void visit( DirectCallExpression& node ) override;
+            void visit( MethodCallExpression& node ) override;
+            void visit( LiteralCallExpression& node ) override;
+            void visit( IndirectCallExpression& node ) override;
+            void visit( TypeCastingExpression& node ) override;
+            void visit( UnaryExpression& node ) override;
+            void visit( BinaryExpression& node ) override;
+            void visit( LetExpression& node ) override;
+            void visit( ConditionalExpression& node ) override;
+            void visit( ChooseExpression& node ) override;
+            void visit( UniversalQuantifierExpression& node ) override;
+            void visit( ExistentialQuantifierExpression& node ) override;
+            void visit( CardinalityExpression& node ) override;
 
-  private:
-    libcasm_fe::Logger& m_log;
-};
+          private:
+            libcasm_fe::Logger& m_log;
+        };
+    }
+}
 
 //
 //
@@ -158,11 +164,12 @@ void PropertyResolverVisitor::visit( RecordLiteral& node )
     node.setProperties( properties );
 }
 
-void PropertyResolverVisitor::visit( EmbracedExpression& node )
+void PropertyResolverVisitor::visit( AbstractExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.expression()->properties() );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::PURE );
 }
 
 void PropertyResolverVisitor::visit( NamedExpression& node )
@@ -179,32 +186,17 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
     libcasm_ir::Properties callProperties;
     switch( node.targetType() )
     {
-        case DirectCallExpression::TargetType::BUILTIN:
-        {
-            const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-            callProperties = annotation.properties();
-            break;
-        }
-        case DirectCallExpression::TargetType::VARIABLE:  // [[fallthrough]]
-        case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
-        case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
-        case DirectCallExpression::TargetType::RULE:      // [[fallthrough]]
+        case DirectCallExpression::TargetType::BUILTIN:     // [[fallthrough]]
+        case DirectCallExpression::TargetType::VARIABLE:    // [[fallthrough]]
+        case DirectCallExpression::TargetType::FUNCTION:    // [[fallthrough]]
+        case DirectCallExpression::TargetType::DERIVED:     // [[fallthrough]]
+        case DirectCallExpression::TargetType::RULE:        // [[fallthrough]]
+        case DirectCallExpression::TargetType::DOMAINTYPE:  // [[fallthrough]]
         case DirectCallExpression::TargetType::CONSTANT:
         {
             const auto& definition = node.targetDefinition();
             assert( definition.get() != nullptr );
             callProperties = definition->properties();
-            break;
-        }
-        case DirectCallExpression::TargetType::TYPE_DOMAIN:
-        {
-            callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
-            callProperties.set( libcasm_ir::Property::PURE );
-            break;
-        }
-        case DirectCallExpression::TargetType::SELF:
-        {
-            callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
             break;
         }
         case DirectCallExpression::TargetType::UNKNOWN:
@@ -230,17 +222,24 @@ void PropertyResolverVisitor::visit( MethodCallExpression& node )
     RecursiveVisitor::visit( node );
 
     libcasm_ir::Properties callProperties;
-    if( node.methodType() == MethodCallExpression::MethodType::BUILTIN )
+    switch( node.targetType() )
     {
-        const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-        callProperties = annotation.properties();
-    }
-    else
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "method type '" + node.methodTypeName() + "' is not implemented!" );
-        return;
+        case TargetCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
+        case TargetCallExpression::TargetType::DERIVED:   // [[fallthrough]]
+        case TargetCallExpression::TargetType::RULE:
+        {
+            const auto& definition = node.targetDefinition();
+            assert( definition.get() != nullptr );
+            callProperties = definition->properties();
+            break;
+        }
+        default:
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "method type '" + node.targetTypeName() + "' is not implemented!" );
+            return;
+        }
     }
 
     if( node.arguments()->size() > 0 )
@@ -286,25 +285,28 @@ void PropertyResolverVisitor::visit( TypeCastingExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    // propagate the fromExpression properties
-    node.setProperties( node.fromExpression()->properties() );
+    const auto& definition = node.targetDefinition();
+    const auto& definitionProperties = definition->properties();
+    node.setProperties( definitionProperties * node.fromExpression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( UnaryExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
-    node.setProperties( annotation.properties() * node.expression()->properties() );
+    const auto& definition = node.targetDefinition();
+    const auto& definitionProperties = definition->properties();
+    node.setProperties( definitionProperties * node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( BinaryExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
+    const auto& definition = node.targetDefinition();
+    const auto& definitionProperties = definition->properties();
     node.setProperties(
-        annotation.properties() * node.left()->properties() * node.right()->properties() );
+        definitionProperties * node.left()->properties() * node.right()->properties() );
 }
 
 void PropertyResolverVisitor::visit( LetExpression& node )
@@ -355,8 +357,9 @@ void PropertyResolverVisitor::visit( CardinalityExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-    node.setProperties( annotation.properties() * node.expression()->properties() );
+    const auto& definition = node.targetDefinition();
+    const auto& definitionProperties = definition->properties();
+    node.setProperties( definitionProperties * node.expression()->properties() );
 }
 
 //
@@ -378,7 +381,7 @@ u1 PropertyResolverPass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     PropertyResolverVisitor visitor( log );
-    specification->definitions()->accept( visitor );
+    specification->ast()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )

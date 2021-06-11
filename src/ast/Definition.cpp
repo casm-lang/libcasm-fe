@@ -45,17 +45,12 @@
 
 #include "Definition.h"
 
+#include <libcasm-fe/Namespace>
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/Literal>
 
-#include "../various/GrammarToken.h"
-
 using namespace libcasm_fe;
-using namespace Ast;
-
-static const auto unresolvedToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-
-static const auto initDefinitionIdentifier = std::make_shared< Identifier >( "$init$" );
+using namespace AST;
 
 //
 //
@@ -65,10 +60,11 @@ static const auto initDefinitionIdentifier = std::make_shared< Identifier >( "$i
 Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 : TypedPropertyNode( type )
 , m_identifier( identifier )
-, m_attributes( std::make_shared< Attributes >() )
-, m_delimiterToken( unresolvedToken )
-, m_maxNumberOfLocals( 0 )
+, m_symboltable( std::make_shared< Namespace >() )
+, m_templateSymbols( std::make_shared< VariableDefinitions >() )
+, m_abstract( false )
 , m_exported( false )
+, m_maxNumberOfLocals( 0 )
 {
 }
 
@@ -77,35 +73,29 @@ const Identifier::Ptr& Definition::identifier( void ) const
     return m_identifier;
 }
 
-void Definition::setAttributes( const Attributes::Ptr& attributes )
+void Definition::setTemplateSymbols( const VariableDefinitions::Ptr& templateSymbols )
 {
-    m_attributes = attributes;
+    m_templateSymbols = templateSymbols;
 }
 
-const Attributes::Ptr& Definition::attributes( void ) const
+const VariableDefinitions::Ptr& Definition::templateSymbols( void ) const
 {
-    return m_attributes;
+    return m_templateSymbols;
 }
 
-void Definition::setDelimiterToken( const Token::Ptr& delimiterToken )
+u1 Definition::isTemplate( void ) const
 {
-    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
-    m_delimiterToken = delimiterToken;
+    return templateSymbols()->size() != 0;
 }
 
-const Token::Ptr& Definition::delimiterToken( void ) const
+void Definition::setAbstract( const u1 abstract )
 {
-    return m_delimiterToken;
+    m_abstract = abstract;
 }
 
-void Definition::setMaximumNumberOfLocals( std::size_t maxNumberOfLocals )
+u1 Definition::abstract( void ) const
 {
-    m_maxNumberOfLocals = maxNumberOfLocals;
-}
-
-std::size_t Definition::maximumNumberOfLocals( void ) const
-{
-    return m_maxNumberOfLocals;
+    return m_abstract;
 }
 
 void Definition::setExported( const u1 exported )
@@ -118,25 +108,28 @@ u1 Definition::exported( void ) const
     return m_exported;
 }
 
-//
-//
-// HeaderDefinition
-//
-
-HeaderDefinition::HeaderDefinition( const Token::Ptr& headerToken )
-: Definition( Node::ID::HEADER_DEFINITION, std::make_shared< Identifier >( "$header$" ) )
-, m_headerToken( headerToken )
+void Definition::setMaximumNumberOfLocals( std::size_t maxNumberOfLocals )
 {
+    m_maxNumberOfLocals = maxNumberOfLocals;
 }
 
-const Token::Ptr& HeaderDefinition::headerToken( void ) const
+std::size_t Definition::maximumNumberOfLocals( void ) const
 {
-    return m_headerToken;
+    return m_maxNumberOfLocals;
 }
 
-void HeaderDefinition::accept( Visitor& visitor )
+const Namespace::Ptr& Definition::symboltable( void ) const
 {
-    visitor.visit( *this );
+    return m_symboltable;
+}
+
+void Definition::clone( Definition& duplicate ) const
+{
+    TypedPropertyNode::clone( duplicate );
+    duplicate.setTemplateSymbols( templateSymbols() );
+    duplicate.setAbstract( abstract() );
+    duplicate.setExported( exported() );
+    duplicate.setMaximumNumberOfLocals( maximumNumberOfLocals() );
 }
 
 //
@@ -145,11 +138,11 @@ void HeaderDefinition::accept( Visitor& visitor )
 //
 
 VariableDefinition::VariableDefinition(
-    const Identifier::Ptr& identifier, const Token::Ptr& colonToken, const Type::Ptr& variableType )
+    const Identifier::Ptr& identifier, const Type::Ptr& variableType )
 : Definition( Node::ID::VARIABLE_DEFINITION, identifier )
 , m_variableType( variableType )
-, m_colonToken( colonToken )
 , m_localIndex( 0 )
+, m_objectDefinition()
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
     setProperty( libcasm_ir::Property::PURE );
@@ -160,9 +153,9 @@ const Type::Ptr& VariableDefinition::variableType( void ) const
     return m_variableType;
 }
 
-const Token::Ptr& VariableDefinition::colonToken( void ) const
+void VariableDefinition::setVariableType( const Type::Ptr& variableType )
 {
-    return m_colonToken;
+    m_variableType = variableType;
 }
 
 void VariableDefinition::setLocalIndex( std::size_t localIndex )
@@ -175,9 +168,116 @@ std::size_t VariableDefinition::localIndex( void ) const
     return m_localIndex;
 }
 
+void VariableDefinition::setObjectDefinition( const TypeDefinition::Ptr& objectDefinition )
+{
+    m_objectDefinition = objectDefinition;
+}
+
+const TypeDefinition::Ptr& VariableDefinition::objectDefinition( void ) const
+{
+    return m_objectDefinition;
+}
+
+std::string VariableDefinition::typeDescription( void ) const
+{
+    return identifier()->name() + " : " + variableType()->signature();
+}
+
 void VariableDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr VariableDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< VariableDefinition >(
+        identifier()->duplicate< Identifier >(), variableType()->duplicate< Type >() );
+
+    Definition::clone( *duplicate );
+    duplicate->setLocalIndex( localIndex() );
+    duplicate->setObjectDefinition( objectDefinition() );
+    return duplicate;
+}
+
+//
+//
+// TypeDefinition
+//
+
+TypeDefinition::TypeDefinition( const Node::ID id, const Type::Ptr& domainType )
+: Definition(
+      id,
+      AST::make< Identifier >( domainType->name()->sourceLocation(), domainType->name()->path() ) )
+, m_domainType( domainType )
+, m_basicBehavior()
+, m_extendedBehaviors()
+{
+}
+
+const Type::Ptr& TypeDefinition::domainType( void ) const
+{
+    return m_domainType;
+}
+
+void TypeDefinition::setBasicBehavior( const ImplementDefinition::Ptr& basicBehavior )
+{
+    const auto& behaviorName = "*";
+    auto behaviorNamespace = symboltable()->findNamespace( behaviorName );
+    if( not behaviorNamespace )
+    {
+        behaviorNamespace = std::make_shared< Namespace >();
+        symboltable()->registerNamespace( behaviorName, behaviorNamespace );
+    }
+
+    const auto& implementDefinition = basicBehavior;
+    const auto& typeName = implementDefinition->domainType()->signature();
+    behaviorNamespace->registerSymbol( typeName, implementDefinition->ptr< Definition >() );
+
+    assert( not m_basicBehavior and " inconsistent state @ Namespace " );
+    m_basicBehavior = implementDefinition;
+}
+
+const ImplementDefinition::Ptr& TypeDefinition::basicBehavior( void ) const
+{
+    return m_basicBehavior;
+}
+
+void TypeDefinition::addExtendedBehavior( const ImplementDefinition::Ptr& extendedBehavior )
+{
+    const auto& behaviorName = "+";
+    auto behaviorNamespace = symboltable()->findNamespace( behaviorName );
+    if( not behaviorNamespace )
+    {
+        behaviorNamespace = std::make_shared< Namespace >();
+        symboltable()->registerNamespace( behaviorName, behaviorNamespace );
+    }
+
+    const auto& implementDefinition = extendedBehavior;
+    const auto& typeName = implementDefinition->behaviorType()->signature();
+    behaviorNamespace->registerSymbol( typeName, implementDefinition->ptr< Definition >() );
+
+    const auto result = m_extendedBehaviors.emplace( typeName, implementDefinition );
+    if( not result.second )
+    {
+        throw std::domain_error( " inconsistent state " );
+    }
+}
+
+const std::unordered_map< std::string, std::shared_ptr< ImplementDefinition > >&
+TypeDefinition::extendedBehaviors( void ) const
+{
+    return m_extendedBehaviors;
+}
+
+void TypeDefinition::clone( TypeDefinition& duplicate ) const
+{
+    Definition::clone( duplicate );
+    duplicate.setBasicBehavior( basicBehavior() );
+    for( const auto& element : duplicate.extendedBehaviors() )
+    {
+        const auto& extendedBehavior = element.second;
+        duplicate.addExtendedBehavior( extendedBehavior );
+    }
 }
 
 //
@@ -186,37 +286,24 @@ void VariableDefinition::accept( Visitor& visitor )
 //
 
 FunctionDefinition::FunctionDefinition(
-    const Token::Ptr& functionToken,
     const Identifier::Ptr& identifier,
-    const Token::Ptr& colonToken,
     const Types::Ptr& argumentTypes,
-    const Token::Ptr& mapsToken,
     const Type::Ptr& returnType,
-    const Defined::Ptr& defined,
-    const Initially::Ptr& initially )
+    const Expression::Ptr& defined,
+    const MappedExpressions::Ptr& initially,
+    const Classification classification,
+    const u1 symbolic )
 : Definition( Node::ID::FUNCTION_DEFINITION, identifier )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
 , m_defined( defined )
-, m_functionToken( functionToken )
-, m_mapsToken( mapsToken )
-, m_colonToken( colonToken )
-, m_classification( Classification::UNKNOWN )
-, m_symbolic( false )
 , m_initially( initially )
-, m_isProgram( identifier->name() == "program" )
+, m_classification( classification )
+, m_symbolic( symbolic )
+, m_program( identifier->name() == "program" )
+, m_initiallyRule( AST::make< SkipRule >( initially->sourceLocation() ) )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-}
-
-bool FunctionDefinition::isProgram( void ) const
-{
-    return m_isProgram;
-}
-
-bool FunctionDefinition::isLocal( void ) const
-{
-    return m_classification == Classification::LOCAL;
 }
 
 const Types::Ptr& FunctionDefinition::argumentTypes( void ) const
@@ -229,29 +316,14 @@ const Type::Ptr& FunctionDefinition::returnType( void ) const
     return m_returnType;
 }
 
-const Token::Ptr& FunctionDefinition::functionToken( void ) const
-{
-    return m_functionToken;
-}
-
-const Token::Ptr& FunctionDefinition::colonToken( void ) const
-{
-    return m_colonToken;
-}
-
-const Token::Ptr& FunctionDefinition::mapsToken( void ) const
-{
-    return m_mapsToken;
-}
-
-const Defined::Ptr& FunctionDefinition::defined( void ) const
+const Expression::Ptr& FunctionDefinition::defined( void ) const
 {
     return m_defined;
 }
 
-void FunctionDefinition::setClassification( FunctionDefinition::Classification classification )
+const MappedExpressions::Ptr& FunctionDefinition::initially( void ) const
 {
-    m_classification = classification;
+    return m_initially;
 }
 
 FunctionDefinition::Classification FunctionDefinition::classification( void ) const
@@ -261,50 +333,7 @@ FunctionDefinition::Classification FunctionDefinition::classification( void ) co
 
 std::string FunctionDefinition::classificationName( void ) const
 {
-    return toString( classification() );
-}
-
-std::string FunctionDefinition::toString( const Classification classification )
-{
-    switch( classification )
-    {
-        case FunctionDefinition::Classification::UNKNOWN:
-        {
-            return "unknown";
-        }
-        case FunctionDefinition::Classification::IN:
-        {
-            return "in";
-        }
-        case FunctionDefinition::Classification::CONTROLLED:
-        {
-            return "controlled";
-        }
-        case FunctionDefinition::Classification::SHARED:
-        {
-            return "shared";
-        }
-        case FunctionDefinition::Classification::OUT:
-        {
-            return "out";
-        }
-        case FunctionDefinition::Classification::STATIC:
-        {
-            return "static";
-        }
-        case FunctionDefinition::Classification::LOCAL:
-        {
-            return "local";
-        }
-    }
-
-    assert( !" internal error! " );
-    return std::string();
-}
-
-void FunctionDefinition::setSymbolic( u1 symbolic )
-{
-    m_symbolic = symbolic;
+    return CST::FunctionDefinition::toString( classification() );
 }
 
 u1 FunctionDefinition::symbolic( void ) const
@@ -312,14 +341,64 @@ u1 FunctionDefinition::symbolic( void ) const
     return m_symbolic;
 }
 
-const Initially::Ptr& FunctionDefinition::initially( void ) const
+bool FunctionDefinition::program( void ) const
 {
-    return m_initially;
+    return m_program;
+}
+
+bool FunctionDefinition::local( void ) const
+{
+    return m_classification == Classification::LOCAL;
+}
+
+void FunctionDefinition::setInitiallyRule( const Rule::Ptr& initiallyRule )
+{
+    m_initiallyRule = initiallyRule;
+}
+
+const Rule::Ptr& FunctionDefinition::initiallyRule( void ) const
+{
+    return m_initiallyRule;
+}
+
+std::string FunctionDefinition::typeDescription( void ) const
+{
+    std::stringstream stream;
+    stream << ":";
+
+    const auto& innerTypes = argumentTypes();
+    for( const auto& innerType : *innerTypes )
+    {
+        stream << " " << innerType->signature() << "* ";
+    }
+
+    if( innerTypes->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+    }
+
+    stream << " -> " << returnType()->signature() << " ";
+    return stream.str();
 }
 
 void FunctionDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr FunctionDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< FunctionDefinition >(
+        identifier()->duplicate< Identifier >(),
+        argumentTypes()->duplicate< Types >(),
+        returnType()->duplicate< Type >(),
+        defined()->duplicate< Expression >(),
+        initially()->duplicate< MappedExpressions >(),
+        classification(),
+        symbolic() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -328,27 +407,19 @@ void FunctionDefinition::accept( Visitor& visitor )
 //
 
 DerivedDefinition::DerivedDefinition(
-    const Token::Ptr& derivedToken,
     const Identifier::Ptr& identifier,
-    const NodeList< VariableDefinition >::Ptr& arguments,
-    const Token::Ptr& mapsToken,
+    const VariableDefinitions::Ptr& arguments,
     const Type::Ptr& returnType,
-    const Token::Ptr& assignmentToken,
     const Expression::Ptr& expression )
 : Definition( Node::ID::DERIVED_DEFINITION, identifier )
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_expression( expression )
-, m_derivedToken( derivedToken )
-, m_mapsToken( mapsToken )
-, m_assignmentToken( assignmentToken )
-, m_leftBracketToken( unresolvedToken )
-, m_rightBracketToken( unresolvedToken )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
 }
 
-const NodeList< VariableDefinition >::Ptr& DerivedDefinition::arguments( void ) const
+const VariableDefinitions::Ptr& DerivedDefinition::arguments( void ) const
 {
     return m_arguments;
 }
@@ -358,51 +429,52 @@ const Type::Ptr& DerivedDefinition::returnType( void ) const
     return m_returnType;
 }
 
+void DerivedDefinition::setReturnType( const Type::Ptr& returnType )
+{
+    m_returnType = returnType;
+}
+
 const Expression::Ptr& DerivedDefinition::expression( void ) const
 {
     return m_expression;
 }
 
-const Token::Ptr& DerivedDefinition::derivedToken( void ) const
+std::string DerivedDefinition::typeDescription( void ) const
 {
-    return m_derivedToken;
-}
+    std::stringstream stream;
+    stream << "(";
 
-const Token::Ptr& DerivedDefinition::mapsToken( void ) const
-{
-    return m_mapsToken;
-}
+    const auto& innerDefinitions = arguments();
+    for( const auto& innerDefinition : *innerDefinitions )
+    {
+        stream << " " << innerDefinition->typeDescription() << ", ";
+    }
 
-const Token::Ptr& DerivedDefinition::assignmentToken( void ) const
-{
-    return m_assignmentToken;
-}
+    if( innerDefinitions->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+        stream << " ";
+    }
 
-void DerivedDefinition::setLeftBracketToken( const Token::Ptr& leftBracketToken )
-{
-    assert( m_leftBracketToken->token() == Grammar::Token::UNRESOLVED );
-    m_leftBracketToken = leftBracketToken;
-}
-
-const Token::Ptr& DerivedDefinition::leftBracketToken( void ) const
-{
-    return m_leftBracketToken;
-}
-
-void DerivedDefinition::setRightBracketToken( const Token::Ptr& rightBracketToken )
-{
-    assert( m_rightBracketToken->token() == Grammar::Token::UNRESOLVED );
-    m_rightBracketToken = rightBracketToken;
-}
-
-const Token::Ptr& DerivedDefinition::rightBracketToken( void ) const
-{
-    return m_rightBracketToken;
+    stream << ") -> " << returnType()->signature() << " ";
+    return stream.str();
 }
 
 void DerivedDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr DerivedDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< DerivedDefinition >(
+        identifier()->duplicate< Identifier >(),
+        arguments()->duplicate< VariableDefinitions >(),
+        returnType()->duplicate< Type >(),
+        expression()->duplicate< Expression >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -411,26 +483,18 @@ void DerivedDefinition::accept( Visitor& visitor )
 //
 
 RuleDefinition::RuleDefinition(
-    const Token::Ptr& ruleToken,
     const Identifier::Ptr& identifier,
-    const NodeList< VariableDefinition >::Ptr& arguments,
-    const Token::Ptr& mapsToken,
+    const VariableDefinitions::Ptr& arguments,
     const Type::Ptr& returnType,
-    const Token::Ptr& assignmentToken,
     const Rule::Ptr& rule )
 : Definition( Node::ID::RULE_DEFINITION, identifier )
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_rule( rule )
-, m_ruleToken( ruleToken )
-, m_mapsToken( mapsToken )
-, m_assignmentToken( assignmentToken )
-, m_leftBracketToken( unresolvedToken )
-, m_rightBracketToken( unresolvedToken )
 {
 }
 
-const NodeList< VariableDefinition >::Ptr& RuleDefinition::arguments( void ) const
+const VariableDefinitions::Ptr& RuleDefinition::arguments( void ) const
 {
     return m_arguments;
 }
@@ -440,51 +504,52 @@ const Type::Ptr& RuleDefinition::returnType( void ) const
     return m_returnType;
 }
 
+void RuleDefinition::setReturnType( const Type::Ptr& returnType )
+{
+    m_returnType = returnType;
+}
+
 const Rule::Ptr& RuleDefinition::rule( void ) const
 {
     return m_rule;
 }
 
-const Token::Ptr& RuleDefinition::ruleToken( void ) const
+std::string RuleDefinition::typeDescription( void ) const
 {
-    return m_ruleToken;
-}
+    std::stringstream stream;
+    stream << "(";
 
-const Token::Ptr& RuleDefinition::mapsToken( void ) const
-{
-    return m_mapsToken;
-}
+    const auto& innerDefinitions = arguments();
+    for( const auto& innerDefinition : *innerDefinitions )
+    {
+        stream << " " << innerDefinition->typeDescription() << ", ";
+    }
 
-const Token::Ptr& RuleDefinition::assignmentToken( void ) const
-{
-    return m_assignmentToken;
-}
+    if( innerDefinitions->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+        stream << " ";
+    }
 
-void RuleDefinition::setLeftBracketToken( const Token::Ptr& leftBracketToken )
-{
-    assert( m_leftBracketToken->token() == Grammar::Token::UNRESOLVED );
-    m_leftBracketToken = leftBracketToken;
-}
-
-const Token::Ptr& RuleDefinition::leftBracketToken( void ) const
-{
-    return m_leftBracketToken;
-}
-
-void RuleDefinition::setRightBracketToken( const Token::Ptr& rightBracketToken )
-{
-    assert( m_rightBracketToken->token() == Grammar::Token::UNRESOLVED );
-    m_rightBracketToken = rightBracketToken;
-}
-
-const Token::Ptr& RuleDefinition::rightBracketToken( void ) const
-{
-    return m_rightBracketToken;
+    stream << ") -> " << returnType()->signature() << " ";
+    return stream.str();
 }
 
 void RuleDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr RuleDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< RuleDefinition >(
+        identifier()->duplicate< Identifier >(),
+        arguments()->duplicate< VariableDefinitions >(),
+        returnType()->duplicate< Type >(),
+        rule()->duplicate< Rule >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -499,9 +564,23 @@ EnumeratorDefinition::EnumeratorDefinition( const Identifier::Ptr& identifier )
     setProperty( libcasm_ir::Property::PURE );
 }
 
+std::string EnumeratorDefinition::typeDescription( void ) const
+{
+    return identifier()->name();
+}
+
 void EnumeratorDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr EnumeratorDefinition::clone( void ) const
+{
+    auto duplicate =
+        std::make_shared< EnumeratorDefinition >( identifier()->duplicate< Identifier >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -510,18 +589,12 @@ void EnumeratorDefinition::accept( Visitor& visitor )
 //
 
 EnumerationDefinition::EnumerationDefinition(
-    const Token::Ptr& enumerationToken,
-    const Identifier::Ptr& identifier,
-    const Token::Ptr& assignmentToken,
-    const Token::Ptr& leftBraceToken,
-    const Enumerators::Ptr& enumerators,
-    const Token::Ptr& rightBraceToken )
-: Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
+    const Identifier::Ptr& identifier, const Enumerators::Ptr& enumerators )
+: TypeDefinition(
+      Node::ID::ENUMERATION_DEFINITION,
+      AST::make< BasicType >(
+          identifier->sourceLocation(), IdentifierPath::fromIdentifier( identifier ) ) )
 , m_enumerators( enumerators )
-, m_enumerationToken( enumerationToken )
-, m_assignmentToken( assignmentToken )
-, m_leftBraceToken( leftBraceToken )
-, m_rightBraceToken( rightBraceToken )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
     setProperty( libcasm_ir::Property::PURE );
@@ -532,24 +605,9 @@ const Enumerators::Ptr& EnumerationDefinition::enumerators( void ) const
     return m_enumerators;
 }
 
-const Token::Ptr& EnumerationDefinition::enumerationToken( void ) const
+std::string EnumerationDefinition::typeDescription( void ) const
 {
-    return m_enumerationToken;
-}
-
-const Token::Ptr& EnumerationDefinition::assignmentToken( void ) const
-{
-    return m_assignmentToken;
-}
-
-const Token::Ptr& EnumerationDefinition::leftBraceToken( void ) const
-{
-    return m_leftBraceToken;
-}
-
-const Token::Ptr& EnumerationDefinition::rightBraceToken( void ) const
-{
-    return m_rightBraceToken;
+    return domainType()->signature();
 }
 
 void EnumerationDefinition::accept( Visitor& visitor )
@@ -557,36 +615,34 @@ void EnumerationDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr EnumerationDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< EnumerationDefinition >(
+        identifier()->duplicate< Identifier >(), enumerators()->duplicate< Enumerators >() );
+
+    TypeDefinition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // UsingDefinition
 //
 
-UsingDefinition::UsingDefinition(
-    const Token::Ptr& usingToken,
-    const Identifier::Ptr& identifier,
-    const Token::Ptr& assignmentToken,
-    const Type::Ptr& type )
+UsingDefinition::UsingDefinition( const Identifier::Ptr& identifier, const Type::Ptr& aliasType )
 : Definition( Node::ID::USING_DEFINITION, identifier )
-, m_type( type )
-, m_usingToken( usingToken )
-, m_assignmentToken( assignmentToken )
+, m_aliasType( aliasType )
 {
 }
 
-const Type::Ptr& UsingDefinition::type( void ) const
+const Type::Ptr& UsingDefinition::aliasType( void ) const
 {
-    return m_type;
+    return m_aliasType;
 }
 
-const Token::Ptr& UsingDefinition::usingToken( void ) const
+std::string UsingDefinition::typeDescription( void ) const
 {
-    return m_usingToken;
-}
-
-const Token::Ptr& UsingDefinition::assignmentToken( void ) const
-{
-    return m_assignmentToken;
+    return aliasType()->signature();
 }
 
 void UsingDefinition::accept( Visitor& visitor )
@@ -594,27 +650,26 @@ void UsingDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr UsingDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< UsingDefinition >(
+        identifier()->duplicate< Identifier >(), aliasType()->duplicate< Type >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // UsingPathDefinition
 //
 
-UsingPathDefinition::UsingPathDefinition(
-    const Token::Ptr& usingToken,
-    const IdentifierPath::Ptr& path,
-    const Token::Ptr& doubleColonToken,
-    const Token::Ptr& asterixToken )
-: Definition( Node::ID::USING_PATH_DEFINITION, std::make_shared< Identifier >() )
+UsingPathDefinition::UsingPathDefinition( const IdentifierPath::Ptr& path, const u1 explicitSymbol )
+: Definition(
+      Node::ID::USING_PATH_DEFINITION,
+      AST::make< Identifier >( path->sourceLocation(), path->path() ) )
 , m_path( path )
-, m_usingToken( usingToken )
-, m_doubleColonToken( doubleColonToken )
-, m_asterixToken( asterixToken )
-{
-}
-
-UsingPathDefinition::UsingPathDefinition(
-    const Token::Ptr& usingToken, const IdentifierPath::Ptr& path )
-: UsingPathDefinition( usingToken, path, Token::unresolved(), Token::unresolved() )
+, m_explicitSymbol( explicitSymbol )
 {
 }
 
@@ -625,28 +680,26 @@ const IdentifierPath::Ptr& UsingPathDefinition::path( void ) const
 
 u1 UsingPathDefinition::explicitSymbol( void ) const
 {
-    return m_doubleColonToken->token() == Grammar::Token::UNRESOLVED and
-           m_asterixToken->token() == Grammar::Token::UNRESOLVED;
+    return m_explicitSymbol;
 }
 
-const Token::Ptr& UsingPathDefinition::usingToken( void ) const
+std::string UsingPathDefinition::typeDescription( void ) const
 {
-    return m_usingToken;
-}
-
-const Token::Ptr& UsingPathDefinition::doubleColonToken( void ) const
-{
-    return m_doubleColonToken;
-}
-
-const Token::Ptr& UsingPathDefinition::asterixToken( void ) const
-{
-    return m_asterixToken;
+    return path()->path();
 }
 
 void UsingPathDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr UsingPathDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< UsingPathDefinition >(
+        path()->duplicate< IdentifierPath >(), explicitSymbol() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -655,14 +708,9 @@ void UsingPathDefinition::accept( Visitor& visitor )
 //
 
 InvariantDefinition::InvariantDefinition(
-    const Token::Ptr& invariantToken,
-    const Identifier::Ptr& identifier,
-    const Token::Ptr& assignmentToken,
-    const Expression::Ptr& expression )
+    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
 : Definition( Node::ID::INVARIANT_DEFINITION, identifier )
 , m_expression( expression )
-, m_invariantToken( invariantToken )
-, m_assignmentToken( assignmentToken )
 {
 }
 
@@ -671,14 +719,9 @@ const Expression::Ptr& InvariantDefinition::expression( void ) const
     return m_expression;
 }
 
-const Token::Ptr& InvariantDefinition::invariantToken( void ) const
+std::string InvariantDefinition::typeDescription( void ) const
 {
-    return m_invariantToken;
-}
-
-const Token::Ptr& InvariantDefinition::assignmentToken( void ) const
-{
-    return m_assignmentToken;
+    return "...";
 }
 
 void InvariantDefinition::accept( Visitor& visitor )
@@ -686,76 +729,283 @@ void InvariantDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr InvariantDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< InvariantDefinition >(
+        identifier()->duplicate< Identifier >(), expression()->duplicate< Expression >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//
+// DomainDefinition
+//
+
+DomainDefinition::DomainDefinition( const Type::Ptr& domainType )
+: TypeDefinition( Node::ID::DOMAIN_DEFINITION, domainType )
+{
+}
+
+std::string DomainDefinition::typeDescription( void ) const
+{
+    return domainType()->signature();
+}
+
+void DomainDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr DomainDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< DomainDefinition >( domainType()->duplicate< Type >() );
+
+    TypeDefinition::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//
+// StructureDefinition
+//
+
+StructureDefinition::StructureDefinition(
+    const Type::Ptr& domainType, const FunctionDefinitions::Ptr& functions )
+: TypeDefinition( Node::ID::STRUCTURE_DEFINITION, domainType )
+, m_functions( functions )
+{
+}
+
+const FunctionDefinitions::Ptr& StructureDefinition::functions( void ) const
+{
+    return m_functions;
+}
+
+std::string StructureDefinition::typeDescription( void ) const
+{
+    return domainType()->signature();
+}
+
+void StructureDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr StructureDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< StructureDefinition >(
+        domainType()->duplicate< Type >(), functions()->duplicate< FunctionDefinitions >() );
+
+    TypeDefinition::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//
+// BehaviorDefinition
+//
+
+BehaviorDefinition::BehaviorDefinition(
+    const Type::Ptr& domainType, const Definitions::Ptr& definitions )
+: TypeDefinition( Node::ID::BEHAVIOR_DEFINITION, domainType )
+, m_definitions( definitions )
+{
+}
+
+const Definitions::Ptr& BehaviorDefinition::definitions( void ) const
+{
+    return m_definitions;
+}
+
+std::string BehaviorDefinition::typeDescription( void ) const
+{
+    return domainType()->signature();
+}
+
+void BehaviorDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr BehaviorDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< BehaviorDefinition >(
+        domainType()->duplicate< Type >(), definitions()->duplicate< Definitions >() );
+
+    TypeDefinition::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//
+// ImplementDefinition
+//
+
+ImplementDefinition::ImplementDefinition(
+    const Type::Ptr& behaviorType,
+    const Type::Ptr& domainType,
+    const Definitions::Ptr& definitions )
+: TypeDefinition( Node::ID::IMPLEMENT_DEFINITION, domainType )
+, m_behaviorType( behaviorType )
+, m_definitions( definitions )
+{
+}
+
+const Type::Ptr& ImplementDefinition::behaviorType( void ) const
+{
+    return m_behaviorType;
+}
+
+const Definitions::Ptr& ImplementDefinition::definitions( void ) const
+{
+    return m_definitions;
+}
+
+u1 ImplementDefinition::forBehaviorType( void ) const
+{
+    return domainType() != behaviorType();
+}
+
+std::string ImplementDefinition::typeDescription( void ) const
+{
+    return domainType()->signature();
+}
+
+void ImplementDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr ImplementDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< ImplementDefinition >(
+        behaviorType()->duplicate< Type >(),
+        domainType()->duplicate< Type >(),
+        definitions()->duplicate< Definitions >() );
+
+    TypeDefinition::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//
+// BuiltinDefinition
+//
+
+BuiltinDefinition::BuiltinDefinition(
+    const Identifier::Ptr& identifier,
+    const Types::Ptr& argumentTypes,
+    const Type::Ptr& returnType )
+: Definition( Node::ID::BUILTIN_DEFINITION, identifier )
+, m_argumentTypes( argumentTypes )
+, m_returnType( returnType )
+, m_targetId( libcasm_ir::Value::_SIZE_ )
+{
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    setProperty( libcasm_ir::Property::PURE );
+}
+
+const Types::Ptr& BuiltinDefinition::argumentTypes( void ) const
+{
+    return m_argumentTypes;
+}
+
+const Type::Ptr& BuiltinDefinition::returnType( void ) const
+{
+    return m_returnType;
+}
+
+void BuiltinDefinition::setTargetId( const libcasm_ir::Value::ID targetId )
+{
+    m_targetId = targetId;
+}
+
+libcasm_ir::Value::ID BuiltinDefinition::targetId( void ) const
+{
+    assert( hasTargetId() );
+    return m_targetId;
+}
+
+u1 BuiltinDefinition::hasTargetId( void ) const
+{
+    return m_targetId != libcasm_ir::Value::_SIZE_;
+}
+
+std::string BuiltinDefinition::typeDescription( void ) const
+{
+    std::stringstream stream;
+    stream << ":";
+
+    const auto& innerTypes = argumentTypes();
+    for( const auto& innerType : *innerTypes )
+    {
+        stream << " " << innerType->signature() << "* ";
+    }
+
+    if( innerTypes->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+    }
+
+    stream << " -> " << returnType()->signature() << " ";
+    return stream.str();
+}
+
+void BuiltinDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr BuiltinDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< BuiltinDefinition >(
+        identifier()->duplicate< Identifier >(),
+        argumentTypes()->duplicate< Types >(),
+        returnType()->duplicate< Type >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // InitDefinition
 //
 
-InitDefinition::InitDefinition( const Token::Ptr& initToken, const IdentifierPath::Ptr& initPath )
-: Definition( Node::ID::INIT_DEFINITION, initDefinitionIdentifier )
-, m_initPath( initPath )
-, m_initializers( std::make_shared< Initializers >() )
-, m_initToken( initToken )
-, m_leftBraceToken( unresolvedToken )
-, m_rightBraceToken( unresolvedToken )
-, m_programFunction( nullptr )
-{
-}
-
-InitDefinition::InitDefinition(
-    const Token::Ptr& initToken,
-    const Token::Ptr& leftBraceToken,
-    const Initializers::Ptr& initializers,
-    const Token::Ptr& rightBraceToken )
-: Definition( Node::ID::INIT_DEFINITION, initDefinitionIdentifier )
-, m_initPath( nullptr )
+InitDefinition::InitDefinition( const MappedExpressions::Ptr& initializers, const u1 singleAgent )
+: Definition(
+      Node::ID::INIT_DEFINITION, AST::make< Identifier >( initializers->sourceLocation(), "init" ) )
 , m_initializers( initializers )
-, m_initToken( initToken )
-, m_leftBraceToken( leftBraceToken )
-, m_rightBraceToken( rightBraceToken )
-, m_programFunction( nullptr )
+, m_singleAgent( singleAgent )
+, m_external( false )
 {
 }
 
-const IdentifierPath::Ptr& InitDefinition::initPath( void ) const
-{
-    return m_initPath;
-}
-
-const Initializers::Ptr& InitDefinition::initializers( void ) const
+const MappedExpressions::Ptr& InitDefinition::initializers( void ) const
 {
     return m_initializers;
 }
 
-const Token::Ptr& InitDefinition::initToken( void ) const
+u1 InitDefinition::singleAgent( void ) const
 {
-    return m_initToken;
+    return m_singleAgent;
 }
 
-const Token::Ptr& InitDefinition::leftBraceToken( void ) const
+void InitDefinition::setExternal( void )
 {
-    return m_leftBraceToken;
+    m_external = true;
 }
 
-const Token::Ptr& InitDefinition::rightBraceToken( void ) const
+u1 InitDefinition::external( void ) const
 {
-    return m_rightBraceToken;
+    return m_external;
 }
 
-void InitDefinition::setProgramFunction( const FunctionDefinition::Ptr& programFunction )
+std::string InitDefinition::typeDescription( void ) const
 {
-    assert( m_programFunction == nullptr );
-    m_programFunction = programFunction;
-}
-
-const FunctionDefinition::Ptr& InitDefinition::programFunction( void ) const
-{
-    return m_programFunction;
-}
-
-u1 InitDefinition::isSingleAgent( void ) const
-{
-    return m_initPath != nullptr;
+    return ( external() ? "external" : "internal" );
 }
 
 void InitDefinition::accept( Visitor& visitor )
@@ -763,25 +1013,28 @@ void InitDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr InitDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< InitDefinition >(
+        initializers()->duplicate< MappedExpressions >(), singleAgent() );
+
+    Definition::clone( *duplicate );
+    if( external() )
+    {
+        duplicate->setExternal();
+    }
+    return duplicate;
+}
+
 //
 //
 // ImportDefinition
 //
 
-ImportDefinition::ImportDefinition( const Token::Ptr& importToken, const IdentifierPath::Ptr& path )
-: ImportDefinition( importToken, path, unresolvedToken, std::make_shared< Identifier >() )
-{
-}
-
 ImportDefinition::ImportDefinition(
-    const Token::Ptr& importToken,
-    const IdentifierPath::Ptr& path,
-    const Token::Ptr& asToken,
-    const Identifier::Ptr& identifier )
+    const IdentifierPath::Ptr& path, const Identifier::Ptr& identifier )
 : Definition( Node::ID::IMPORT_DEFINITION, identifier )
 , m_path( path )
-, m_importToken( importToken )
-, m_asToken( asToken )
 {
 }
 
@@ -790,19 +1043,23 @@ const IdentifierPath::Ptr& ImportDefinition::path( void ) const
     return m_path;
 }
 
-const Token::Ptr& ImportDefinition::importToken( void ) const
+std::string ImportDefinition::typeDescription( void ) const
 {
-    return m_importToken;
-}
-
-const Token::Ptr& ImportDefinition::asToken( void ) const
-{
-    return m_asToken;
+    return path()->path();
 }
 
 void ImportDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr ImportDefinition::clone( void ) const
+{
+    auto duplicate = std::make_shared< ImportDefinition >(
+        path()->duplicate< IdentifierPath >(), identifier()->duplicate< Identifier >() );
+
+    Definition::clone( *duplicate );
+    return duplicate;
 }
 
 //

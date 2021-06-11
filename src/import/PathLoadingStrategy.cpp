@@ -65,7 +65,7 @@ std::string PathLoadingStrategy::basePath( void ) const
 }
 
 libstdhl::Standard::RFC3986::URI PathLoadingStrategy::toURI(
-    const Ast::IdentifierPath::Ptr& identifierPath ) const
+    const AST::IdentifierPath::Ptr& identifierPath ) const
 {
     return libstdhl::Standard::RFC3986::URI(
         "file", "/", toFileSystemPath( identifierPath ), "", "" );
@@ -85,9 +85,8 @@ libpass::LoadFilePass::Input::Ptr PathLoadingStrategy::loadSource(
 }
 
 std::string PathLoadingStrategy::toFileSystemPath(
-    const Ast::IdentifierPath::Ptr& identifierPath ) const
+    const AST::IdentifierPath::Ptr& identifierPath ) const
 {
-    assert( identifierPath->type() == Ast::IdentifierPath::Type::ABSOLUTE );
     const auto delimiter = Namespace::delimiter();
     const auto identifierPathName = identifierPath->path();
     const auto modulePath = identifierPath->identifiers()->front()->name();

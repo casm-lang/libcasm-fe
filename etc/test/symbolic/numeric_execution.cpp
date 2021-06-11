@@ -52,7 +52,7 @@
 #include <libpass/analyze/LoadFilePass>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace LST;
 
 #define SOURCE( PASS, CONTENT, STATUS, CONFIG )                                                   \
     {                                                                                             \

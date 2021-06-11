@@ -129,6 +129,30 @@ add_dependencies( ${PROJECT}-cpp
 
 #
 #
+# prelude
+#
+
+set( DEF_CASM_PRELUDE "${CMAKE_CURRENT_SOURCE_DIR}/lib/CASM.casm" )
+set( CXX_CASM_PRELUDE "${CMAKE_CURRENT_BINARY_DIR}/src/CASM.casm.h" )
+
+add_custom_command(
+  OUTPUT         ${CXX_CASM_PRELUDE}
+  COMMAND        make -C ${CMAKE_CURRENT_SOURCE_DIR} ${CXX_CASM_PRELUDE}
+  DEPENDS        ${DEF_CASM_PRELUDE}
+  COMMENT        ""
+  )
+
+add_custom_target( ${PROJECT}-prelude ALL
+  DEPENDS
+    ${CXX_CASM_PRELUDE}
+  )
+
+add_dependencies( ${PROJECT}-cpp
+  ${PROJECT}-prelude
+  )
+
+#
+#
 # library
 #
 

@@ -52,26 +52,25 @@ namespace libcasm_fe
     // --------------------------------------------------------- 0*** ...
     // generic syntax error
     {
-        SyntaxError = 0x0000  // 00** ... syntax/grammar
-        ,
+        SyntaxError = 0x0000,  // 00** ... syntax/grammar
         SyntaxErrorUnrecognizedCharacter = 0x0001,
         SyntaxErrorUnclosedString = 0x0002,
         SyntaxErrorInvalidStatement = 0x0003,
-        SyntaxErrorUnclosedComment = 0x0004
+        SyntaxErrorUnclosedComment = 0x0004,
 
         // --------------------------------------------------------- 05** ...
         // attribution errors
-        ,
         AttributionBasicAttributeUnknown = 0x0400,
         AttributionBasicAttributeAlreadyUsed = 0x0401,
         AttributionExpressionAttributeUnknown = 0x0410,
-        AttributionExpressionAttributeAlreadyUsed = 0x0411
+        AttributionExpressionAttributeAlreadyUsed = 0x0411,
+        AttributionSymbolAttributeUnknown = 0x0420,
+        AttributionSymbolAttributeAlreadyUsed = 0x0421,
 
         // --------------------------------------------------------- 05** ...
         // symbol resolver errors
-        ,
         SymbolIsUnknown = 0x0500,
-        UpdateRuleFunctionSymbolIsInvalid = 0x0501,
+        SymbolIsInvalid = 0x0501,
         SymbolAlreadyDefined = 0x0502,
         SymbolArgumentSizeMismatch = 0x0503,
 
@@ -122,8 +121,26 @@ namespace libcasm_fe
         // invariant errors
         InvariantDefinitionInvalidExpression = 0x4e00,
         InvariantDefinitionInvariantViolated = 0x4e01,
-
         InvariantDefinitionExpressionInvalidProperty = 0x4e02,
+
+        // ---------------------------------------------------------
+        // structure errors
+
+        StructureDefinitionAlreadyUsed = 0x5500,
+        StructureDefinitionIdentifierIsBuiltinName = 0x5510,
+
+        // ---------------------------------------------------------
+        // feature errors
+
+        FeatureDefinitionAlreadyUsed = 0x5600,
+        FeatureDefinitionIdentifierIsBuiltinName = 0x5610,
+
+        // ---------------------------------------------------------
+        // implement errors
+
+        ImplementDefinitionAlreadyUsed = 0x5700,
+        ImplementDefinitionIdentifierIsBuiltinName = 0x5710,
+        ImplementDefinitionOfUndefinedStructure = 0x5720,
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
@@ -311,6 +328,7 @@ namespace libcasm_fe
         TypeUnsupported = 0xfffe
 
         ,
+        Internal = 0xe505,
         Unspecified = 0xffff
     };
 }

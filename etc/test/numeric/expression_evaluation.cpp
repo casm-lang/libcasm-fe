@@ -47,7 +47,7 @@
 
 #include <memory>
 
-#include "../src/Ast.h"
+#include "../src/AST.h"
 #include "../src/execute/NumericExecutionPass.h"
 #include "../src/various/location.hh"
 

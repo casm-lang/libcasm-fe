@@ -51,28 +51,8 @@
 
 using namespace libcasm_fe;
 
-// basic types
-static const std::unordered_set< std::string > TYPE_NAMES_FOR_BASIC_TYPES = {
-    TypeInfo::TYPE_NAME_VOID,   TypeInfo::TYPE_NAME_BOOLEAN, TypeInfo::TYPE_NAME_INTEGER,
-    TypeInfo::TYPE_NAME_STRING, TypeInfo::TYPE_NAME_DECIMAL, TypeInfo::TYPE_NAME_RATIONAL,
-};
-
-// composed types
-static const std::unordered_set< std::string > TYPE_NAMES_FOR_COMPOSED_TYPES = {
-    TypeInfo::TYPE_NAME_TUPLE, TypeInfo::TYPE_NAME_RECORD
-};
-// template types
-static const std::unordered_set< std::string > TYPE_NAMES_FOR_TEMPLATE_TYPES = {
-    TypeInfo::TYPE_NAME_LIST,
-    TypeInfo::TYPE_NAME_RANGE,
-    TypeInfo::TYPE_NAME_FILE,
-    TypeInfo::TYPE_NAME_PORT
-};
-
-// reference types
-static const std::unordered_set< std::string > TYPE_NAMES_FOR_REFERENCE_TYPES = {
-    TypeInfo::TYPE_NAME_RULEREF, TypeInfo::TYPE_NAME_FUNCREF
-};
+namespace IR = libcasm_ir;
+namespace MEM = libstdhl::Memory;
 
 //
 //
@@ -81,15 +61,29 @@ static const std::unordered_set< std::string > TYPE_NAMES_FOR_REFERENCE_TYPES = 
 
 TypeInfo::TypeInfo( void )
 {
-    setType( TypeInfo::TYPE_NAME_VOID, libstdhl::Memory::get< libcasm_ir::VoidType >() );
-    setType( TypeInfo::TYPE_NAME_BOOLEAN, libstdhl::Memory::get< libcasm_ir::BooleanType >() );
-    setType( TypeInfo::TYPE_NAME_INTEGER, libstdhl::Memory::get< libcasm_ir::IntegerType >() );
-    setType( TypeInfo::TYPE_NAME_STRING, libstdhl::Memory::get< libcasm_ir::StringType >() );
-    setType( TypeInfo::TYPE_NAME_RATIONAL, libstdhl::Memory::get< libcasm_ir::RationalType >() );
-    setType( TypeInfo::TYPE_NAME_DECIMAL, libstdhl::Memory::get< libcasm_ir::DecimalType >() );
+    setType( TypeInfo::TYPE_NAME_VOID, MEM::get< IR::VoidType >() );
+    setType( TypeInfo::TYPE_NAME_OBJECT, MEM::get< IR::ObjectType >( TypeInfo::TYPE_NAME_OBJECT ) );
+    setType(
+        TypeInfo::TYPE_NAME_ENUMERATION,
+        MEM::get< IR::ObjectType >( TypeInfo::TYPE_NAME_ENUMERATION ) );
+
+    setType( TypeInfo::TYPE_NAME_BOOLEAN, MEM::get< IR::BooleanType >() );
+    setType( TypeInfo::TYPE_NAME_INTEGER, MEM::get< IR::IntegerType >() );
+    setType( TypeInfo::TYPE_NAME_STRING, MEM::get< IR::StringType >() );
+    setType( TypeInfo::TYPE_NAME_DECIMAL, MEM::get< IR::DecimalType >() );
+    setType( TypeInfo::TYPE_NAME_RATIONAL, MEM::get< IR::RationalType >() );
+
+    setType( TypeInfo::TYPE_NAME_BINARY, nullptr );
+    setType( TypeInfo::TYPE_NAME_RULEREF, nullptr );  // template type
+    setType( TypeInfo::TYPE_NAME_FUNCREF, nullptr );  // template type
+    setType( TypeInfo::TYPE_NAME_RANGE, nullptr );    // template type
+    setType( TypeInfo::TYPE_NAME_LIST, nullptr );     // template type
+    // setType( TypeInfo::TYPE_NAME_SET, nullptr ); // TODO: FIXME: @ppaulweber: feature/set
+    setType( TypeInfo::TYPE_NAME_PORT, nullptr );  // template type
+    setType( TypeInfo::TYPE_NAME_FILE, nullptr );  // template type
 }
 
-void TypeInfo::setType( const std::string& name, const libcasm_ir::Type::Ptr& type )
+void TypeInfo::setType( const std::string& name, const IR::Type::Ptr& type )
 {
     const auto result = m_typeName2typePtr.emplace( name, type );
     if( not result.second )
@@ -98,7 +92,7 @@ void TypeInfo::setType( const std::string& name, const libcasm_ir::Type::Ptr& ty
     }
 }
 
-libcasm_ir::Type::Ptr TypeInfo::getType( const std::string& name ) const
+IR::Type::Ptr TypeInfo::getType( const std::string& name ) const
 {
     const auto it = m_typeName2typePtr.find( name );
     if( it == m_typeName2typePtr.cend() )
@@ -115,29 +109,28 @@ u1 TypeInfo::hasType( const std::string& name ) const
     return it != m_typeName2typePtr.cend();
 }
 
-u1 TypeInfo::isBasicType( const std::string& name ) const
-{
-    const auto it = TYPE_NAMES_FOR_BASIC_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_BASIC_TYPES.cend();
-}
+const std::string TypeInfo::TYPE_NAME_VOID = "Void";
+const std::string TypeInfo::TYPE_NAME_BOOLEAN = "Boolean";
+const std::string TypeInfo::TYPE_NAME_BINARY = "Binary";
+const std::string TypeInfo::TYPE_NAME_INTEGER = "Integer";
+const std::string TypeInfo::TYPE_NAME_STRING = "String";
+const std::string TypeInfo::TYPE_NAME_DECIMAL = "Decimal";
+const std::string TypeInfo::TYPE_NAME_RATIONAL = "Rational";
 
-u1 TypeInfo::isComposedType( const std::string& name ) const
-{
-    const auto it = TYPE_NAMES_FOR_COMPOSED_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_COMPOSED_TYPES.cend();
-}
+const std::string TypeInfo::TYPE_NAME_TUPLE = "Tuple";
+const std::string TypeInfo::TYPE_NAME_RECORD = "Record";
 
-u1 TypeInfo::isTemplateType( const std::string& name ) const
-{
-    const auto it = TYPE_NAMES_FOR_TEMPLATE_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_TEMPLATE_TYPES.cend();
-}
+const std::string TypeInfo::TYPE_NAME_LIST = "List";
+const std::string TypeInfo::TYPE_NAME_RANGE = "Range";
+const std::string TypeInfo::TYPE_NAME_FILE = "File";
+const std::string TypeInfo::TYPE_NAME_PORT = "Port";
 
-u1 TypeInfo::isReferenceType( const std::string& name ) const
-{
-    const auto it = TYPE_NAMES_FOR_REFERENCE_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_REFERENCE_TYPES.cend();
-}
+const std::string TypeInfo::TYPE_NAME_RULEREF = "RuleRef";
+const std::string TypeInfo::TYPE_NAME_FUNCREF = "FuncRef";
+
+const std::string TypeInfo::TYPE_NAME_ENUMERATION = "enumeration";
+const std::string TypeInfo::TYPE_NAME_OBJECT = "Object";
+const std::string TypeInfo::TYPE_NAME_AGENT = "Agent";
 
 //
 //  Local variables:

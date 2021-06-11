@@ -63,14 +63,6 @@ namespace libcasm_fe
 
         u1 hasType( const std::string& name ) const;
 
-        u1 isBasicType( const std::string& name ) const;
-
-        u1 isComposedType( const std::string& name ) const;
-
-        u1 isTemplateType( const std::string& name ) const;
-
-        u1 isReferenceType( const std::string& name ) const;
-
       protected:
         TypeInfo( void );
 
@@ -81,27 +73,32 @@ namespace libcasm_fe
 
       public:
         // basic types
-        static constexpr const char* TYPE_NAME_VOID = "Void";
-        static constexpr const char* TYPE_NAME_BOOLEAN = "Boolean";
-        static constexpr const char* TYPE_NAME_BINARY = "Binary";
-        static constexpr const char* TYPE_NAME_INTEGER = "Integer";
-        static constexpr const char* TYPE_NAME_STRING = "String";
-        static constexpr const char* TYPE_NAME_DECIMAL = "Decimal";
-        static constexpr const char* TYPE_NAME_RATIONAL = "Rational";
+        static const std::string TYPE_NAME_VOID;
+        static const std::string TYPE_NAME_BOOLEAN;
+        static const std::string TYPE_NAME_BINARY;
+        static const std::string TYPE_NAME_INTEGER;
+        static const std::string TYPE_NAME_STRING;
+        static const std::string TYPE_NAME_DECIMAL;
+        static const std::string TYPE_NAME_RATIONAL;
 
         // composed types
-        static constexpr const char* TYPE_NAME_TUPLE = "Tuple";
-        static constexpr const char* TYPE_NAME_RECORD = "Record";
+        static const std::string TYPE_NAME_TUPLE;
+        static const std::string TYPE_NAME_RECORD;
 
         // template types
-        static constexpr const char* TYPE_NAME_LIST = "List";
-        static constexpr const char* TYPE_NAME_RANGE = "Range";
-        static constexpr const char* TYPE_NAME_FILE = "File";
-        static constexpr const char* TYPE_NAME_PORT = "Port";
+        static const std::string TYPE_NAME_LIST;
+        static const std::string TYPE_NAME_RANGE;
+        static const std::string TYPE_NAME_FILE;
+        static const std::string TYPE_NAME_PORT;
 
         // reference types
-        static constexpr const char* TYPE_NAME_RULEREF = "RuleRef";
-        static constexpr const char* TYPE_NAME_FUNCREF = "FuncRef";
+        static const std::string TYPE_NAME_RULEREF;
+        static const std::string TYPE_NAME_FUNCREF;
+
+        // object types
+        static const std::string TYPE_NAME_ENUMERATION;
+        static const std::string TYPE_NAME_OBJECT;
+        static const std::string TYPE_NAME_AGENT;
 
         static TypeInfo& instance( void )
         {

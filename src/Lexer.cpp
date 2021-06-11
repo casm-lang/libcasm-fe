@@ -67,7 +67,7 @@ void Lexer::setFileName( const std::string& fileName )
     m_loc.begin.fileName = m_loc.end.fileName = std::make_shared< std::string >( fileName );
 }
 
-Spans::Ptr Lexer::fetchSpansAndReset( void )
+CST::Spans::Ptr Lexer::fetchSpansAndReset( void )
 {
     const auto currentSpans = m_spans;
     m_spans = std::make_shared< Spans >();

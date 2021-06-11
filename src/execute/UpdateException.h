@@ -46,9 +46,9 @@
 #ifndef _LIBCASM_FE_UPDATE_EXCEPTION_H_
 #define _LIBCASM_FE_UPDATE_EXCEPTION_H_
 
-#include <libcasm-fe/ast/Definition>
-#include <libcasm-fe/ast/Node>
 #include <libcasm-fe/execute/RuntimeException>
+#include <libcasm-fe/lst/Definition>
+#include <libcasm-fe/lst/Node>
 
 #include <libcasm-ir/Constant>
 
@@ -59,8 +59,8 @@ namespace libcasm_fe
       public:
         struct UpdateInfo
         {
-            Ast::Node::Ptr producer;
-            Ast::FunctionDefinition::Ptr function;
+            LST::Node::Ptr producer;
+            LST::FunctionDefinition::Ptr function;
             std::vector< libcasm_ir::Constant > arguments;
             libcasm_ir::Constant value;
         };

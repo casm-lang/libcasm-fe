@@ -73,7 +73,7 @@
 #include "libtptp/transform/SourceToAstPass.h"
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace LST;
 
 namespace IR = libcasm_ir;
 
@@ -148,9 +148,7 @@ u1 SymbolicExecutionPass::run( libpass::PassResult& pr )
 
         if( not scheduler.check() )
         {
-            log.warning(
-                { specification->header()->sourceLocation() },
-                "no init definition found in this specification" );
+            log.warning( "no init definition found in this specification" );
         }
 
         while( not scheduler.done() )
@@ -162,7 +160,6 @@ u1 SymbolicExecutionPass::run( libpass::PassResult& pr )
         if( scheduler.numberOfSteps() == 0 )
         {
             log.warning(
-                { specification->header()->sourceLocation() },
                 "Could not perform a single step because no agent was initially available. This "
                 "may happen when no valid initial rule has been specified (see InitRule)." );
         }

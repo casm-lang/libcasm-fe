@@ -45,52 +45,64 @@
 
 #include "SymbolRegistrationPass.h"
 
-#include <libcasm-fe/Logger>
-#include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
-#include <libcasm-fe/ast/EmptyVisitor>
-
-#include <libcasm-fe/analyze/AttributionPass>
-#include <libcasm-fe/transform/SourceToAstPass>
-
-#include <libcasm-ir/Builtin>
+#include <libcasm-fe/ast/Declaration>
+#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/transform/CstToAstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char SymbolRegistrationPass::id = 0;
 
 static libpass::PassRegistration< SymbolRegistrationPass > PASS(
-    "ASTSymbolRegistrationPass",
-    "registers declared symbols in the symbol table",
+    "Symbol Registration Pass",
+    "registers defined and declared symbols in the namespace symbol table",
     "ast-sym-reg",
     0 );
 
-class SymbolRegistrationVisitor final : public EmptyVisitor
+//
+//
+// SymbolRegistrationVisitor
+//
+
+namespace libcasm_fe
 {
-  public:
-    SymbolRegistrationVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
+    namespace AST
+    {
+        class SymbolRegistrationVisitor final : public RecursiveVisitor
+        {
+          public:
+            SymbolRegistrationVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
-    void visit( InitDefinition& node ) override;
-    void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( EnumeratorDefinition& node ) override;
-    void visit( EnumerationDefinition& node ) override;
-    void visit( UsingDefinition& node ) override;
+            void visit( InitDefinition& node ) override;
+            void visit( FunctionDefinition& node ) override;
+            void visit( DerivedDefinition& node ) override;
+            void visit( RuleDefinition& node ) override;
+            void visit( EnumeratorDefinition& node ) override;
+            void visit( EnumerationDefinition& node ) override;
+            void visit( UsingDefinition& node ) override;
+            void visit( DomainDefinition& node ) override;
+            void visit( StructureDefinition& node ) override;
+            void visit( BehaviorDefinition& node ) override;
+            void visit( ImplementDefinition& node ) override;
+            void visit( BuiltinDefinition& node ) override;
+            void visit( Declaration& node ) override;
 
-  private:
-    void registerSymbol( Definition& node );
+          private:
+            void registerSymbol( Definition& node );
 
-  private:
-    libcasm_fe::Logger& m_log;
-    Namespace& m_symboltable;
-};
+          private:
+            libcasm_fe::Logger& m_log;
+            Namespace& m_symboltable;
+        };
+    }
+}
 
 SymbolRegistrationVisitor::SymbolRegistrationVisitor(
     libcasm_fe::Logger& log, Namespace& symboltable )
@@ -99,152 +111,24 @@ SymbolRegistrationVisitor::SymbolRegistrationVisitor(
 {
 }
 
-static BasicType::Ptr createRuleRefType( libstdhl::SourceLocation& sourceLocation )
-{
-    const auto type = libstdhl::Memory::get< libcasm_ir::RuleReferenceType >();
-    const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
-    const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
-    const auto node = Ast::make< BasicType >( sourceLocation, path );
-    node->setType( type );
-    return node;
-}
-
-static BasicType::Ptr createAgentType( libstdhl::SourceLocation& sourceLocation )
-{
-    const auto name = Ast::make< Identifier >( sourceLocation, "Agent" );
-    const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
-    const auto node = Ast::make< BasicType >( sourceLocation, path );
-    return node;
-}
-
-static const std::string PROGRAM = "program";
-
-static FunctionDefinition::Ptr createProgramFunction(
-    libstdhl::SourceLocation& sourceLocation, const Initializers::Ptr& initializers )
-{
-    const auto agentType = createAgentType( sourceLocation );
-    const auto ruleRefType = createRuleRefType( sourceLocation );
-
-    const auto argTypes = Ast::make< Types >( sourceLocation );
-    argTypes->add( agentType );
-
-    const auto program = Ast::make< Identifier >( sourceLocation, PROGRAM );
-    const auto defined = Ast::make< Defined >(
-        sourceLocation,
-        Token::unresolved(),
-        Token::unresolved(),
-        Ast::make< UndefLiteral >( sourceLocation ),
-        Token::unresolved() );
-
-    const auto initially = Ast::make< Initially >(
-        sourceLocation,
-        Token::unresolved(),
-        Token::unresolved(),
-        initializers,
-        Token::unresolved() );
-
-    return Ast::make< FunctionDefinition >(
-        sourceLocation,
-        Token::unresolved(),
-        program,
-        Token::unresolved(),
-        argTypes,
-        Token::unresolved(),
-        ruleRefType,
-        defined,
-        initially );
-}
-
 void SymbolRegistrationVisitor::visit( InitDefinition& node )
 {
-    auto location = node.sourceLocation();
-    auto initializers = node.initializers();
+    const auto& name = node.identifier()->name();
 
-    const auto& symbol = m_symboltable.findSymbol( PROGRAM );
-    if( symbol )
+    try
     {
+        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
+    }
+    catch( const std::domain_error& e )
+    {
+        const auto& symbol = m_symboltable.findSymbol( name );
         m_log.error(
             { node.sourceLocation() },
-            "multiple definition of 'init' rule",
+            "multiple definitions of 'init' rule",
             Code::AgentInitRuleMultipleDefinitions );
         m_log.info( { symbol->sourceLocation() }, "first definition found here" );
         return;
     }
-
-    if( node.isSingleAgent() )
-    {
-        initializers = Ast::make< Initializers >( location );
-
-        static const auto AGENT( "Agent" );
-        static const auto SINGLE_AGENT_CONSTANT( "$" );
-
-        const auto agent = std::make_shared< EnumeratorDefinition >(
-            std::make_shared< Identifier >( SINGLE_AGENT_CONSTANT ) );
-
-        const auto agentEnumerators = std::make_shared< Enumerators >();
-        agentEnumerators->add( agent );
-
-        const auto agentEnum = std::make_shared< EnumerationDefinition >(
-            Token::unresolved(),
-            std::make_shared< Identifier >( AGENT ),
-            Token::unresolved(),
-            Token::unresolved(),
-            agentEnumerators,
-            Token::unresolved() );
-
-        const auto kind = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
-        kind->add( SINGLE_AGENT_CONSTANT );
-
-        const auto type = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
-        agent->setType( type );
-        agentEnum->setType( type );
-
-        try
-        {
-            m_symboltable.registerSymbol( SINGLE_AGENT_CONSTANT, agentEnum );
-            m_symboltable.registerSymbol( AGENT, agentEnum );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.debug( { node.sourceLocation() }, e.what() );
-            return;
-        }
-
-        const auto singleAgentIdentifier = Ast::make< Identifier >( location, "$" );
-        auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( location );
-        const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
-            location,
-            IdentifierPath::fromIdentifier( singleAgentIdentifier ),
-            singleAgentArguments );
-        singleAgent->setTargetType( DirectCallExpression::TargetType::CONSTANT );
-
-        const auto programArguments = libcasm_fe::Ast::make< Expressions >( location );
-        programArguments->add( singleAgent );
-
-        const auto ruleReference =
-            Ast::make< ReferenceLiteral >( location, Token::unresolved(), node.initPath() );
-
-        const auto initializer = Ast::make< Initializer >(
-            location,
-            Token::unresolved(),
-            programArguments,
-            Token::unresolved(),
-            Token::unresolved(),
-            ruleReference );
-        initializers->add( initializer );
-    }
-
-    const auto programFunction = createProgramFunction( location, initializers );
-    node.setProgramFunction( programFunction );
-
-    // patch and apply the name of the program declaration to the initializer functions
-    const auto programFunctionInitializers = programFunction->initially()->initializers();
-    for( auto& programFunctionInitializer : *programFunctionInitializers )
-    {
-        programFunctionInitializer->setFunction( programFunction );
-    }
-
-    registerSymbol( *node.programFunction() );
 }
 
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
@@ -269,44 +153,10 @@ void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
 
 void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 {
-    const auto& name = node.identifier()->name();
-    m_log.debug( "creating IR enumeration type '" + name + "'" );
-    const auto kind = std::make_shared< libcasm_ir::Enumeration >( name );
-    for( const auto& enumerator : *node.enumerators() )
-    {
-        try
-        {
-            kind->add( enumerator->identifier()->name() );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.debug( { enumerator->sourceLocation() }, e.what() );
-        }
-    }
-
-    const auto type = std::make_shared< libcasm_ir::EnumerationType >( kind );
-    node.setType( type );
-
-    for( const auto& enumerator : *node.enumerators() )
-    {
-        enumerator->setType( type );
-    }
-
     registerSymbol( node );
 
-    // register enumerators in a sub-namespace
-    const auto enumeratorNamespace = std::make_shared< Namespace >();
-    SymbolRegistrationVisitor enumeratorVisitor( m_log, *enumeratorNamespace );
+    SymbolRegistrationVisitor enumeratorVisitor( m_log, *node.symboltable() );
     node.enumerators()->accept( enumeratorVisitor );
-
-    try
-    {
-        m_symboltable.registerNamespace( name, enumeratorNamespace );
-    }
-    catch( const std::domain_error& e )
-    {
-        m_log.debug( { node.sourceLocation() }, e.what() );
-    }
 }
 
 void SymbolRegistrationVisitor::visit( UsingDefinition& node )
@@ -314,28 +164,48 @@ void SymbolRegistrationVisitor::visit( UsingDefinition& node )
     registerSymbol( node );
 }
 
+void SymbolRegistrationVisitor::visit( DomainDefinition& node )
+{
+    registerSymbol( node );
+}
+
+void SymbolRegistrationVisitor::visit( StructureDefinition& node )
+{
+    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, *node.symboltable() );
+    node.functions()->accept( symbolRegistrationVisitor );
+
+    registerSymbol( node );
+}
+
+void SymbolRegistrationVisitor::visit( BehaviorDefinition& node )
+{
+    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, *node.symboltable() );
+    node.definitions()->accept( symbolRegistrationVisitor );
+
+    registerSymbol( node );
+}
+
+void SymbolRegistrationVisitor::visit( ImplementDefinition& node )
+{
+    // symbol registration is done during symbol resolving
+
+    SymbolRegistrationVisitor symbolRegistrationVisitor( m_log, *node.symboltable() );
+    node.definitions()->accept( symbolRegistrationVisitor );
+}
+
+void SymbolRegistrationVisitor::visit( BuiltinDefinition& node )
+{
+    registerSymbol( node );
+}
+
+void SymbolRegistrationVisitor::visit( Declaration& node )
+{
+    registerSymbol( node );
+}
+
 void SymbolRegistrationVisitor::registerSymbol( Definition& node )
 {
     const auto& name = node.identifier()->name();
-
-    if( libcasm_ir::Builtin::available( name ) )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
-            Code::IdentifierIsBuiltinName );
-        return;
-    }
-
-    if( TypeInfo::instance().hasType( name ) )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot use type name '" + name + "' as " + node.description() + " symbol",
-            Code::IdentifierIsTypeName );
-        return;
-    }
-
     try
     {
         m_symboltable.registerSymbol( name, node.ptr< Definition >() );
@@ -343,35 +213,83 @@ void SymbolRegistrationVisitor::registerSymbol( Definition& node )
     catch( const std::domain_error& e )
     {
         const auto& symbol = m_symboltable.findSymbol( name );
-        m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
-        m_log.info( { symbol->sourceLocation() }, e.what() );
+
+        if( symbol->abstract() and not node.abstract() )
+        {
+            symbol->symboltable()->replaceSymbol( name, node.ptr< Definition >() );
+            return;
+        }
+        else
+        {
+            m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
+            m_log.info( { symbol->sourceLocation() }, e.what() );
+            return;
+        }
+    }
+
+    if( ( node.id() == Node::ID::DOMAIN_DEFINITION ) or
+        ( node.id() == Node::ID::ENUMERATION_DEFINITION ) or
+        ( node.id() == Node::ID::STRUCTURE_DEFINITION ) )
+    {
+        const auto& typeDefinition = static_cast< TypeDefinition& >( node );
+        const auto& typeName = typeDefinition.domainType()->signature();
+
+        try
+        {
+            node.symboltable()->registerNamespace( name, std::make_shared< Namespace >() );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
+        }
+
+        try
+        {
+            node.symboltable()->registerSymbol( name, node.ptr< Definition >() );
+        }
+        catch( const std::domain_error& e )
+        {
+            const auto& symbol = node.symboltable()->findSymbol( typeName );
+
+            if( symbol->abstract() and not node.abstract() )
+            {
+                m_symboltable.replaceSymbol( name, node.ptr< Definition >() );
+                return;
+            }
+
+            m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
+            m_log.info( { symbol->sourceLocation() }, e.what() );
+        }
+
+        return;
     }
 }
 
+//
+//
+// SymbolRegistrationPass
+//
+
 void SymbolRegistrationPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
-    pu.scheduleAfter< AttributionPass >();
+    pu.require< CstToAstPass >();
 }
 
 u1 SymbolRegistrationPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SourceToAstPass >();
-    const auto specification = data->specification();
+    const auto& data = pr.output< CstToAstPass >();
+    const auto& specification = data->specification();
 
     SymbolRegistrationVisitor visitor( log, *specification->symboltable() );
-    specification->definitions()->accept( visitor );
-
-#ifndef NDEBUG
-    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
-#endif
+    specification->ast()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
     {
-        log.debug( "found %lu error(s) during symbol table creation", errors );
+        log.debug( "symbol table =\n" + specification->symboltable()->dump() );
+        log.debug( "found %lu error(s) during symbol registration", errors );
         return false;
     }
 

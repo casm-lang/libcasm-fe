@@ -45,13 +45,16 @@
 
 #include "Namespace.h"
 
+#include "various/GrammarToken.h"
+
 #include <libstdhl/Ansi>
 #include <libstdhl/String>
 
-#include "various/GrammarToken.h"
+#include <algorithm>
+#include <iostream>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 const std::string& Namespace::delimiter( void )
 {
@@ -70,16 +73,27 @@ Namespace::Namespace( void )
 {
 }
 
-void Namespace::registerSymbol( const std::string& name, const Ast::Definition::Ptr& definition )
+void Namespace::registerSymbol( const std::string& name, const AST::Definition::Ptr& definition )
 {
     const auto result = m_symbols.emplace( name, definition );
     if( not result.second )
     {
-        const auto& existingDefinition = result.first->second;
-        throw std::domain_error(
-            "symbol '" + name + "' already defined as '" + existingDefinition->description() +
-            "'" );
+        throw std::domain_error( "symbol '" + name + "' already defined" );
     }
+}
+
+void Namespace::replaceSymbol( const std::string& name, const AST::Definition::Ptr& definition )
+{
+    const auto& symbol = findSymbol( name );
+    if( not symbol )
+    {
+        throw std::domain_error( "symbol '" + name + "' not registered" );
+    }
+
+    m_symbols.erase( name );
+
+    const auto result = m_symbols.emplace( name, definition );
+    assert( result.second and "inconsistent state" );
 }
 
 void Namespace::registerNamespace(
@@ -103,44 +117,66 @@ Definition::Ptr Namespace::findSymbol( const std::string& name ) const
     return it->second;
 }
 
-Namespace::Symbol Namespace::findSymbol( const IdentifierPath& path ) const
+Namespace::Symbol Namespace::findSymbol( const IdentifierPath& identifierPath ) const
 {
-    const auto& pathSegments = *path.identifiers();
-
-    u1 externalImport = false;
-    auto* _namespace = this;
-
-    for( u64 i = 0; i < ( pathSegments.size() - 1 ); i++ )
+    std::vector< std::string > path;
+    path.reserve( identifierPath.identifiers()->size() );
+    for( const auto& identifier : *identifierPath.identifiers() )
     {
-        const auto& name = pathSegments[ i ]->name();
+        path.emplace_back( identifier->name() );
+    }
 
-        const auto it = _namespace->m_namespaces.find( name );
-        if( it == _namespace->m_namespaces.end() )
+    return findSymbol( path.data(), path.size(), false );
+}
+
+Namespace::Symbol Namespace::findSymbol(
+    const std::string* path, const std::size_t size, const u1 externalImport ) const
+{
+    assert( path and size > 0 );
+    const auto& name = path[ 0 ];
+    const auto* subPath = &path[ 1 ];
+    const auto subSize = size - 1;
+
+    const auto& definition = findSymbol( name );
+    if( definition )
+    {
+        if( subSize == 0 )
         {
-            return Symbol{ nullptr, false };
+            return Symbol{ definition, not externalImport or definition->exported() };
         }
-
-        _namespace = it->second.first.get();
-        const auto visibility = it->second.second;
-
-        if( visibility == Visibility::External )
+        else
         {
-            externalImport = true;
-        }
-        else if( visibility == Visibility::Internal and externalImport )
-        {
-            externalImport = false;
+            return definition->symboltable()->findSymbol( subPath, subSize, externalImport );
         }
     }
 
-    const auto definition = _namespace->findSymbol( path.baseName() );
-
-    if( not definition )
+    const auto it = m_namespaces.find( name );
+    if( it == m_namespaces.end() )
     {
         return Symbol{ nullptr, false };
     }
 
-    return Symbol{ definition, not externalImport or definition->exported() };
+    const auto& definitionNamespace = it->second.first.get();
+    const auto visibility = it->second.second;
+
+    if( subSize == 0 )
+    {
+        return Symbol{ nullptr, false };
+    }
+    else
+    {
+        auto updatedExternalImport = externalImport;
+        if( visibility == Visibility::External )
+        {
+            updatedExternalImport = true;
+        }
+        else if( visibility == Visibility::Internal and externalImport )
+        {
+            updatedExternalImport = false;
+        }
+
+        return definitionNamespace->findSymbol( subPath, subSize, updatedExternalImport );
+    }
 }
 
 Namespace::Ptr Namespace::findNamespace( const std::string& name ) const
@@ -174,9 +210,66 @@ Namespace::Ptr Namespace::findNamespace( const IdentifierPath& path ) const
     return _namespace;
 }
 
-const std::unordered_map< std::string, Ast::Definition::Ptr >& Namespace::symbols( void ) const
+const std::unordered_map< std::string, AST::Definition::Ptr >& Namespace::symbols( void ) const
 {
     return m_symbols;
+}
+
+const std::unordered_map< std::string, Namespace::Linkage >& Namespace::namespaces( void ) const
+{
+    return m_namespaces;
+}
+
+u1 Namespace::empty( void ) const
+{
+    return symbols().size() == 0 and namespaces().size() == 0;
+}
+
+void Namespace::registerTypeDefinition( TypeDefinition& node )
+{
+    if( not node.type() )
+    {
+        throw std::invalid_argument( node.description() + " has no concrete IR type" );
+    }
+
+    const auto result =
+        m_typeIdToTypeDefinition.emplace( node.type()->id(), node.ptr< TypeDefinition >() );
+
+    if( not result.second )
+    {
+        const auto& existingTypeID = result.first->first;
+        const auto& existingNode = result.first->second;
+
+        throw std::domain_error(
+            "already registered " + node.description() + " '" + node.typeDescription() +
+            "' with type ID '" + std::to_string( existingTypeID ) + "'" );
+    }
+}
+
+AST::TypeDefinition::Ptr Namespace::findTypeDefinition( const libcasm_ir::Type::ID typeID ) const
+{
+    const auto& definitionResult = m_typeIdToTypeDefinition.find( typeID );
+    if( definitionResult == m_typeIdToTypeDefinition.end() )
+    {
+        return nullptr;
+    }
+
+    return definitionResult->second;
+}
+
+AST::TypeDefinition::Ptr Namespace::findTypeDefinition( const std::string& typeName ) const
+{
+    for( const auto& entry : m_typeIdToTypeDefinition )
+    {
+        const auto& typeId = entry.first;
+        const auto& typeDefinition = entry.second;
+        if( typeDefinition->type()->description() == typeName )
+        {
+            return typeDefinition;
+        }
+    }
+
+    return nullptr;
 }
 
 std::string Namespace::dump( const std::string& indention ) const
@@ -188,38 +281,70 @@ std::string Namespace::dump( const std::string& indention ) const
 std::string Namespace::dump(
     const std::string& indention, std::unordered_set< const Namespace* >& visited ) const
 {
-    std::stringstream stream;
-
     const auto it = visited.emplace( this );
     if( not it.second )
     {
-        stream << indention << "...\n";
-        return stream.str();
+        return indention + " ...\n";
     }
 
+    if( m_symbols.size() == 0 and m_namespaces.size() == 0 )
+    {
+        return indention + "\n";
+    }
+
+    std::stringstream stream;
     for( const auto& symbol : m_symbols )
     {
         const auto& name = symbol.first;
         const auto& definition = symbol.second;
         const auto& type = definition->type();
+        const auto prefix = indention + name;
 
-        stream << indention << name << " "
-               << libstdhl::Ansi::format< libstdhl::Ansi::Color::CYAN >( definition->description() )
+        stream << prefix << " "
+               << libstdhl::Ansi::format< libstdhl::Ansi::Color::MAGENTA >(
+                      definition->description() )
+               << " "
+               << libstdhl::Ansi::format< libstdhl::Ansi::Color::YELLOW >(
+                      definition->abstract() ? "abstract " : "" )
+               << libstdhl::Ansi::format< libstdhl::Ansi::Color::RED >(
+                      definition->isTemplate() ? "template " : "" )
+               << libstdhl::Ansi::format< libstdhl::Ansi::Color::CYAN >(
+                      definition->typeDescription() )
                << " "
                << libstdhl::Ansi::format< libstdhl::Ansi::Color::BLUE >(
                       type ? type->description() : "$unresolved$" )
                << "\n";
+
+        if( not definition->symboltable()->empty() and
+            definition->id() != Node::ID::USING_DEFINITION )
+        {
+            stream << definition->symboltable()->dump( prefix + ".", visited );
+        }
     }
 
     for( const auto& _namespace : m_namespaces )
     {
         const auto& name = _namespace.first;
         const auto& space = _namespace.second.first;
-        const auto visibility = _namespace.second.second;
-        const auto prefix = indention + name + Namespace::delimiter();
+        if( not space )
+        {
+            continue;
+        }
 
-        stream << prefix << ( visibility == Visibility::Internal ? "-" : "+" ) << "\n";
+        const auto visibility = libstdhl::Ansi::format< libstdhl::Ansi::Color::MAGENTA >(
+            _namespace.second.second == Visibility::Internal ? "-" : "+" );
+        const auto prefix = indention + name + Namespace::delimiter() + visibility;
         stream << space->dump( prefix, visited );
+    }
+
+    for( const auto& entry : m_typeIdToTypeDefinition )
+    {
+        const auto& typeId = entry.first;
+        const auto& typeDefinition = entry.second;
+        const auto dName = typeDefinition->identifier()->name();
+        const auto tName = typeId;
+
+        stream << std::to_string( tName ) << ": " << dName << "\n";
     }
 
     if( indention == "" )

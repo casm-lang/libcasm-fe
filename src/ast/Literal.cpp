@@ -45,57 +45,22 @@
 
 #include "Literal.h"
 
-#include "../various/GrammarToken.h"
-
-#include <libcasm-fe/ast/Token>
-
-#include "Definition.h"
-#include "Type.h"
-
-#include <libstdhl/File>
-#include <libstdhl/String>
-
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
+
+//
+//
+// Literal
+//
 
 Literal::Literal( Node::ID id )
 : Expression( id )
-, m_leftBracket( Token::unresolved() )
-, m_rightBracket( Token::unresolved() )
-, m_spans( std::make_shared< Spans >() )
 {
 }
 
-void Literal::setSpans( const Spans::Ptr& spans )
+void Literal::clone( Literal& duplicate ) const
 {
-    m_spans = spans;
-}
-
-const Spans::Ptr& Literal::spans( void ) const
-{
-    return m_spans;
-}
-
-void Literal::setLeftBracket( const Token::Ptr& leftBracket )
-{
-    assert( m_leftBracket->token() == Grammar::Token::UNRESOLVED );
-    m_leftBracket = leftBracket;
-}
-
-const Token::Ptr& Literal::leftBracket( void ) const
-{
-    return m_leftBracket;
-}
-
-void Literal::setRightBracket( const Token::Ptr& rightBracket )
-{
-    assert( m_rightBracket->token() == Grammar::Token::UNRESOLVED );
-    m_rightBracket = rightBracket;
-}
-
-const Token::Ptr& Literal::rightBracket( void ) const
-{
-    return m_rightBracket;
+    Expression::clone( duplicate );
 }
 
 //
@@ -115,6 +80,14 @@ void UndefLiteral::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr UndefLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< UndefLiteral >();
+
+    Literal::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // ValueLiteral
@@ -123,7 +96,6 @@ void UndefLiteral::accept( Visitor& visitor )
 ValueLiteral::ValueLiteral( const libcasm_ir::Constant::Ptr& value )
 : Literal( Node::ID::VALUE_LITERAL )
 , m_value( value )
-, m_radix( libstdhl::Type::Radix::DECIMAL )
 {
     Expression::setType( value->type().ptr_type() );
 
@@ -134,12 +106,6 @@ ValueLiteral::ValueLiteral( const libcasm_ir::Constant::Ptr& value )
 const libcasm_ir::Constant::Ptr& ValueLiteral::value( void ) const
 {
     return m_value;
-}
-
-void ValueLiteral::setValue( const libcasm_ir::Constant::Ptr& value )
-{
-    m_value = value;
-    Expression::setType( m_value->type().ptr_type() );
 }
 
 void ValueLiteral::setRadix( const libstdhl::Type::Radix radix )
@@ -162,18 +128,25 @@ void ValueLiteral::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr ValueLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< ValueLiteral >( value() );
+
+    Literal::clone( *duplicate );
+    duplicate->setRadix( radix() );
+    return duplicate;
+}
+
 //
 //
 // ReferenceLiteral
 //
 
-ReferenceLiteral::ReferenceLiteral( const Token::Ptr& at, const IdentifierPath::Ptr& identifier )
+ReferenceLiteral::ReferenceLiteral( const IdentifierPath::Ptr& identifier )
 : Literal( Node::ID::REFERENCE_LITERAL )
 , m_identifier( identifier )
-, m_at( at )
 , m_referenceType( ReferenceType::UNKNOWN )
-, m_reference( nullptr )
-, m_builtinId( libcasm_ir::Value::ID::_SIZE_ )
+, m_reference()
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
     setProperty( libcasm_ir::Property::PURE );
@@ -182,11 +155,6 @@ ReferenceLiteral::ReferenceLiteral( const Token::Ptr& at, const IdentifierPath::
 const IdentifierPath::Ptr& ReferenceLiteral::identifier( void ) const
 {
     return m_identifier;
-}
-
-const Token::Ptr& ReferenceLiteral::at( void ) const
-{
-    return m_at;
 }
 
 void ReferenceLiteral::setReferenceType( ReferenceType referenceType )
@@ -199,35 +167,60 @@ ReferenceLiteral::ReferenceType ReferenceLiteral::referenceType( void ) const
     return m_referenceType;
 }
 
-void ReferenceLiteral::setReference( const TypedNode::Ptr& reference )
+void ReferenceLiteral::setReference( const Definition::Ptr& reference )
 {
     m_reference = reference;
 }
 
-const TypedNode::Ptr& ReferenceLiteral::reference( void ) const
+const Definition::Ptr& ReferenceLiteral::reference( void ) const
 {
-    assert(
-        ( m_referenceType != ReferenceType::BUILTIN ) and
-        ( m_referenceType != ReferenceType::UNKNOWN ) );
-
+    assert( m_reference != nullptr );
     return m_reference;
-}
-
-void ReferenceLiteral::setBuiltinId( libcasm_ir::Value::ID builtinId )
-{
-    m_builtinId = builtinId;
-}
-
-libcasm_ir::Value::ID ReferenceLiteral::builtinId( void ) const
-{
-    assert( m_referenceType == ReferenceType::BUILTIN );
-
-    return m_builtinId;
 }
 
 void ReferenceLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr ReferenceLiteral::clone( void ) const
+{
+    auto duplicate =
+        std::make_shared< ReferenceLiteral >( identifier()->duplicate< IdentifierPath >() );
+
+    Literal::clone( *duplicate );
+    duplicate->setReferenceType( referenceType() );
+    duplicate->setReference( m_reference );
+    return duplicate;
+}
+
+//
+//
+// SetLiteral
+//
+
+SetLiteral::SetLiteral( const Expressions::Ptr& expressions )
+: Literal( Node::ID::SET_LITERAL )
+, m_expressions( expressions )
+{
+}
+
+const Expressions::Ptr& SetLiteral::expressions( void ) const
+{
+    return m_expressions;
+}
+
+void SetLiteral::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr SetLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< SetLiteral >( expressions()->duplicate< Expressions >() );
+
+    Literal::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -251,17 +244,23 @@ void ListLiteral::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr ListLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< ListLiteral >( expressions()->duplicate< Expressions >() );
+
+    Literal::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // RangeLiteral
 //
 
-RangeLiteral::RangeLiteral(
-    const Expression::Ptr& left, const Token::Ptr& dotdot, const Expression::Ptr& right )
+RangeLiteral::RangeLiteral( const Expression::Ptr& left, const Expression::Ptr& right )
 : Literal( Node::ID::RANGE_LITERAL )
 , m_left( left )
 , m_right( right )
-, m_dotdot( dotdot )
 {
 }
 
@@ -275,14 +274,18 @@ const Expression::Ptr& RangeLiteral::right( void ) const
     return m_right;
 }
 
-const Token::Ptr& RangeLiteral::dotdot( void ) const
-{
-    return m_dotdot;
-}
-
 void RangeLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr RangeLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< RangeLiteral >(
+        left()->duplicate< Expression >(), right()->duplicate< Expression >() );
+
+    Literal::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -306,6 +309,14 @@ void TupleLiteral::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr TupleLiteral::clone( void ) const
+{
+    auto duplicate = std::make_shared< TupleLiteral >( expressions()->duplicate< Expressions >() );
+
+    Literal::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
 // RecordLiteral
@@ -325,6 +336,15 @@ const NamedExpressions::Ptr& RecordLiteral::namedExpressions( void ) const
 void RecordLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr RecordLiteral::clone( void ) const
+{
+    auto duplicate =
+        std::make_shared< RecordLiteral >( namedExpressions()->duplicate< NamedExpressions >() );
+
+    Literal::clone( *duplicate );
+    return duplicate;
 }
 
 //

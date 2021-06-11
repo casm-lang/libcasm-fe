@@ -92,11 +92,11 @@ function generate_token
 
     echo "        };" >> $dst
     echo "        " >> $dst
-    echo "        static std::string tokenAsString( const Token token )" >> $dst
+    echo "        static std::string tokenAsString( const Grammar::Token token )" >> $dst
     echo "        {" >> $dst
     echo "            switch( token )" >> $dst
     echo "            {" >> $dst
-    echo "                case /*  0 */ Token::UNRESOLVED:" >> $dst
+    echo "                case /*  0 */ Grammar::Token::UNRESOLVED:" >> $dst
 	echo "                {" >> $dst
 	echo "                    return \"\$unresolved\$\";" >> $dst
 	echo "                }" >> $dst
@@ -105,7 +105,7 @@ function generate_token
     uid=1
     for element in $tokens; do
 	if [ "$mode" = "name" ]; then
-	    printf "                case /* %2i */ Token::$element:\n" $uid >> $dst
+	    printf "                case /* %2i */ Grammar::Token::$element:\n" $uid >> $dst
 	    mode=token
 	else
 	    # mode token
@@ -201,7 +201,7 @@ function generate_parser
     for element in $tokens; do
         #printf "%2i -> %s\n" $uid $element
 	    if [ "$mode" = "name" ]; then
-	        echo "%type <Ast::Token::Ptr> $element" >> $dst
+	        echo "%type <CST::Token::Ptr> $element" >> $dst
 	        mode=token
 	    else
 	        # mode token

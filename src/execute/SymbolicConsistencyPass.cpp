@@ -49,10 +49,10 @@
 #include <libcasm-fe/execute/ExecutionVisitor>
 
 #include <libcasm-fe/Exception.h>
-#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
 #include <libcasm-fe/execute/Agent>
 #include <libcasm-fe/execute/SymbolicConsistencyVisitor>
 #include <libcasm-fe/import/SpecificationMergerPass>
+#include <libcasm-fe/transform/AstToLstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
@@ -71,7 +71,7 @@
 #include <mutex>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace LST;
 
 namespace IR = libcasm_ir;
 
@@ -86,7 +86,7 @@ static libpass::PassRegistration< SymbolicConsistencyPass > PASS(
 void SymbolicConsistencyPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SpecificationMergerPass >();
-    pu.scheduleAfter< FrameSizeDeterminationPass >();
+    pu.scheduleAfter< AstToLstPass >();
 }
 
 u1 SymbolicConsistencyPass::run( libpass::PassResult& pr )
@@ -107,7 +107,7 @@ u1 SymbolicConsistencyPass::run( libpass::PassResult& pr )
         catch( SymbolicConsistencyVisitor::Conflict& e )
         {
             auto function = e.conflictingFunction();
-            if( function->isProgram() )
+            if( function->program() )
             {
                 std::stringstream err;
                 err << "Cannot promote 'program' function to symbolic." << std::endl << e.what();

@@ -290,6 +290,8 @@ class UpdateSet
                 return std::unique_ptr< ParallelUpdateSet< Details > >(
                     new ParallelUpdateSet< Details >( initialSize, this ) );
         }
+
+        return nullptr;
     }
 
     /**

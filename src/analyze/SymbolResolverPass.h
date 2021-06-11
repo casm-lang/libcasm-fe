@@ -46,12 +46,18 @@
 #ifndef _LIBCASM_FE_SYMBOL_RESOLVER_PASS_H_
 #define _LIBCASM_FE_SYMBOL_RESOLVER_PASS_H_
 
+#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/Type>
+
 #include <libpass/Pass>
+#include <libpass/PassData>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 namespace libcasm_fe
 {
     /**
-     * @brief Resolves AST identifiers of type-, call-, ... nodes
+       @brief Resolves AST symbols
      */
     class SymbolResolverPass final : public libpass::Pass
     {
@@ -61,6 +67,35 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
+
+      public:
+        class Output : public libpass::PassData
+        {
+          public:
+            using Ptr = std::shared_ptr< Output >;
+
+            Output(
+                const AST::Types::Ptr& templateTypes,
+                const AST::Definitions::Ptr& templateDefinitions )
+            : m_templateTypes( templateTypes )
+            , m_templateDefinitions( templateDefinitions )
+            {
+            }
+
+            AST::Types::Ptr templateTypes( void ) const
+            {
+                return m_templateTypes;
+            }
+
+            AST::Definitions::Ptr templateDefinitions( void ) const
+            {
+                return m_templateDefinitions;
+            }
+
+          private:
+            const AST::Types::Ptr m_templateTypes;
+            const AST::Definitions::Ptr m_templateDefinitions;
+        };
     };
 }
 

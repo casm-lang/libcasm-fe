@@ -53,11 +53,11 @@
 #include <libpass/analyze/LoadFilePass>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace LST;
 
 bool isFunctionSymbolic( const Specification::Ptr& specification, std::string function )
 {
-    for( const auto& definition : *specification->definitions() )
+    for( const auto& definition : *specification->lst()->definitions() )
     {
         if( definition->id() == Node::ID::FUNCTION_DEFINITION )
         {

@@ -52,7 +52,7 @@
 #include <libpass/analyze/LoadFilePass>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 static const auto source = R"***(
 CASM
@@ -62,6 +62,8 @@ init test_skip
 rule test_skip = skip
 
 rule test_update_program_self_undef = program( self ) := undef
+
+function foo : -> Integer
 
 )***";
 
@@ -118,22 +120,38 @@ rule test_update_program_self_undef = program( self ) := undef
 
 SOURCE_TEST( analyze, ConsistencyCheckPass, source, true, , );
 
-SOURCE_TEST( transform, SourceToAstPass, source, true, , { pass.setDebug( false ); } );
+SOURCE_TEST( transform, SourceToCstPass, source, true, , { pass.setDebug( false ); } );
 
-SOURCE_TEST( transform, AstDumpSourcePass, source, true, , );
-SOURCE_TEST( transform, AstDumpDotPass, source, true, , );
+SOURCE_TEST( transform, CstEmitPass, source, true, , );
+SOURCE_TEST( transform, CstDumpPass, source, true, , );
+SOURCE_TEST( transform, AstDumpPass, source, true, , );
 
 SOURCE_TEST( execute, NumericExecutionPass, source, true, , );  // TODO: FIXME:
 // https://github.com/casm-lang/casm/issues/93
 //
-// static const auto source_with_no_init = R"***(
-// CASM
-//
-// rule test = skip
-//
-// )***";
-//
-// SOURCE_TEST( execute, NumericExecutionPass, source_with_no_init, true, _noInitDefinition, );
+static const auto source_with_no_init = R"***(
+CASM
+
+rule test = skip
+
+)***";
+
+SOURCE_TEST( execute, NumericExecutionPass, source_with_no_init, true, _noInitDefinition, );
+
+static const auto source_with_multi_agent = R"***(
+CASM
+
+using Agent = Integer
+
+init { ( 0 ) -> @foo, ( 1 ) -> @bar }
+
+rule foo = println( self as String )
+
+rule bar = println( self as String )
+
+)***";
+
+SOURCE_TEST( execute, NumericExecutionPass, source_with_multi_agent, true, _multiAgent, );
 
 static const auto source_add = R"***(
 CASM
@@ -204,6 +222,17 @@ rule test =
     lib::foo
     bar::foo
     assert( lib::Color::Red = Color::Red )
+
+    let x = Color::Blue in
+       assert( x.asString = "Blue" )
+
+    assert( true )
+    assert( not false )
+    assert( 0 =  0 )
+    assert( 123 != 321 )
+    assert( 1 as Boolean )
+    assert( not 0 as Boolean )
+    assert( |1| = 1 )
 }
 
 )***";
@@ -216,6 +245,10 @@ CASM
 function qux : -> Integer
 
 [ export ] enumeration Color = { Red, Blue, Green }
+
+implement Color = {
+    derived asString( this ) -> String = this as String
+}
 
 )***";
 

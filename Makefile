@@ -48,7 +48,9 @@ TARGET = libcasm-fe
 FORMAT  = src
 FORMAT += src/allocator
 FORMAT += src/analyze
+FORMAT += src/cst
 FORMAT += src/ast
+FORMAT += src/lst
 FORMAT += src/execute
 FORMAT += src/transform
 FORMAT += etc
@@ -122,3 +124,9 @@ src/various/Grammar.org: src/various/GrammarParser.xml src/GrammarLexer.l
 	@sed -i "s/\"decimal\"/\"`grep '// DECIMAL' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
 	@sed -i "s/\"identifier\"/\"([a-ZA-Z_]|UTF8){([a-zA-Z_0-9]|UTF8)}*\"/g" $@
 	@sed -i "s/\"string\"/'\"'.*'\"'/g" $@
+
+
+%/src/CASM.casm.h: lib/CASM.casm
+	printf "static const std::string CASM_casm = R\"***(" > $@
+	cat lib/CASM.casm >> $@
+	printf ")***\";\n\n" >> $@

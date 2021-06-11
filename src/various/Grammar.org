@@ -56,6 +56,11 @@ Definition ::= InitDefinition
              | UsingPathDefinition
              | InvariantDefinition
              | ImportDefinition
+             | StructureDefinition
+             | BehaviorDefinition
+             | ImplementDefinition
+             | DomainDefinition
+             | BuiltinDefinition
 #+end_src
 
 #+html: {{page>.:grammar:Definition&noheader&nofooter}}
@@ -65,7 +70,7 @@ Definition ::= InitDefinition
 
 #+begin_src
 InitDefinition ::= "init" IdentifierPath
-                 | "init" "{" Initializers "}"
+                 | "init" "{" MappedExpressions "}"
 #+end_src
 
 #+html: {{page>.:grammar:InitDefinition&noheader&nofooter}}
@@ -85,6 +90,7 @@ EnumerationDefinition ::= "enumeration" Identifier "=" "{" Enumerators "}"
 #+begin_src
 DerivedDefinition ::= "derived" Identifier "->" Type "=" Term
                     | "derived" Identifier "(" Parameters ")" "->" Type "=" Term
+                    | "derived" Identifier "(" MethodParameters ")" "->" Type "=" Term
 #+end_src
 
 #+html: {{page>.:grammar:DerivedDefinition&noheader&nofooter}}
@@ -97,6 +103,8 @@ RuleDefinition ::= "rule" Identifier "=" Rule
                  | "rule" Identifier "->" Type "=" Rule
                  | "rule" Identifier "(" Parameters ")" "=" Rule
                  | "rule" Identifier "(" Parameters ")" "->" Type "=" Rule
+                 | "rule" Identifier "(" MethodParameters ")" "=" Rule
+                 | "rule" Identifier "(" MethodParameters ")" "->" Type "=" Rule
 #+end_src
 
 #+html: {{page>.:grammar:RuleDefinition&noheader&nofooter}}
@@ -167,6 +175,136 @@ ImportDefinition ::= "import" IdentifierPath
 #+end_src
 
 #+html: {{page>.:grammar:ImportDefinition&noheader&nofooter}}
+
+
+** StructureDefinition
+
+#+begin_src
+StructureDefinition ::= "structure" Identifier "=" "{" StructureDefinitionList "}"
+#+end_src
+
+#+html: {{page>.:grammar:StructureDefinition&noheader&nofooter}}
+
+
+** StructureDefinitionList
+
+#+begin_src
+StructureDefinitionList ::= StructureDefinitionList StructureDefinitionElement
+                          | StructureDefinitionElement
+#+end_src
+
+#+html: {{page>.:grammar:StructureDefinitionList&noheader&nofooter}}
+
+
+** StructureDefinitionElement
+
+#+begin_src
+StructureDefinitionElement ::= Attributes FunctionDefinition
+                             | FunctionDefinition
+#+end_src
+
+#+html: {{page>.:grammar:StructureDefinitionElement&noheader&nofooter}}
+
+
+** BehaviorDefinition
+
+#+begin_src
+BehaviorDefinition ::= "behavior" Type "=" "{" BehaviorDefinitionList "}"
+#+end_src
+
+#+html: {{page>.:grammar:BehaviorDefinition&noheader&nofooter}}
+
+
+** BehaviorDefinitionElement
+
+#+begin_src
+BehaviorDefinitionElement ::= Attributes Declaration
+                            | Declaration
+                            | Attributes DerivedDefinition
+                            | DerivedDefinition
+                            | Attributes RuleDefinition
+                            | RuleDefinition
+#+end_src
+
+#+html: {{page>.:grammar:BehaviorDefinitionElement&noheader&nofooter}}
+
+
+** BehaviorDefinitionList
+
+#+begin_src
+BehaviorDefinitionList ::= BehaviorDefinitionList BehaviorDefinitionElement
+                         | BehaviorDefinitionElement
+#+end_src
+
+#+html: {{page>.:grammar:BehaviorDefinitionList&noheader&nofooter}}
+
+
+** ImplementDefinition
+
+#+begin_src
+ImplementDefinition ::= "implement" Type "=" "{" ImplementDefinitionList "}"
+                      | "implement" Type "for" Type "=" "{" ImplementDefinitionList "}"
+#+end_src
+
+#+html: {{page>.:grammar:ImplementDefinition&noheader&nofooter}}
+
+
+** ImplementDefinitionList
+
+#+begin_src
+ImplementDefinitionList ::= ImplementDefinitionList ImplementDefinitionElement
+                          | ImplementDefinitionElement
+#+end_src
+
+#+html: {{page>.:grammar:ImplementDefinitionList&noheader&nofooter}}
+
+
+** ImplementDefinitionElement
+
+#+begin_src
+ImplementDefinitionElement ::= Attributes ImplementDefinitionAttributedElement
+                             | ImplementDefinitionAttributedElement
+#+end_src
+
+#+html: {{page>.:grammar:ImplementDefinitionElement&noheader&nofooter}}
+
+
+** ImplementDefinitionAttributedElement
+
+#+begin_src
+ImplementDefinitionAttributedElement ::= DerivedDefinition
+                                       | RuleDefinition
+#+end_src
+
+#+html: {{page>.:grammar:ImplementDefinitionAttributedElement&noheader&nofooter}}
+
+
+** DomainDefinition
+
+#+begin_src
+DomainDefinition ::= "domain" Type
+#+end_src
+
+#+html: {{page>.:grammar:DomainDefinition&noheader&nofooter}}
+
+
+** BuiltinDefinition
+
+#+begin_src
+BuiltinDefinition ::= "builtin" RelationType
+#+end_src
+
+#+html: {{page>.:grammar:BuiltinDefinition&noheader&nofooter}}
+
+
+** Declaration
+
+#+begin_src
+Declaration ::= "derived" Identifier ":" MaybeFunctionParameters "->" Type
+              | "rule" Identifier ":" MaybeFunctionParameters "->" Type
+#+end_src
+
+#+html: {{page>.:grammar:Declaration&noheader&nofooter}}
 
 
 ** Rules
@@ -319,6 +457,7 @@ SequenceRule ::= "{|" Rules "|}"
 
 #+begin_src
 UpdateRule ::= DirectCallExpression ":=" Term
+             | MethodCallExpression ":=" Term
 #+end_src
 
 #+html: {{page>.:grammar:UpdateRule&noheader&nofooter}}
@@ -355,7 +494,7 @@ Terms ::= Terms "," Term
 ** Term
 
 #+begin_src
-Term ::= SimpleOrClaspedTerm
+Term ::= Expression
        | TypeCastingExpression
        | OperatorExpression
        | LetExpression
@@ -369,18 +508,18 @@ Term ::= SimpleOrClaspedTerm
 #+html: {{page>.:grammar:Term&noheader&nofooter}}
 
 
-** SimpleOrClaspedTerm
+** Expression
 
 #+begin_src
-SimpleOrClaspedTerm ::= "(" Term ")"
-                      | CallExpression
-                      | LiteralCallExpression
-                      | Literal
-                      | "+" SimpleOrClaspedTerm
-                      | "-" SimpleOrClaspedTerm
+Expression ::= "(" Term ")"
+             | CallExpression
+             | LiteralCallExpression
+             | Literal
+             | "+" Expression
+             | "-" Expression
 #+end_src
 
-#+html: {{page>.:grammar:SimpleOrClaspedTerm&noheader&nofooter}}
+#+html: {{page>.:grammar:Expression&noheader&nofooter}}
 
 
 ** OperatorExpression
@@ -423,7 +562,8 @@ CallExpression ::= DirectCallExpression
 ** DirectCallExpression
 
 #+begin_src
-DirectCallExpression ::= IdentifierPath
+DirectCallExpression ::= "this"
+                       | IdentifierPath
                        | IdentifierPath "(" ")"
                        | IdentifierPath "(" Terms ")"
 #+end_src
@@ -434,9 +574,9 @@ DirectCallExpression ::= IdentifierPath
 ** MethodCallExpression
 
 #+begin_src
-MethodCallExpression ::= SimpleOrClaspedTerm "." Identifier
-                       | SimpleOrClaspedTerm "." Identifier "(" ")"
-                       | SimpleOrClaspedTerm "." Identifier "(" Terms ")"
+MethodCallExpression ::= Expression "." Identifier
+                       | Expression "." Identifier "(" ")"
+                       | Expression "." Identifier "(" Terms ")"
 #+end_src
 
 #+html: {{page>.:grammar:MethodCallExpression&noheader&nofooter}}
@@ -445,7 +585,7 @@ MethodCallExpression ::= SimpleOrClaspedTerm "." Identifier
 ** LiteralCallExpression
 
 #+begin_src
-LiteralCallExpression ::= SimpleOrClaspedTerm "." IntegerLiteral
+LiteralCallExpression ::= Expression "." IntegerLiteral
 #+end_src
 
 #+html: {{page>.:grammar:LiteralCallExpression&noheader&nofooter}}
@@ -464,7 +604,7 @@ IndirectCallExpression ::= CallExpression "(" ")"
 ** TypeCastingExpression
 
 #+begin_src
-TypeCastingExpression ::= SimpleOrClaspedTerm "as" Type
+TypeCastingExpression ::= Expression "as" Type
 #+end_src
 
 #+html: {{page>.:grammar:TypeCastingExpression&noheader&nofooter}}
@@ -518,7 +658,7 @@ ExistentialQuantifierExpression ::= "exists" AttributedVariables "in" Term "with
 ** CardinalityExpression
 
 #+begin_src
-CardinalityExpression ::= "|" SimpleOrClaspedTerm "|"
+CardinalityExpression ::= "|" Expression "|"
 #+end_src
 
 #+html: {{page>.:grammar:CardinalityExpression&noheader&nofooter}}
@@ -649,7 +789,7 @@ TupleLiteral ::= "(" Terms "," Term ")"
 ** RecordLiteral
 
 #+begin_src
-RecordLiteral ::= "(" Assignments ")"
+RecordLiteral ::= "{" Assignments "}"
 #+end_src
 
 #+html: {{page>.:grammar:RecordLiteral&noheader&nofooter}}
@@ -674,6 +814,27 @@ Assignment ::= Identifier ":" Term
 #+html: {{page>.:grammar:Assignment&noheader&nofooter}}
 
 
+** MappedExpressions
+
+#+begin_src
+MappedExpressions ::= MappedExpressions "," MappedExpression
+                    | MappedExpression
+#+end_src
+
+#+html: {{page>.:grammar:MappedExpressions&noheader&nofooter}}
+
+
+** MappedExpression
+
+#+begin_src
+MappedExpression ::= "->" Term
+                   | "(" Term ")" "->" Term
+                   | TupleLiteral "->" Term
+#+end_src
+
+#+html: {{page>.:grammar:MappedExpression&noheader&nofooter}}
+
+
 ** Types
 
 #+begin_src
@@ -693,6 +854,8 @@ Type ::= BasicType
        | TemplateType
        | RelationType
        | FixedSizedType
+       | MappingType
+       | VaradicType
 #+end_src
 
 #+html: {{page>.:grammar:Type&noheader&nofooter}}
@@ -719,7 +882,7 @@ TupleType ::= "(" Types "," Type ")"
 ** RecordType
 
 #+begin_src
-RecordType ::= "(" TypedVariables "," TypedVariable ")"
+RecordType ::= "{" TypedVariables "," TypedVariable "}"
 #+end_src
 
 #+html: {{page>.:grammar:RecordType&noheader&nofooter}}
@@ -752,6 +915,24 @@ FixedSizedType ::= IdentifierPath "'" Term
 #+html: {{page>.:grammar:FixedSizedType&noheader&nofooter}}
 
 
+** MappingType
+
+#+begin_src
+MappingType ::= "<" FunctionParameters "->" Type ">"
+#+end_src
+
+#+html: {{page>.:grammar:MappingType&noheader&nofooter}}
+
+
+** VaradicType
+
+#+begin_src
+VaradicType ::= Identifier "..."
+#+end_src
+
+#+html: {{page>.:grammar:VaradicType&noheader&nofooter}}
+
+
 ** FunctionParameters
 
 #+begin_src
@@ -770,6 +951,16 @@ MaybeFunctionParameters ::= FunctionParameters
 #+end_src
 
 #+html: {{page>.:grammar:MaybeFunctionParameters&noheader&nofooter}}
+
+
+** MethodParameters
+
+#+begin_src
+MethodParameters ::= MethodParameters "," TypedAttributedVariable
+                   | "this"
+#+end_src
+
+#+html: {{page>.:grammar:MethodParameters&noheader&nofooter}}
 
 
 ** Parameters
@@ -795,32 +986,12 @@ MaybeDefined ::= "defined" "{" Term "}"
 ** MaybeInitially
 
 #+begin_src
-MaybeInitially ::= "=" "{" Initializers "}"
+MaybeInitially ::= "=" "{" Expression "}"
+                 | "=" "{" MappedExpressions "}"
                  | null
 #+end_src
 
 #+html: {{page>.:grammar:MaybeInitially&noheader&nofooter}}
-
-
-** Initializers
-
-#+begin_src
-Initializers ::= Initializers "," Initializer
-               | Initializer
-#+end_src
-
-#+html: {{page>.:grammar:Initializers&noheader&nofooter}}
-
-
-** Initializer
-
-#+begin_src
-Initializer ::= Term
-              | "(" Term ")" "->" Term
-              | TupleLiteral "->" Term
-#+end_src
-
-#+html: {{page>.:grammar:Initializer&noheader&nofooter}}
 
 
 ** Identifier
@@ -828,6 +999,10 @@ Initializer ::= Term
 #+begin_src
 Identifier ::= "([a-ZA-Z_]|UTF8){([a-zA-Z_0-9]|UTF8)}*"
              | "in"
+             | "CASM"
+             | "self"
+             | "enumeration"
+             | "structure"
 #+end_src
 
 #+html: {{page>.:grammar:Identifier&noheader&nofooter}}
@@ -964,6 +1139,7 @@ Attributes ::= Attributes Attribute
 
 #+begin_src
 Attribute ::= "[" BasicAttribute "]"
+            | "[" SymbolAttribute "]"
             | "[" ExpressionAttribute "]"
 #+end_src
 
@@ -977,6 +1153,15 @@ BasicAttribute ::= Identifier
 #+end_src
 
 #+html: {{page>.:grammar:BasicAttribute&noheader&nofooter}}
+
+
+** SymbolAttribute
+
+#+begin_src
+SymbolAttribute ::= Identifier TypedVariable
+#+end_src
+
+#+html: {{page>.:grammar:SymbolAttribute&noheader&nofooter}}
 
 
 ** ExpressionAttribute

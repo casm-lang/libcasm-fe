@@ -58,7 +58,7 @@
 #include <libcasm-fe/analyze/SymbolResolverPass>
 #include <libcasm-fe/analyze/TypeCheckPass>
 #include <libcasm-fe/analyze/TypeInferencePass>
-#include <libcasm-fe/ast/Span>
+#include <libcasm-fe/cst/Literal>
 #include <libcasm-fe/execute/NumericExecutionPass>
 #include <libcasm-fe/execute/SymbolicConsistencyPass>
 #include <libcasm-fe/execute/SymbolicExecutionPass>
@@ -66,10 +66,13 @@
 #include <libcasm-fe/import/FileLoadingStrategy>
 #include <libcasm-fe/import/ImportError>
 #include <libcasm-fe/import/SpecificationRepository>
-#include <libcasm-fe/transform/AstDumpDotPass>
-#include <libcasm-fe/transform/AstDumpSourcePass>
-#include <libcasm-fe/transform/AstToCasmIRPass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/transform/AstDumpPass>
+#include <libcasm-fe/transform/CstDumpPass>
+#include <libcasm-fe/transform/CstEmitPass>
+#include <libcasm-fe/transform/CstToAstPass>
+#include <libcasm-fe/transform/LstDumpPass>
+#include <libcasm-fe/transform/LstToIrPass>
+#include <libcasm-fe/transform/SourceToCstPass>
 
 namespace libcasm_fe
 {

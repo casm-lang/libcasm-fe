@@ -62,9 +62,9 @@ Specification::Specification( void )
 : m_asmType( AsmType::SYNCHRONOUS )
 , m_name()
 , m_location()
-, m_header()
-, m_definitions()
-, m_spans( std::make_shared< Ast::Spans >() )
+, m_cst()
+, m_ast()
+, m_lst()
 , m_symboltable( std::make_shared< Namespace >() )
 {
 }
@@ -117,34 +117,48 @@ const std::string& Specification::name( void ) const
     return m_name;
 }
 
-void Specification::setHeader( const Ast::HeaderDefinition::Ptr& header )
+void Specification::setCst( const CST::Root::Ptr& cst )
 {
-    m_header = header;
+    m_cst = cst;
 }
 
-const Ast::HeaderDefinition::Ptr& Specification::header( void ) const
+const CST::Root::Ptr& Specification::cst( void ) const
 {
-    return m_header;
+    assert( m_cst and " inconsistent state " );
+    return m_cst;
 }
 
-void Specification::setDefinitions( const Ast::Definitions::Ptr& definitions )
+void Specification::setAst( const AST::Root::Ptr& ast )
 {
-    m_definitions = definitions;
+    m_ast = ast;
 }
 
-const Ast::Definitions::Ptr& Specification::definitions( void ) const
+const AST::Root::Ptr& Specification::ast( void ) const
 {
-    return m_definitions;
+    assert( m_ast and " inconsistent state " );
+    return m_ast;
 }
 
-void Specification::setSpans( const Ast::Spans::Ptr& spans )
+void Specification::setIst( const AST::Root::Ptr& ist )
 {
-    m_spans = spans;
+    m_ist = ist;
 }
 
-const Ast::Spans::Ptr& Specification::spans( void ) const
+const AST::Root::Ptr& Specification::ist( void ) const
 {
-    return m_spans;
+    assert( m_ist and " inconsistent state " );
+    return m_ist;
+}
+
+void Specification::setLst( const LST::Root::Ptr& lst )
+{
+    m_lst = lst;
+}
+
+const LST::Root::Ptr& Specification::lst( void ) const
+{
+    assert( m_lst and " inconsistent state " );
+    return m_lst;
 }
 
 void Specification::setSymboltable( const Namespace::Ptr& symboltable )

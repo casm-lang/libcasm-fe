@@ -45,10 +45,12 @@
 
 #include "Node.h"
 
+#include <libcasm-fe/ast/Declaration>
+
 #include <cassert>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 Node::Node( Node::ID id )
 : m_id( id )
@@ -75,9 +77,9 @@ std::string Node::description( void ) const
 {
     switch( m_id )
     {
-        case ID::HEADER_DEFINITION:
+        case ID::ROOT:
         {
-            return "header";
+            return "root";
         }
         case ID::INIT_DEFINITION:
         {
@@ -127,7 +129,32 @@ std::string Node::description( void ) const
         {
             return "import";
         }
-            // literals
+        case ID::DOMAIN_DEFINITION:
+        {
+            return "domain";
+        }
+        case ID::STRUCTURE_DEFINITION:
+        {
+            return "structure";
+        }
+        case ID::BEHAVIOR_DEFINITION:
+        {
+            return "behavior";
+        }
+        case ID::IMPLEMENT_DEFINITION:
+        {
+            return "implement";
+        }
+        case ID::BUILTIN_DEFINITION:
+        {
+            return "builtin";
+        }
+        case ID::DECLARATION:
+        {
+            const auto& declaration = static_cast< const Declaration& >( *this );
+            return declaration.kindName() + " declaration";
+        }
+        // literals
         case ID::UNDEF_LITERAL:
         {
             return "undef";
@@ -144,6 +171,10 @@ std::string Node::description( void ) const
         {
             return "range";
         }
+        case ID::SET_LITERAL:
+        {
+            return "set";
+        }
         case ID::LIST_LITERAL:
         {
             return "list";
@@ -156,13 +187,17 @@ std::string Node::description( void ) const
         {
             return "record";
         }
-        case ID::EMBRACED_EXPRESSION:
+        case ID::ABSTRACT_EXPRESSION:
         {
-            return "embraced expression";
+            return "abstract expression";
         }
         case ID::NAMED_EXPRESSION:
         {
             return "named expression";
+        }
+        case ID::MAPPED_EXPRESSION:
+        {
+            return "mapped expression";
         }
         case ID::DIRECT_CALL_EXPRESSION:
         {
@@ -186,11 +221,11 @@ std::string Node::description( void ) const
         }
         case ID::UNARY_EXPRESSION:
         {
-            return "expression";
+            return "unary expression";
         }
         case ID::BINARY_EXPRESSION:
         {
-            return "expression";
+            return "binary expression";
         }
         case ID::LET_EXPRESSION:
         {
@@ -264,10 +299,6 @@ std::string Node::description( void ) const
         {
             return "call";
         }
-        case ID::WHILE_RULE:
-        {
-            return "while";
-        }
         case ID::UNRESOLVED_TYPE:
         {
             return "unresolved type";
@@ -296,23 +327,6 @@ std::string Node::description( void ) const
         {
             return "relation type";
         }
-        case ID::BASIC_ATTRIBUTE:
-        {
-            return "basic attribute";
-        }
-        case ID::EXPRESSION_ATTRIBUTE:
-        {
-            return "expression attribute";
-        }
-        // helper
-        case ID::DEFINED:
-        {
-            return "defined";
-        }
-        case ID::INITIALIZER:
-        {
-            return "initializer";
-        }
         // other
         case ID::NODE_LIST:
         {
@@ -338,18 +352,15 @@ std::string Node::description( void ) const
         {
             return "variable binding";
         }
-        case ID::TOKEN:
-        {
-            return "token";
-        }
-        case ID::SPAN:
-        {
-            return "span";
-        }
     }
 
     assert( !" internal error! " );
     return std::string();
+}
+
+void Node::clone( Node& duplicate ) const
+{
+    duplicate.setSourceLocation( sourceLocation() );
 }
 
 //
@@ -371,6 +382,12 @@ void TypedNode::setType( const libcasm_ir::Type::Ptr& type )
 const libcasm_ir::Type::Ptr& TypedNode::type( void ) const
 {
     return m_type;
+}
+
+void TypedNode::clone( TypedNode& duplicate ) const
+{
+    Node::clone( duplicate );
+    // duplicate.setType( type() ); // TODO: FIXME: @ppaulweber
 }
 
 //
@@ -397,6 +414,12 @@ void TypedPropertyNode::setProperties( const libcasm_ir::Properties& properties 
 const libcasm_ir::Properties& TypedPropertyNode::properties( void ) const
 {
     return m_properties;
+}
+
+void TypedPropertyNode::clone( TypedPropertyNode& duplicate ) const
+{
+    TypedNode::clone( duplicate );
+    duplicate.setProperties( properties() );
 }
 
 //

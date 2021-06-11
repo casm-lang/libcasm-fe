@@ -47,7 +47,7 @@
 
 #include <memory>
 
-#include "../src/Ast.h"
+#include "../src/AST.h"
 #include "../src/Symbolic.h"
 #include "../src/execute/SymbolicExecutionPass.h"
 #include "../src/various/location.hh"

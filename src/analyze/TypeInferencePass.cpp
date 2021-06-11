@@ -45,26 +45,36 @@
 
 #include "TypeInferencePass.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
-#include <libcasm-fe/ast/RecursiveVisitor>
+#include <libcasm-fe/analyze/SymbolRegistrationPass>
+#include <libcasm-fe/analyze/SymbolResolverPass>
+#include <libcasm-fe/analyze/TypeCheckPass>
+#include <libcasm-fe/ast/Declaration>
+#include <libcasm-fe/ast/Literal>
+#include <libcasm-fe/ast/Visitor>
 #include <libcasm-fe/import/SpecificationMergerPass>
+
 #include <libcasm-ir/Builtin>
 #include <libcasm-ir/Exception>
+
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
+
 #include <libstdhl/String>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char TypeInferencePass::id = 0;
 
 static libpass::PassRegistration< TypeInferencePass > PASS(
-    "ASTTypeInferencePass",
+    "Type Inference Pass",
     "type inference of all types in the AST representation",
     "ast-infer",
     0 );
@@ -72,15 +82,19 @@ static libpass::PassRegistration< TypeInferencePass > PASS(
 class TypeInferenceVisitor final : public RecursiveVisitor
 {
   public:
-    TypeInferenceVisitor( libcasm_fe::Logger& log, const Namespace& symboltable );
+    TypeInferenceVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
-    void visit( Initializer& node ) override;
-
-    void visit( InitDefinition& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( EnumerationDefinition& node ) override;
+    void visit( BuiltinDefinition& node ) override;
+    void visit( DomainDefinition& node ) override;
+    void visit( StructureDefinition& node ) override;
+    void visit( BehaviorDefinition& node ) override;
+    void visit( ImplementDefinition& node ) override;
+    void visit( Declaration& node ) override;
     void visit( InvariantDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
@@ -90,7 +104,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( TupleLiteral& node ) override;
     void visit( RecordLiteral& node ) override;
 
-    void visit( EmbracedExpression& node ) override;
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
@@ -107,7 +120,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( CardinalityExpression& node ) override;
 
     void visit( ConditionalRule& node ) override;
-    void visit( WhileRule& node ) override;
 
     void visit( CaseRule& node ) override;
     void visit( ExpressionCase& node ) override;
@@ -118,10 +130,22 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ChooseRule& node ) override;
     void visit( UpdateRule& node ) override;
 
+    void visit( BasicType& node ) override;
+    void visit( TupleType& node ) override;
+    void visit( RecordType& node ) override;
+    void visit( FixedSizedType& node ) override;
+    void visit( TemplateType& node ) override;
+    void visit( RelationType& node ) override;
+
     void visit( VariableBinding& node ) override;
 
   private:
-    bool tryResolveCallInTypeNamespace( DirectCallExpression& node ) const;
+    void resolveDomainTypeBehaviorImplementSymbol(
+        TargetCallExpression& node,
+        const libcasm_ir::Type::Ptr& domainType,
+        const AST::Type::Ptr& behaviorType,
+        const std::string& symbolName,
+        const libcasm_ir::Type::Ptr& resultType = nullptr );
 
     void assignment(
         TypedNode& lhs,
@@ -130,12 +154,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         const std::string& src,
         const Code assignmentErr );
 
-    const libcasm_ir::Annotation* annotate(
-        Node& node, const std::vector< Expression::Ptr >& expressions = {} );
-
     void inference(
         const std::string& description,
-        const libcasm_ir::Annotation* annotation,
         TypedNode& node,
         const std::vector< Expression::Ptr >& arguments = {} );
 
@@ -145,8 +165,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void annotateNodes( const NodeList< T >& nodes, const libcasm_ir::Type::ID typeId );
 
     /**
-     * Removes all annotations of \a node from m_typeIDs which are not of kind \a kind.
-     */
+        Removes all annotations of \a node from m_typeIDs which are not of kind \a kind.
+    */
     void filterAnnotationsByKind( const Node& node, const libcasm_ir::Type::Kind kind );
 
     void checkIfNodeHasTypeOfKind(
@@ -157,100 +177,31 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
   private:
     libcasm_fe::Logger& m_log;
-    const Namespace& m_symboltable;
+    Namespace& m_symboltable;
 
     std::unordered_map< const Node*, std::set< libcasm_ir::Type::ID > > m_typeIDs;
 };
 
-TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log, const Namespace& symboltable )
+TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 {
 }
 
-void TypeInferenceVisitor::visit( Initializer& node )
-{
-    auto& value = *node.value();
-    auto& arguments = *node.arguments();
-    auto& function = *node.function();
-
-    function.accept( *this );
-    if( not function.type() )
-    {
-        return;
-    }
-
-    const auto& resultType = function.type()->ptr_result();
-    const auto& argumentTypes = function.type()->arguments().data();
-
-    if( arguments.size() != argumentTypes.size() )
-    {
-        m_log.error(
-            { arguments.sourceLocation() },
-            "invalid number of arguments: function '" + function.identifier()->name() +
-                "' expects " + std::to_string( argumentTypes.size() ) + " arguments but " +
-                std::to_string( arguments.size() ) + " were given",
-            Code::SymbolArgumentSizeMismatch );
-        return;
-    }
-
-    m_typeIDs[&value ].emplace( resultType->id() );
-    for( std::size_t i = 0; i < arguments.size(); i++ )
-    {
-        m_typeIDs[ arguments.at( i ).get() ].emplace( argumentTypes.at( i )->id() );
-    }
-
-    value.accept( *this );
-    assignment(
-        *function.returnType(),
-        value,
-        "updated function",
-        "updating expression",
-        Code::TypeInferenceUpdateRuleTypesMismatch );
-
-    arguments.accept( *this );
-    for( std::size_t pos = 0; pos < arguments.size(); pos++ )
-    {
-        const auto& argument = arguments.at( pos );
-        if( not argument->type() )
-        {
-            continue;
-        }
-
-        const auto exprArgType = argument->type();
-        const auto callArgType = argumentTypes.at( pos );
-
-        if( *callArgType != *exprArgType )
-        {
-            if( callArgType->isInteger() and exprArgType->isInteger() )
-            {
-                argument->setType( callArgType );
-                continue;
-            }
-
-            m_log.error(
-                { argument->sourceLocation() },
-                "type mismatch: function argument type at position " + std::to_string( pos + 1 ) +
-                    " was '" + exprArgType->description() + "', function definition expects '" +
-                    callArgType->description() + "'",
-                Code::TypeInferenceFunctionArgumentTypeMismatch );
-        }
-    }
-}
-
-void TypeInferenceVisitor::visit( InitDefinition& node )
-{
-    RecursiveVisitor::visit( node );
-    node.programFunction()->accept( *this );
-}
-
 void TypeInferenceVisitor::visit( VariableDefinition& node )
 {
+    if( node.type() and node.type()->isObject() )
+    {
+        node.setType( nullptr );
+    }
+
     if( node.type() )
     {
-        // may be invoked multiple times -> only type once
         return;
     }
+
+    const auto description = "variable '" + node.identifier()->name() + "'";
+    inference( description, node );
 
     RecursiveVisitor::visit( node );
 
@@ -258,138 +209,128 @@ void TypeInferenceVisitor::visit( VariableDefinition& node )
     {
         node.setType( node.variableType()->type() );
     }
-
-    const auto description = "variable '" + node.identifier()->name() + "'";
-    inference( description, nullptr, node );
+    else if( node.objectDefinition() and node.objectDefinition()->type() )
+    {
+        node.setType( node.objectDefinition()->type() );
+    }
 }
 
 void TypeInferenceVisitor::visit( FunctionDefinition& node )
 {
-    if( node.type() )
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
+
+    const auto& expression = node.defined();
+    const auto& returnType = node.returnType();
+
+    // annotate the function defined expression (default) with the return type information
+    m_typeIDs[ expression.get() ].emplace( returnType->type()->id() );
+
+    // infer type of expression
+    expression->accept( *this );
+    node.initiallyRule()->accept( *this );
+
+    if( expression->type() and expression->type() != returnType->type() )
     {
-        // may be invoked multiple times -> only type once
-        return;
-    }
-
-    node.returnType()->accept( *this );
-    assert( node.returnType()->type() && "return type must be specified" );
-
-    node.argumentTypes()->accept( *this );
-    std::vector< libcasm_ir::Type::Ptr > argTypeList;
-    argTypeList.reserve( node.argumentTypes()->size() );
-    for( const auto& argumentType : *node.argumentTypes() )
-    {
-        assert( argumentType->type() && "argument type must be specified" );
-        argTypeList.emplace_back( argumentType->type() );
-    }
-
-    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-        node.returnType()->type(), argTypeList );
-    node.setType( type );
-
-    auto& returnType = *node.returnType()->type();
-
-    // annotate the defined expression (default value/expression) with the return type
-    m_typeIDs[ node.defined()->expression().get() ].emplace( returnType.id() );
-    node.defined()->expression()->accept( *this );
-
-    if( node.defined()->expression()->type() and
-        node.defined()->expression()->type() != node.returnType()->type() )
-    {
-        if( node.defined()->expression()->type()->isInteger() ==
-            node.returnType()->type()->isInteger() )
+        if( expression->type()->isInteger() == returnType->type()->isInteger() )
         {
-            // relaxation: mixed ranged and non-ranged integer types are allowed and checked in a
-            // later pass or step!
+            // relax passing expression Integer'[a..b] to Integer
+            return;
         }
-        else
-        {
-            m_log.error(
-                { node.defined()->expression()->sourceLocation(),
-                  node.returnType()->sourceLocation() },
-                "type mismatch: type of default value was '" +
-                    node.defined()->expression()->type()->description() + "', function expects '" +
-                    node.returnType()->type()->description() + "'",
-                Code::TypeInferenceFunctionDefaultValueTypeMismatch );
-        }
-    }
 
-    node.initially()->accept( *this );
+        const std::string msg = "type mismatch: result type was '" +
+                                expression->type()->description() + "', but " + node.description() +
+                                " expects '" + returnType->type()->description() + "'";
+        // m_log.error(
+        //     { expression->sourceLocation() },
+        //     msg,
+        //     Code::TypeInferenceFunctionDefaultValueTypeMismatch );
+        m_log.warning( { expression->sourceLocation() }, msg );
+        m_log.info( { returnType->sourceLocation() }, msg );
+    }
 }
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
 {
-    if( node.type() )
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
+
+    const auto& expression = node.expression();
+    const auto& returnType = node.returnType();
+
+    // annotate the derived expression with the return type information
+    m_typeIDs[ expression.get() ].emplace( returnType->type()->id() );
+
+    // infer type of expression
+    expression->accept( *this );
+
+    if( expression->type() and expression->type() != returnType->type() )
     {
-        // may be invoked multiple times -> only type once
-        return;
-    }
-
-    node.returnType()->accept( *this );
-    assert( node.returnType()->type() && "return type must be specified" );
-
-    node.arguments()->accept( *this );
-    std::vector< libcasm_ir::Type::Ptr > argTypeList;
-    argTypeList.reserve( node.arguments()->size() );
-    for( const auto& argument : *node.arguments() )
-    {
-        assert( argument->type() && "argument type must be specified" );
-        argTypeList.emplace_back( argument->type() );
-    }
-
-    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-        node.returnType()->type(), argTypeList );
-    node.setType( type );
-
-    auto& returnType = *node.returnType()->type();
-    m_typeIDs[ node.expression().get() ].emplace( returnType.id() );
-    node.expression()->accept( *this );
-
-    if( node.expression()->type() )
-    {
-        const auto& expTy = *node.expression()->type();
-
-        if( returnType != expTy )
+        if( expression->type()->isInteger() == returnType->type()->isInteger() )
         {
-            if( expTy.isInteger() and returnType.isInteger() )
-            {
-                return;
-            }
-
-            m_log.error(
-                { node.expression()->sourceLocation() },
-                "type mismatch: result type was '" + expTy.description() + "', derived expects '" +
-                    returnType.description() + "'",
-                Code::TypeInferenceDerivedReturnTypeMismatch );
+            // relax passing expression Integer'[a..b] to Integer
+            return;
         }
+
+        const std::string msg = "type mismatch: result type was '" +
+                                expression->type()->description() + "', but " + node.description() +
+                                " expects '" + returnType->type()->description() + "'";
+        m_log.error(
+            { expression->sourceLocation() }, msg, Code::TypeInferenceDerivedReturnTypeMismatch );
+        m_log.info( { returnType->sourceLocation() }, msg );
     }
 }
 
 void TypeInferenceVisitor::visit( RuleDefinition& node )
 {
-    if( node.type() )
-    {
-        // may be invoked multiple times -> only type once
-        return;
-    }
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
 
-    node.returnType()->accept( *this );
-    assert( node.returnType()->type() && "return type must be specified" );
+    RecursiveVisitor::visit( node );
+}
 
-    node.arguments()->accept( *this );
-    std::vector< libcasm_ir::Type::Ptr > argTypeList;
-    argTypeList.reserve( node.arguments()->size() );
-    for( const auto& argument : *node.arguments() )
-    {
-        assert( argument->type() && "argument type must be specified" );
-        argTypeList.emplace_back( argument->type() );
-    }
+void TypeInferenceVisitor::visit( EnumerationDefinition& node )
+{
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
+}
 
-    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-        node.returnType()->type(), argTypeList );
-    node.setType( type );
+void TypeInferenceVisitor::visit( BuiltinDefinition& node )
+{
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
 
-    node.rule()->accept( *this );
+    RecursiveVisitor::visit( node );
+}
+
+void TypeInferenceVisitor::visit( DomainDefinition& node )
+{
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
+
+    RecursiveVisitor::visit( node );
+}
+
+void TypeInferenceVisitor::visit( StructureDefinition& node )
+{
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
+
+    RecursiveVisitor::visit( node );
+}
+
+void TypeInferenceVisitor::visit( BehaviorDefinition& node )
+{
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
+
+    RecursiveVisitor::visit( node );
+}
+
+void TypeInferenceVisitor::visit( ImplementDefinition& node )
+{
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
+
+    RecursiveVisitor::visit( node );
+}
+
+void TypeInferenceVisitor::visit( Declaration& node )
+{
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
+
+    RecursiveVisitor::visit( node );
 }
 
 void TypeInferenceVisitor::visit( InvariantDefinition& node )
@@ -408,7 +349,7 @@ void TypeInferenceVisitor::visit( InvariantDefinition& node )
 void TypeInferenceVisitor::visit( UndefLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    inference( "undef literal", nullptr, node );
+    inference( "undef literal", node );
 }
 
 void TypeInferenceVisitor::visit( ReferenceLiteral& node )
@@ -419,96 +360,33 @@ void TypeInferenceVisitor::visit( ReferenceLiteral& node )
     }
 
     RecursiveVisitor::visit( node );
-    inference( "reference literal", nullptr, node );
+    inference( "reference literal", node );
 
     switch( node.referenceType() )
     {
         case ReferenceLiteral::ReferenceType::FUNCTION:  // [[fallthrough]]
         case ReferenceLiteral::ReferenceType::DERIVED:
         {
-            // make sure that the reference has been typed
-            node.reference()->accept( *this );
-
+            assert( node.reference()->type() and " inconsistent state @ TypeCheckPass " );
             const auto type = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
                 std::static_pointer_cast< libcasm_ir::RelationType >( node.reference()->type() ) );
             node.setType( type );
             break;
         }
-        case ReferenceLiteral::ReferenceType::BUILTIN:
-        {
-            libcasm_ir::Annotation const* annotation = nullptr;
-            try
-            {
-                annotation = &libcasm_ir::Annotation::find( node.builtinId() );
-            }
-            catch( const std::domain_error& e )
-            {
-                assert( !"reference should have been resolved" );
-                return;
-            }
-            assert( annotation );
-
-            if( node.type() )
-            {
-                // type has been inferred -> check if relation type is valid
-                assert( node.type()->isReference() );
-                const auto& referenceType =
-                    std::static_pointer_cast< libcasm_ir::ReferenceType >( node.type() );
-                const auto relationType = referenceType->dereference();
-
-                if( not annotation->valid( *relationType ) )
-                {
-                    m_log.error(
-                        { node.sourceLocation() },
-                        "built-in '" + node.identifier()->path() + "' has no type relation '" +
-                            relationType->description() + "'",
-                        Code::TypeInferenceBuiltinRelationTypeInvalid );
-                }
-            }
-            else if( annotation->relations().size() == 1 )
-            {
-                // only unambiguous annotations can be used for type resolving
-                const auto& relation = annotation->relations().at( 0 );
-
-                std::vector< libcasm_ir::Type::Ptr > argumentTypes;
-                for( const auto& argumentId : relation.argument )
-                {
-                    argumentTypes.emplace_back( libcasm_ir::Type::fromID( argumentId ) );
-                }
-
-                const auto& returnType = libcasm_ir::Type::fromID( relation.result );
-
-                const auto type = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
-                    returnType, argumentTypes );
-                node.setType( type );
-            }
-            break;
-        }
         case ReferenceLiteral::ReferenceType::RULE:
         {
-            // make sure that the reference has been typed
-            node.reference()->accept( *this );
-
+            assert( node.reference()->type() and " inconsistent state @ TypeCheckPass " );
             const auto type = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
                 std::static_pointer_cast< libcasm_ir::RelationType >( node.reference()->type() ) );
             node.setType( type );
             break;
         }
-        default:
+        case ReferenceLiteral::ReferenceType::UNKNOWN:
         {
-            assert( !" unknown reference type! " );
+            m_log.error( { node.sourceLocation() }, "unimplemented " + node.description() );
+            break;
         }
     }
-}
-
-void TypeInferenceVisitor::visit( EmbracedExpression& node )
-{
-    for( const auto typeId : m_typeIDs[&node ] )
-    {
-        m_typeIDs[ node.expression().get() ].emplace( typeId );
-    }
-    RecursiveVisitor::visit( node );
-    node.setType( node.expression()->type() );
 }
 
 void TypeInferenceVisitor::visit( NamedExpression& node )
@@ -519,150 +397,63 @@ void TypeInferenceVisitor::visit( NamedExpression& node )
 
 void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
-    if( node.type() )
-    {
-        return;
-    }
+    assert(
+        node.targetType() != DirectCallExpression::TargetType::UNKNOWN and
+        " inconsistent state @ SymbolResolverPass " );
 
-    assert( node.identifier() );
-    const auto identifier = node.identifier();
+    const auto& symbolPath = node.identifier();
+    const auto& symbolName = symbolPath->path();
 
-    if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
-    {
-        inference( "direct call", nullptr, node );
-        if( not tryResolveCallInTypeNamespace( node ) )
-        {
-            return;
-        }
-    }
+    const auto& symbol = node.targetDefinition();
+    assert( symbol and " inconsistent state @ SymbolResolverPass " );
 
-    assert( node.targetType() != DirectCallExpression::TargetType::UNKNOWN );
-
+    auto& arguments = *node.arguments();
     std::vector< libcasm_ir::Type::Ptr > argumentTypes;
 
     switch( node.targetType() )
     {
-        case DirectCallExpression::TargetType::VARIABLE:
-        {
-            const auto& variable = node.targetDefinition();
-
-            m_typeIDs[ variable.get() ] = m_typeIDs[&node ];
-            variable->accept( *this );
-
-            node.setType( variable->type() );
-            break;
-        }
-        case DirectCallExpression::TargetType::BUILTIN:
-        {
-            auto directCallArguments = node.arguments()->data();
-            const auto* annotation = annotate( node, directCallArguments );
-
-            RecursiveVisitor::visit( node );
-
-            const auto description = "built-in '" + identifier->path() + "'";
-            inference( description, annotation, node, directCallArguments );
-
-            RecursiveVisitor::visit( node );
-
-            for( auto argumentType : *node.arguments() )
-            {
-                if( not argumentType->type() )
-                {
-                    m_log.debug(
-                        { argumentType->sourceLocation() },
-                        "TODO: '" + identifier->path() + "' has a non-typed argument(s)" );
-                    return;
-                }
-
-                argumentTypes.emplace_back( argumentType->type() );
-            }
-
-            if( node.type() )
-            {
-                const auto relationType = libstdhl::Memory::make< libcasm_ir::RelationType >(
-                    node.type(), argumentTypes );
-
-                if( not annotation->valid( *relationType ) )
-                {
-                    m_log.error(
-                        { node.sourceLocation() },
-                        "built-in '" + identifier->path() + "' has no type relation '" +
-                            relationType->description() + "'",
-                        Code::TypeInferenceBuiltinRelationTypeInvalid );
-                    return;
-                }
-
-                node.setTargetBuiltinType( relationType );
-            }
-
-            break;
-        }
+        case DirectCallExpression::TargetType::RULE:      // [[fallthrough]]
         case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
         case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
-        case DirectCallExpression::TargetType::RULE:      // [[fallthrough]]
-        case DirectCallExpression::TargetType::SELF:      // [[fallthrough]]
-        case DirectCallExpression::TargetType::CONSTANT:
+        case DirectCallExpression::TargetType::BUILTIN:   // [[fallthrough]]
+        case DirectCallExpression::TargetType::DOMAINTYPE:
         {
-            // make sure that the definition has been typed
-            const auto& definition = node.targetDefinition();
-            if( not definition )
-            {
-                // break inference of not defined direct calls!
-                return;
-            }
-
-            definition->accept( *this );
-
-            const auto& arguments = *node.arguments();
-            argumentTypes = definition->type()->arguments().data();
-            for( std::size_t i = 0; i < arguments.size(); i++ )
-            {
-                m_typeIDs[ arguments.at( i ).get() ].emplace( argumentTypes.at( i )->id() );
-            }
-
-            node.setType( definition->type()->ptr_result() );
             break;
         }
-        case DirectCallExpression::TargetType::TYPE_DOMAIN:
+        case DirectCallExpression::TargetType::CONSTANT:  // [[fallthrough]]
+        case DirectCallExpression::TargetType::VARIABLE:
         {
-            assert( node.arguments()->size() == 0 );
-
-            // if the type domain has FE definition use this type!
-            const auto& definition = node.targetDefinition();
-            if( definition )
-            {
-                definition->accept( *this );
-                assert( definition->type()->arguments().size() == 0 );
-                node.setType( definition->type() );
-                break;
-            }
-
-            try
-            {
-                const auto& typeDomain = TypeInfo::instance().getType( identifier->path() );
-                node.setType( typeDomain );
-            }
-            catch( const std::domain_error& e )
-            {
-                m_log.error( { node.sourceLocation() }, e.what() );
-            }
-            break;
+            symbol->accept( *this );
+            node.setType( symbol->type() );
+            return;
         }
         case DirectCallExpression::TargetType::UNKNOWN:
         {
-            assert( !"unknown target type" );
+            m_log.error(
+                { node.sourceLocation() },
+                "unimplemented " + node.description() + " symbol '" + symbolName +
+                    "' found of target type " + node.targetTypeName() );
             return;
         }
     }
 
-    if( node.type() )
+    assert( symbol->type() and " inconsistent state @ TypeCheckPass " );
+
+    // annotate type information to arguments
+    argumentTypes = symbol->type()->arguments().data();
+    for( std::size_t i = 0; i < arguments.size(); i++ )
     {
-        m_typeIDs[&node ].emplace( node.type()->id() );
+        m_typeIDs[ arguments.at( i ).get() ].emplace( argumentTypes.at( i )->id() );
     }
 
-    RecursiveVisitor::visit( node );
+    // infer argument types
+    arguments.accept( *this );
 
-    const auto& arguments = *node.arguments();
+    assert( node.type() and " inconsistent state @ TypeCheckPass " );
+    assert(
+        *node.type() == *symbol->type()->ptr_result() and " inconsistent state @ TypeCheckPass " );
+    m_typeIDs[ &node ].emplace( node.type()->id() );
+
     assert( arguments.size() == argumentTypes.size() );
 
     for( std::size_t pos = 0; pos < arguments.size(); pos++ )
@@ -676,14 +467,51 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         const auto exprArgType = exprArg->type();
         const auto callArgType = argumentTypes.at( pos );
 
+        if( node.targetType() == DirectCallExpression::TargetType::BUILTIN )
+        {
+            if( ( not exprArgType->isObject() ) and callArgType->isObject() )
+            {
+                // relaxing: OK if argument expression concrete type (not Object) passed to argument
+                // call generic type (Object)
+                continue;
+            }
+
+            if( exprArgType->isObject() and callArgType->isReference() )
+            {
+                // relaxing: OK if argument expression generic type (Object) and passed to argument
+                // call {Rule,Func}Ref type
+                continue;
+            }
+
+            if( ( exprArgType->isObject() and
+                  ( libstdhl::String::startsWith(
+                        exprArgType->description(), TypeInfo::TYPE_NAME_RANGE ) or
+                    exprArgType->description() == TypeInfo::TYPE_NAME_AGENT or
+                    exprArgType->description() == TypeInfo::TYPE_NAME_ENUMERATION ) ) and
+                callArgType->isObject() )
+            {
+                // relaxing: OK if argument expression 'enumeration'/'Agent'/'Range...' type
+                // (Object) passed to argument call generic type (Object)
+                continue;
+            }
+        }
+
         if( callArgType->isInteger() and exprArgType->isInteger() )
         {
+            // relaxing: OK, if arguments are integer and/or integer ranged types
             continue;
         }
 
-        if( *callArgType != *exprArgType )
+        if( ( not exprArgType->isObject() ) and
+            callArgType->description() == TypeInfo::TYPE_NAME_AGENT )
         {
-            const std::map< DirectCallExpression::TargetType, Code > codes = {
+            // relaxing: OK if argument expression is not Object passed to 'Agent'
+            continue;
+        }
+
+        if( *exprArgType != *callArgType )
+        {
+            const std::unordered_map< DirectCallExpression::TargetType, Code > codes = {
                 { DirectCallExpression::TargetType::FUNCTION,
                   Code::TypeInferenceFunctionArgumentTypeMismatch },
                 { DirectCallExpression::TargetType::DERIVED,
@@ -695,106 +523,175 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             };
 
             const auto code = codes.find( node.targetType() );
-            assert( code != codes.end() and " invalid target type with arguments " );
+            assert( code != codes.end() and " inconsistent state @ target type with arguments " );
 
-            m_log.error(
-                { exprArg->sourceLocation() },
+            const std::string msg =
                 "type mismatch: " + node.targetTypeName() + " argument type at position " +
-                    std::to_string( pos + 1 ) + " was '" + exprArgType->description() + "', " +
-                    node.targetTypeName() + " definition expects '" + callArgType->description() +
-                    "'",
-                code->second );
+                std::to_string( pos + 1 ) + " was '" + exprArgType->description() + "', " +
+                node.targetTypeName() + " definition expects '" + callArgType->description() + "'";
+            m_log.error( { exprArg->sourceLocation() }, msg, code->second );
+            m_log.info( { symbol->sourceLocation() }, msg );
         }
     }
 }
 
 void TypeInferenceVisitor::visit( MethodCallExpression& node )
 {
+    const std::string description = "'.' operator";
+    const auto& sourceLocation = node.sourceLocation();
+    const auto& methodName = node.methodName()->name();
+
     if( node.type() )
     {
+        m_log.debug(
+            { sourceLocation },
+            "found inferred " + node.description() + " '" + methodName + "' with type '" +
+                node.type()->description() + "' " );
         return;
     }
 
-    const auto& methodName = node.methodName()->name();
-
-    node.object()->accept( *this );
+    node.arguments()->accept( *this );  // include object at first position
 
     if( not node.object()->type() )
     {
         // the object type is essential to resolve the method
         m_log.error(
-            { node.sourceLocation() },
+            { sourceLocation },
             "unable to resolve object type",
             Code::TypeInferenceInvalidMethodCallExpression );
         return;
     }
 
-    std::vector< Expression::Ptr > methodCallArguments;
-    methodCallArguments.reserve( 1 + node.arguments()->size() );
-    methodCallArguments.emplace_back( node.object() );  // pass object instance as first argument
-    methodCallArguments.insert(
-        methodCallArguments.end(), node.arguments()->begin(), node.arguments()->end() );
-
-    const auto* annotation = annotate( node, methodCallArguments );
-    if( not annotation )
+    const auto& objectType = node.object()->type();
+    auto typeDefinition = m_symboltable.findTypeDefinition( objectType->id() );
+    // assert( typeDefinition and (" inconsistent state @ TypeCheckPass: " +
+    // objectType->description()) );
+    if( not typeDefinition )
     {
-        return;
+        typeDefinition = m_symboltable.findTypeDefinition( objectType->description() );
     }
 
-    // for the time being only builtin method calls are supported
-    node.setMethodType( MethodCallExpression::MethodType::BUILTIN );
-    node.setTargetBuiltinId( annotation->valueID() );
-
-    RecursiveVisitor::visit( node );
-
-    const auto description = "built-in method '" + methodName + "'";
-    inference( description, annotation, node, methodCallArguments );
-
-    RecursiveVisitor::visit( node );
-
-    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
-    argumentTypes.emplace_back( node.object()->type() );
-    for( auto argumentType : *node.arguments() )
-    {
-        if( not argumentType->type() )
-        {
-            m_log.debug(
-                { argumentType->sourceLocation() },
-                "TODO: '" + methodName + "' has a non-typed argument(s)" );
-            return;
-        }
-
-        argumentTypes.emplace_back( argumentType->type() );
-    }
-
-    const auto relationType =
-        libstdhl::Memory::make< libcasm_ir::RelationType >( node.type(), argumentTypes );
-
-    if( not annotation->valid( *relationType ) )
+    if( not typeDefinition )
     {
         m_log.error(
-            { node.sourceLocation() },
-            "built-in '" + methodName + "' has no type relation '" + relationType->description() +
-                "'" );
+            { sourceLocation },
+            "internal: inconsistent state @ MethodCallExpression:" + objectType->description() );
+        m_log.warning( "internal: \n" + m_symboltable.dump() );
         return;
     }
 
-    node.setTargetBuiltinType( relationType );
+    const auto& objectTypeName = typeDefinition->domainType()->signature();
+    // const auto& objectTypePath = typeDefinition->domainType()->signaturePath();
+    const auto& objectTypeNamespace = typeDefinition->symboltable();
+    const auto& methodSignature = objectTypeName + Namespace::delimiter() + methodName;
+
+    std::vector< TypeDefinition::Ptr > behaviorTypes = {};
+
+    // search for possible call symbol in members
+    if( typeDefinition->id() == Node::ID::STRUCTURE_DEFINITION )
+    {
+        const auto& domainBehavior = typeDefinition;
+        const auto& symbol = objectTypeNamespace->findSymbol( methodName );
+        if( symbol )
+        {
+            // m_log.debug(
+            //     { sourceLocation, symbol->sourceLocation() },
+            //     "found domain behavior: " + methodSignature );
+            behaviorTypes.emplace_back( domainBehavior );
+        }
+    }
+
+    // search for declarations/definitions inside a behavior
+    if( typeDefinition->id() == Node::ID::BEHAVIOR_DEFINITION )
+    {
+        const auto& defaultBehavior = typeDefinition;
+        const auto& symbol = objectTypeNamespace->findSymbol( methodName );
+        if( symbol )
+        {
+            // m_log.debug(
+            //     { sourceLocation, symbol->sourceLocation() },
+            //     "found default behavior: " + methodSignature );
+            behaviorTypes.emplace_back( defaultBehavior );
+        }
+    }
+
+    // search for possible call symbol in basic behavior
+    if( typeDefinition->basicBehavior() )
+    {
+        const auto& basicBehavior = typeDefinition->basicBehavior();
+        const auto& basicBehaviorNamespace = basicBehavior->symboltable();
+        const auto& symbol = basicBehaviorNamespace->findSymbol( methodName );
+        if( symbol )
+        {
+            // m_log.debug(
+            //     { sourceLocation, symbol->sourceLocation() },
+            //     "found basic behavior: " + methodSignature );
+            behaviorTypes.emplace_back( basicBehavior );
+        }
+    }
+
+    // search for possible call symbol in extended behaviors
+    for( const auto& element : typeDefinition->extendedBehaviors() )
+    {
+        const auto& extendedBehavior = element.second;
+        const auto& extendedBehaviorNamespace = extendedBehavior->symboltable();
+        const auto& symbol = extendedBehaviorNamespace->findSymbol( methodName );
+        if( symbol )
+        {
+            // m_log.debug(
+            //     { sourceLocation, symbol->sourceLocation() },
+            //     "found extended behavior: " + methodSignature );
+            behaviorTypes.emplace_back( extendedBehavior );
+        }
+    }
+
+    if( behaviorTypes.size() == 0 )
+    {
+        m_log.error(
+            { sourceLocation },
+            "type '" + objectTypeName + "' does not have a method '" + methodName + "'",
+            Code::Unspecified );
+        return;
+    }
+
+    if( behaviorTypes.size() > 1 )
+    {
+        m_log.error(
+            { sourceLocation },
+            "type '" + objectTypeName + "' does have multiple methods '" + methodName + "'",
+            Code::Unspecified );
+        return;
+    }
+
+    AST::Type::Ptr behaviorType = behaviorTypes.front()->domainType();
+
+    try
+    {
+        resolveDomainTypeBehaviorImplementSymbol( node, objectType, behaviorType, methodName );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error(
+            { sourceLocation },
+            "invalid " + description + ", because " + std::string( e.what() ),
+            Code::Unspecified );
+        return;
+    }
 }
 
 void TypeInferenceVisitor::visit( LiteralCallExpression& node )
 {
-    node.object()->accept( *this );
+    const std::string description = "'.' operator";
 
+    node.object()->accept( *this );
     const auto& objectType = node.object()->type();
     if( not objectType )
     {
         // the object type is essential to resolve the literal access
         m_log.error(
-            { node.sourceLocation() },
-            "unable to resolve object type",
+            { node.object()->sourceLocation() },
+            "unable to infer object type of " + description,
             Code::TypeInferenceInvalidLiteralCallExpression );
-        return;
     }
 
     node.literal()->accept( *this );
@@ -803,68 +700,111 @@ void TypeInferenceVisitor::visit( LiteralCallExpression& node )
     if( not literalType )
     {
         m_log.error(
-            { node.sourceLocation() },
-            "unable to resolve literal type",
+            { node.literal()->sourceLocation() },
+            "unable to infer literal type of " + description,
             Code::TypeInferenceInvalidLiteralCallExpression );
+    }
+
+    if( not objectType or not literalType )
+    {
         return;
     }
 
-    if( objectType->isTuple() and literalType->isInteger() )
-    {
-        const auto& literal = static_cast< const ValueLiteral& >( *node.literal() );
-        const auto& constant =
-            static_cast< const libcasm_ir::IntegerConstant& >( *literal.value() );
-        const auto& value = static_cast< const libstdhl::Type::Integer& >( constant.value() );
+    const auto& sourceLocation = node.sourceLocation();
+    const auto& expressionType = node.object()->type();
 
-        if( value >= 1 and value <= objectType->arguments().size() )
-        {
-            const auto& resultType = objectType->arguments()[ value.value() - 1 ];
-            node.setType( resultType );
-        }
-        else
+    const auto& behaviorType = AST::make< TemplateType >(
+        sourceLocation,
+        IdentifierPath::fromIdentifier(
+            AST::make< Identifier >( sourceLocation, "ElementAccess" ) ),
+        std::make_shared< Types >() );
+
+    const auto& symbolName = "at";
+
+    assert(
+        node.literal()->id() == Node::ID::VALUE_LITERAL and
+        " inconsistent state @ GrammarParser " );
+    assert( literalType->isInteger() and " inconsistent state @ TypeCheckPass " );
+    const auto& literal = static_cast< const ValueLiteral& >( *node.literal() );
+    const auto& index = std::static_pointer_cast< libcasm_ir::IntegerConstant >( literal.value() );
+
+    const auto& objectTypeDefinition = m_symboltable.findTypeDefinition( objectType->id() );
+    assert( objectTypeDefinition and " inconsistent state @ TypeCheckPass " );
+
+    if( objectTypeDefinition->domainType()->id() == Node::ID::TUPLE_TYPE )
+    {
+        const auto& tupleTypeDefinition =
+            static_cast< const TupleType& >( *objectTypeDefinition->domainType() );
+
+        if( index->value() < 0 or index->value() > tupleTypeDefinition.subTypes()->size() )
         {
             m_log.error(
-                { node.sourceLocation() },
-                "element access of '" + objectType->description() + "' at position '" +
-                    value.to_string() + "' is out-of-bounds",
+                { sourceLocation, tupleTypeDefinition.sourceLocation() },
+                "unable to infer " + description + ", because " +
+                    tupleTypeDefinition.description() + " has only " +
+                    std::to_string( tupleTypeDefinition.subTypes()->size() ) +
+                    " elements and the index is " + index->toString(),
                 Code::TypeInferenceInvalidLiteralCallExpression );
+            return;
         }
+
+        behaviorType->subTypes()->add(
+            ( *tupleTypeDefinition.subTypes() )[ index->value_i64() - 1 ] );
     }
     else
     {
         m_log.error(
-            { node.sourceLocation() },
-            "unsupported literal call expression of '" + objectType->description() + "' and '" +
-                literalType->description() + "'",
+            { sourceLocation, objectTypeDefinition->sourceLocation() },
+            "unimplemented literal call for '" + objectTypeDefinition->typeDescription() +
+                "' and index " + index->toString(),
             Code::TypeInferenceInvalidLiteralCallExpression );
+        return;
+    }
+
+    try
+    {
+        resolveDomainTypeBehaviorImplementSymbol( node, expressionType, behaviorType, symbolName );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error(
+            { sourceLocation },
+            "invalid " + description + ", because " + std::string( e.what() ),
+            Code::Unspecified );
     }
 }
 
 void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
+    m_log.error(
+        { node.sourceLocation() },
+        "UNIMPLEMENTED " + node.description() +
+            " current type: " + ( node.type() ? node.type()->description() : "$unresolved$" ) );
 
-    const auto& expressionType = node.expression()->type();
+    // RecursiveVisitor::visit( node );
 
-    if( not expressionType )
-    {
-        m_log.error(
-            { node.expression()->sourceLocation() },
-            "unable to resolve type of indirect call expression" );
-        return;
-    }
+    // const auto& expressionType = node.expression()->type();
 
-    if( not expressionType->isReference() )
-    {
-        m_log.error(
-            { node.expression()->sourceLocation() },
-            "expression is not a reference",
-            Code::TypeInferenceInvalidIndirectCallExpression );
-        return;
-    }
+    // if( not expressionType )
+    // {
+    //     m_log.error(
+    //         { node.expression()->sourceLocation() },
+    //         "unable to resolve type of indirect call expression" );
+    //     return;
+    // }
 
-    const auto& refType = std::static_pointer_cast< libcasm_ir::ReferenceType >( expressionType );
-    node.setType( refType->dereference() );
+    // if( not expressionType->isReference() )
+    // {
+    //     m_log.error(
+    //         { node.expression()->sourceLocation() },
+    //         "expression is not a reference",
+    //         Code::TypeInferenceInvalidIndirectCallExpression );
+    //     return;
+    // }
+
+    // const auto& refType = std::static_pointer_cast< libcasm_ir::ReferenceType >( expressionType
+    // ); node.setType( refType->dereference() );
 }
 
 void TypeInferenceVisitor::visit( TypeCastingExpression& node )
@@ -878,11 +818,12 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 
     node.fromExpression()->accept( *this );
 
+    const std::string description = "'as' operator";
     if( not node.fromExpression()->type() )
     {
         m_log.error(
             { node.fromExpression()->sourceLocation() },
-            "unable to infer expression type of 'as operator'",
+            "unable to infer expression type of " + description,
             Code::TypeInferenceTypeCastingExpressionFromHasNoType );
     }
 
@@ -891,189 +832,216 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         return;
     }
 
-    const auto resultType = node.asType()->type();
-    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+    const auto& sourceLocation = node.sourceLocation();
+    const auto& expressionType = node.fromExpression()->type();
 
-    const auto& fromExpressionType = node.fromExpression()->type();
-    argumentTypes.emplace_back( fromExpressionType );
+    const auto& behaviorType = AST::make< TemplateType >(
+        sourceLocation,
+        IdentifierPath::fromIdentifier( AST::make< Identifier >( sourceLocation, "TypeCasting" ) ),
+        std::make_shared< Types >() );
 
-    const auto relationType =
-        libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
+    const auto& resultTypeDefinition =
+        m_symboltable.findTypeDefinition( node.asType()->type()->id() );
+    assert( resultTypeDefinition and " inconsistent state " );
+    behaviorType->subTypes()->add( node.asType() );
 
-    switch( resultType->kind() )
+    const auto& symbolName = "convertTo";
+    const auto& resultType = node.asType()->type();
+
+    try
     {
-        case libcasm_ir::Type::Kind::VOID:      // [fallthrough]
-        case libcasm_ir::Type::Kind::LABEL:     // [fallthrough]
-        case libcasm_ir::Type::Kind::LOCATION:  // [fallthrough]
-        case libcasm_ir::Type::Kind::RELATION:
-        {
-            m_log.error(
-                { node.asType()->sourceLocation() },
-                "invalid 'as' operator type '" + resultType->description() +
-                    "' to perform type casting",
-                Code::TypeInferenceTypeCastingExpressionAsHasInvalidType );
-            return;
-        }
-        case libcasm_ir::Type::Kind::BOOLEAN:
-        {
-            node.setCastingType( TypeCastingExpression::CastingType::BUILTIN );
-            node.setTargetBuiltinId( libcasm_ir::Value::AS_BOOLEAN_BUILTIN );
-            break;
-        }
-        case libcasm_ir::Type::Kind::INTEGER:
-        {
-            node.setCastingType( TypeCastingExpression::CastingType::BUILTIN );
-            node.setTargetBuiltinId( libcasm_ir::Value::AS_INTEGER_BUILTIN );
-            break;
-        }
-        case libcasm_ir::Type::Kind::RATIONAL:
-        {
-            node.setCastingType( TypeCastingExpression::CastingType::BUILTIN );
-            node.setTargetBuiltinId( libcasm_ir::Value::AS_RATIONAL_BUILTIN );
-            break;
-        }
-        case libcasm_ir::Type::Kind::BINARY:
-        {
-            node.setCastingType( TypeCastingExpression::CastingType::BUILTIN );
-            node.setTargetBuiltinId( libcasm_ir::Value::AS_BINARY_BUILTIN );
-            break;
-        }
-        case libcasm_ir::Type::Kind::DECIMAL:
-        {
-            node.setCastingType( TypeCastingExpression::CastingType::BUILTIN );
-            node.setTargetBuiltinId( libcasm_ir::Value::AS_DECIMAL_BUILTIN );
-            break;
-        }
-        case libcasm_ir::Type::Kind::STRING:
-        {
-            node.setCastingType( TypeCastingExpression::CastingType::BUILTIN );
-            node.setTargetBuiltinId( libcasm_ir::Value::AS_STRING_BUILTIN );
-            break;
-        }
-        case libcasm_ir::Type::Kind::ENUMERATION:
-        {
-            node.setCastingType( TypeCastingExpression::CastingType::BUILTIN );
-            node.setTargetBuiltinId( libcasm_ir::Value::AS_ENUMERATION_BUILTIN );
-            break;
-        }
-        case libcasm_ir::Type::Kind::RANGE:               // [fallthrough]
-        case libcasm_ir::Type::Kind::TUPLE:               // [fallthrough]
-        case libcasm_ir::Type::Kind::RECORD:              // [fallthrough]
-        case libcasm_ir::Type::Kind::LIST:                // [fallthrough]
-        case libcasm_ir::Type::Kind::RULE_REFERENCE:      // [fallthrough]
-        case libcasm_ir::Type::Kind::FUNCTION_REFERENCE:  // [fallthrough]
-        case libcasm_ir::Type::Kind::FILE:                // [fallthrough]
-        case libcasm_ir::Type::Kind::PORT:
-        {
-            // TODO: PPA: FIXME: continue here with missing casting
-            // functionality
-            break;
-        }
-        case libcasm_ir::Type::Kind::_SIZE_:
-        {
-            assert( !" internal error!" );
-            break;
-        }
+        resolveDomainTypeBehaviorImplementSymbol(
+            node, expressionType, behaviorType, symbolName, resultType );
     }
-
-    if( node.castingType() == TypeCastingExpression::CastingType::BUILTIN )
+    catch( const std::domain_error& e )
     {
-        const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-
-        if( not annotation.valid( *relationType ) )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "invalid 'as operator' type casting relation '" + relationType->description() +
-                    "' found'",
-                Code::TypeInferenceInvalidTypeCastingExpression );
-            return;
-        }
-
-        node.setTargetBuiltinType( relationType );
-    }
-    else
-    {
-        // TODO: PPA: FIXME: implement here possible derived and feature type
-        // casting expressions
         m_log.error(
-            { node.sourceLocation() },
-            "unknown 'as operator' type casting relation '" + relationType->description() +
-                "' found",
+            { sourceLocation },
+            "invalid " + description + ", because " + std::string( e.what() ),
             Code::TypeInferenceInvalidTypeCastingExpression );
-        return;
     }
-
-    node.setType( resultType );
 }
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
 {
-    if( node.op() == libcasm_ir::Value::ADD_INSTRUCTION )
+    const auto& operationTokenName = node.operationTokenString();
+    const auto& description = "unary operator '" + operationTokenName + "'";
+    const auto& expression = node.expression();
+
+    RecursiveVisitor::visit( node );
+
+    if( node.type() )
     {
-        // add unary expression (e.g. '+4') will not be annotated,
-        // just visit sub-nodes, propagate the expression type to this node and return
-        RecursiveVisitor::visit( node );
-        node.setType( node.expression()->type() );
         return;
     }
 
-    const auto* annotation = annotate( node, { node.expression() } );
-
-    RecursiveVisitor::visit( node );
-
-    const auto description = "unary operator '" + node.operationToken()->tokenString() + "'";
-
-    inference( description, annotation, node, { node.expression() } );
-
-    RecursiveVisitor::visit( node );
-
-    if( node.type() and node.expression()->type() )
+    if( node.expression()->type() )
     {
-        const std::vector< libcasm_ir::Type::Ptr > argTypeList{ node.expression()->type() };
+        m_typeIDs[ node.expression().get() ].emplace( node.expression()->type()->id() );
+    }
 
-        const libcasm_ir::RelationType relationType( node.type(), argTypeList );
+    inference( description, node, { expression } );
 
-        if( not annotation->valid( relationType ) )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                description + " has no type relation '" + relationType.description() + "'",
-                Code::TypeInferenceOperatorUnaryRelationTypeInvalid );
-        }
+    if( not expression->type() )
+    {
+        m_log.error(
+            { expression->sourceLocation() },
+            "unable to infer expression type of " + description,
+            Code::TypeInferenceTypeCastingExpressionFromHasNoType );
+        return;
+    }
+
+    static const std::unordered_map< std::string, std::pair< std::string, std::string > >
+        behaviorToSymbol = {
+            { Grammar::tokenAsString( Grammar::Token::PLUS ), { "Positive", "sign" } },
+            { Grammar::tokenAsString( Grammar::Token::MINUS ), { "Inversion", "invert" } },
+            { Grammar::tokenAsString( Grammar::Token::NOT ), { "Negation", "negate" } },
+        };
+
+    const auto operation = behaviorToSymbol.find( operationTokenName );
+    if( operation == behaviorToSymbol.end() )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unimplemented " + description + " type inference mapping",
+            Code::Unspecified );
+        return;
+    }
+
+    const auto& sourceLocation = node.sourceLocation();
+    const auto& expressionType = expression->type();
+
+    const auto& behaviorType = AST::make< BasicType >(
+        sourceLocation,
+        IdentifierPath::fromIdentifier(
+            AST::make< Identifier >( sourceLocation, operation->second.first ) ) );
+
+    const auto& symbolName = operation->second.second;
+
+    try
+    {
+        resolveDomainTypeBehaviorImplementSymbol( node, expressionType, behaviorType, symbolName );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error(
+            { sourceLocation },
+            "invalid " + description + ", because " + std::string( e.what() ),
+            Code::Unspecified );
     }
 }
 
 void TypeInferenceVisitor::visit( BinaryExpression& node )
 {
-    const auto* annotation = annotate( node, { node.left(), node.right() } );
+    const auto& operationTokenName = node.operationTokenString();
+    const auto& description = "binary operator '" + operationTokenName + "'";
+    const auto& lhsExpression = node.left();
+    const auto& rhsExpression = node.right();
 
     RecursiveVisitor::visit( node );
 
-    const auto description = "binary operator '" + node.operationToken()->tokenString() + "'";
-    inference( description, annotation, node, { node.left(), node.right() } );
-
-    RecursiveVisitor::visit( node );
-
-    if( node.type() and node.left()->type() and node.right()->type() )
+    if( node.type() )
     {
-        const std::vector< libcasm_ir::Type::Ptr > argTypeList{ node.left()->type(),
-                                                                node.right()->type() };
+        return;
+    }
 
-        const libcasm_ir::RelationType relationType( node.type(), argTypeList );
+    if( node.left()->type() )
+    {
+        m_typeIDs[ node.right().get() ].emplace( node.left()->type()->id() );
+    }
 
-        if( not annotation->valid( relationType ) )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                description + " has no type relation '" + relationType.description() + "'",
-                Code::TypeInferenceOperatorBinaryRelationTypeInvalid );
-        }
+    if( node.right()->type() )
+    {
+        m_typeIDs[ node.left().get() ].emplace( node.right()->type()->id() );
+    }
+
+    RecursiveVisitor::visit( node );
+
+    inference( description, node, { lhsExpression, rhsExpression } );
+
+    if( not lhsExpression->type() )
+    {
+        m_log.error(
+            { lhsExpression->sourceLocation() },
+            "unable to infer left expression type of " + description,
+            Code::Unspecified );
+    }
+
+    if( not rhsExpression->type() )
+    {
+        m_log.error(
+            { rhsExpression->sourceLocation() },
+            "unable to infer right expression type of " + description,
+            Code::Unspecified );
+    }
+
+    if( not lhsExpression->type() or not rhsExpression->type() )
+    {
+        return;
+    }
+
+    static const std::unordered_map< std::string, std::pair< std::string, std::string > >
+        behaviorToSymbol = {
+            { Grammar::tokenAsString( Grammar::Token::PLUS ), { "Addition", "add" } },
+            { Grammar::tokenAsString( Grammar::Token::MINUS ), { "Subtraction", "subtract" } },
+            { Grammar::tokenAsString( Grammar::Token::ASTERIX ), { "Multiplication", "multiply" } },
+            { Grammar::tokenAsString( Grammar::Token::SLASH ), { "Division", "divide" } },
+            { Grammar::tokenAsString( Grammar::Token::PERCENT ), { "Modulus", "modulo" } },
+            { Grammar::tokenAsString( Grammar::Token::CARET ), { "Exponentiation", "power" } },
+            { Grammar::tokenAsString( Grammar::Token::EQUAL ), { "Equality", "equal" } },
+            { Grammar::tokenAsString( Grammar::Token::NEQUAL ), { "Equality", "unequal" } },
+            { Grammar::tokenAsString( Grammar::Token::LESSER ), { "PartialOrder", "lessThan" } },
+            { Grammar::tokenAsString( Grammar::Token::GREATER ),
+              { "PartialOrder", "greaterThan" } },
+            { Grammar::tokenAsString( Grammar::Token::LESSEQ ),
+              { "TotalOrder", "lessThanOrEqual" } },
+            { Grammar::tokenAsString( Grammar::Token::GREATEREQ ),
+              { "TotalOrder", "greaterThanOrEqual" } },
+            { Grammar::tokenAsString( Grammar::Token::OR ), { "Logical", "disjunction" } },
+            { Grammar::tokenAsString( Grammar::Token::XOR ),
+              { "Logical", "exclusiveDisjunction" } },
+            { Grammar::tokenAsString( Grammar::Token::AND ), { "Logical", "conjunction" } },
+            { Grammar::tokenAsString( Grammar::Token::ARROW ), { "Logical", "implication" } },
+            { Grammar::tokenAsString( Grammar::Token::IMPLIES ), { "Logical", "implication" } },
+        };
+
+    const auto operation = behaviorToSymbol.find( operationTokenName );
+    if( operation == behaviorToSymbol.end() )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unimplemented " + description + " type inference mapping",
+            Code::Unspecified );
+        return;
+    }
+
+    const auto& sourceLocation = node.sourceLocation();
+    const auto& expressionType = lhsExpression->type();
+
+    const auto& behaviorType = AST::make< BasicType >(
+        sourceLocation,
+        IdentifierPath::fromIdentifier(
+            AST::make< Identifier >( sourceLocation, operation->second.first ) ) );
+
+    const auto& symbolName = operation->second.second;
+
+    try
+    {
+        resolveDomainTypeBehaviorImplementSymbol( node, expressionType, behaviorType, symbolName );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error(
+            { sourceLocation },
+            "invalid " + description + ", because " + std::string( e.what() ),
+            Code::Unspecified );
     }
 }
 
 void TypeInferenceVisitor::visit( ListLiteral& node )
 {
+    RecursiveVisitor::visit( node );
+
     if( node.type() )
     {
         return;
@@ -1082,7 +1050,7 @@ void TypeInferenceVisitor::visit( ListLiteral& node )
     filterAnnotationsByKind( node, libcasm_ir::Type::Kind::LIST );
 
     // propagate type annotation to all list elements
-    for( const auto typeId : m_typeIDs[&node ] )
+    for( const auto typeId : m_typeIDs[ &node ] )
     {
         const auto type = libcasm_ir::Type::fromID( typeId );
         assert( type->isList() );
@@ -1092,17 +1060,26 @@ void TypeInferenceVisitor::visit( ListLiteral& node )
 
     node.expressions()->accept( *this );
 
+    u1 valid = true;
     for( const auto& expression : *node.expressions() )
     {
-        if( expression->type() )
+        if( not expression->type() )
         {
-            annotateNodes( *node.expressions(), expression->type()->id() );
+            valid = false;
+            m_log.error(
+                { expression->sourceLocation() },
+                "unable to infer list element type",
+                Code::Unspecified );
         }
     }
 
-    node.expressions()->accept( *this );
+    if( not valid )
+    {
+        return;
+    }
 
-    inference( "list literal", nullptr, node );
+    inference( "list literal", node );
+
     if( not node.type() )
     {
         // inference failed, use type of first typed expression instead
@@ -1141,6 +1118,11 @@ void TypeInferenceVisitor::visit( ListLiteral& node )
 
 void TypeInferenceVisitor::visit( RangeLiteral& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     node.left()->accept( *this );
 
     if( node.left()->type() )
@@ -1156,25 +1138,36 @@ void TypeInferenceVisitor::visit( RangeLiteral& node )
         node.left()->accept( *this );
     }
 
-    const auto lhsType = node.left()->type();
-    const auto rhsType = node.right()->type();
+    const auto& lhsType = node.left()->type();
+    const auto& rhsType = node.right()->type();
     if( not( lhsType and rhsType ) )
     {
         return;
     }
 
+    const auto& sourceLocation = node.sourceLocation();
     if( *lhsType != *rhsType )
     {
         m_log.error(
-            { node.sourceLocation() },
+            { sourceLocation },
             "types of range does not match, " + lhsType->description() +
                 " != " + rhsType->description(),
             Code::TypeInferenceRangeLiteralTypeMismatch );
         return;
     }
 
-    const auto rangeType = libstdhl::Memory::get< libcasm_ir::RangeType >( lhsType );
-    node.setType( rangeType );
+    const auto& subTypeDefinition = m_symboltable.findTypeDefinition( lhsType->id() );
+    assert( subTypeDefinition and " inconsistent state " );
+    subTypeDefinition->accept( *this );
+
+    const auto& subType = subTypeDefinition->domainType()->duplicate< AST::Type >();
+
+    const auto& domainSymbol = m_symboltable.findSymbol( TypeInfo::TYPE_NAME_RANGE );
+    assert( domainSymbol and " inconsistent state, checked during symbol registration " );
+    const auto& domainDefinition = domainSymbol->ptr< DomainDefinition >();
+    assert(
+        domainDefinition->domainType()->id() == Node::ID::TEMPLATE_TYPE and
+        " inconsistent state " );
 }
 
 void TypeInferenceVisitor::visit( TupleLiteral& node )
@@ -1187,7 +1180,7 @@ void TypeInferenceVisitor::visit( TupleLiteral& node )
     filterAnnotationsByKind( node, libcasm_ir::Type::Kind::TUPLE );
 
     // propagate type annotation to all tuple elements
-    for( const auto typeId : m_typeIDs[&node ] )
+    for( const auto typeId : m_typeIDs[ &node ] )
     {
         const auto type = libcasm_ir::Type::fromID( typeId );
         assert( type->isTuple() );
@@ -1226,6 +1219,8 @@ void TypeInferenceVisitor::visit( TupleLiteral& node )
 
 void TypeInferenceVisitor::visit( RecordLiteral& node )
 {
+    RecursiveVisitor::visit( node );
+
     if( node.type() )
     {
         return;
@@ -1234,7 +1229,7 @@ void TypeInferenceVisitor::visit( RecordLiteral& node )
     filterAnnotationsByKind( node, libcasm_ir::Type::Kind::RECORD );
 
     // propagate type annotation to all record elements
-    for( const auto typeId : m_typeIDs[&node ] )
+    for( const auto typeId : m_typeIDs[ &node ] )
     {
         const auto type = libcasm_ir::Type::fromID( typeId );
         assert( type->isRecord() );
@@ -1281,7 +1276,7 @@ void TypeInferenceVisitor::visit( LetExpression& node )
         return;
     }
 
-    m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
+    m_typeIDs[ node.expression().get() ] = m_typeIDs[ &node ];
 
     node.variableBindings()->accept( *this );
 
@@ -1300,8 +1295,8 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
         return;
     }
 
-    m_typeIDs[ node.thenExpression().get() ] = m_typeIDs[&node ];
-    m_typeIDs[ node.elseExpression().get() ] = m_typeIDs[&node ];
+    m_typeIDs[ node.thenExpression().get() ] = m_typeIDs[ &node ];
+    m_typeIDs[ node.elseExpression().get() ] = m_typeIDs[ &node ];
 
     const auto& condExpr = *node.condition();
     const auto& thenExpr = *node.thenExpression();
@@ -1311,14 +1306,14 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
     if( thenExpr.type() )
     {
-        m_typeIDs[&elseExpr ].emplace( thenExpr.type()->id() );
+        m_typeIDs[ &elseExpr ].emplace( thenExpr.type()->id() );
     }
 
     node.elseExpression()->accept( *this );
 
     if( elseExpr.type() )
     {
-        m_typeIDs[&thenExpr ].emplace( elseExpr.type()->id() );
+        m_typeIDs[ &thenExpr ].emplace( elseExpr.type()->id() );
     }
 
     node.thenExpression()->accept( *this );
@@ -1357,7 +1352,7 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
         return;
     }
 
-    m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
+    m_typeIDs[ node.expression().get() ] = m_typeIDs[ &node ];
 
     node.variables()->accept( *this );
 
@@ -1418,56 +1413,37 @@ void TypeInferenceVisitor::visit( ExistentialQuantifierExpression& node )
 
 void TypeInferenceVisitor::visit( CardinalityExpression& node )
 {
-    if( node.type() )
-    {
-        return;
-    }
-
-    RecursiveVisitor::visit( node );
-
     const std::string description = "cardinality operator";
+
+    node.expression()->accept( *this );
     if( not node.expression()->type() )
     {
         m_log.error(
             { node.expression()->sourceLocation() },
-            "unable to infer expression type of '" + description + "'",
+            "unable to infer expression type of " + description,
             Code::TypeInferenceCardinalityExpressionHasNoType );
         return;
     }
 
-    // FIXME: TODO: for now we only support IR built-in size calculation
-    node.setCardinalityType( CardinalityExpression::CardinalityType::BUILTIN );
-    node.setTargetBuiltinId( libcasm_ir::Value::SIZE_BUILTIN );
+    const auto& sourceLocation = node.sourceLocation();
+    const auto& expressionType = node.expression()->type();
+    const auto& behaviorType = AST::make< BasicType >(
+        sourceLocation,
+        IdentifierPath::fromIdentifier(
+            AST::make< Identifier >( sourceLocation, "Cardinality" ) ) );
+    const auto& symbolName = "size";
 
-    // if it is a IR built-in, we can annotate it and due to the annotation, we can infer the
-    // resulting type of this expression
-    const std::vector< Expression::Ptr > expression = { node.expression() };
-    inference( description, annotate( node, expression ), node, expression );
-
-    if( not node.type() )
+    try
     {
-        return;
+        resolveDomainTypeBehaviorImplementSymbol( node, expressionType, behaviorType, symbolName );
     }
-
-    const auto resultType = node.type();
-    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
-    argumentTypes.emplace_back( node.expression()->type() );
-
-    const auto relationType =
-        libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
-
-    const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-    if( not annotation.valid( *relationType ) )
+    catch( const std::domain_error& e )
     {
         m_log.error(
-            { node.sourceLocation() },
-            "invalid '" + description + "' type relation '" + relationType->description() +
-                "' found'",
+            { sourceLocation },
+            "invalid " + description + ", because " + std::string( e.what() ),
             Code::TypeInferenceCardinalityExpressionInvalid );
-        return;
     }
-
-    node.setTargetBuiltinType( relationType );
 }
 
 void TypeInferenceVisitor::visit( ConditionalRule& node )
@@ -1481,19 +1457,6 @@ void TypeInferenceVisitor::visit( ConditionalRule& node )
         libcasm_ir::Type::Kind::BOOLEAN,
         "condition",
         Code::TypeInferenceConditionalRuleInvalidConditionType );
-}
-
-void TypeInferenceVisitor::visit( WhileRule& node )
-{
-    m_typeIDs[ node.condition().get() ].emplace( libcasm_ir::Type::Kind::BOOLEAN );
-
-    RecursiveVisitor::visit( node );
-
-    checkIfNodeHasTypeOfKind(
-        *node.condition(),
-        libcasm_ir::Type::Kind::BOOLEAN,
-        "condition",
-        Code::TypeInferenceWhileRuleInvalidConditionType );
 }
 
 void TypeInferenceVisitor::visit( CaseRule& node )
@@ -1510,8 +1473,8 @@ void TypeInferenceVisitor::visit( CaseRule& node )
 
     if( not node.expression()->type() )
     {
-        // if CaseRule expression is still not typed, try to infer the type from the ExpressionCase
-        // types
+        // if CaseRule expression is still not typed
+        // try to infer the type from the ExpressionCase types
         for( auto _case : *node.cases() )
         {
             if( _case->id() == Node::ID::EXPRESSION_CASE )
@@ -1532,7 +1495,7 @@ void TypeInferenceVisitor::visit( CaseRule& node )
 
 void TypeInferenceVisitor::visit( ExpressionCase& node )
 {
-    m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
+    m_typeIDs[ node.expression().get() ] = m_typeIDs[ &node ];
     RecursiveVisitor::visit( node );
 }
 
@@ -1543,12 +1506,7 @@ void TypeInferenceVisitor::visit( DefaultCase& node )
 
 void TypeInferenceVisitor::visit( LetRule& node )
 {
-    node.variableBindings()->accept( *this );
-
-    node.rule()->accept( *this );
-
-    // revisit the variable bindings to infer again the variable type from underlying let rule
-    node.variableBindings()->accept( *this );
+    RecursiveVisitor::visit( node );
 }
 
 void TypeInferenceVisitor::visit( ForallRule& node )
@@ -1664,7 +1622,9 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
 
     if( func.type() )
     {
-        m_typeIDs[&expr ].emplace( func.type()->id() );
+        func.setType( func.type()->ptr_result() );
+
+        m_typeIDs[ &expr ].emplace( func.type()->id() );
     }
 
     node.expression()->accept( *this );
@@ -1677,8 +1637,98 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
         Code::TypeInferenceUpdateRuleTypesMismatch );
 }
 
+void TypeInferenceVisitor::visit( BasicType& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& symbol = node.typeDefinition();
+    assert( symbol and " inconsistent state @ SymbolResolverPass " );
+    assert( symbol->type() and " inconsistent state @ TypeCheckPass " );
+    node.setType( symbol->type() );
+}
+
+void TypeInferenceVisitor::visit( TupleType& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& symbol = node.typeDefinition();
+    assert( symbol and " inconsistent state @ SymbolResolverPass " );
+    assert( symbol->type() and " inconsistent state @ TypeCheckPass " );
+    node.setType( symbol->type() );
+}
+
+void TypeInferenceVisitor::visit( RecordType& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    m_log.error(
+        { node.sourceLocation() },
+        "unable to infer " + node.description() + " '" + node.signature() + "'",
+        Code::Unspecified );
+}
+
+void TypeInferenceVisitor::visit( FixedSizedType& node )
+{
+    node.size()->accept( *this );
+
+    if( node.type() )
+    {
+        return;
+    }
+
+    m_log.error(
+        { node.sourceLocation() },
+        "unable to infer " + node.description() + " '" + node.signature() + "'",
+        Code::Unspecified );
+}
+
+void TypeInferenceVisitor::visit( TemplateType& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& symbol = node.typeDefinition();
+    assert( symbol and " inconsistent state @ SymbolResolverPass " );
+    assert( symbol->type() and " inconsistent state @ TypeCheckPass " );
+    node.setType( symbol->type() );
+}
+
+void TypeInferenceVisitor::visit( RelationType& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    if( node.mapping() )
+    {
+        return;
+    }
+
+    const auto& symbol = node.typeDefinition();
+    assert( symbol and " inconsistent state @ SymbolResolverPass " );
+    assert( symbol->type() and " inconsistent state @ TypeCheckPass " );
+    node.setType( symbol->type() );
+}
+
 void TypeInferenceVisitor::visit( VariableBinding& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     node.variable()->accept( *this );
 
     if( node.variable()->type() )
@@ -1693,99 +1743,26 @@ void TypeInferenceVisitor::visit( VariableBinding& node )
     {
         const auto expressionTypeId = node.expression()->type()->id();
         m_typeIDs[ node.variable().get() ].emplace( expressionTypeId );
+
+        node.variable()->accept( *this );
     }
 
-    node.variable()->accept( *this );
+    assignment(
+        *node.variable(),
+        *node.expression(),
+        "variable '" + node.variable()->identifier()->name() + "'",
+        "expression",
+        Code::TypeInferenceInvalidVariableBindingTypeMismatch );
 
-    if( node.variable()->type() or node.expression()->type() )
-    {
-        assignment(
-            *node.variable(),
-            *node.expression(),
-            "variable '" + node.variable()->identifier()->name() + "'",
-            "expression",
-            Code::TypeInferenceInvalidVariableBindingTypeMismatch );
-    }
-}
-
-bool TypeInferenceVisitor::tryResolveCallInTypeNamespace( DirectCallExpression& node ) const
-{
+    node.setType( node.variable()->type() );
     if( not node.type() )
     {
-        return false;
-    }
-
-    const auto& name = node.identifier()->path();
-    const auto& typeName = node.type()->description();
-
-    // TODO: this will need some extra care when we add the import feature. (e.g. namespace
-    // lookup by type)
-    const auto typeNamespace = m_symboltable.findNamespace( typeName );
-    if( not typeNamespace )
-    {
         m_log.error(
             { node.sourceLocation() },
-            "'" + node.identifier()->path() + "' is unknown",
-            Code::SymbolIsUnknown );
-
-        return false;
+            "unable to infer type of " + node.description() + " '" +
+                node.variable()->identifier()->name() + "'",
+            Code::Unspecified );
     }
-
-    const auto maybeSymbol = typeNamespace->findSymbol( *node.identifier() );
-    const auto symbol = maybeSymbol.first;
-    const auto accessible = maybeSymbol.second;
-
-    if( not symbol )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "'" + name + "' has not been defined in namespace '" + typeName + "'",
-            Code::SymbolIsUnknown );
-        return false;
-    }
-    else if( not accessible )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "'" + name + "' is not accessible in namespace '" + typeName + "'",
-            Code::SymbolIsInaccessible );
-        m_log.warning(
-            { symbol->sourceLocation() },
-            "'" + symbol->identifier()->name() + "' has not been exported" );
-        return false;
-    }
-
-    std::size_t expectedNumberOfArguments = 0;
-
-    switch( symbol->id() )
-    {
-        case Node::ID::ENUMERATOR_DEFINITION:
-        {
-            node.setTargetType( DirectCallExpression::TargetType::CONSTANT );
-            break;
-        }
-        default:
-        {
-            m_log.error(
-                { node.identifier()->sourceLocation() },
-                "cannot reference " + symbol->description() + " '" + name + "'" );
-            return false;
-        }
-    }
-
-    if( node.arguments()->size() != expectedNumberOfArguments )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "invalid argument size: " + symbol->description() + " '" + name + "' expects " +
-                std::to_string( expectedNumberOfArguments ) + " arguments",
-            Code::SymbolArgumentSizeMismatch );
-        return false;
-    }
-
-    node.setTargetDefinition( symbol );
-
-    return true;
 }
 
 void TypeInferenceVisitor::assignment(
@@ -1850,122 +1827,232 @@ void TypeInferenceVisitor::assignment(
                 }
             }
 
-            m_log.error(
-                { rhs.sourceLocation(), lhsSourceLocation },
-                "type mismatch: " + src + " was '" + tyRhs.description() + "', but " + dst +
-                    " expects '" + tyLhs.description() + "'",
-                assignmentErr );
+            const std::string msg = "type mismatch: " + src + " was '" + tyRhs.description() +
+                                    "', but " + dst + " expects '" + tyLhs.description() + "'";
+            // m_log.error( { rhs.sourceLocation() }, msg, assignmentErr );
+            m_log.warning( { rhs.sourceLocation() }, msg );
+            m_log.info( { lhsSourceLocation }, msg );
         }
     }
 }
 
-const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
-    Node& node, const std::vector< Expression::Ptr >& expressions )
+void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
+    TargetCallExpression& node,
+    const libcasm_ir::Type::Ptr& domainType,
+    const AST::Type::Ptr& behaviorType,
+    const std::string& symbolName,
+    const libcasm_ir::Type::Ptr& resultType )
 {
-    const libcasm_ir::Annotation* annotation = nullptr;
-
-    if( node.id() == libcasm_fe::Ast::Type::ID::UNARY_EXPRESSION )
+    auto typeDefinition = m_symboltable.findTypeDefinition( domainType->id() );
+    if( not typeDefinition )
     {
-        annotation =
-            &libcasm_ir::Annotation::find( static_cast< const UnaryExpression& >( node ).op() );
+        typeDefinition = m_symboltable.findTypeDefinition( domainType->description() );
     }
-    else if( node.id() == libcasm_fe::Ast::Type::ID::BINARY_EXPRESSION )
+
+    if( not typeDefinition )
     {
-        annotation =
-            &libcasm_ir::Annotation::find( static_cast< const BinaryExpression& >( node ).op() );
+        m_log.error(
+            { node.sourceLocation() },
+            "internal: '" + domainType->description() + "'\n" + m_symboltable.dump() );
+        // assert( typeDefinition and " inconsistent state @ TypeCheckPass " );
+        return;
     }
-    else if( node.id() == libcasm_fe::Ast::Type::ID::DIRECT_CALL_EXPRESSION )
+
+    auto behavior = behaviorType->typeDefinition();
+    if( not behavior )
     {
-        auto& directCall = static_cast< DirectCallExpression& >( node );
-        assert( directCall.identifier() );
-        const auto identifier = directCall.identifier();
+        const auto& behaviorTypeName = behaviorType->signature();
 
-        try
+        // search if desired behavior is the basic behavior
+        if( typeDefinition->basicBehavior() )
         {
-            const auto& builtin_annotation =
-                libcasm_ir::Annotation::find( directCall.targetBuiltinId() );
-            annotation = &builtin_annotation;
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error(
-                { directCall.sourceLocation() },
-                "unable to resolve built-in symbol '" + identifier->path() +
-                    "', due to missing annotation information from 'libcasm-ir'" );
-            return nullptr;
-        }
-    }
-    else if( node.id() == libcasm_fe::Ast::Type::ID::METHOD_CALL_EXPRESSION )
-    {
-        const auto& methodCall = static_cast< MethodCallExpression& >( node );
-        const auto& methodName = methodCall.methodName()->name();
-
-        try
-        {
-            const auto& builtin_annotation = libcasm_ir::Annotation::find( methodName );
-            annotation = &builtin_annotation;
-        }
-        catch( const std::domain_error& e )
-        {
-            return nullptr;
+            const auto& basicBehaviorNamespace =
+                typeDefinition->symboltable()->findNamespace( "*" );
+            assert( basicBehaviorNamespace and " inconsistent state " );
+            const auto& basicBehavior = basicBehaviorNamespace->findSymbol( behaviorTypeName );
+            if( basicBehavior )
+            {
+                behavior = basicBehavior->ptr< TypeDefinition >();
+            }
         }
 
-        const auto expectedNumberOfArguments = annotation->relations().front().argument.size();
-        if( expressions.size() != expectedNumberOfArguments )
+        // search if desired behavior is one of the extended behaviors
+        if( typeDefinition->extendedBehaviors().size() > 0 )
         {
-            m_log.error(
-                { node.sourceLocation() },
-                "invalid argument size: method '" + methodName + "' expects " +
-                    std::to_string( expectedNumberOfArguments - 1 ) + " arguments",
-                Code::SymbolArgumentSizeMismatch );
-            return nullptr;
+            const auto& extendedBehaviorNamespace =
+                typeDefinition->symboltable()->findNamespace( "+" );
+            assert( extendedBehaviorNamespace and " inconsistent state " );
+            const auto& extendedBehavior =
+                extendedBehaviorNamespace->findSymbol( behaviorTypeName );
+            if( extendedBehavior )
+            {
+                behavior = extendedBehavior->ptr< TypeDefinition >();
+            }
         }
-    }
-    else if( node.id() == libcasm_fe::Ast::Type::ID::CARDINALITY_EXPRESSION )
-    {
-        const auto& cardinalityExpression = static_cast< CardinalityExpression& >( node );
 
-        if( cardinalityExpression.cardinalityType() ==
-            CardinalityExpression::CardinalityType::BUILTIN )
+        if( not behavior )
         {
-            assert( cardinalityExpression.targetBuiltinId() );
-            const auto& builtin_annotation =
-                libcasm_ir::Annotation::find( cardinalityExpression.targetBuiltinId() );
-            annotation = &builtin_annotation;
-        }
-        else
-        {
-            return nullptr;
+            throw std::domain_error(
+                "the behavior '" + behaviorTypeName + "' is not implemented for " +
+                typeDefinition->description() + " '" + typeDefinition->domainType()->signature() +
+                "'" );
         }
     }
     else
     {
-        assert( !"no annotation possible for this node type" );
-        return nullptr;
-    }
-
-    assert( annotation != nullptr );
-
-    assert( expressions.size() == annotation->relations().front().argument.size() );
-    for( std::size_t c = 0; c < expressions.size(); c++ )
-    {
-        for( auto argumentTypeID : annotation->argumentTypeIDs( c ) )
+        // search for possible call symbol in basic behaviors
+        if( typeDefinition->basicBehavior() )
         {
-            m_typeIDs[ expressions[ c ].get() ].emplace( argumentTypeID );
+            const auto& basicBehavior = typeDefinition->basicBehavior();
+            const auto& basicBehaviorNamespace = basicBehavior->symboltable();
+            const auto& symbol = basicBehaviorNamespace->findSymbol( symbolName );
+            if( symbol )
+            {
+                behavior = basicBehavior;
+            }
+        }
+
+        // search for possible call symbol in extended behaviors
+        for( const auto& element : typeDefinition->extendedBehaviors() )
+        {
+            const auto& extendedBehavior = element.second;
+            const auto& extendedBehaviorNamespace = extendedBehavior->symboltable();
+            const auto& symbol = extendedBehaviorNamespace->findSymbol( symbolName );
+            if( symbol )
+            {
+                behavior = extendedBehavior;
+            }
         }
     }
 
-    for( auto resultTypeID : annotation->resultTypeIDs() )
+    const auto& behaviorNamespace = behavior->symboltable();
+    // m_log.info( symbolName + "\n" + behaviorNamespace->dump() );
+
+    const auto& symbol = behaviorNamespace->findSymbol( symbolName );
+    if( not symbol )
     {
-        m_typeIDs[&node ].emplace( resultTypeID );
+        throw std::domain_error(
+            "method call '" + symbolName + "' is not defined for " + typeDefinition->description() +
+            " '" + typeDefinition->domainType()->signature() + "'" );
     }
 
-    return annotation;
+    assert( symbol->type() and " inconsistent state @ TypeCheckPass " );
+    const auto& symbolType = symbol->type();
+    const auto returnType = ( resultType ? resultType : symbolType->ptr_result() );
+
+    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+    for( const auto& expression : *node.arguments() )
+    {
+        argumentTypes.emplace_back( expression->type()->ptr_result() );
+    }
+    const auto relationType =
+        libstdhl::Memory::make< libcasm_ir::RelationType >( returnType, argumentTypes );
+
+    if( *symbolType != *relationType )
+    {
+        const auto& symbolArgumentTypes = symbolType->arguments();
+        const auto& relationArgumentTypes = relationType->arguments();
+
+        u1 valid = false;
+        if( symbolArgumentTypes.size() == relationArgumentTypes.size() )
+        {
+            valid = true;
+            for( std::size_t i = 0; i < symbolArgumentTypes.size(); i++ )
+            {
+                const auto& symbolArgumentType = symbolArgumentTypes[ i ];
+                const auto& relationArgumentType = relationArgumentTypes[ i ];
+
+                if( relationArgumentType->isInteger() and symbolArgumentType->isInteger() )
+                {
+                    // relax passing argument use Integer'[a..b] to def Integer
+                    continue;
+                }
+
+                if( not relationArgumentType->isObject() and symbolArgumentType->isObject() )
+                {
+                    // relax passing argument is concrete type of abstract object
+                    continue;
+                }
+
+                if( relationArgumentType->isObject() and
+                    relationArgumentType->description() != TypeInfo::TYPE_NAME_OBJECT and
+                    symbolArgumentType->isObject() )
+                {
+                    // relax passing argument is concrete object of abstract object
+                    continue;
+                }
+
+                if( symbolArgumentType != relationArgumentType )
+                {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+
+        if( not valid )
+        {
+            const auto msg = "use: '" + relationType->description() + ", def: '" +
+                             symbolType->description() + "'";
+            m_log.info( { symbol->sourceLocation() }, msg );
+            throw std::domain_error( msg );
+        }
+    }
+
+    node.setTargetDefinition( symbol );
+    node.setType( relationType->ptr_result() );
+
+    switch( symbol->id() )
+    {
+        case Node::ID::FUNCTION_DEFINITION:
+        {
+            node.setTargetType( DirectCallExpression::TargetType::FUNCTION );
+            break;
+        }
+        case Node::ID::DERIVED_DEFINITION:
+        {
+            node.setTargetType( DirectCallExpression::TargetType::DERIVED );
+            break;
+        }
+        case Node::ID::RULE_DEFINITION:
+        {
+            node.setTargetType( DirectCallExpression::TargetType::RULE );
+            break;
+        }
+        case Node::ID::BUILTIN_DEFINITION:
+        {
+            node.setTargetType( DirectCallExpression::TargetType::BUILTIN );
+            break;
+        }
+        case Node::ID::DECLARATION:
+        {
+            const auto& declaration = static_cast< const Declaration& >( *symbol );
+            switch( declaration.kind() )
+            {
+                case Declaration::Kind::DERIVED:
+                {
+                    node.setTargetType( DirectCallExpression::TargetType::DERIVED );
+                    break;
+                }
+                case Declaration::Kind::RULE:
+                {
+                    node.setTargetType( DirectCallExpression::TargetType::RULE );
+                    break;
+                }
+            }
+            break;
+        }
+        default:
+        {
+            const auto msg = "invalid symbol '" + symbol->description() + "'";
+            m_log.info( { symbol->sourceLocation() }, msg );
+            throw std::domain_error( msg );
+        }
+    }
 }
 
 void TypeInferenceVisitor::inference(
     const std::string& description,
-    const libcasm_ir::Annotation* annotation,
     TypedNode& node,
     const std::vector< Expression::Ptr >& arguments )
 {
@@ -1974,7 +2061,7 @@ void TypeInferenceVisitor::inference(
         return;
     }
 
-    auto& typeIDs = m_typeIDs[&node ];
+    auto& typeIDs = m_typeIDs[ &node ];
 
     std::vector< libcasm_ir::Type::Ptr > argTypes = {};
     std::vector< libcasm_ir::Value::Ptr > argValues = {};
@@ -1992,59 +2079,12 @@ void TypeInferenceVisitor::inference(
         if( arguments[ c ]->id() == Node::ID::VALUE_LITERAL )
         {
             const auto argumentValue =
-                static_cast< Ast::ValueLiteral* >( arguments[ c ].get() )->value();
+                static_cast< AST::ValueLiteral* >( arguments[ c ].get() )->value();
             argValues.emplace_back( argumentValue );
         }
         else
         {
             argValues.emplace_back( nullptr );
-        }
-    }
-
-    if( annotation and arguments.size() > 0 )
-    {
-        annotation->resolve( argTypes );
-
-        auto unknownTypeArgCnt = 0;
-        for( std::size_t c = 0; c < arguments.size(); c++ )
-        {
-            if( not argTypes[ c ] )
-            {
-                unknownTypeArgCnt++;
-                continue;
-            }
-
-            m_typeIDs[ arguments[ c ].get() ].emplace( argTypes[ c ]->id() );
-        }
-
-        if( unknownTypeArgCnt == 0 )
-        {
-            try
-            {
-                const auto inferredTypeID = annotation->inference( argTypes, argValues );
-                typeIDs = { inferredTypeID };
-            }
-            catch( const libcasm_ir::TypeArgumentException& e )
-            {
-                m_log.error(
-                    { arguments[ e.position() ]->sourceLocation() },
-                    "type mismatch: " + description + " argument type at position " +
-                        std::to_string( e.position() + 1 ) + ": " + e.what(),
-                    Code::TypeInferenceArgumentTypeMismatch );
-                return;
-            }
-            catch( const std::domain_error& e )
-            {
-                m_log.error(
-                    { node.sourceLocation() },
-                    "unable to infer result type of " + description + ": " + e.what(),
-                    Code::TypeInferenceNotDefinedForExpression );
-            }
-            catch( const std::invalid_argument& e )
-            {
-                m_log.error( { node.sourceLocation() }, e.what() );
-                return;
-            }
         }
     }
 
@@ -2166,7 +2206,7 @@ void TypeInferenceVisitor::annotateNodes(
 void TypeInferenceVisitor::filterAnnotationsByKind(
     const Node& node, const libcasm_ir::Type::Kind kind )
 {
-    auto& annotations = m_typeIDs[&node ];
+    auto& annotations = m_typeIDs[ &node ];
 
     for( auto it = annotations.begin(); it != annotations.end(); )
     {
@@ -2209,6 +2249,12 @@ class CallTargetCheckVisitor final : public RecursiveVisitor
 
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
+    void visit( CardinalityExpression& node ) override;
+    void visit( TypeCastingExpression& node ) override;
+
+  private:
+    void check( TargetCallExpression& node ) const;
 
   private:
     libcasm_fe::Logger& m_log;
@@ -2221,29 +2267,58 @@ CallTargetCheckVisitor::CallTargetCheckVisitor( libcasm_fe::Logger& log )
 
 void CallTargetCheckVisitor::visit( DirectCallExpression& node )
 {
-    if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown symbol '" + node.identifier()->path() + "' found",
-            Code::SymbolIsUnknown );
-    }
+    RecursiveVisitor::visit( node );
+    check( node );
 }
 
 void CallTargetCheckVisitor::visit( MethodCallExpression& node )
 {
-    if( node.methodType() == MethodCallExpression::MethodType::UNKNOWN )
+    RecursiveVisitor::visit( node );
+    check( node );
+}
+
+void CallTargetCheckVisitor::visit( LiteralCallExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    check( node );
+}
+
+void CallTargetCheckVisitor::visit( CardinalityExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    check( node );
+}
+
+void CallTargetCheckVisitor::visit( TypeCastingExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    check( node );
+}
+
+void CallTargetCheckVisitor::check( TargetCallExpression& node ) const
+{
+    if( not node.hasTargetDefinition() )
     {
         m_log.error(
-            { node.methodName()->sourceLocation() },
-            "unknown method '" + node.methodName()->name() + "' found",
-            Code::MethodIsUnknown );
+            { node.sourceLocation() },
+            "unknown symbol '" + node.description() + "' found",
+            Code::SymbolIsUnknown );
+        return;
+    }
+
+    if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "invalid symbol '" + node.description() + "' found",
+            Code::SymbolIsInvalid );
     }
 }
 
 void TypeInferencePass::usage( libpass::PassUsage& pu )
 {
     pu.require< SpecificationMergerPass >();
+    pu.scheduleAfter< TypeCheckPass >();
 }
 
 u1 TypeInferencePass::run( libpass::PassResult& pr )
@@ -2254,26 +2329,24 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     TypeInferenceVisitor typeInferenceVisitor( log, *specification->symboltable() );
-    specification->definitions()->accept( typeInferenceVisitor );
-
-#ifndef NDEBUG
-    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
-#endif
+    specification->ast()->accept( typeInferenceVisitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
     {
+        log.debug( "symbol table =\n" + specification->symboltable()->dump() );
         log.debug( "found %lu error(s) during type inference", errors );
         return false;
     }
 
     CallTargetCheckVisitor callTargetCheckVisitor( log );
-    specification->definitions()->accept( callTargetCheckVisitor );
+    specification->ast()->accept( callTargetCheckVisitor );
 
     const auto checkErrors = log.errors();
     if( checkErrors > 0 )
     {
-        log.debug( "found %lu error(s) during type inference", checkErrors );
+        log.debug( "symbol table =\n" + specification->symboltable()->dump() );
+        log.debug( "found %lu error(s) during call target checking", checkErrors );
         return false;
     }
 

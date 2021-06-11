@@ -46,16 +46,16 @@
 #ifndef _LIBCASM_FE_REFERENCE_CONSTANT_H_
 #define _LIBCASM_FE_REFERENCE_CONSTANT_H_
 
-#include <libcasm-fe/ast/Literal>
+#include <libcasm-fe/lst/Literal>
 
 #include <libcasm-ir/Constant>
 
 namespace libcasm_fe
 {
-    class ReferenceConstant final : public libcasm_ir::ReferenceConstant< Ast::ReferenceLiteral >
+    class ReferenceConstant final : public libcasm_ir::ReferenceConstant< LST::ReferenceLiteral >
     {
       public:
-        explicit ReferenceConstant( const Ast::ReferenceLiteral* literal );
+        explicit ReferenceConstant( const LST::ReferenceLiteral* literal );
 
         explicit ReferenceConstant( void );
 

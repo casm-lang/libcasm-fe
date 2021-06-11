@@ -46,7 +46,7 @@
 
 #include <libcasm-fe/Codes>
 #include <libcasm-fe/Logger>
-#include <libcasm-fe/ast/Span>
+#include <libcasm-fe/cst/Span>
 
 #include "various/GrammarToken.h"
 
@@ -65,7 +65,7 @@ using namespace libcasm_fe;
 
 // Code run each time a token is matched, see GrammarToken.hpp.
 #define YY_TOKEN_ACTION( TOKEN ) \
-    const auto token = Ast::make< Ast::Token >( m_loc, Grammar::Token:: TOKEN ); \
+    const auto token = CST::make< CST::Token >( m_loc, Grammar::Token:: TOKEN ); \
     token->setSpans( fetchSpansAndReset() ); \
     return Parser::make_##TOKEN( token, m_loc );
 
@@ -98,7 +98,7 @@ using namespace libcasm_fe;
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( yytext + 2, libstdhl::Type::BINARY );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = CST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
         valueLiteral->setRadix( libstdhl::Type::Radix::BINARY );
     }
@@ -115,7 +115,7 @@ using namespace libcasm_fe;
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( yytext + 2, libstdhl::Type::HEXADECIMAL );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = CST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
         valueLiteral->setRadix( libstdhl::Type::Radix::HEXADECIMAL );
     }
@@ -132,7 +132,7 @@ using namespace libcasm_fe;
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::RationalConstant >( yytext + 2 );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = CST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
 
     }
@@ -149,7 +149,7 @@ using namespace libcasm_fe;
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::IntegerConstant >( yytext, libstdhl::Type::DECIMAL );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = CST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
     }
     catch( const std::domain_error& e )
@@ -165,7 +165,7 @@ using namespace libcasm_fe;
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::DecimalConstant >( yytext );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = CST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
 
     }
@@ -179,7 +179,7 @@ using namespace libcasm_fe;
 {{grammartoken}}
 
 [\x20]+ { // space
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::SPACE, yyleng);
+    const auto span = CST::make< Span >( m_loc, Grammar::Span::SPACE, yyleng);
     m_spans->add(span);
     m_loc.step();
 }
@@ -189,14 +189,14 @@ using namespace libcasm_fe;
 }
 
 [\t]+ { // tabulator
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::TABULATOR, yyleng );
+    const auto span = CST::make< Span >( m_loc, Grammar::Span::TABULATOR, yyleng );
     m_spans->add(span);
     m_loc.step();
 }
 
 [\n]+ { // newline
     m_loc.lines( yyleng );
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::NEWLINE, yyleng );
+    const auto span = CST::make< Span >( m_loc, Grammar::Span::NEWLINE, yyleng );
     m_spans->add(span);
     m_loc.step();
 }
@@ -218,7 +218,7 @@ using namespace libcasm_fe;
     }
     else
     {
-        const auto identifier = Ast::make< Identifier >( m_loc, m_strbuf );
+        const auto identifier = CST::make< Identifier >( m_loc, m_strbuf );
         identifier->setSpans( fetchSpansAndReset() );
         return Parser::make_IDENTIFIER( identifier, m_loc );
     }
@@ -253,7 +253,7 @@ using namespace libcasm_fe;
 }
 
 <YY_IDENTIFIER>\n {
-    const auto identifier = Ast::make< Identifier >( m_loc, m_strbuf );
+    const auto identifier = CST::make< Identifier >( m_loc, m_strbuf );
     identifier->setSpans( fetchSpansAndReset() );
     const auto token = Parser::make_IDENTIFIER( identifier, m_loc );
     unput( yytext[0] );
@@ -266,7 +266,7 @@ using namespace libcasm_fe;
     m_loc.columns( -yyleng );
     unput( yytext[0] );
     BEGIN( INITIAL );
-    const auto identifier = Ast::make< Identifier >( m_loc, m_strbuf );
+    const auto identifier = CST::make< Identifier >( m_loc, m_strbuf );
     identifier->setSpans( fetchSpansAndReset() );
     return Parser::make_IDENTIFIER( identifier, m_loc );
 }
@@ -299,7 +299,7 @@ using namespace libcasm_fe;
             unput( firstCharacter );
         }
 
-        const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+        const auto span = CST::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
         m_spans->add( span );
         m_loc.step();
         BEGIN( INITIAL );
@@ -311,7 +311,7 @@ using namespace libcasm_fe;
         {
             unput( secondCharacter );
             unput( firstCharacter );
-            const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+            const auto span = CST::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
             m_spans->add( span );
             m_loc.step();
             BEGIN( INITIAL );
@@ -325,7 +325,7 @@ using namespace libcasm_fe;
 }
 
 <YY_INLINE_COMMENT><<EOF>> {
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+    const auto span = CST::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
     m_spans->add(span);
     BEGIN( INITIAL );
 }
@@ -338,7 +338,7 @@ using namespace libcasm_fe;
 
 <YY_BLOCK_COMMENT>"*/" {
     m_strbuf.append( yytext );
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::BLOCK_COMMENT, m_strbuf.length() );
+    const auto span = CST::make< Span >( m_loc, Grammar::Span::BLOCK_COMMENT, m_strbuf.length() );
     m_spans->add(span);
     m_loc.step();
     BEGIN( INITIAL );
@@ -377,7 +377,7 @@ using namespace libcasm_fe;
     try
     {
         const auto value = libstdhl::Memory::get< libcasm_ir::StringConstant >( m_strbuf );
-        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral = CST::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
     }
     catch( const std::domain_error& e )

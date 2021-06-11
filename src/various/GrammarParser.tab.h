@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.7.2.
+// A Bison parser, made by GNU Bison 3.7.6.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
-// Copyright (C) 2002-2015, 2018-2020 Free Software Foundation, Inc.
+// Copyright (C) 2002-2015, 2018-2021 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // As a special exception, you may create a larger work that contains
 // part or all of the Bison parser skeleton and distribute that work
@@ -45,7 +45,7 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // "%code requires" blocks.
-#line 63 "../../obj/src/GrammarParser.y"
+#line 64 "../../obj/src/GrammarParser.y"
 
     namespace libcasm_fe
     {
@@ -54,17 +54,17 @@
     }
 
     #include <libcasm-fe/Specification>
-    #include <libcasm-fe/ast/Definition>
-    #include <libcasm-fe/ast/Expression>
-    #include <libcasm-fe/ast/Rule>
-    #include <libcasm-fe/ast/Token>
+    #include <libcasm-fe/cst/Definition>
+    #include <libcasm-fe/cst/Declaration>
+    #include <libcasm-fe/cst/Literal>
     #include <libcasm-fe/Exception>
+    #include <libcasm-fe/TypeInfo>
     #include <libcasm-fe/Logger>
 
     #include <libstdhl/SourceLocation>
 
     using namespace libcasm_fe;
-    using namespace Ast;
+    using namespace CST;
 
     #define YY_NULLPTR nullptr
 
@@ -139,9 +139,9 @@
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define YYUSE(E) ((void) (E))
+# define YY_USE(E) ((void) (E))
 #else
-# define YYUSE(E) /* empty */
+# define YY_USE(E) /* empty */
 #endif
 
 #if defined __GNUC__ && ! defined __ICC && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
@@ -201,7 +201,7 @@
 # define YYDEBUG 1
 #endif
 
-#line 50 "../../obj/src/GrammarParser.y"
+#line 51 "../../obj/src/GrammarParser.y"
 namespace libcasm_fe {
 #line 207 "GrammarParser.tab.h"
 
@@ -417,6 +417,27 @@ namespace libcasm_fe {
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
+      // Attribute
+      char dummy1[sizeof (Attribute::Ptr)];
+
+      // Attributes
+      char dummy2[sizeof (Attributes::Ptr)];
+
+      // BasicAttribute
+      char dummy3[sizeof (BasicAttribute::Ptr)];
+
+      // BasicType
+      char dummy4[sizeof (BasicType::Ptr)];
+
+      // BehaviorDefinition
+      char dummy5[sizeof (BehaviorDefinition::Ptr)];
+
+      // BlockRule
+      char dummy6[sizeof (BlockRule::Ptr)];
+
+      // BuiltinDefinition
+      char dummy7[sizeof (BuiltinDefinition::Ptr)];
+
       // "CASM"
       // "init"
       // "derived"
@@ -425,6 +446,14 @@ namespace libcasm_fe {
       // "using"
       // "invariant"
       // "import"
+      // "structure"
+      // "behavior"
+      // "implement"
+      // "for"
+      // "self"
+      // "this"
+      // "domain"
+      // "builtin"
       // "function"
       // "defined"
       // "seq"
@@ -480,8 +509,6 @@ namespace libcasm_fe {
       // "%"
       // "^"
       // "'"
-      // ".."
-      // "."
       // "->"
       // "=>"
       // ":="
@@ -490,231 +517,244 @@ namespace libcasm_fe {
       // ">="
       // "{|"
       // "|}"
-      char dummy1[sizeof (Ast::Token::Ptr)];
-
-      // Attribute
-      char dummy2[sizeof (Attribute::Ptr)];
-
-      // Attributes
-      char dummy3[sizeof (Attributes::Ptr)];
-
-      // BasicAttribute
-      char dummy4[sizeof (BasicAttribute::Ptr)];
-
-      // BasicType
-      char dummy5[sizeof (BasicType::Ptr)];
-
-      // BlockRule
-      char dummy6[sizeof (BlockRule::Ptr)];
+      // "."
+      // ".."
+      // "..."
+      char dummy8[sizeof (CST::Token::Ptr)];
 
       // CallExpression
-      char dummy7[sizeof (CallExpression::Ptr)];
+      char dummy9[sizeof (CallExpression::Ptr)];
 
       // CallRule
-      char dummy8[sizeof (CallRule::Ptr)];
+      char dummy10[sizeof (CallRule::Ptr)];
 
       // CardinalityExpression
-      char dummy9[sizeof (CardinalityExpression::Ptr)];
+      char dummy11[sizeof (CardinalityExpression::Ptr)];
 
       // CaseLabel
-      char dummy10[sizeof (Case::Ptr)];
+      char dummy12[sizeof (Case::Ptr)];
 
       // CaseRule
-      char dummy11[sizeof (CaseRule::Ptr)];
+      char dummy13[sizeof (CaseRule::Ptr)];
 
       // CaseLabels
-      char dummy12[sizeof (Cases::Ptr)];
+      char dummy14[sizeof (Cases::Ptr)];
 
       // ChooseExpression
-      char dummy13[sizeof (ChooseExpression::Ptr)];
+      char dummy15[sizeof (ChooseExpression::Ptr)];
 
       // ChooseRule
-      char dummy14[sizeof (ChooseRule::Ptr)];
+      char dummy16[sizeof (ChooseRule::Ptr)];
 
       // ConditionalExpression
-      char dummy15[sizeof (ConditionalExpression::Ptr)];
+      char dummy17[sizeof (ConditionalExpression::Ptr)];
 
       // ConditionalRule
-      char dummy16[sizeof (ConditionalRule::Ptr)];
+      char dummy18[sizeof (ConditionalRule::Ptr)];
+
+      // Declaration
+      char dummy19[sizeof (Declaration::Ptr)];
 
       // MaybeDefined
-      char dummy17[sizeof (Defined::Ptr)];
+      char dummy20[sizeof (Defined::Ptr)];
 
       // AttributedDefinition
       // Definition
-      char dummy18[sizeof (Definition::Ptr)];
+      // BehaviorDefinitionElement
+      // ImplementDefinitionElement
+      // ImplementDefinitionAttributedElement
+      char dummy21[sizeof (Definition::Ptr)];
 
       // Definitions
-      char dummy19[sizeof (Definitions::Ptr)];
+      // BehaviorDefinitionList
+      // ImplementDefinitionList
+      char dummy22[sizeof (Definitions::Ptr)];
 
       // DerivedDefinition
-      char dummy20[sizeof (DerivedDefinition::Ptr)];
+      char dummy23[sizeof (DerivedDefinition::Ptr)];
 
       // DirectCallExpression
-      char dummy21[sizeof (DirectCallExpression::Ptr)];
+      char dummy24[sizeof (DirectCallExpression::Ptr)];
+
+      // DomainDefinition
+      char dummy25[sizeof (DomainDefinition::Ptr)];
 
       // EnumerationDefinition
-      char dummy22[sizeof (EnumerationDefinition::Ptr)];
+      char dummy26[sizeof (EnumerationDefinition::Ptr)];
 
       // EnumeratorDefinition
-      char dummy23[sizeof (EnumeratorDefinition::Ptr)];
+      char dummy27[sizeof (EnumeratorDefinition::Ptr)];
 
       // Enumerators
-      char dummy24[sizeof (Enumerators::Ptr)];
+      char dummy28[sizeof (Enumerators::Ptr)];
 
       // ExistentialQuantifierExpression
-      char dummy25[sizeof (ExistentialQuantifierExpression::Ptr)];
+      char dummy29[sizeof (ExistentialQuantifierExpression::Ptr)];
 
       // Term
-      // SimpleOrClaspedTerm
+      // Expression
       // OperatorExpression
-      char dummy26[sizeof (Expression::Ptr)];
+      char dummy30[sizeof (Expression::Ptr)];
 
       // ExpressionAttribute
-      char dummy27[sizeof (ExpressionAttribute::Ptr)];
+      char dummy31[sizeof (ExpressionAttribute::Ptr)];
 
       // Terms
-      char dummy28[sizeof (Expressions::Ptr)];
+      char dummy32[sizeof (Expressions::Ptr)];
 
       // FixedSizedType
-      char dummy29[sizeof (FixedSizedType::Ptr)];
+      char dummy33[sizeof (FixedSizedType::Ptr)];
 
       // ForallRule
-      char dummy30[sizeof (ForallRule::Ptr)];
+      char dummy34[sizeof (ForallRule::Ptr)];
 
       // FunctionDefinition
+      // StructureDefinitionElement
       // AttributedLocalFunctionDefinition
       // LocalFunctionDefinition
-      char dummy31[sizeof (FunctionDefinition::Ptr)];
+      char dummy35[sizeof (FunctionDefinition::Ptr)];
 
+      // StructureDefinitionList
       // LocalFunctionDefinitions
-      char dummy32[sizeof (FunctionDefinitions::Ptr)];
+      char dummy36[sizeof (FunctionDefinitions::Ptr)];
 
       // Header
-      char dummy33[sizeof (HeaderDefinition::Ptr)];
+      char dummy37[sizeof (HeaderDefinition::Ptr)];
 
       // "identifier"
       // Identifier
-      char dummy34[sizeof (Identifier::Ptr)];
+      char dummy38[sizeof (Identifier::Ptr)];
 
       // IdentifierPath
-      char dummy35[sizeof (IdentifierPath::Ptr)];
+      char dummy39[sizeof (IdentifierPath::Ptr)];
+
+      // ImplementDefinition
+      char dummy40[sizeof (ImplementDefinition::Ptr)];
 
       // ImportDefinition
-      char dummy36[sizeof (ImportDefinition::Ptr)];
+      char dummy41[sizeof (ImportDefinition::Ptr)];
 
       // IndirectCallExpression
-      char dummy37[sizeof (IndirectCallExpression::Ptr)];
+      char dummy42[sizeof (IndirectCallExpression::Ptr)];
 
       // InitDefinition
-      char dummy38[sizeof (InitDefinition::Ptr)];
-
-      // Initializer
-      char dummy39[sizeof (Initializer::Ptr)];
-
-      // Initializers
-      char dummy40[sizeof (Initializers::Ptr)];
+      char dummy43[sizeof (InitDefinition::Ptr)];
 
       // MaybeInitially
-      char dummy41[sizeof (Initially::Ptr)];
+      char dummy44[sizeof (Initially::Ptr)];
 
       // InvariantDefinition
-      char dummy42[sizeof (InvariantDefinition::Ptr)];
+      char dummy45[sizeof (InvariantDefinition::Ptr)];
 
       // IterateRule
-      char dummy43[sizeof (IterateRule::Ptr)];
+      char dummy46[sizeof (IterateRule::Ptr)];
 
       // LetExpression
-      char dummy44[sizeof (LetExpression::Ptr)];
+      char dummy47[sizeof (LetExpression::Ptr)];
 
       // LetRule
-      char dummy45[sizeof (LetRule::Ptr)];
+      char dummy48[sizeof (LetRule::Ptr)];
 
       // ListLiteral
-      char dummy46[sizeof (ListLiteral::Ptr)];
+      char dummy49[sizeof (ListLiteral::Ptr)];
 
       // Literal
-      char dummy47[sizeof (Literal::Ptr)];
+      char dummy50[sizeof (Literal::Ptr)];
 
       // LiteralCallExpression
-      char dummy48[sizeof (LiteralCallExpression::Ptr)];
+      char dummy51[sizeof (LiteralCallExpression::Ptr)];
 
       // LocalRule
-      char dummy49[sizeof (LocalRule::Ptr)];
+      char dummy52[sizeof (LocalRule::Ptr)];
+
+      // MappedExpression
+      char dummy53[sizeof (MappedExpression::Ptr)];
+
+      // MappedExpressions
+      char dummy54[sizeof (MappedExpressions::Ptr)];
+
+      // MappingType
+      char dummy55[sizeof (MappingType::Ptr)];
 
       // MethodCallExpression
-      char dummy50[sizeof (MethodCallExpression::Ptr)];
+      char dummy56[sizeof (MethodCallExpression::Ptr)];
 
       // Assignment
-      char dummy51[sizeof (NamedExpression::Ptr)];
+      char dummy57[sizeof (NamedExpression::Ptr)];
 
       // Assignments
-      char dummy52[sizeof (NamedExpressions::Ptr)];
+      char dummy58[sizeof (NamedExpressions::Ptr)];
 
       // RangeLiteral
-      char dummy53[sizeof (RangeLiteral::Ptr)];
+      char dummy59[sizeof (RangeLiteral::Ptr)];
 
       // RecordLiteral
-      char dummy54[sizeof (RecordLiteral::Ptr)];
+      char dummy60[sizeof (RecordLiteral::Ptr)];
 
       // RecordType
-      char dummy55[sizeof (RecordType::Ptr)];
+      char dummy61[sizeof (RecordType::Ptr)];
 
       // ReferenceLiteral
-      char dummy56[sizeof (ReferenceLiteral::Ptr)];
+      char dummy62[sizeof (ReferenceLiteral::Ptr)];
 
       // RelationType
-      char dummy57[sizeof (RelationType::Ptr)];
+      char dummy63[sizeof (RelationType::Ptr)];
 
       // Rule
-      char dummy58[sizeof (Rule::Ptr)];
+      char dummy64[sizeof (Rule::Ptr)];
 
       // RuleDefinition
-      char dummy59[sizeof (RuleDefinition::Ptr)];
+      char dummy65[sizeof (RuleDefinition::Ptr)];
 
       // Rules
-      char dummy60[sizeof (Rules::Ptr)];
+      char dummy66[sizeof (Rules::Ptr)];
 
       // SequenceRule
-      char dummy61[sizeof (SequenceRule::Ptr)];
+      char dummy67[sizeof (SequenceRule::Ptr)];
 
       // SkipRule
-      char dummy62[sizeof (SkipRule::Ptr)];
+      char dummy68[sizeof (SkipRule::Ptr)];
 
       // Specification
-      char dummy63[sizeof (Specification::Ptr)];
+      char dummy69[sizeof (Specification::Ptr)];
+
+      // StructureDefinition
+      char dummy70[sizeof (StructureDefinition::Ptr)];
+
+      // SymbolAttribute
+      char dummy71[sizeof (SymbolAttribute::Ptr)];
 
       // TemplateType
-      char dummy64[sizeof (TemplateType::Ptr)];
+      char dummy72[sizeof (TemplateType::Ptr)];
 
       // TupleLiteral
-      char dummy65[sizeof (TupleLiteral::Ptr)];
+      char dummy73[sizeof (TupleLiteral::Ptr)];
 
       // TupleType
-      char dummy66[sizeof (TupleType::Ptr)];
+      char dummy74[sizeof (TupleType::Ptr)];
 
       // TypeCastingExpression
-      char dummy67[sizeof (TypeCastingExpression::Ptr)];
+      char dummy75[sizeof (TypeCastingExpression::Ptr)];
 
       // Types
       // FunctionParameters
       // MaybeFunctionParameters
-      char dummy68[sizeof (Types::Ptr)];
+      char dummy76[sizeof (Types::Ptr)];
 
       // UndefinedLiteral
-      char dummy69[sizeof (UndefLiteral::Ptr)];
+      char dummy77[sizeof (UndefLiteral::Ptr)];
 
       // UniversalQuantifierExpression
-      char dummy70[sizeof (UniversalQuantifierExpression::Ptr)];
+      char dummy78[sizeof (UniversalQuantifierExpression::Ptr)];
 
       // UpdateRule
-      char dummy71[sizeof (UpdateRule::Ptr)];
+      char dummy79[sizeof (UpdateRule::Ptr)];
 
       // UsingDefinition
-      char dummy72[sizeof (UsingDefinition::Ptr)];
+      char dummy80[sizeof (UsingDefinition::Ptr)];
 
       // UsingPathDefinition
-      char dummy73[sizeof (UsingPathDefinition::Ptr)];
+      char dummy81[sizeof (UsingPathDefinition::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -728,30 +768,34 @@ namespace libcasm_fe {
       // DecimalLiteral
       // BinaryLiteral
       // StringLiteral
-      char dummy74[sizeof (ValueLiteral::Ptr)];
+      char dummy82[sizeof (ValueLiteral::Ptr)];
+
+      // VaradicType
+      char dummy83[sizeof (VaradicType::Ptr)];
 
       // VariableBinding
-      char dummy75[sizeof (VariableBinding::Ptr)];
+      char dummy84[sizeof (VariableBinding::Ptr)];
 
       // VariableBindings
-      char dummy76[sizeof (VariableBindings::Ptr)];
+      char dummy85[sizeof (VariableBindings::Ptr)];
 
       // Variable
       // TypedVariable
       // AttributedVariable
       // TypedAttributedVariable
-      char dummy77[sizeof (VariableDefinition::Ptr)];
+      char dummy86[sizeof (VariableDefinition::Ptr)];
 
+      // MethodParameters
       // Parameters
       // AttributedVariables
       // TypedVariables
-      char dummy78[sizeof (VariableDefinitions::Ptr)];
+      char dummy87[sizeof (VariableDefinitions::Ptr)];
 
       // WhileRule
-      char dummy79[sizeof (WhileRule::Ptr)];
+      char dummy88[sizeof (WhileRule::Ptr)];
 
       // Type
-      char dummy80[sizeof (libcasm_fe::Ast::Type::Ptr)];
+      char dummy89[sizeof (libcasm_fe::CST::Type::Ptr)];
     };
 
     /// The size of the largest semantic type.
@@ -811,83 +855,92 @@ namespace libcasm_fe {
     USING = 263,                   // "using"
     INVARIANT = 264,               // "invariant"
     IMPORT = 265,                  // "import"
-    FUNCTION = 266,                // "function"
-    DEFINED = 267,                 // "defined"
-    SEQ = 268,                     // "seq"
-    ENDSEQ = 269,                  // "endseq"
-    PAR = 270,                     // "par"
-    ENDPAR = 271,                  // "endpar"
-    SKIP = 272,                    // "skip"
-    LET = 273,                     // "let"
-    LOCAL = 274,                   // "local"
-    IN = 275,                      // "in"
-    FORALL = 276,                  // "forall"
-    CHOOSE = 277,                  // "choose"
-    ITERATE = 278,                 // "iterate"
-    DO = 279,                      // "do"
-    IF = 280,                      // "if"
-    THEN = 281,                    // "then"
-    ELSE = 282,                    // "else"
-    CASE = 283,                    // "case"
-    OF = 284,                      // "of"
-    DEFAULT = 285,                 // "default"
-    HOLDS = 286,                   // "holds"
-    EXISTS = 287,                  // "exists"
-    WITH = 288,                    // "with"
-    AS = 289,                      // "as"
-    WHILE = 290,                   // "while"
-    UNDEF = 291,                   // "undef"
-    FALSE = 292,                   // "false"
-    TRUE = 293,                    // "true"
-    AND = 294,                     // "and"
-    OR = 295,                      // "or"
-    XOR = 296,                     // "xor"
-    IMPLIES = 297,                 // "implies"
-    NOT = 298,                     // "not"
-    PLUS = 299,                    // "+"
-    MINUS = 300,                   // "-"
-    EQUAL = 301,                   // "="
-    LPAREN = 302,                  // "("
-    RPAREN = 303,                  // ")"
-    LSQPAREN = 304,                // "["
-    RSQPAREN = 305,                // "]"
-    LCURPAREN = 306,               // "{"
-    RCURPAREN = 307,               // "}"
-    COLON = 308,                   // ":"
-    DOUBLECOLON = 309,             // "::"
-    UNDERLINE = 310,               // "_"
-    VERTICAL_BAR = 311,            // "|"
-    AT = 312,                      // "@"
-    COMMA = 313,                   // ","
-    LESSER = 314,                  // "<"
-    GREATER = 315,                 // ">"
-    ASTERIX = 316,                 // "*"
-    SLASH = 317,                   // "/"
-    PERCENT = 318,                 // "%"
-    CARET = 319,                   // "^"
-    MARK = 320,                    // "'"
-    DOTDOT = 321,                  // ".."
-    DOT = 322,                     // "."
-    MAPS = 323,                    // "->"
-    ARROW = 324,                   // "=>"
-    UPDATE = 325,                  // ":="
-    NEQUAL = 326,                  // "!="
-    LESSEQ = 327,                  // "<="
-    GREATEREQ = 328,               // ">="
-    SEQ_BRACKET = 329,             // "{|"
-    ENDSEQ_BRACKET = 330,          // "|}"
-    BINARY = 331,                  // "binary"
-    HEXADECIMAL = 332,             // "hexadecimal"
-    INTEGER = 333,                 // "integer"
-    RATIONAL = 334,                // "rational"
-    DECIMAL = 335,                 // "decimal"
-    STRING = 336,                  // "string"
-    IDENTIFIER = 337,              // "identifier"
-    BASIC_TYPE = 338,              // BASIC_TYPE
-    CALL = 339,                    // CALL
-    UPLUS = 340,                   // UPLUS
-    UMINUS = 341,                  // UMINUS
-    CALL_WITHOUT_ARGS = 342        // CALL_WITHOUT_ARGS
+    STRUCTURE = 266,               // "structure"
+    BEHAVIOR = 267,                // "behavior"
+    IMPLEMENT = 268,               // "implement"
+    FOR = 269,                     // "for"
+    SELF = 270,                    // "self"
+    THIS = 271,                    // "this"
+    DOMAINTYPE = 272,              // "domain"
+    BUILTIN = 273,                 // "builtin"
+    FUNCTION = 274,                // "function"
+    DEFINED = 275,                 // "defined"
+    SEQ = 276,                     // "seq"
+    ENDSEQ = 277,                  // "endseq"
+    PAR = 278,                     // "par"
+    ENDPAR = 279,                  // "endpar"
+    SKIP = 280,                    // "skip"
+    LET = 281,                     // "let"
+    LOCAL = 282,                   // "local"
+    IN = 283,                      // "in"
+    FORALL = 284,                  // "forall"
+    CHOOSE = 285,                  // "choose"
+    ITERATE = 286,                 // "iterate"
+    DO = 287,                      // "do"
+    IF = 288,                      // "if"
+    THEN = 289,                    // "then"
+    ELSE = 290,                    // "else"
+    CASE = 291,                    // "case"
+    OF = 292,                      // "of"
+    DEFAULT = 293,                 // "default"
+    HOLDS = 294,                   // "holds"
+    EXISTS = 295,                  // "exists"
+    WITH = 296,                    // "with"
+    AS = 297,                      // "as"
+    WHILE = 298,                   // "while"
+    UNDEF = 299,                   // "undef"
+    FALSE = 300,                   // "false"
+    TRUE = 301,                    // "true"
+    AND = 302,                     // "and"
+    OR = 303,                      // "or"
+    XOR = 304,                     // "xor"
+    IMPLIES = 305,                 // "implies"
+    NOT = 306,                     // "not"
+    PLUS = 307,                    // "+"
+    MINUS = 308,                   // "-"
+    EQUAL = 309,                   // "="
+    LPAREN = 310,                  // "("
+    RPAREN = 311,                  // ")"
+    LSQPAREN = 312,                // "["
+    RSQPAREN = 313,                // "]"
+    LCURPAREN = 314,               // "{"
+    RCURPAREN = 315,               // "}"
+    COLON = 316,                   // ":"
+    DOUBLECOLON = 317,             // "::"
+    UNDERLINE = 318,               // "_"
+    VERTICAL_BAR = 319,            // "|"
+    AT = 320,                      // "@"
+    COMMA = 321,                   // ","
+    LESSER = 322,                  // "<"
+    GREATER = 323,                 // ">"
+    ASTERIX = 324,                 // "*"
+    SLASH = 325,                   // "/"
+    PERCENT = 326,                 // "%"
+    CARET = 327,                   // "^"
+    MARK = 328,                    // "'"
+    MAPS = 329,                    // "->"
+    ARROW = 330,                   // "=>"
+    UPDATE = 331,                  // ":="
+    NEQUAL = 332,                  // "!="
+    LESSEQ = 333,                  // "<="
+    GREATEREQ = 334,               // ">="
+    SEQ_BRACKET = 335,             // "{|"
+    ENDSEQ_BRACKET = 336,          // "|}"
+    DOT = 337,                     // "."
+    DOTDOT = 338,                  // ".."
+    DOTDOTDOT = 339,               // "..."
+    BINARY = 340,                  // "binary"
+    HEXADECIMAL = 341,             // "hexadecimal"
+    INTEGER = 342,                 // "integer"
+    RATIONAL = 343,                // "rational"
+    DECIMAL = 344,                 // "decimal"
+    STRING = 345,                  // "string"
+    IDENTIFIER = 346,              // "identifier"
+    BASIC_TYPE = 347,              // BASIC_TYPE
+    CALL = 348,                    // CALL
+    UPLUS = 349,                   // UPLUS
+    UMINUS = 350,                  // UMINUS
+    CALL_WITHOUT_ARGS = 351        // CALL_WITHOUT_ARGS
       };
       /// Backward compatibility alias (Bison 3.6).
       typedef token_kind_type yytokentype;
@@ -904,7 +957,7 @@ namespace libcasm_fe {
     {
       enum symbol_kind_type
       {
-        YYNTOKENS = 88, ///< Number of tokens.
+        YYNTOKENS = 97, ///< Number of tokens.
         S_YYEMPTY = -2,
         S_YYEOF = 0,                             // "end of file"
         S_YYerror = 1,                           // error
@@ -917,180 +970,206 @@ namespace libcasm_fe {
         S_USING = 8,                             // "using"
         S_INVARIANT = 9,                         // "invariant"
         S_IMPORT = 10,                           // "import"
-        S_FUNCTION = 11,                         // "function"
-        S_DEFINED = 12,                          // "defined"
-        S_SEQ = 13,                              // "seq"
-        S_ENDSEQ = 14,                           // "endseq"
-        S_PAR = 15,                              // "par"
-        S_ENDPAR = 16,                           // "endpar"
-        S_SKIP = 17,                             // "skip"
-        S_LET = 18,                              // "let"
-        S_LOCAL = 19,                            // "local"
-        S_IN = 20,                               // "in"
-        S_FORALL = 21,                           // "forall"
-        S_CHOOSE = 22,                           // "choose"
-        S_ITERATE = 23,                          // "iterate"
-        S_DO = 24,                               // "do"
-        S_IF = 25,                               // "if"
-        S_THEN = 26,                             // "then"
-        S_ELSE = 27,                             // "else"
-        S_CASE = 28,                             // "case"
-        S_OF = 29,                               // "of"
-        S_DEFAULT = 30,                          // "default"
-        S_HOLDS = 31,                            // "holds"
-        S_EXISTS = 32,                           // "exists"
-        S_WITH = 33,                             // "with"
-        S_AS = 34,                               // "as"
-        S_WHILE = 35,                            // "while"
-        S_UNDEF = 36,                            // "undef"
-        S_FALSE = 37,                            // "false"
-        S_TRUE = 38,                             // "true"
-        S_AND = 39,                              // "and"
-        S_OR = 40,                               // "or"
-        S_XOR = 41,                              // "xor"
-        S_IMPLIES = 42,                          // "implies"
-        S_NOT = 43,                              // "not"
-        S_PLUS = 44,                             // "+"
-        S_MINUS = 45,                            // "-"
-        S_EQUAL = 46,                            // "="
-        S_LPAREN = 47,                           // "("
-        S_RPAREN = 48,                           // ")"
-        S_LSQPAREN = 49,                         // "["
-        S_RSQPAREN = 50,                         // "]"
-        S_LCURPAREN = 51,                        // "{"
-        S_RCURPAREN = 52,                        // "}"
-        S_COLON = 53,                            // ":"
-        S_DOUBLECOLON = 54,                      // "::"
-        S_UNDERLINE = 55,                        // "_"
-        S_VERTICAL_BAR = 56,                     // "|"
-        S_AT = 57,                               // "@"
-        S_COMMA = 58,                            // ","
-        S_LESSER = 59,                           // "<"
-        S_GREATER = 60,                          // ">"
-        S_ASTERIX = 61,                          // "*"
-        S_SLASH = 62,                            // "/"
-        S_PERCENT = 63,                          // "%"
-        S_CARET = 64,                            // "^"
-        S_MARK = 65,                             // "'"
-        S_DOTDOT = 66,                           // ".."
-        S_DOT = 67,                              // "."
-        S_MAPS = 68,                             // "->"
-        S_ARROW = 69,                            // "=>"
-        S_UPDATE = 70,                           // ":="
-        S_NEQUAL = 71,                           // "!="
-        S_LESSEQ = 72,                           // "<="
-        S_GREATEREQ = 73,                        // ">="
-        S_SEQ_BRACKET = 74,                      // "{|"
-        S_ENDSEQ_BRACKET = 75,                   // "|}"
-        S_BINARY = 76,                           // "binary"
-        S_HEXADECIMAL = 77,                      // "hexadecimal"
-        S_INTEGER = 78,                          // "integer"
-        S_RATIONAL = 79,                         // "rational"
-        S_DECIMAL = 80,                          // "decimal"
-        S_STRING = 81,                           // "string"
-        S_IDENTIFIER = 82,                       // "identifier"
-        S_BASIC_TYPE = 83,                       // BASIC_TYPE
-        S_CALL = 84,                             // CALL
-        S_UPLUS = 85,                            // UPLUS
-        S_UMINUS = 86,                           // UMINUS
-        S_CALL_WITHOUT_ARGS = 87,                // CALL_WITHOUT_ARGS
-        S_YYACCEPT = 88,                         // $accept
-        S_Specification = 89,                    // Specification
-        S_Header = 90,                           // Header
-        S_Definitions = 91,                      // Definitions
-        S_AttributedDefinition = 92,             // AttributedDefinition
-        S_Definition = 93,                       // Definition
-        S_InitDefinition = 94,                   // InitDefinition
-        S_EnumerationDefinition = 95,            // EnumerationDefinition
-        S_DerivedDefinition = 96,                // DerivedDefinition
-        S_RuleDefinition = 97,                   // RuleDefinition
-        S_FunctionDefinition = 98,               // FunctionDefinition
-        S_EnumeratorDefinition = 99,             // EnumeratorDefinition
-        S_Enumerators = 100,                     // Enumerators
-        S_UsingDefinition = 101,                 // UsingDefinition
-        S_UsingPathDefinition = 102,             // UsingPathDefinition
-        S_InvariantDefinition = 103,             // InvariantDefinition
-        S_ImportDefinition = 104,                // ImportDefinition
-        S_Rules = 105,                           // Rules
-        S_Rule = 106,                            // Rule
-        S_SkipRule = 107,                        // SkipRule
-        S_ConditionalRule = 108,                 // ConditionalRule
-        S_CaseRule = 109,                        // CaseRule
-        S_CaseLabels = 110,                      // CaseLabels
-        S_CaseLabel = 111,                       // CaseLabel
-        S_LetRule = 112,                         // LetRule
-        S_LocalRule = 113,                       // LocalRule
-        S_ForallRule = 114,                      // ForallRule
-        S_ChooseRule = 115,                      // ChooseRule
-        S_IterateRule = 116,                     // IterateRule
-        S_BlockRule = 117,                       // BlockRule
-        S_SequenceRule = 118,                    // SequenceRule
-        S_UpdateRule = 119,                      // UpdateRule
-        S_CallRule = 120,                        // CallRule
-        S_WhileRule = 121,                       // WhileRule
-        S_Terms = 122,                           // Terms
-        S_Term = 123,                            // Term
-        S_SimpleOrClaspedTerm = 124,             // SimpleOrClaspedTerm
-        S_OperatorExpression = 125,              // OperatorExpression
-        S_CallExpression = 126,                  // CallExpression
-        S_DirectCallExpression = 127,            // DirectCallExpression
-        S_MethodCallExpression = 128,            // MethodCallExpression
-        S_LiteralCallExpression = 129,           // LiteralCallExpression
-        S_IndirectCallExpression = 130,          // IndirectCallExpression
-        S_TypeCastingExpression = 131,           // TypeCastingExpression
-        S_LetExpression = 132,                   // LetExpression
-        S_ConditionalExpression = 133,           // ConditionalExpression
-        S_ChooseExpression = 134,                // ChooseExpression
-        S_UniversalQuantifierExpression = 135,   // UniversalQuantifierExpression
-        S_ExistentialQuantifierExpression = 136, // ExistentialQuantifierExpression
-        S_CardinalityExpression = 137,           // CardinalityExpression
-        S_Literal = 138,                         // Literal
-        S_UndefinedLiteral = 139,                // UndefinedLiteral
-        S_BooleanLiteral = 140,                  // BooleanLiteral
-        S_IntegerLiteral = 141,                  // IntegerLiteral
-        S_RationalLiteral = 142,                 // RationalLiteral
-        S_DecimalLiteral = 143,                  // DecimalLiteral
-        S_BinaryLiteral = 144,                   // BinaryLiteral
-        S_StringLiteral = 145,                   // StringLiteral
-        S_ReferenceLiteral = 146,                // ReferenceLiteral
-        S_ListLiteral = 147,                     // ListLiteral
-        S_RangeLiteral = 148,                    // RangeLiteral
-        S_TupleLiteral = 149,                    // TupleLiteral
-        S_RecordLiteral = 150,                   // RecordLiteral
-        S_Assignments = 151,                     // Assignments
-        S_Assignment = 152,                      // Assignment
-        S_Types = 153,                           // Types
-        S_Type = 154,                            // Type
-        S_BasicType = 155,                       // BasicType
-        S_TupleType = 156,                       // TupleType
-        S_RecordType = 157,                      // RecordType
-        S_TemplateType = 158,                    // TemplateType
-        S_RelationType = 159,                    // RelationType
-        S_FixedSizedType = 160,                  // FixedSizedType
-        S_FunctionParameters = 161,              // FunctionParameters
-        S_MaybeFunctionParameters = 162,         // MaybeFunctionParameters
-        S_Parameters = 163,                      // Parameters
-        S_MaybeDefined = 164,                    // MaybeDefined
-        S_MaybeInitially = 165,                  // MaybeInitially
-        S_Initializers = 166,                    // Initializers
-        S_Initializer = 167,                     // Initializer
-        S_Identifier = 168,                      // Identifier
-        S_IdentifierPath = 169,                  // IdentifierPath
-        S_Variable = 170,                        // Variable
-        S_AttributedVariables = 171,             // AttributedVariables
-        S_TypedVariables = 172,                  // TypedVariables
-        S_TypedVariable = 173,                   // TypedVariable
-        S_AttributedVariable = 174,              // AttributedVariable
-        S_TypedAttributedVariable = 175,         // TypedAttributedVariable
-        S_VariableBindings = 176,                // VariableBindings
-        S_VariableBinding = 177,                 // VariableBinding
-        S_LocalFunctionDefinitions = 178,        // LocalFunctionDefinitions
-        S_AttributedLocalFunctionDefinition = 179, // AttributedLocalFunctionDefinition
-        S_LocalFunctionDefinition = 180,         // LocalFunctionDefinition
-        S_Attributes = 181,                      // Attributes
-        S_Attribute = 182,                       // Attribute
-        S_BasicAttribute = 183,                  // BasicAttribute
-        S_ExpressionAttribute = 184              // ExpressionAttribute
+        S_STRUCTURE = 11,                        // "structure"
+        S_BEHAVIOR = 12,                         // "behavior"
+        S_IMPLEMENT = 13,                        // "implement"
+        S_FOR = 14,                              // "for"
+        S_SELF = 15,                             // "self"
+        S_THIS = 16,                             // "this"
+        S_DOMAINTYPE = 17,                       // "domain"
+        S_BUILTIN = 18,                          // "builtin"
+        S_FUNCTION = 19,                         // "function"
+        S_DEFINED = 20,                          // "defined"
+        S_SEQ = 21,                              // "seq"
+        S_ENDSEQ = 22,                           // "endseq"
+        S_PAR = 23,                              // "par"
+        S_ENDPAR = 24,                           // "endpar"
+        S_SKIP = 25,                             // "skip"
+        S_LET = 26,                              // "let"
+        S_LOCAL = 27,                            // "local"
+        S_IN = 28,                               // "in"
+        S_FORALL = 29,                           // "forall"
+        S_CHOOSE = 30,                           // "choose"
+        S_ITERATE = 31,                          // "iterate"
+        S_DO = 32,                               // "do"
+        S_IF = 33,                               // "if"
+        S_THEN = 34,                             // "then"
+        S_ELSE = 35,                             // "else"
+        S_CASE = 36,                             // "case"
+        S_OF = 37,                               // "of"
+        S_DEFAULT = 38,                          // "default"
+        S_HOLDS = 39,                            // "holds"
+        S_EXISTS = 40,                           // "exists"
+        S_WITH = 41,                             // "with"
+        S_AS = 42,                               // "as"
+        S_WHILE = 43,                            // "while"
+        S_UNDEF = 44,                            // "undef"
+        S_FALSE = 45,                            // "false"
+        S_TRUE = 46,                             // "true"
+        S_AND = 47,                              // "and"
+        S_OR = 48,                               // "or"
+        S_XOR = 49,                              // "xor"
+        S_IMPLIES = 50,                          // "implies"
+        S_NOT = 51,                              // "not"
+        S_PLUS = 52,                             // "+"
+        S_MINUS = 53,                            // "-"
+        S_EQUAL = 54,                            // "="
+        S_LPAREN = 55,                           // "("
+        S_RPAREN = 56,                           // ")"
+        S_LSQPAREN = 57,                         // "["
+        S_RSQPAREN = 58,                         // "]"
+        S_LCURPAREN = 59,                        // "{"
+        S_RCURPAREN = 60,                        // "}"
+        S_COLON = 61,                            // ":"
+        S_DOUBLECOLON = 62,                      // "::"
+        S_UNDERLINE = 63,                        // "_"
+        S_VERTICAL_BAR = 64,                     // "|"
+        S_AT = 65,                               // "@"
+        S_COMMA = 66,                            // ","
+        S_LESSER = 67,                           // "<"
+        S_GREATER = 68,                          // ">"
+        S_ASTERIX = 69,                          // "*"
+        S_SLASH = 70,                            // "/"
+        S_PERCENT = 71,                          // "%"
+        S_CARET = 72,                            // "^"
+        S_MARK = 73,                             // "'"
+        S_MAPS = 74,                             // "->"
+        S_ARROW = 75,                            // "=>"
+        S_UPDATE = 76,                           // ":="
+        S_NEQUAL = 77,                           // "!="
+        S_LESSEQ = 78,                           // "<="
+        S_GREATEREQ = 79,                        // ">="
+        S_SEQ_BRACKET = 80,                      // "{|"
+        S_ENDSEQ_BRACKET = 81,                   // "|}"
+        S_DOT = 82,                              // "."
+        S_DOTDOT = 83,                           // ".."
+        S_DOTDOTDOT = 84,                        // "..."
+        S_BINARY = 85,                           // "binary"
+        S_HEXADECIMAL = 86,                      // "hexadecimal"
+        S_INTEGER = 87,                          // "integer"
+        S_RATIONAL = 88,                         // "rational"
+        S_DECIMAL = 89,                          // "decimal"
+        S_STRING = 90,                           // "string"
+        S_IDENTIFIER = 91,                       // "identifier"
+        S_BASIC_TYPE = 92,                       // BASIC_TYPE
+        S_CALL = 93,                             // CALL
+        S_UPLUS = 94,                            // UPLUS
+        S_UMINUS = 95,                           // UMINUS
+        S_CALL_WITHOUT_ARGS = 96,                // CALL_WITHOUT_ARGS
+        S_YYACCEPT = 97,                         // $accept
+        S_Specification = 98,                    // Specification
+        S_Header = 99,                           // Header
+        S_Definitions = 100,                     // Definitions
+        S_AttributedDefinition = 101,            // AttributedDefinition
+        S_Definition = 102,                      // Definition
+        S_InitDefinition = 103,                  // InitDefinition
+        S_EnumerationDefinition = 104,           // EnumerationDefinition
+        S_DerivedDefinition = 105,               // DerivedDefinition
+        S_RuleDefinition = 106,                  // RuleDefinition
+        S_FunctionDefinition = 107,              // FunctionDefinition
+        S_EnumeratorDefinition = 108,            // EnumeratorDefinition
+        S_Enumerators = 109,                     // Enumerators
+        S_UsingDefinition = 110,                 // UsingDefinition
+        S_UsingPathDefinition = 111,             // UsingPathDefinition
+        S_InvariantDefinition = 112,             // InvariantDefinition
+        S_ImportDefinition = 113,                // ImportDefinition
+        S_StructureDefinition = 114,             // StructureDefinition
+        S_StructureDefinitionList = 115,         // StructureDefinitionList
+        S_StructureDefinitionElement = 116,      // StructureDefinitionElement
+        S_BehaviorDefinition = 117,              // BehaviorDefinition
+        S_BehaviorDefinitionElement = 118,       // BehaviorDefinitionElement
+        S_BehaviorDefinitionList = 119,          // BehaviorDefinitionList
+        S_ImplementDefinition = 120,             // ImplementDefinition
+        S_ImplementDefinitionList = 121,         // ImplementDefinitionList
+        S_ImplementDefinitionElement = 122,      // ImplementDefinitionElement
+        S_ImplementDefinitionAttributedElement = 123, // ImplementDefinitionAttributedElement
+        S_DomainDefinition = 124,                // DomainDefinition
+        S_BuiltinDefinition = 125,               // BuiltinDefinition
+        S_Declaration = 126,                     // Declaration
+        S_Rules = 127,                           // Rules
+        S_Rule = 128,                            // Rule
+        S_SkipRule = 129,                        // SkipRule
+        S_ConditionalRule = 130,                 // ConditionalRule
+        S_CaseRule = 131,                        // CaseRule
+        S_CaseLabels = 132,                      // CaseLabels
+        S_CaseLabel = 133,                       // CaseLabel
+        S_LetRule = 134,                         // LetRule
+        S_LocalRule = 135,                       // LocalRule
+        S_ForallRule = 136,                      // ForallRule
+        S_ChooseRule = 137,                      // ChooseRule
+        S_IterateRule = 138,                     // IterateRule
+        S_BlockRule = 139,                       // BlockRule
+        S_SequenceRule = 140,                    // SequenceRule
+        S_UpdateRule = 141,                      // UpdateRule
+        S_CallRule = 142,                        // CallRule
+        S_WhileRule = 143,                       // WhileRule
+        S_Terms = 144,                           // Terms
+        S_Term = 145,                            // Term
+        S_Expression = 146,                      // Expression
+        S_OperatorExpression = 147,              // OperatorExpression
+        S_CallExpression = 148,                  // CallExpression
+        S_DirectCallExpression = 149,            // DirectCallExpression
+        S_MethodCallExpression = 150,            // MethodCallExpression
+        S_LiteralCallExpression = 151,           // LiteralCallExpression
+        S_IndirectCallExpression = 152,          // IndirectCallExpression
+        S_TypeCastingExpression = 153,           // TypeCastingExpression
+        S_LetExpression = 154,                   // LetExpression
+        S_ConditionalExpression = 155,           // ConditionalExpression
+        S_ChooseExpression = 156,                // ChooseExpression
+        S_UniversalQuantifierExpression = 157,   // UniversalQuantifierExpression
+        S_ExistentialQuantifierExpression = 158, // ExistentialQuantifierExpression
+        S_CardinalityExpression = 159,           // CardinalityExpression
+        S_Literal = 160,                         // Literal
+        S_UndefinedLiteral = 161,                // UndefinedLiteral
+        S_BooleanLiteral = 162,                  // BooleanLiteral
+        S_IntegerLiteral = 163,                  // IntegerLiteral
+        S_RationalLiteral = 164,                 // RationalLiteral
+        S_DecimalLiteral = 165,                  // DecimalLiteral
+        S_BinaryLiteral = 166,                   // BinaryLiteral
+        S_StringLiteral = 167,                   // StringLiteral
+        S_ReferenceLiteral = 168,                // ReferenceLiteral
+        S_ListLiteral = 169,                     // ListLiteral
+        S_RangeLiteral = 170,                    // RangeLiteral
+        S_TupleLiteral = 171,                    // TupleLiteral
+        S_RecordLiteral = 172,                   // RecordLiteral
+        S_Assignments = 173,                     // Assignments
+        S_Assignment = 174,                      // Assignment
+        S_MappedExpressions = 175,               // MappedExpressions
+        S_MappedExpression = 176,                // MappedExpression
+        S_Types = 177,                           // Types
+        S_Type = 178,                            // Type
+        S_BasicType = 179,                       // BasicType
+        S_TupleType = 180,                       // TupleType
+        S_RecordType = 181,                      // RecordType
+        S_TemplateType = 182,                    // TemplateType
+        S_RelationType = 183,                    // RelationType
+        S_FixedSizedType = 184,                  // FixedSizedType
+        S_MappingType = 185,                     // MappingType
+        S_VaradicType = 186,                     // VaradicType
+        S_FunctionParameters = 187,              // FunctionParameters
+        S_MaybeFunctionParameters = 188,         // MaybeFunctionParameters
+        S_MethodParameters = 189,                // MethodParameters
+        S_Parameters = 190,                      // Parameters
+        S_MaybeDefined = 191,                    // MaybeDefined
+        S_MaybeInitially = 192,                  // MaybeInitially
+        S_Identifier = 193,                      // Identifier
+        S_IdentifierPath = 194,                  // IdentifierPath
+        S_Variable = 195,                        // Variable
+        S_AttributedVariables = 196,             // AttributedVariables
+        S_TypedVariables = 197,                  // TypedVariables
+        S_TypedVariable = 198,                   // TypedVariable
+        S_AttributedVariable = 199,              // AttributedVariable
+        S_TypedAttributedVariable = 200,         // TypedAttributedVariable
+        S_VariableBindings = 201,                // VariableBindings
+        S_VariableBinding = 202,                 // VariableBinding
+        S_LocalFunctionDefinitions = 203,        // LocalFunctionDefinitions
+        S_AttributedLocalFunctionDefinition = 204, // AttributedLocalFunctionDefinition
+        S_LocalFunctionDefinition = 205,         // LocalFunctionDefinition
+        S_Attributes = 206,                      // Attributes
+        S_Attribute = 207,                       // Attribute
+        S_BasicAttribute = 208,                  // BasicAttribute
+        S_SymbolAttribute = 209,                 // SymbolAttribute
+        S_ExpressionAttribute = 210              // ExpressionAttribute
       };
     };
 
@@ -1127,6 +1206,34 @@ namespace libcasm_fe {
       {
         switch (this->kind ())
     {
+      case symbol_kind::S_Attribute: // Attribute
+        value.move< Attribute::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_Attributes: // Attributes
+        value.move< Attributes::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_BasicAttribute: // BasicAttribute
+        value.move< BasicAttribute::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_BasicType: // BasicType
+        value.move< BasicType::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_BehaviorDefinition: // BehaviorDefinition
+        value.move< BehaviorDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_BlockRule: // BlockRule
+        value.move< BlockRule::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_BuiltinDefinition: // BuiltinDefinition
+        value.move< BuiltinDefinition::Ptr > (std::move (that.value));
+        break;
+
       case symbol_kind::S_CASM: // "CASM"
       case symbol_kind::S_INIT: // "init"
       case symbol_kind::S_DERIVED: // "derived"
@@ -1135,6 +1242,14 @@ namespace libcasm_fe {
       case symbol_kind::S_USING: // "using"
       case symbol_kind::S_INVARIANT: // "invariant"
       case symbol_kind::S_IMPORT: // "import"
+      case symbol_kind::S_STRUCTURE: // "structure"
+      case symbol_kind::S_BEHAVIOR: // "behavior"
+      case symbol_kind::S_IMPLEMENT: // "implement"
+      case symbol_kind::S_FOR: // "for"
+      case symbol_kind::S_SELF: // "self"
+      case symbol_kind::S_THIS: // "this"
+      case symbol_kind::S_DOMAINTYPE: // "domain"
+      case symbol_kind::S_BUILTIN: // "builtin"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -1190,8 +1305,6 @@ namespace libcasm_fe {
       case symbol_kind::S_PERCENT: // "%"
       case symbol_kind::S_CARET: // "^"
       case symbol_kind::S_MARK: // "'"
-      case symbol_kind::S_DOTDOT: // ".."
-      case symbol_kind::S_DOT: // "."
       case symbol_kind::S_MAPS: // "->"
       case symbol_kind::S_ARROW: // "=>"
       case symbol_kind::S_UPDATE: // ":="
@@ -1200,27 +1313,10 @@ namespace libcasm_fe {
       case symbol_kind::S_GREATEREQ: // ">="
       case symbol_kind::S_SEQ_BRACKET: // "{|"
       case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
-        value.move< Ast::Token::Ptr > (std::move (that.value));
-        break;
-
-      case symbol_kind::S_Attribute: // Attribute
-        value.move< Attribute::Ptr > (std::move (that.value));
-        break;
-
-      case symbol_kind::S_Attributes: // Attributes
-        value.move< Attributes::Ptr > (std::move (that.value));
-        break;
-
-      case symbol_kind::S_BasicAttribute: // BasicAttribute
-        value.move< BasicAttribute::Ptr > (std::move (that.value));
-        break;
-
-      case symbol_kind::S_BasicType: // BasicType
-        value.move< BasicType::Ptr > (std::move (that.value));
-        break;
-
-      case symbol_kind::S_BlockRule: // BlockRule
-        value.move< BlockRule::Ptr > (std::move (that.value));
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOTDOTDOT: // "..."
+        value.move< CST::Token::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_CallExpression: // CallExpression
@@ -1263,16 +1359,25 @@ namespace libcasm_fe {
         value.move< ConditionalRule::Ptr > (std::move (that.value));
         break;
 
+      case symbol_kind::S_Declaration: // Declaration
+        value.move< Declaration::Ptr > (std::move (that.value));
+        break;
+
       case symbol_kind::S_MaybeDefined: // MaybeDefined
         value.move< Defined::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
+      case symbol_kind::S_BehaviorDefinitionElement: // BehaviorDefinitionElement
+      case symbol_kind::S_ImplementDefinitionElement: // ImplementDefinitionElement
+      case symbol_kind::S_ImplementDefinitionAttributedElement: // ImplementDefinitionAttributedElement
         value.move< Definition::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_Definitions: // Definitions
+      case symbol_kind::S_BehaviorDefinitionList: // BehaviorDefinitionList
+      case symbol_kind::S_ImplementDefinitionList: // ImplementDefinitionList
         value.move< Definitions::Ptr > (std::move (that.value));
         break;
 
@@ -1282,6 +1387,10 @@ namespace libcasm_fe {
 
       case symbol_kind::S_DirectCallExpression: // DirectCallExpression
         value.move< DirectCallExpression::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_DomainDefinition: // DomainDefinition
+        value.move< DomainDefinition::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_EnumerationDefinition: // EnumerationDefinition
@@ -1301,7 +1410,7 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_Term: // Term
-      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_Expression: // Expression
       case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.move< Expression::Ptr > (std::move (that.value));
         break;
@@ -1323,11 +1432,13 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_FunctionDefinition: // FunctionDefinition
+      case symbol_kind::S_StructureDefinitionElement: // StructureDefinitionElement
       case symbol_kind::S_AttributedLocalFunctionDefinition: // AttributedLocalFunctionDefinition
       case symbol_kind::S_LocalFunctionDefinition: // LocalFunctionDefinition
         value.move< FunctionDefinition::Ptr > (std::move (that.value));
         break;
 
+      case symbol_kind::S_StructureDefinitionList: // StructureDefinitionList
       case symbol_kind::S_LocalFunctionDefinitions: // LocalFunctionDefinitions
         value.move< FunctionDefinitions::Ptr > (std::move (that.value));
         break;
@@ -1345,6 +1456,10 @@ namespace libcasm_fe {
         value.move< IdentifierPath::Ptr > (std::move (that.value));
         break;
 
+      case symbol_kind::S_ImplementDefinition: // ImplementDefinition
+        value.move< ImplementDefinition::Ptr > (std::move (that.value));
+        break;
+
       case symbol_kind::S_ImportDefinition: // ImportDefinition
         value.move< ImportDefinition::Ptr > (std::move (that.value));
         break;
@@ -1355,14 +1470,6 @@ namespace libcasm_fe {
 
       case symbol_kind::S_InitDefinition: // InitDefinition
         value.move< InitDefinition::Ptr > (std::move (that.value));
-        break;
-
-      case symbol_kind::S_Initializer: // Initializer
-        value.move< Initializer::Ptr > (std::move (that.value));
-        break;
-
-      case symbol_kind::S_Initializers: // Initializers
-        value.move< Initializers::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_MaybeInitially: // MaybeInitially
@@ -1399,6 +1506,18 @@ namespace libcasm_fe {
 
       case symbol_kind::S_LocalRule: // LocalRule
         value.move< LocalRule::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_MappedExpression: // MappedExpression
+        value.move< MappedExpression::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_MappedExpressions: // MappedExpressions
+        value.move< MappedExpressions::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_MappingType: // MappingType
+        value.move< MappingType::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_MethodCallExpression: // MethodCallExpression
@@ -1455,6 +1574,14 @@ namespace libcasm_fe {
 
       case symbol_kind::S_Specification: // Specification
         value.move< Specification::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_StructureDefinition: // StructureDefinition
+        value.move< StructureDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_SymbolAttribute: // SymbolAttribute
+        value.move< SymbolAttribute::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -1514,6 +1641,10 @@ namespace libcasm_fe {
         value.move< ValueLiteral::Ptr > (std::move (that.value));
         break;
 
+      case symbol_kind::S_VaradicType: // VaradicType
+        value.move< VaradicType::Ptr > (std::move (that.value));
+        break;
+
       case symbol_kind::S_VariableBinding: // VariableBinding
         value.move< VariableBinding::Ptr > (std::move (that.value));
         break;
@@ -1529,6 +1660,7 @@ namespace libcasm_fe {
         value.move< VariableDefinition::Ptr > (std::move (that.value));
         break;
 
+      case symbol_kind::S_MethodParameters: // MethodParameters
       case symbol_kind::S_Parameters: // Parameters
       case symbol_kind::S_AttributedVariables: // AttributedVariables
       case symbol_kind::S_TypedVariables: // TypedVariables
@@ -1540,7 +1672,7 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_Type: // Type
-        value.move< libcasm_fe::Ast::Type::Ptr > (std::move (that.value));
+        value.move< libcasm_fe::CST::Type::Ptr > (std::move (that.value));
         break;
 
       default:
@@ -1553,7 +1685,7 @@ namespace libcasm_fe {
       /// Copy constructor.
       basic_symbol (const basic_symbol& that);
 
-      /// Constructor for valueless symbols, and symbols from each type.
+      /// Constructors for typed symbols.
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, location_type&& l)
         : Base (t)
@@ -1565,19 +1697,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, Ast::Token::Ptr&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const Ast::Token::Ptr& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Attribute::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1591,6 +1711,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Attributes::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1604,6 +1725,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, BasicAttribute::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1617,6 +1739,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, BasicType::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1630,6 +1753,21 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, BehaviorDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const BehaviorDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, BlockRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1643,6 +1781,35 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, BuiltinDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const BuiltinDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, CST::Token::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const CST::Token::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, CallExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1656,6 +1823,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, CallRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1669,6 +1837,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, CardinalityExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1682,6 +1851,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Case::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1695,6 +1865,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, CaseRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1708,6 +1879,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Cases::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1721,6 +1893,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ChooseExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1734,6 +1907,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ChooseRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1747,6 +1921,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ConditionalExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1760,6 +1935,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ConditionalRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1773,6 +1949,21 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Declaration::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Declaration::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Defined::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1786,6 +1977,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Definition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1799,6 +1991,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Definitions::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1812,6 +2005,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, DerivedDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1825,6 +2019,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, DirectCallExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1838,6 +2033,21 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, DomainDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const DomainDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, EnumerationDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1851,6 +2061,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, EnumeratorDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1864,6 +2075,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Enumerators::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1877,6 +2089,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ExistentialQuantifierExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1890,6 +2103,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Expression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1903,6 +2117,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ExpressionAttribute::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1916,6 +2131,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Expressions::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1929,6 +2145,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, FixedSizedType::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1942,6 +2159,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ForallRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1955,6 +2173,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, FunctionDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1968,6 +2187,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, FunctionDefinitions::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1981,6 +2201,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, HeaderDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -1994,6 +2215,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Identifier::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2007,6 +2229,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, IdentifierPath::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2020,6 +2243,21 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, ImplementDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const ImplementDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ImportDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2033,6 +2271,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, IndirectCallExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2046,6 +2285,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, InitDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2059,32 +2299,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, Initializer::Ptr&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const Initializer::Ptr& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, Initializers::Ptr&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const Initializers::Ptr& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Initially::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2098,6 +2313,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, InvariantDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2111,6 +2327,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, IterateRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2124,6 +2341,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, LetExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2137,6 +2355,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, LetRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2150,6 +2369,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ListLiteral::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2163,6 +2383,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Literal::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2176,6 +2397,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, LiteralCallExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2189,6 +2411,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, LocalRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2202,6 +2425,49 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, MappedExpression::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const MappedExpression::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, MappedExpressions::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const MappedExpressions::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, MappingType::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const MappingType::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, MethodCallExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2215,6 +2481,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, NamedExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2228,6 +2495,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, NamedExpressions::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2241,6 +2509,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, RangeLiteral::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2254,6 +2523,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, RecordLiteral::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2267,6 +2537,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, RecordType::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2280,6 +2551,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ReferenceLiteral::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2293,6 +2565,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, RelationType::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2306,6 +2579,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Rule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2319,6 +2593,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, RuleDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2332,6 +2607,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Rules::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2345,6 +2621,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, SequenceRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2358,6 +2635,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, SkipRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2371,6 +2649,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Specification::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2384,6 +2663,35 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, StructureDefinition::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const StructureDefinition::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, SymbolAttribute::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const SymbolAttribute::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, TemplateType::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2397,6 +2705,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, TupleLiteral::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2410,6 +2719,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, TupleType::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2423,6 +2733,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, TypeCastingExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2436,6 +2747,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, Types::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2449,6 +2761,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, UndefLiteral::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2462,6 +2775,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, UniversalQuantifierExpression::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2475,6 +2789,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, UpdateRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2488,6 +2803,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, UsingDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2501,6 +2817,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, UsingPathDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2514,6 +2831,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ValueLiteral::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2527,6 +2845,21 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, VaradicType::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const VaradicType::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, VariableBinding::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2540,6 +2873,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, VariableBindings::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2553,6 +2887,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, VariableDefinition::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2566,6 +2901,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, VariableDefinitions::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2579,6 +2915,7 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, WhileRule::Ptr&& v, location_type&& l)
         : Base (t)
@@ -2592,14 +2929,15 @@ namespace libcasm_fe {
         , location (l)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, libcasm_fe::Ast::Type::Ptr&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, libcasm_fe::CST::Type::Ptr&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const libcasm_fe::Ast::Type::Ptr& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const libcasm_fe::CST::Type::Ptr& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -2613,7 +2951,7 @@ namespace libcasm_fe {
       }
 
       /// Destroy contents, and record that is empty.
-      void clear ()
+      void clear () YY_NOEXCEPT
       {
         // User destructor.
         symbol_kind_type yykind = this->kind ();
@@ -2628,6 +2966,34 @@ namespace libcasm_fe {
         // Value type destructor.
 switch (yykind)
     {
+      case symbol_kind::S_Attribute: // Attribute
+        value.template destroy< Attribute::Ptr > ();
+        break;
+
+      case symbol_kind::S_Attributes: // Attributes
+        value.template destroy< Attributes::Ptr > ();
+        break;
+
+      case symbol_kind::S_BasicAttribute: // BasicAttribute
+        value.template destroy< BasicAttribute::Ptr > ();
+        break;
+
+      case symbol_kind::S_BasicType: // BasicType
+        value.template destroy< BasicType::Ptr > ();
+        break;
+
+      case symbol_kind::S_BehaviorDefinition: // BehaviorDefinition
+        value.template destroy< BehaviorDefinition::Ptr > ();
+        break;
+
+      case symbol_kind::S_BlockRule: // BlockRule
+        value.template destroy< BlockRule::Ptr > ();
+        break;
+
+      case symbol_kind::S_BuiltinDefinition: // BuiltinDefinition
+        value.template destroy< BuiltinDefinition::Ptr > ();
+        break;
+
       case symbol_kind::S_CASM: // "CASM"
       case symbol_kind::S_INIT: // "init"
       case symbol_kind::S_DERIVED: // "derived"
@@ -2636,6 +3002,14 @@ switch (yykind)
       case symbol_kind::S_USING: // "using"
       case symbol_kind::S_INVARIANT: // "invariant"
       case symbol_kind::S_IMPORT: // "import"
+      case symbol_kind::S_STRUCTURE: // "structure"
+      case symbol_kind::S_BEHAVIOR: // "behavior"
+      case symbol_kind::S_IMPLEMENT: // "implement"
+      case symbol_kind::S_FOR: // "for"
+      case symbol_kind::S_SELF: // "self"
+      case symbol_kind::S_THIS: // "this"
+      case symbol_kind::S_DOMAINTYPE: // "domain"
+      case symbol_kind::S_BUILTIN: // "builtin"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -2691,8 +3065,6 @@ switch (yykind)
       case symbol_kind::S_PERCENT: // "%"
       case symbol_kind::S_CARET: // "^"
       case symbol_kind::S_MARK: // "'"
-      case symbol_kind::S_DOTDOT: // ".."
-      case symbol_kind::S_DOT: // "."
       case symbol_kind::S_MAPS: // "->"
       case symbol_kind::S_ARROW: // "=>"
       case symbol_kind::S_UPDATE: // ":="
@@ -2701,27 +3073,10 @@ switch (yykind)
       case symbol_kind::S_GREATEREQ: // ">="
       case symbol_kind::S_SEQ_BRACKET: // "{|"
       case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
-        value.template destroy< Ast::Token::Ptr > ();
-        break;
-
-      case symbol_kind::S_Attribute: // Attribute
-        value.template destroy< Attribute::Ptr > ();
-        break;
-
-      case symbol_kind::S_Attributes: // Attributes
-        value.template destroy< Attributes::Ptr > ();
-        break;
-
-      case symbol_kind::S_BasicAttribute: // BasicAttribute
-        value.template destroy< BasicAttribute::Ptr > ();
-        break;
-
-      case symbol_kind::S_BasicType: // BasicType
-        value.template destroy< BasicType::Ptr > ();
-        break;
-
-      case symbol_kind::S_BlockRule: // BlockRule
-        value.template destroy< BlockRule::Ptr > ();
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOTDOTDOT: // "..."
+        value.template destroy< CST::Token::Ptr > ();
         break;
 
       case symbol_kind::S_CallExpression: // CallExpression
@@ -2764,16 +3119,25 @@ switch (yykind)
         value.template destroy< ConditionalRule::Ptr > ();
         break;
 
+      case symbol_kind::S_Declaration: // Declaration
+        value.template destroy< Declaration::Ptr > ();
+        break;
+
       case symbol_kind::S_MaybeDefined: // MaybeDefined
         value.template destroy< Defined::Ptr > ();
         break;
 
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
+      case symbol_kind::S_BehaviorDefinitionElement: // BehaviorDefinitionElement
+      case symbol_kind::S_ImplementDefinitionElement: // ImplementDefinitionElement
+      case symbol_kind::S_ImplementDefinitionAttributedElement: // ImplementDefinitionAttributedElement
         value.template destroy< Definition::Ptr > ();
         break;
 
       case symbol_kind::S_Definitions: // Definitions
+      case symbol_kind::S_BehaviorDefinitionList: // BehaviorDefinitionList
+      case symbol_kind::S_ImplementDefinitionList: // ImplementDefinitionList
         value.template destroy< Definitions::Ptr > ();
         break;
 
@@ -2783,6 +3147,10 @@ switch (yykind)
 
       case symbol_kind::S_DirectCallExpression: // DirectCallExpression
         value.template destroy< DirectCallExpression::Ptr > ();
+        break;
+
+      case symbol_kind::S_DomainDefinition: // DomainDefinition
+        value.template destroy< DomainDefinition::Ptr > ();
         break;
 
       case symbol_kind::S_EnumerationDefinition: // EnumerationDefinition
@@ -2802,7 +3170,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Term: // Term
-      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_Expression: // Expression
       case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.template destroy< Expression::Ptr > ();
         break;
@@ -2824,11 +3192,13 @@ switch (yykind)
         break;
 
       case symbol_kind::S_FunctionDefinition: // FunctionDefinition
+      case symbol_kind::S_StructureDefinitionElement: // StructureDefinitionElement
       case symbol_kind::S_AttributedLocalFunctionDefinition: // AttributedLocalFunctionDefinition
       case symbol_kind::S_LocalFunctionDefinition: // LocalFunctionDefinition
         value.template destroy< FunctionDefinition::Ptr > ();
         break;
 
+      case symbol_kind::S_StructureDefinitionList: // StructureDefinitionList
       case symbol_kind::S_LocalFunctionDefinitions: // LocalFunctionDefinitions
         value.template destroy< FunctionDefinitions::Ptr > ();
         break;
@@ -2846,6 +3216,10 @@ switch (yykind)
         value.template destroy< IdentifierPath::Ptr > ();
         break;
 
+      case symbol_kind::S_ImplementDefinition: // ImplementDefinition
+        value.template destroy< ImplementDefinition::Ptr > ();
+        break;
+
       case symbol_kind::S_ImportDefinition: // ImportDefinition
         value.template destroy< ImportDefinition::Ptr > ();
         break;
@@ -2856,14 +3230,6 @@ switch (yykind)
 
       case symbol_kind::S_InitDefinition: // InitDefinition
         value.template destroy< InitDefinition::Ptr > ();
-        break;
-
-      case symbol_kind::S_Initializer: // Initializer
-        value.template destroy< Initializer::Ptr > ();
-        break;
-
-      case symbol_kind::S_Initializers: // Initializers
-        value.template destroy< Initializers::Ptr > ();
         break;
 
       case symbol_kind::S_MaybeInitially: // MaybeInitially
@@ -2900,6 +3266,18 @@ switch (yykind)
 
       case symbol_kind::S_LocalRule: // LocalRule
         value.template destroy< LocalRule::Ptr > ();
+        break;
+
+      case symbol_kind::S_MappedExpression: // MappedExpression
+        value.template destroy< MappedExpression::Ptr > ();
+        break;
+
+      case symbol_kind::S_MappedExpressions: // MappedExpressions
+        value.template destroy< MappedExpressions::Ptr > ();
+        break;
+
+      case symbol_kind::S_MappingType: // MappingType
+        value.template destroy< MappingType::Ptr > ();
         break;
 
       case symbol_kind::S_MethodCallExpression: // MethodCallExpression
@@ -2956,6 +3334,14 @@ switch (yykind)
 
       case symbol_kind::S_Specification: // Specification
         value.template destroy< Specification::Ptr > ();
+        break;
+
+      case symbol_kind::S_StructureDefinition: // StructureDefinition
+        value.template destroy< StructureDefinition::Ptr > ();
+        break;
+
+      case symbol_kind::S_SymbolAttribute: // SymbolAttribute
+        value.template destroy< SymbolAttribute::Ptr > ();
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -3015,6 +3401,10 @@ switch (yykind)
         value.template destroy< ValueLiteral::Ptr > ();
         break;
 
+      case symbol_kind::S_VaradicType: // VaradicType
+        value.template destroy< VaradicType::Ptr > ();
+        break;
+
       case symbol_kind::S_VariableBinding: // VariableBinding
         value.template destroy< VariableBinding::Ptr > ();
         break;
@@ -3030,6 +3420,7 @@ switch (yykind)
         value.template destroy< VariableDefinition::Ptr > ();
         break;
 
+      case symbol_kind::S_MethodParameters: // MethodParameters
       case symbol_kind::S_Parameters: // Parameters
       case symbol_kind::S_AttributedVariables: // AttributedVariables
       case symbol_kind::S_TypedVariables: // TypedVariables
@@ -3041,7 +3432,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Type: // Type
-        value.template destroy< libcasm_fe::Ast::Type::Ptr > ();
+        value.template destroy< libcasm_fe::CST::Type::Ptr > ();
         break;
 
       default:
@@ -3100,7 +3491,7 @@ switch (yykind)
       by_kind (kind_type t);
 
       /// Record that this symbol is empty.
-      void clear ();
+      void clear () YY_NOEXCEPT;
 
       /// Steal the symbol kind from \a that.
       void move (by_kind& that);
@@ -3133,55 +3524,45 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, location_type l)
         : super_type(token_type (tok), std::move (l))
-      {
-        YY_ASSERT (tok == token::END || tok == token::YYerror || tok == token::YYUNDEF || tok == token::BASIC_TYPE || tok == token::CALL || tok == token::UPLUS || tok == token::UMINUS || tok == token::CALL_WITHOUT_ARGS);
-      }
 #else
       symbol_type (int tok, const location_type& l)
         : super_type(token_type (tok), l)
-      {
-        YY_ASSERT (tok == token::END || tok == token::YYerror || tok == token::YYUNDEF || tok == token::BASIC_TYPE || tok == token::CALL || tok == token::UPLUS || tok == token::UMINUS || tok == token::CALL_WITHOUT_ARGS);
-      }
 #endif
+      {
+        YY_ASSERT (tok == token::END
+                   || (token::YYerror <= tok && tok <= token::YYUNDEF)
+                   || (token::BASIC_TYPE <= tok && tok <= token::CALL_WITHOUT_ARGS));
+      }
 #if 201103L <= YY_CPLUSPLUS
-      symbol_type (int tok, Ast::Token::Ptr v, location_type l)
+      symbol_type (int tok, CST::Token::Ptr v, location_type l)
         : super_type(token_type (tok), std::move (v), std::move (l))
-      {
-        YY_ASSERT (tok == token::CASM || tok == token::INIT || tok == token::DERIVED || tok == token::ENUMERATION || tok == token::RULE || tok == token::USING || tok == token::INVARIANT || tok == token::IMPORT || tok == token::FUNCTION || tok == token::DEFINED || tok == token::SEQ || tok == token::ENDSEQ || tok == token::PAR || tok == token::ENDPAR || tok == token::SKIP || tok == token::LET || tok == token::LOCAL || tok == token::IN || tok == token::FORALL || tok == token::CHOOSE || tok == token::ITERATE || tok == token::DO || tok == token::IF || tok == token::THEN || tok == token::ELSE || tok == token::CASE || tok == token::OF || tok == token::DEFAULT || tok == token::HOLDS || tok == token::EXISTS || tok == token::WITH || tok == token::AS || tok == token::WHILE || tok == token::UNDEF || tok == token::FALSE || tok == token::TRUE || tok == token::AND || tok == token::OR || tok == token::XOR || tok == token::IMPLIES || tok == token::NOT || tok == token::PLUS || tok == token::MINUS || tok == token::EQUAL || tok == token::LPAREN || tok == token::RPAREN || tok == token::LSQPAREN || tok == token::RSQPAREN || tok == token::LCURPAREN || tok == token::RCURPAREN || tok == token::COLON || tok == token::DOUBLECOLON || tok == token::UNDERLINE || tok == token::VERTICAL_BAR || tok == token::AT || tok == token::COMMA || tok == token::LESSER || tok == token::GREATER || tok == token::ASTERIX || tok == token::SLASH || tok == token::PERCENT || tok == token::CARET || tok == token::MARK || tok == token::DOTDOT || tok == token::DOT || tok == token::MAPS || tok == token::ARROW || tok == token::UPDATE || tok == token::NEQUAL || tok == token::LESSEQ || tok == token::GREATEREQ || tok == token::SEQ_BRACKET || tok == token::ENDSEQ_BRACKET);
-      }
 #else
-      symbol_type (int tok, const Ast::Token::Ptr& v, const location_type& l)
+      symbol_type (int tok, const CST::Token::Ptr& v, const location_type& l)
         : super_type(token_type (tok), v, l)
-      {
-        YY_ASSERT (tok == token::CASM || tok == token::INIT || tok == token::DERIVED || tok == token::ENUMERATION || tok == token::RULE || tok == token::USING || tok == token::INVARIANT || tok == token::IMPORT || tok == token::FUNCTION || tok == token::DEFINED || tok == token::SEQ || tok == token::ENDSEQ || tok == token::PAR || tok == token::ENDPAR || tok == token::SKIP || tok == token::LET || tok == token::LOCAL || tok == token::IN || tok == token::FORALL || tok == token::CHOOSE || tok == token::ITERATE || tok == token::DO || tok == token::IF || tok == token::THEN || tok == token::ELSE || tok == token::CASE || tok == token::OF || tok == token::DEFAULT || tok == token::HOLDS || tok == token::EXISTS || tok == token::WITH || tok == token::AS || tok == token::WHILE || tok == token::UNDEF || tok == token::FALSE || tok == token::TRUE || tok == token::AND || tok == token::OR || tok == token::XOR || tok == token::IMPLIES || tok == token::NOT || tok == token::PLUS || tok == token::MINUS || tok == token::EQUAL || tok == token::LPAREN || tok == token::RPAREN || tok == token::LSQPAREN || tok == token::RSQPAREN || tok == token::LCURPAREN || tok == token::RCURPAREN || tok == token::COLON || tok == token::DOUBLECOLON || tok == token::UNDERLINE || tok == token::VERTICAL_BAR || tok == token::AT || tok == token::COMMA || tok == token::LESSER || tok == token::GREATER || tok == token::ASTERIX || tok == token::SLASH || tok == token::PERCENT || tok == token::CARET || tok == token::MARK || tok == token::DOTDOT || tok == token::DOT || tok == token::MAPS || tok == token::ARROW || tok == token::UPDATE || tok == token::NEQUAL || tok == token::LESSEQ || tok == token::GREATEREQ || tok == token::SEQ_BRACKET || tok == token::ENDSEQ_BRACKET);
-      }
 #endif
+      {
+        YY_ASSERT ((token::CASM <= tok && tok <= token::DOTDOTDOT));
+      }
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, Identifier::Ptr v, location_type l)
         : super_type(token_type (tok), std::move (v), std::move (l))
-      {
-        YY_ASSERT (tok == token::IDENTIFIER);
-      }
 #else
       symbol_type (int tok, const Identifier::Ptr& v, const location_type& l)
         : super_type(token_type (tok), v, l)
+#endif
       {
         YY_ASSERT (tok == token::IDENTIFIER);
       }
-#endif
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, ValueLiteral::Ptr v, location_type l)
         : super_type(token_type (tok), std::move (v), std::move (l))
-      {
-        YY_ASSERT (tok == token::BINARY || tok == token::HEXADECIMAL || tok == token::INTEGER || tok == token::RATIONAL || tok == token::DECIMAL || tok == token::STRING);
-      }
 #else
       symbol_type (int tok, const ValueLiteral::Ptr& v, const location_type& l)
         : super_type(token_type (tok), v, l)
-      {
-        YY_ASSERT (tok == token::BINARY || tok == token::HEXADECIMAL || tok == token::INTEGER || tok == token::RATIONAL || tok == token::DECIMAL || tok == token::STRING);
-      }
 #endif
+      {
+        YY_ASSERT ((token::BINARY <= tok && tok <= token::STRING));
+      }
     };
 
     /// Build a parser object.
@@ -3278,14 +3659,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_CASM (Ast::Token::Ptr v, location_type l)
+      make_CASM (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::CASM, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_CASM (const Ast::Token::Ptr& v, const location_type& l)
+      make_CASM (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::CASM, v, l);
       }
@@ -3293,14 +3674,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_INIT (Ast::Token::Ptr v, location_type l)
+      make_INIT (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::INIT, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_INIT (const Ast::Token::Ptr& v, const location_type& l)
+      make_INIT (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::INIT, v, l);
       }
@@ -3308,14 +3689,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_DERIVED (Ast::Token::Ptr v, location_type l)
+      make_DERIVED (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::DERIVED, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_DERIVED (const Ast::Token::Ptr& v, const location_type& l)
+      make_DERIVED (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::DERIVED, v, l);
       }
@@ -3323,14 +3704,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_ENUMERATION (Ast::Token::Ptr v, location_type l)
+      make_ENUMERATION (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::ENUMERATION, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_ENUMERATION (const Ast::Token::Ptr& v, const location_type& l)
+      make_ENUMERATION (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::ENUMERATION, v, l);
       }
@@ -3338,14 +3719,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_RULE (Ast::Token::Ptr v, location_type l)
+      make_RULE (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::RULE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_RULE (const Ast::Token::Ptr& v, const location_type& l)
+      make_RULE (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::RULE, v, l);
       }
@@ -3353,14 +3734,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_USING (Ast::Token::Ptr v, location_type l)
+      make_USING (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::USING, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_USING (const Ast::Token::Ptr& v, const location_type& l)
+      make_USING (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::USING, v, l);
       }
@@ -3368,14 +3749,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_INVARIANT (Ast::Token::Ptr v, location_type l)
+      make_INVARIANT (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::INVARIANT, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_INVARIANT (const Ast::Token::Ptr& v, const location_type& l)
+      make_INVARIANT (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::INVARIANT, v, l);
       }
@@ -3383,14 +3764,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_IMPORT (Ast::Token::Ptr v, location_type l)
+      make_IMPORT (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::IMPORT, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_IMPORT (const Ast::Token::Ptr& v, const location_type& l)
+      make_IMPORT (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::IMPORT, v, l);
       }
@@ -3398,14 +3779,134 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_FUNCTION (Ast::Token::Ptr v, location_type l)
+      make_STRUCTURE (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::STRUCTURE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_STRUCTURE (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::STRUCTURE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_BEHAVIOR (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::BEHAVIOR, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_BEHAVIOR (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::BEHAVIOR, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_IMPLEMENT (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::IMPLEMENT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_IMPLEMENT (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::IMPLEMENT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_FOR (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::FOR, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_FOR (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::FOR, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_SELF (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::SELF, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_SELF (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::SELF, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_THIS (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::THIS, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_THIS (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::THIS, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOMAINTYPE (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DOMAINTYPE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOMAINTYPE (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DOMAINTYPE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_BUILTIN (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::BUILTIN, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_BUILTIN (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::BUILTIN, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_FUNCTION (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::FUNCTION, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_FUNCTION (const Ast::Token::Ptr& v, const location_type& l)
+      make_FUNCTION (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::FUNCTION, v, l);
       }
@@ -3413,14 +3914,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_DEFINED (Ast::Token::Ptr v, location_type l)
+      make_DEFINED (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::DEFINED, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_DEFINED (const Ast::Token::Ptr& v, const location_type& l)
+      make_DEFINED (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::DEFINED, v, l);
       }
@@ -3428,14 +3929,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_SEQ (Ast::Token::Ptr v, location_type l)
+      make_SEQ (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::SEQ, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_SEQ (const Ast::Token::Ptr& v, const location_type& l)
+      make_SEQ (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::SEQ, v, l);
       }
@@ -3443,14 +3944,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_ENDSEQ (Ast::Token::Ptr v, location_type l)
+      make_ENDSEQ (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::ENDSEQ, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_ENDSEQ (const Ast::Token::Ptr& v, const location_type& l)
+      make_ENDSEQ (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::ENDSEQ, v, l);
       }
@@ -3458,14 +3959,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_PAR (Ast::Token::Ptr v, location_type l)
+      make_PAR (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::PAR, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_PAR (const Ast::Token::Ptr& v, const location_type& l)
+      make_PAR (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::PAR, v, l);
       }
@@ -3473,14 +3974,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_ENDPAR (Ast::Token::Ptr v, location_type l)
+      make_ENDPAR (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::ENDPAR, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_ENDPAR (const Ast::Token::Ptr& v, const location_type& l)
+      make_ENDPAR (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::ENDPAR, v, l);
       }
@@ -3488,14 +3989,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_SKIP (Ast::Token::Ptr v, location_type l)
+      make_SKIP (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::SKIP, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_SKIP (const Ast::Token::Ptr& v, const location_type& l)
+      make_SKIP (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::SKIP, v, l);
       }
@@ -3503,14 +4004,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_LET (Ast::Token::Ptr v, location_type l)
+      make_LET (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::LET, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_LET (const Ast::Token::Ptr& v, const location_type& l)
+      make_LET (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::LET, v, l);
       }
@@ -3518,14 +4019,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_LOCAL (Ast::Token::Ptr v, location_type l)
+      make_LOCAL (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::LOCAL, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_LOCAL (const Ast::Token::Ptr& v, const location_type& l)
+      make_LOCAL (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::LOCAL, v, l);
       }
@@ -3533,14 +4034,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_IN (Ast::Token::Ptr v, location_type l)
+      make_IN (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::IN, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_IN (const Ast::Token::Ptr& v, const location_type& l)
+      make_IN (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::IN, v, l);
       }
@@ -3548,14 +4049,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_FORALL (Ast::Token::Ptr v, location_type l)
+      make_FORALL (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::FORALL, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_FORALL (const Ast::Token::Ptr& v, const location_type& l)
+      make_FORALL (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::FORALL, v, l);
       }
@@ -3563,14 +4064,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_CHOOSE (Ast::Token::Ptr v, location_type l)
+      make_CHOOSE (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::CHOOSE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_CHOOSE (const Ast::Token::Ptr& v, const location_type& l)
+      make_CHOOSE (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::CHOOSE, v, l);
       }
@@ -3578,14 +4079,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_ITERATE (Ast::Token::Ptr v, location_type l)
+      make_ITERATE (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::ITERATE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_ITERATE (const Ast::Token::Ptr& v, const location_type& l)
+      make_ITERATE (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::ITERATE, v, l);
       }
@@ -3593,14 +4094,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_DO (Ast::Token::Ptr v, location_type l)
+      make_DO (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::DO, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_DO (const Ast::Token::Ptr& v, const location_type& l)
+      make_DO (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::DO, v, l);
       }
@@ -3608,14 +4109,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_IF (Ast::Token::Ptr v, location_type l)
+      make_IF (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::IF, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_IF (const Ast::Token::Ptr& v, const location_type& l)
+      make_IF (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::IF, v, l);
       }
@@ -3623,14 +4124,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_THEN (Ast::Token::Ptr v, location_type l)
+      make_THEN (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::THEN, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_THEN (const Ast::Token::Ptr& v, const location_type& l)
+      make_THEN (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::THEN, v, l);
       }
@@ -3638,14 +4139,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_ELSE (Ast::Token::Ptr v, location_type l)
+      make_ELSE (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::ELSE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_ELSE (const Ast::Token::Ptr& v, const location_type& l)
+      make_ELSE (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::ELSE, v, l);
       }
@@ -3653,14 +4154,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_CASE (Ast::Token::Ptr v, location_type l)
+      make_CASE (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::CASE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_CASE (const Ast::Token::Ptr& v, const location_type& l)
+      make_CASE (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::CASE, v, l);
       }
@@ -3668,14 +4169,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_OF (Ast::Token::Ptr v, location_type l)
+      make_OF (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::OF, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_OF (const Ast::Token::Ptr& v, const location_type& l)
+      make_OF (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::OF, v, l);
       }
@@ -3683,14 +4184,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_DEFAULT (Ast::Token::Ptr v, location_type l)
+      make_DEFAULT (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::DEFAULT, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_DEFAULT (const Ast::Token::Ptr& v, const location_type& l)
+      make_DEFAULT (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::DEFAULT, v, l);
       }
@@ -3698,14 +4199,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_HOLDS (Ast::Token::Ptr v, location_type l)
+      make_HOLDS (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::HOLDS, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_HOLDS (const Ast::Token::Ptr& v, const location_type& l)
+      make_HOLDS (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::HOLDS, v, l);
       }
@@ -3713,14 +4214,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_EXISTS (Ast::Token::Ptr v, location_type l)
+      make_EXISTS (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::EXISTS, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_EXISTS (const Ast::Token::Ptr& v, const location_type& l)
+      make_EXISTS (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::EXISTS, v, l);
       }
@@ -3728,14 +4229,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_WITH (Ast::Token::Ptr v, location_type l)
+      make_WITH (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::WITH, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_WITH (const Ast::Token::Ptr& v, const location_type& l)
+      make_WITH (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::WITH, v, l);
       }
@@ -3743,14 +4244,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_AS (Ast::Token::Ptr v, location_type l)
+      make_AS (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::AS, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_AS (const Ast::Token::Ptr& v, const location_type& l)
+      make_AS (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::AS, v, l);
       }
@@ -3758,14 +4259,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_WHILE (Ast::Token::Ptr v, location_type l)
+      make_WHILE (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::WHILE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_WHILE (const Ast::Token::Ptr& v, const location_type& l)
+      make_WHILE (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::WHILE, v, l);
       }
@@ -3773,14 +4274,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_UNDEF (Ast::Token::Ptr v, location_type l)
+      make_UNDEF (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::UNDEF, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_UNDEF (const Ast::Token::Ptr& v, const location_type& l)
+      make_UNDEF (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::UNDEF, v, l);
       }
@@ -3788,14 +4289,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_FALSE (Ast::Token::Ptr v, location_type l)
+      make_FALSE (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::FALSE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_FALSE (const Ast::Token::Ptr& v, const location_type& l)
+      make_FALSE (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::FALSE, v, l);
       }
@@ -3803,14 +4304,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_TRUE (Ast::Token::Ptr v, location_type l)
+      make_TRUE (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::TRUE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_TRUE (const Ast::Token::Ptr& v, const location_type& l)
+      make_TRUE (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::TRUE, v, l);
       }
@@ -3818,14 +4319,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_AND (Ast::Token::Ptr v, location_type l)
+      make_AND (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::AND, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_AND (const Ast::Token::Ptr& v, const location_type& l)
+      make_AND (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::AND, v, l);
       }
@@ -3833,14 +4334,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_OR (Ast::Token::Ptr v, location_type l)
+      make_OR (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::OR, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_OR (const Ast::Token::Ptr& v, const location_type& l)
+      make_OR (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::OR, v, l);
       }
@@ -3848,14 +4349,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_XOR (Ast::Token::Ptr v, location_type l)
+      make_XOR (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::XOR, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_XOR (const Ast::Token::Ptr& v, const location_type& l)
+      make_XOR (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::XOR, v, l);
       }
@@ -3863,14 +4364,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_IMPLIES (Ast::Token::Ptr v, location_type l)
+      make_IMPLIES (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::IMPLIES, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_IMPLIES (const Ast::Token::Ptr& v, const location_type& l)
+      make_IMPLIES (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::IMPLIES, v, l);
       }
@@ -3878,14 +4379,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_NOT (Ast::Token::Ptr v, location_type l)
+      make_NOT (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::NOT, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_NOT (const Ast::Token::Ptr& v, const location_type& l)
+      make_NOT (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::NOT, v, l);
       }
@@ -3893,14 +4394,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_PLUS (Ast::Token::Ptr v, location_type l)
+      make_PLUS (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::PLUS, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_PLUS (const Ast::Token::Ptr& v, const location_type& l)
+      make_PLUS (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::PLUS, v, l);
       }
@@ -3908,14 +4409,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_MINUS (Ast::Token::Ptr v, location_type l)
+      make_MINUS (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::MINUS, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_MINUS (const Ast::Token::Ptr& v, const location_type& l)
+      make_MINUS (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::MINUS, v, l);
       }
@@ -3923,14 +4424,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_EQUAL (Ast::Token::Ptr v, location_type l)
+      make_EQUAL (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::EQUAL, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_EQUAL (const Ast::Token::Ptr& v, const location_type& l)
+      make_EQUAL (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::EQUAL, v, l);
       }
@@ -3938,14 +4439,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_LPAREN (Ast::Token::Ptr v, location_type l)
+      make_LPAREN (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::LPAREN, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_LPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      make_LPAREN (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::LPAREN, v, l);
       }
@@ -3953,14 +4454,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_RPAREN (Ast::Token::Ptr v, location_type l)
+      make_RPAREN (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::RPAREN, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_RPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      make_RPAREN (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::RPAREN, v, l);
       }
@@ -3968,14 +4469,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_LSQPAREN (Ast::Token::Ptr v, location_type l)
+      make_LSQPAREN (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::LSQPAREN, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_LSQPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      make_LSQPAREN (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::LSQPAREN, v, l);
       }
@@ -3983,14 +4484,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_RSQPAREN (Ast::Token::Ptr v, location_type l)
+      make_RSQPAREN (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::RSQPAREN, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_RSQPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      make_RSQPAREN (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::RSQPAREN, v, l);
       }
@@ -3998,14 +4499,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_LCURPAREN (Ast::Token::Ptr v, location_type l)
+      make_LCURPAREN (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::LCURPAREN, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_LCURPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      make_LCURPAREN (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::LCURPAREN, v, l);
       }
@@ -4013,14 +4514,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_RCURPAREN (Ast::Token::Ptr v, location_type l)
+      make_RCURPAREN (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::RCURPAREN, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_RCURPAREN (const Ast::Token::Ptr& v, const location_type& l)
+      make_RCURPAREN (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::RCURPAREN, v, l);
       }
@@ -4028,14 +4529,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_COLON (Ast::Token::Ptr v, location_type l)
+      make_COLON (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::COLON, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_COLON (const Ast::Token::Ptr& v, const location_type& l)
+      make_COLON (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::COLON, v, l);
       }
@@ -4043,14 +4544,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_DOUBLECOLON (Ast::Token::Ptr v, location_type l)
+      make_DOUBLECOLON (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::DOUBLECOLON, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_DOUBLECOLON (const Ast::Token::Ptr& v, const location_type& l)
+      make_DOUBLECOLON (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::DOUBLECOLON, v, l);
       }
@@ -4058,14 +4559,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_UNDERLINE (Ast::Token::Ptr v, location_type l)
+      make_UNDERLINE (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::UNDERLINE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_UNDERLINE (const Ast::Token::Ptr& v, const location_type& l)
+      make_UNDERLINE (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::UNDERLINE, v, l);
       }
@@ -4073,14 +4574,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_VERTICAL_BAR (Ast::Token::Ptr v, location_type l)
+      make_VERTICAL_BAR (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::VERTICAL_BAR, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_VERTICAL_BAR (const Ast::Token::Ptr& v, const location_type& l)
+      make_VERTICAL_BAR (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::VERTICAL_BAR, v, l);
       }
@@ -4088,14 +4589,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_AT (Ast::Token::Ptr v, location_type l)
+      make_AT (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::AT, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_AT (const Ast::Token::Ptr& v, const location_type& l)
+      make_AT (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::AT, v, l);
       }
@@ -4103,14 +4604,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_COMMA (Ast::Token::Ptr v, location_type l)
+      make_COMMA (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::COMMA, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_COMMA (const Ast::Token::Ptr& v, const location_type& l)
+      make_COMMA (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::COMMA, v, l);
       }
@@ -4118,14 +4619,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_LESSER (Ast::Token::Ptr v, location_type l)
+      make_LESSER (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::LESSER, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_LESSER (const Ast::Token::Ptr& v, const location_type& l)
+      make_LESSER (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::LESSER, v, l);
       }
@@ -4133,14 +4634,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_GREATER (Ast::Token::Ptr v, location_type l)
+      make_GREATER (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::GREATER, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_GREATER (const Ast::Token::Ptr& v, const location_type& l)
+      make_GREATER (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::GREATER, v, l);
       }
@@ -4148,14 +4649,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_ASTERIX (Ast::Token::Ptr v, location_type l)
+      make_ASTERIX (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::ASTERIX, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_ASTERIX (const Ast::Token::Ptr& v, const location_type& l)
+      make_ASTERIX (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::ASTERIX, v, l);
       }
@@ -4163,14 +4664,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_SLASH (Ast::Token::Ptr v, location_type l)
+      make_SLASH (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::SLASH, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_SLASH (const Ast::Token::Ptr& v, const location_type& l)
+      make_SLASH (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::SLASH, v, l);
       }
@@ -4178,14 +4679,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_PERCENT (Ast::Token::Ptr v, location_type l)
+      make_PERCENT (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::PERCENT, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_PERCENT (const Ast::Token::Ptr& v, const location_type& l)
+      make_PERCENT (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::PERCENT, v, l);
       }
@@ -4193,14 +4694,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_CARET (Ast::Token::Ptr v, location_type l)
+      make_CARET (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::CARET, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_CARET (const Ast::Token::Ptr& v, const location_type& l)
+      make_CARET (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::CARET, v, l);
       }
@@ -4208,14 +4709,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_MARK (Ast::Token::Ptr v, location_type l)
+      make_MARK (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::MARK, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_MARK (const Ast::Token::Ptr& v, const location_type& l)
+      make_MARK (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::MARK, v, l);
       }
@@ -4223,44 +4724,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_DOTDOT (Ast::Token::Ptr v, location_type l)
-      {
-        return symbol_type (token::DOTDOT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_DOTDOT (const Ast::Token::Ptr& v, const location_type& l)
-      {
-        return symbol_type (token::DOTDOT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_DOT (Ast::Token::Ptr v, location_type l)
-      {
-        return symbol_type (token::DOT, std::move (v), std::move (l));
-      }
-#else
-      static
-      symbol_type
-      make_DOT (const Ast::Token::Ptr& v, const location_type& l)
-      {
-        return symbol_type (token::DOT, v, l);
-      }
-#endif
-#if 201103L <= YY_CPLUSPLUS
-      static
-      symbol_type
-      make_MAPS (Ast::Token::Ptr v, location_type l)
+      make_MAPS (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::MAPS, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_MAPS (const Ast::Token::Ptr& v, const location_type& l)
+      make_MAPS (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::MAPS, v, l);
       }
@@ -4268,14 +4739,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_ARROW (Ast::Token::Ptr v, location_type l)
+      make_ARROW (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::ARROW, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_ARROW (const Ast::Token::Ptr& v, const location_type& l)
+      make_ARROW (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::ARROW, v, l);
       }
@@ -4283,14 +4754,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_UPDATE (Ast::Token::Ptr v, location_type l)
+      make_UPDATE (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::UPDATE, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_UPDATE (const Ast::Token::Ptr& v, const location_type& l)
+      make_UPDATE (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::UPDATE, v, l);
       }
@@ -4298,14 +4769,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_NEQUAL (Ast::Token::Ptr v, location_type l)
+      make_NEQUAL (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::NEQUAL, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_NEQUAL (const Ast::Token::Ptr& v, const location_type& l)
+      make_NEQUAL (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::NEQUAL, v, l);
       }
@@ -4313,14 +4784,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_LESSEQ (Ast::Token::Ptr v, location_type l)
+      make_LESSEQ (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::LESSEQ, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_LESSEQ (const Ast::Token::Ptr& v, const location_type& l)
+      make_LESSEQ (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::LESSEQ, v, l);
       }
@@ -4328,14 +4799,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_GREATEREQ (Ast::Token::Ptr v, location_type l)
+      make_GREATEREQ (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::GREATEREQ, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_GREATEREQ (const Ast::Token::Ptr& v, const location_type& l)
+      make_GREATEREQ (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::GREATEREQ, v, l);
       }
@@ -4343,14 +4814,14 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_SEQ_BRACKET (Ast::Token::Ptr v, location_type l)
+      make_SEQ_BRACKET (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::SEQ_BRACKET, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_SEQ_BRACKET (const Ast::Token::Ptr& v, const location_type& l)
+      make_SEQ_BRACKET (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::SEQ_BRACKET, v, l);
       }
@@ -4358,16 +4829,61 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_ENDSEQ_BRACKET (Ast::Token::Ptr v, location_type l)
+      make_ENDSEQ_BRACKET (CST::Token::Ptr v, location_type l)
       {
         return symbol_type (token::ENDSEQ_BRACKET, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_ENDSEQ_BRACKET (const Ast::Token::Ptr& v, const location_type& l)
+      make_ENDSEQ_BRACKET (const CST::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::ENDSEQ_BRACKET, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOT (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DOT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOT (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DOT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOTDOT (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DOTDOT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOTDOT (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DOTDOT, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOTDOTDOT (CST::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::DOTDOTDOT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOTDOTDOT (const CST::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::DOTDOTDOT, v, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -4556,9 +5072,9 @@ switch (yykind)
     {
     public:
       context (const Parser& yyparser, const symbol_type& yyla);
-      const symbol_type& lookahead () const { return yyla_; }
-      symbol_kind_type token () const { return yyla_.kind (); }
-      const location_type& location () const { return yyla_.location; }
+      const symbol_type& lookahead () const YY_NOEXCEPT { return yyla_; }
+      symbol_kind_type token () const YY_NOEXCEPT { return yyla_.kind (); }
+      const location_type& location () const YY_NOEXCEPT { return yyla_.location; }
 
       /// Put in YYARG at most YYARGN of the expected tokens, and return the
       /// number of tokens stored in YYARG.  If YYARG is null, return the
@@ -4625,7 +5141,7 @@ switch (yykind)
     // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
     // Performed when YYTABLE does not specify something else to do.  Zero
     // means the default is an error.
-    static const unsigned char yydefact_[];
+    static const short yydefact_[];
 
     // YYPGOTO[NTERM-NUM].
     static const short yypgoto_[];
@@ -4880,9 +5396,9 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 2685,     ///< Last index in yytable_.
-      yynnts_ = 97,  ///< Number of nonterminal symbols.
-      yyfinal_ = 13 ///< Termination state number.
+      yylast_ = 3268,     ///< Last index in yytable_.
+      yynnts_ = 114,  ///< Number of nonterminal symbols.
+      yyfinal_ = 18 ///< Termination state number.
     };
 
 
@@ -4937,10 +5453,11 @@ switch (yykind)
       55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
       65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
       75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86,    87
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96
     };
     // Last valid token kind.
-    const int code_max = 342;
+    const int code_max = 351;
 
     if (t <= 0)
       return symbol_kind::S_YYEOF;
@@ -4959,6 +5476,34 @@ switch (yykind)
   {
     switch (this->kind ())
     {
+      case symbol_kind::S_Attribute: // Attribute
+        value.copy< Attribute::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_Attributes: // Attributes
+        value.copy< Attributes::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_BasicAttribute: // BasicAttribute
+        value.copy< BasicAttribute::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_BasicType: // BasicType
+        value.copy< BasicType::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_BehaviorDefinition: // BehaviorDefinition
+        value.copy< BehaviorDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_BlockRule: // BlockRule
+        value.copy< BlockRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_BuiltinDefinition: // BuiltinDefinition
+        value.copy< BuiltinDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
       case symbol_kind::S_CASM: // "CASM"
       case symbol_kind::S_INIT: // "init"
       case symbol_kind::S_DERIVED: // "derived"
@@ -4967,6 +5512,14 @@ switch (yykind)
       case symbol_kind::S_USING: // "using"
       case symbol_kind::S_INVARIANT: // "invariant"
       case symbol_kind::S_IMPORT: // "import"
+      case symbol_kind::S_STRUCTURE: // "structure"
+      case symbol_kind::S_BEHAVIOR: // "behavior"
+      case symbol_kind::S_IMPLEMENT: // "implement"
+      case symbol_kind::S_FOR: // "for"
+      case symbol_kind::S_SELF: // "self"
+      case symbol_kind::S_THIS: // "this"
+      case symbol_kind::S_DOMAINTYPE: // "domain"
+      case symbol_kind::S_BUILTIN: // "builtin"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -5022,8 +5575,6 @@ switch (yykind)
       case symbol_kind::S_PERCENT: // "%"
       case symbol_kind::S_CARET: // "^"
       case symbol_kind::S_MARK: // "'"
-      case symbol_kind::S_DOTDOT: // ".."
-      case symbol_kind::S_DOT: // "."
       case symbol_kind::S_MAPS: // "->"
       case symbol_kind::S_ARROW: // "=>"
       case symbol_kind::S_UPDATE: // ":="
@@ -5032,27 +5583,10 @@ switch (yykind)
       case symbol_kind::S_GREATEREQ: // ">="
       case symbol_kind::S_SEQ_BRACKET: // "{|"
       case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
-        value.copy< Ast::Token::Ptr > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_Attribute: // Attribute
-        value.copy< Attribute::Ptr > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_Attributes: // Attributes
-        value.copy< Attributes::Ptr > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_BasicAttribute: // BasicAttribute
-        value.copy< BasicAttribute::Ptr > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_BasicType: // BasicType
-        value.copy< BasicType::Ptr > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_BlockRule: // BlockRule
-        value.copy< BlockRule::Ptr > (YY_MOVE (that.value));
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOTDOTDOT: // "..."
+        value.copy< CST::Token::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_CallExpression: // CallExpression
@@ -5095,16 +5629,25 @@ switch (yykind)
         value.copy< ConditionalRule::Ptr > (YY_MOVE (that.value));
         break;
 
+      case symbol_kind::S_Declaration: // Declaration
+        value.copy< Declaration::Ptr > (YY_MOVE (that.value));
+        break;
+
       case symbol_kind::S_MaybeDefined: // MaybeDefined
         value.copy< Defined::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
+      case symbol_kind::S_BehaviorDefinitionElement: // BehaviorDefinitionElement
+      case symbol_kind::S_ImplementDefinitionElement: // ImplementDefinitionElement
+      case symbol_kind::S_ImplementDefinitionAttributedElement: // ImplementDefinitionAttributedElement
         value.copy< Definition::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_Definitions: // Definitions
+      case symbol_kind::S_BehaviorDefinitionList: // BehaviorDefinitionList
+      case symbol_kind::S_ImplementDefinitionList: // ImplementDefinitionList
         value.copy< Definitions::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -5114,6 +5657,10 @@ switch (yykind)
 
       case symbol_kind::S_DirectCallExpression: // DirectCallExpression
         value.copy< DirectCallExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_DomainDefinition: // DomainDefinition
+        value.copy< DomainDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_EnumerationDefinition: // EnumerationDefinition
@@ -5133,7 +5680,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Term: // Term
-      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_Expression: // Expression
       case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.copy< Expression::Ptr > (YY_MOVE (that.value));
         break;
@@ -5155,11 +5702,13 @@ switch (yykind)
         break;
 
       case symbol_kind::S_FunctionDefinition: // FunctionDefinition
+      case symbol_kind::S_StructureDefinitionElement: // StructureDefinitionElement
       case symbol_kind::S_AttributedLocalFunctionDefinition: // AttributedLocalFunctionDefinition
       case symbol_kind::S_LocalFunctionDefinition: // LocalFunctionDefinition
         value.copy< FunctionDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
+      case symbol_kind::S_StructureDefinitionList: // StructureDefinitionList
       case symbol_kind::S_LocalFunctionDefinitions: // LocalFunctionDefinitions
         value.copy< FunctionDefinitions::Ptr > (YY_MOVE (that.value));
         break;
@@ -5177,6 +5726,10 @@ switch (yykind)
         value.copy< IdentifierPath::Ptr > (YY_MOVE (that.value));
         break;
 
+      case symbol_kind::S_ImplementDefinition: // ImplementDefinition
+        value.copy< ImplementDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
       case symbol_kind::S_ImportDefinition: // ImportDefinition
         value.copy< ImportDefinition::Ptr > (YY_MOVE (that.value));
         break;
@@ -5187,14 +5740,6 @@ switch (yykind)
 
       case symbol_kind::S_InitDefinition: // InitDefinition
         value.copy< InitDefinition::Ptr > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_Initializer: // Initializer
-        value.copy< Initializer::Ptr > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_Initializers: // Initializers
-        value.copy< Initializers::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_MaybeInitially: // MaybeInitially
@@ -5231,6 +5776,18 @@ switch (yykind)
 
       case symbol_kind::S_LocalRule: // LocalRule
         value.copy< LocalRule::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_MappedExpression: // MappedExpression
+        value.copy< MappedExpression::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_MappedExpressions: // MappedExpressions
+        value.copy< MappedExpressions::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_MappingType: // MappingType
+        value.copy< MappingType::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_MethodCallExpression: // MethodCallExpression
@@ -5287,6 +5844,14 @@ switch (yykind)
 
       case symbol_kind::S_Specification: // Specification
         value.copy< Specification::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_StructureDefinition: // StructureDefinition
+        value.copy< StructureDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_SymbolAttribute: // SymbolAttribute
+        value.copy< SymbolAttribute::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -5346,6 +5911,10 @@ switch (yykind)
         value.copy< ValueLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
+      case symbol_kind::S_VaradicType: // VaradicType
+        value.copy< VaradicType::Ptr > (YY_MOVE (that.value));
+        break;
+
       case symbol_kind::S_VariableBinding: // VariableBinding
         value.copy< VariableBinding::Ptr > (YY_MOVE (that.value));
         break;
@@ -5361,6 +5930,7 @@ switch (yykind)
         value.copy< VariableDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
+      case symbol_kind::S_MethodParameters: // MethodParameters
       case symbol_kind::S_Parameters: // Parameters
       case symbol_kind::S_AttributedVariables: // AttributedVariables
       case symbol_kind::S_TypedVariables: // TypedVariables
@@ -5372,7 +5942,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Type: // Type
-        value.copy< libcasm_fe::Ast::Type::Ptr > (YY_MOVE (that.value));
+        value.copy< libcasm_fe::CST::Type::Ptr > (YY_MOVE (that.value));
         break;
 
       default:
@@ -5404,6 +5974,34 @@ switch (yykind)
     super_type::move (s);
     switch (this->kind ())
     {
+      case symbol_kind::S_Attribute: // Attribute
+        value.move< Attribute::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_Attributes: // Attributes
+        value.move< Attributes::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_BasicAttribute: // BasicAttribute
+        value.move< BasicAttribute::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_BasicType: // BasicType
+        value.move< BasicType::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_BehaviorDefinition: // BehaviorDefinition
+        value.move< BehaviorDefinition::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_BlockRule: // BlockRule
+        value.move< BlockRule::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_BuiltinDefinition: // BuiltinDefinition
+        value.move< BuiltinDefinition::Ptr > (YY_MOVE (s.value));
+        break;
+
       case symbol_kind::S_CASM: // "CASM"
       case symbol_kind::S_INIT: // "init"
       case symbol_kind::S_DERIVED: // "derived"
@@ -5412,6 +6010,14 @@ switch (yykind)
       case symbol_kind::S_USING: // "using"
       case symbol_kind::S_INVARIANT: // "invariant"
       case symbol_kind::S_IMPORT: // "import"
+      case symbol_kind::S_STRUCTURE: // "structure"
+      case symbol_kind::S_BEHAVIOR: // "behavior"
+      case symbol_kind::S_IMPLEMENT: // "implement"
+      case symbol_kind::S_FOR: // "for"
+      case symbol_kind::S_SELF: // "self"
+      case symbol_kind::S_THIS: // "this"
+      case symbol_kind::S_DOMAINTYPE: // "domain"
+      case symbol_kind::S_BUILTIN: // "builtin"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -5467,8 +6073,6 @@ switch (yykind)
       case symbol_kind::S_PERCENT: // "%"
       case symbol_kind::S_CARET: // "^"
       case symbol_kind::S_MARK: // "'"
-      case symbol_kind::S_DOTDOT: // ".."
-      case symbol_kind::S_DOT: // "."
       case symbol_kind::S_MAPS: // "->"
       case symbol_kind::S_ARROW: // "=>"
       case symbol_kind::S_UPDATE: // ":="
@@ -5477,27 +6081,10 @@ switch (yykind)
       case symbol_kind::S_GREATEREQ: // ">="
       case symbol_kind::S_SEQ_BRACKET: // "{|"
       case symbol_kind::S_ENDSEQ_BRACKET: // "|}"
-        value.move< Ast::Token::Ptr > (YY_MOVE (s.value));
-        break;
-
-      case symbol_kind::S_Attribute: // Attribute
-        value.move< Attribute::Ptr > (YY_MOVE (s.value));
-        break;
-
-      case symbol_kind::S_Attributes: // Attributes
-        value.move< Attributes::Ptr > (YY_MOVE (s.value));
-        break;
-
-      case symbol_kind::S_BasicAttribute: // BasicAttribute
-        value.move< BasicAttribute::Ptr > (YY_MOVE (s.value));
-        break;
-
-      case symbol_kind::S_BasicType: // BasicType
-        value.move< BasicType::Ptr > (YY_MOVE (s.value));
-        break;
-
-      case symbol_kind::S_BlockRule: // BlockRule
-        value.move< BlockRule::Ptr > (YY_MOVE (s.value));
+      case symbol_kind::S_DOT: // "."
+      case symbol_kind::S_DOTDOT: // ".."
+      case symbol_kind::S_DOTDOTDOT: // "..."
+        value.move< CST::Token::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_CallExpression: // CallExpression
@@ -5540,16 +6127,25 @@ switch (yykind)
         value.move< ConditionalRule::Ptr > (YY_MOVE (s.value));
         break;
 
+      case symbol_kind::S_Declaration: // Declaration
+        value.move< Declaration::Ptr > (YY_MOVE (s.value));
+        break;
+
       case symbol_kind::S_MaybeDefined: // MaybeDefined
         value.move< Defined::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
+      case symbol_kind::S_BehaviorDefinitionElement: // BehaviorDefinitionElement
+      case symbol_kind::S_ImplementDefinitionElement: // ImplementDefinitionElement
+      case symbol_kind::S_ImplementDefinitionAttributedElement: // ImplementDefinitionAttributedElement
         value.move< Definition::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_Definitions: // Definitions
+      case symbol_kind::S_BehaviorDefinitionList: // BehaviorDefinitionList
+      case symbol_kind::S_ImplementDefinitionList: // ImplementDefinitionList
         value.move< Definitions::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -5559,6 +6155,10 @@ switch (yykind)
 
       case symbol_kind::S_DirectCallExpression: // DirectCallExpression
         value.move< DirectCallExpression::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_DomainDefinition: // DomainDefinition
+        value.move< DomainDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_EnumerationDefinition: // EnumerationDefinition
@@ -5578,7 +6178,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Term: // Term
-      case symbol_kind::S_SimpleOrClaspedTerm: // SimpleOrClaspedTerm
+      case symbol_kind::S_Expression: // Expression
       case symbol_kind::S_OperatorExpression: // OperatorExpression
         value.move< Expression::Ptr > (YY_MOVE (s.value));
         break;
@@ -5600,11 +6200,13 @@ switch (yykind)
         break;
 
       case symbol_kind::S_FunctionDefinition: // FunctionDefinition
+      case symbol_kind::S_StructureDefinitionElement: // StructureDefinitionElement
       case symbol_kind::S_AttributedLocalFunctionDefinition: // AttributedLocalFunctionDefinition
       case symbol_kind::S_LocalFunctionDefinition: // LocalFunctionDefinition
         value.move< FunctionDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
+      case symbol_kind::S_StructureDefinitionList: // StructureDefinitionList
       case symbol_kind::S_LocalFunctionDefinitions: // LocalFunctionDefinitions
         value.move< FunctionDefinitions::Ptr > (YY_MOVE (s.value));
         break;
@@ -5622,6 +6224,10 @@ switch (yykind)
         value.move< IdentifierPath::Ptr > (YY_MOVE (s.value));
         break;
 
+      case symbol_kind::S_ImplementDefinition: // ImplementDefinition
+        value.move< ImplementDefinition::Ptr > (YY_MOVE (s.value));
+        break;
+
       case symbol_kind::S_ImportDefinition: // ImportDefinition
         value.move< ImportDefinition::Ptr > (YY_MOVE (s.value));
         break;
@@ -5632,14 +6238,6 @@ switch (yykind)
 
       case symbol_kind::S_InitDefinition: // InitDefinition
         value.move< InitDefinition::Ptr > (YY_MOVE (s.value));
-        break;
-
-      case symbol_kind::S_Initializer: // Initializer
-        value.move< Initializer::Ptr > (YY_MOVE (s.value));
-        break;
-
-      case symbol_kind::S_Initializers: // Initializers
-        value.move< Initializers::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_MaybeInitially: // MaybeInitially
@@ -5676,6 +6274,18 @@ switch (yykind)
 
       case symbol_kind::S_LocalRule: // LocalRule
         value.move< LocalRule::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_MappedExpression: // MappedExpression
+        value.move< MappedExpression::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_MappedExpressions: // MappedExpressions
+        value.move< MappedExpressions::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_MappingType: // MappingType
+        value.move< MappingType::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_MethodCallExpression: // MethodCallExpression
@@ -5732,6 +6342,14 @@ switch (yykind)
 
       case symbol_kind::S_Specification: // Specification
         value.move< Specification::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_StructureDefinition: // StructureDefinition
+        value.move< StructureDefinition::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_SymbolAttribute: // SymbolAttribute
+        value.move< SymbolAttribute::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -5791,6 +6409,10 @@ switch (yykind)
         value.move< ValueLiteral::Ptr > (YY_MOVE (s.value));
         break;
 
+      case symbol_kind::S_VaradicType: // VaradicType
+        value.move< VaradicType::Ptr > (YY_MOVE (s.value));
+        break;
+
       case symbol_kind::S_VariableBinding: // VariableBinding
         value.move< VariableBinding::Ptr > (YY_MOVE (s.value));
         break;
@@ -5806,6 +6428,7 @@ switch (yykind)
         value.move< VariableDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
+      case symbol_kind::S_MethodParameters: // MethodParameters
       case symbol_kind::S_Parameters: // Parameters
       case symbol_kind::S_AttributedVariables: // AttributedVariables
       case symbol_kind::S_TypedVariables: // TypedVariables
@@ -5817,7 +6440,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Type: // Type
-        value.move< libcasm_fe::Ast::Type::Ptr > (YY_MOVE (s.value));
+        value.move< libcasm_fe::CST::Type::Ptr > (YY_MOVE (s.value));
         break;
 
       default:
@@ -5854,7 +6477,7 @@ switch (yykind)
 
   inline
   void
-  Parser::by_kind::clear ()
+  Parser::by_kind::clear () YY_NOEXCEPT
   {
     kind_ = symbol_kind::S_YYEMPTY;
   }
@@ -5881,9 +6504,9 @@ switch (yykind)
     return this->kind ();
   }
 
-#line 50 "../../obj/src/GrammarParser.y"
+#line 51 "../../obj/src/GrammarParser.y"
 } // libcasm_fe
-#line 5887 "GrammarParser.tab.h"
+#line 6510 "GrammarParser.tab.h"
 
 
 

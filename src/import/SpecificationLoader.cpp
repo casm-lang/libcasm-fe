@@ -45,17 +45,23 @@
 
 #include "SpecificationLoader.h"
 
-#include <libcasm-fe/analyze/TypeCheckPass>
+#include <libcasm-fe/analyze/TemplatingPass>
+#include <libcasm-fe/import/FileLoadingStrategy>
 #include <libcasm-fe/import/ImportError>
 #include <libcasm-fe/import/LibraryLoaderPass>
 #include <libcasm-fe/import/PathLoadingStrategy>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/transform/CstToAstPass>
 
 #include <libpass/PassLogger>
 #include <libpass/PassManager>
 #include <libpass/analyze/LoadFilePass>
 
+#include <libstdhl/File>
 #include <libstdhl/String>
+
+#include <iostream>
+
+#include "CASM.casm.h"
 
 using namespace libcasm_fe;
 
@@ -79,25 +85,25 @@ void SpecificationLoader::setSpecificationRepository(
 }
 
 Specification::Ptr SpecificationLoader::loadSpecification(
-    const Ast::IdentifierPath::Ptr& identifierPath )
+    const AST::IdentifierPath::Ptr& identifierPath )
 {
     libpass::PassLogger log( &LibraryLoaderPass::id, m_logStream );
 
-    const auto identifierPathName = identifierPath->path();
-    log.debug( "loadSpecification: import '" + identifierPathName + "'" );
+    const auto& identifierPathName = identifierPath->path();
+    log.debug( "loadSpecification: loading '" + identifierPathName + "'" );
 
     LoadingStrategy::Ptr loadingStrategy = m_loadingStrategy;
 
-    const auto moduleName = identifierPath->identifiers()->front()->name();
+    const auto& moduleName = identifierPath->identifiers()->front()->name();
     if( specificationRepository()->project()->configuration() )
     {
-        const auto configuration = specificationRepository()->project()->configuration();
-        log.info( ">>> WE HAVE A PROJECT CONFIG =D @ '" + configuration->fileName() + "' <<<" );
+        const auto& configuration = specificationRepository()->project()->configuration();
+        log.debug( ">>> WE HAVE A PROJECT CONFIG =D @ '" + configuration->fileName() + "' <<<" );
 
-        const auto dependencyLocation = configuration->import( moduleName );
+        const auto& dependencyLocation = configuration->import( moduleName );
         if( dependencyLocation )
         {
-            log.info(
+            log.debug(
                 ">>> found module '" + moduleName + "' @ '" + dependencyLocation->path() +
                 "' <<<" );
             assert( dependencyLocation->scheme() == "file" );
@@ -106,12 +112,36 @@ Specification::Ptr SpecificationLoader::loadSpecification(
         }
     }
 
-    log.debug( "loadSpecification: module '" + moduleName + "'" );
+    if( moduleName == "CASM" )
+    {
+        const auto& casmSpecificationPath =
+            libstdhl::String::replaceAll( identifierPathName, Namespace::delimiter(), "/" ) +
+            Specification::fileExtension();
 
-    // const auto specificationRepository()
+        static const std::unordered_map< std::string, const std::string& >
+            filenameToSpecifiction = {
+                { "CASM", CASM_casm },
+            };
 
-    const auto uri = loadingStrategy->toURI( identifierPath );
-    const auto cachedSpecification = specificationRepository()->get( uri.toString() );
+        const auto& casmSpecification = filenameToSpecifiction.find( identifierPathName );
+        if( casmSpecification == filenameToSpecifiction.end() )
+        {
+            throw SpecificationLoadingError( "Unable to import '" + identifierPathName + "'" );
+        }
+
+        const auto temporaryPath = libstdhl::File::Path::temporary();
+        const auto temporaryName = temporaryPath + "/" + casmSpecificationPath;
+        auto temporaryFile = libstdhl::File::open( temporaryName, std::fstream::out );
+        temporaryFile << casmSpecification->second;
+        temporaryFile.close();
+        loadingStrategy = std::make_shared< FileLoadingStrategy >( temporaryPath );
+    }
+
+    const auto& uri = loadingStrategy->toURI( identifierPath );
+    const auto& uriString = uri.toString();
+    log.debug( "loadSpecification: module '" + moduleName + "' with spec @ '" + uriString + "'" );
+
+    const auto& cachedSpecification = specificationRepository()->get( uriString );
     if( cachedSpecification )
     {
         log.debug( "using '" + identifierPathName + "' from repository" );
@@ -137,13 +167,13 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     libpass::PassManager passManager;
     passManager.setStream( m_logStream );
     passManager.setDefaultResult( defaultPassResult );
-    passManager.setDefaultPass< TypeCheckPass >();
+    passManager.setDefaultPass< TemplatingPass >();
 
     if( not passManager.run() )
     {
 #ifndef NDEBUG
-        auto flush = [&passManager, &uri]() {
-            libstdhl::Log::ApplicationFormatter formatter( uri.toString() );
+        auto flush = [&passManager, &uriString]() {
+            libstdhl::Log::ApplicationFormatter formatter( uriString );
             libstdhl::Log::OutputStreamSink sink( std::cerr, formatter );
             passManager.stream().flush( sink );
         };
@@ -153,10 +183,11 @@ Specification::Ptr SpecificationLoader::loadSpecification(
     }
 
     const auto& passResult = passManager.result();
-    assert( passResult.hasOutput< SourceToAstPass >() );
-    const auto passData = passResult.output< SourceToAstPass >();
+    assert( passResult.hasOutput< CstToAstPass >() );
+    const auto passData = passResult.output< CstToAstPass >();
     const auto specification = passData->specification();
-    assert( specificationRepository()->get( uri.toString() ) == specification );
+
+    assert( specificationRepository()->get( uriString ) == specification );
     return specification;
 }
 

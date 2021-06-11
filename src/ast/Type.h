@@ -43,16 +43,16 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_TYPE_H_
-#define _LIBCASM_FE_TYPE_H_
+#ifndef _LIBCASM_FE_AST_TYPE_H_
+#define _LIBCASM_FE_AST_TYPE_H_
 
 #include <libcasm-fe/ast/Expression>
-#include <libcasm-fe/ast/Token>
 
 namespace libcasm_fe
 {
-    namespace Ast
+    namespace AST
     {
+        class TypeDefinition;
         class VariableDefinition;
         using VariableDefinitions = NodeList< VariableDefinition >;
 
@@ -65,12 +65,20 @@ namespace libcasm_fe
 
             const IdentifierPath::Ptr& name( void ) const;
 
-            void setDelimiterToken( const Token::Ptr& delimiterToken );
-            const Token::Ptr& delimiterToken( void ) const;
+            void setTypeDefinition( const std::shared_ptr< TypeDefinition >& typeDefinition );
+
+            const std::shared_ptr< TypeDefinition >& typeDefinition( void ) const;
+
+            virtual std::string signature( void ) const = 0;
+
+            IdentifierPath::Ptr signaturePath( void ) const;
+
+          protected:
+            void clone( Type& duplicate ) const;
 
           private:
             const IdentifierPath::Ptr m_name;
-            Token::Ptr m_delimiterToken;
+            std::shared_ptr< TypeDefinition > m_typeDefinition;
         };
 
         using Types = NodeList< Type >;
@@ -82,7 +90,11 @@ namespace libcasm_fe
 
             explicit UnresolvedType( void );
 
+            std::string signature( void ) const override;
+
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
         };
 
         class BasicType final : public Type
@@ -92,109 +104,99 @@ namespace libcasm_fe
 
             explicit BasicType( const IdentifierPath::Ptr& identifier );
 
+            std::string signature( void ) const override;
+
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
         };
 
-        class EmbracedType : public Type
-        {
-          public:
-            using Ptr = std::shared_ptr< EmbracedType >;
-
-            EmbracedType(
-                const Node::ID id,
-                const IdentifierPath::Ptr& name,
-                const Token::Ptr& leftBraceToken,
-                const Token::Ptr& rightBraceToken );
-
-            const Token::Ptr& leftBraceToken( void ) const;
-
-            const Token::Ptr& rightBraceToken( void ) const;
-
-          private:
-            const Token::Ptr m_leftBraceToken;
-            const Token::Ptr m_rightBraceToken;
-        };
-
-        class TupleType final : public EmbracedType
+        class TupleType final : public Type
         {
           public:
             using Ptr = std::shared_ptr< TupleType >;
 
-            TupleType(
-                const Token::Ptr& leftBraceToken,
-                const Types::Ptr& subTypes,
-                const Token::Ptr& rightBraceToken );
+            TupleType( const Types::Ptr& subTypes );
 
             const Types::Ptr& subTypes( void ) const;
 
+            std::string signature( void ) const override;
+
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Types::Ptr m_subTypes;
         };
 
-        class RecordType final : public EmbracedType
+        class RecordType final : public Type
         {
           public:
             using Ptr = std::shared_ptr< RecordType >;
 
-            RecordType(
-                const Token::Ptr& leftBraceToken,
-                const std::shared_ptr< VariableDefinitions >& namedSubTypes,
-                const Token::Ptr& rightBraceToken );
+            RecordType( const std::shared_ptr< VariableDefinitions >& namedSubTypes );
 
             const std::shared_ptr< VariableDefinitions >& namedSubTypes( void ) const;
 
+            std::string signature( void ) const override;
+
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const std::shared_ptr< VariableDefinitions > m_namedSubTypes;
         };
 
-        class TemplateType final : public EmbracedType
+        class TemplateType final : public Type
         {
           public:
             using Ptr = std::shared_ptr< TemplateType >;
 
-            TemplateType(
-                const IdentifierPath::Ptr& identifier,
-                const Token::Ptr& leftBraceToken,
-                const Types::Ptr& subTypes,
-                const Token::Ptr& rightBraceToken );
+            TemplateType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes );
 
             const Types::Ptr& subTypes( void ) const;
 
+            void setSubTypes( const Types::Ptr& subTypes );
+
+            u1 varadic( void ) const;
+
+            std::string signature( void ) const override;
+
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
-            const Types::Ptr m_subTypes;
+            Types::Ptr m_subTypes;
         };
 
-        class RelationType final : public EmbracedType
+        class RelationType final : public Type
         {
           public:
             using Ptr = std::shared_ptr< RelationType >;
 
             RelationType(
                 const IdentifierPath::Ptr& identifier,
-                const Token::Ptr& leftBraceToken,
                 const Types::Ptr& argumentTypes,
-                const Token::Ptr& mapsToken,
-                const Type::Ptr& returnType,
-                const Token::Ptr& rightBraceToken );
+                const Type::Ptr& returnType );
 
             const Types::Ptr& argumentTypes( void ) const;
 
             const Type::Ptr& returnType( void ) const;
 
-            const Token::Ptr& mapsToken( void ) const;
+            u1 mapping( void ) const;
+
+            std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Types::Ptr m_argumentTypes;
             const Type::Ptr m_returnType;
-            const Token::Ptr m_mapsToken;
         };
 
         class FixedSizedType final : public Type
@@ -202,25 +204,23 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< FixedSizedType >;
 
-            FixedSizedType(
-                const IdentifierPath::Ptr& identifier,
-                const Token::Ptr& markToken,
-                const Expression::Ptr& size );
+            FixedSizedType( const IdentifierPath::Ptr& identifier, const Expression::Ptr& size );
 
             const Expression::Ptr& size( void ) const;
 
-            const Token::Ptr& markToken( void ) const;
+            std::string signature( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Expression::Ptr m_size;
-            const Token::Ptr m_markToken;
         };
     }
 }
 
-#endif  // _LIBCASM_FE_TYPE_H_
+#endif  // _LIBCASM_FE_AST_TYPE_H_
 
 //
 //  Local variables:

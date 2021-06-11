@@ -79,7 +79,7 @@ namespace libcasm_fe
            @returns The loaded CASM specification
         */
 
-        Specification::Ptr loadSpecification( const Ast::IdentifierPath::Ptr& identifierPath );
+        Specification::Ptr loadSpecification( const AST::IdentifierPath::Ptr& identifierPath );
 
       private:
         libstdhl::Log::Stream& m_logStream;

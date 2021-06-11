@@ -46,14 +46,11 @@
 #include "NumericExecutionPass.h"
 
 #include <libcasm-fe/Logger>
-#include <libcasm-fe/execute/RuntimeException>
-#include <libcasm-fe/execute/UpdateException>
-
 #include <libcasm-fe/execute/Agent>
 #include <libcasm-fe/execute/ExecutionVisitor>
-
-#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
-#include <libcasm-fe/import/SpecificationMergerPass>
+#include <libcasm-fe/execute/RuntimeException>
+#include <libcasm-fe/execute/UpdateException>
+#include <libcasm-fe/transform/AstToLstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
@@ -64,17 +61,16 @@
 #include <mutex>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace LST;
 
 char NumericExecutionPass::id = 0;
 
 static libpass::PassRegistration< NumericExecutionPass > PASS(
-    "NumericExecutionPass", "execute numerically over the AST input specification", "ast-exec", 0 );
+    "Numeric Execution Pass", "execute numerically over LST representation", "lst-exec", 0 );
 
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SpecificationMergerPass >();
-    pu.scheduleAfter< FrameSizeDeterminationPass >();
+    pu.require< AstToLstPass >();
 }
 
 static std::string updateInfoToString( const UpdateException::UpdateInfo& updateInfo )
@@ -104,7 +100,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SpecificationMergerPass >();
+    const auto data = pr.output< AstToLstPass >();
     const auto specification = data->specification();
 
     static u1 constantHandlerFlag = false;
@@ -154,9 +150,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
 
         if( not scheduler.check() )
         {
-            log.warning(
-                { specification->header()->sourceLocation() },
-                "no init definition found in this specification" );
+            log.warning( "no init definition found in this specification" );
         }
 
         while( not scheduler.done() )
@@ -168,7 +162,6 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
         if( scheduler.numberOfSteps() == 0 )
         {
             log.warning(
-                { specification->header()->sourceLocation() },
                 "Could not perform a single step because no agent was initially available. This "
                 "may happen when no valid initial rule has been specified (see InitRule)." );
         }

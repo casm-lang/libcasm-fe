@@ -48,6 +48,10 @@
 
 #include <libpass/Pass>
 
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/ast/Visitor>
+
 namespace libcasm_fe
 {
     /**

@@ -48,11 +48,10 @@
 #include <libcasm-fe/Exception>
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
-#include <libcasm-fe/ast/Expression>
-#include <libcasm-fe/ast/RecursiveVisitor>
-#include <libcasm-fe/ast/Rule>
-#include <libcasm-fe/transform/SourceToAstPass>
 #include <libcasm-fe/execute/UpdateException>
+#include <libcasm-fe/lst/Expression>
+#include <libcasm-fe/lst/Rule>
+#include <libcasm-fe/lst/Visitor>
 
 #include <libcasm-ir/Exception>
 #include <libcasm-ir/Operation>
@@ -62,7 +61,7 @@
 #include <thread>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace LST;
 
 namespace IR = libcasm_ir;
 
@@ -132,7 +131,7 @@ void ParallelDispatchStrategy::dispatch( std::vector< Agent >& agents )
         threads.reserve( agents.size() );
         for( auto& agent : agents )
         {
-            threads.emplace_back( [&] { agent.run(); } );
+            threads.emplace_back( [ & ] { agent.run(); } );
         }
         for( auto& thread : threads )
         {
@@ -198,9 +197,9 @@ void AgentScheduler::setSymbolicEnvironment( IR::SymbolicExecutionEnvironment& e
 
 void AgentScheduler::step( void )
 {
-    if(symbolic() && m_environment)
+    if( symbolic() && m_environment )
     {
-        (*m_environment)->incrementTime();
+        ( *m_environment )->incrementTime();
     }
 
     auto agents = collectAgents();
@@ -329,7 +328,8 @@ void AgentScheduler::collectUpdates( const std::vector< Agent >& agents )
                     "' produced by agent " + agentStrA + " clashed with update '" + updateStrB +
                     "' produced by agent " + agentStrB,
                 {},
-                { ExecutionVisitor::updateAsUpdateInfo( updateA ), ExecutionVisitor::updateAsUpdateInfo( updateB ) },
+                { ExecutionVisitor::updateAsUpdateInfo( updateA ),
+                  ExecutionVisitor::updateAsUpdateInfo( updateB ) },
                 libcasm_fe::Code::UpdateSetMergeConflict );
         }
     }
@@ -340,4 +340,3 @@ void AgentScheduler::fireUpdates( void )
     m_globalState.fireUpdateSet( &m_collectedUpdates );
     m_collectedUpdates.clear();
 }
-

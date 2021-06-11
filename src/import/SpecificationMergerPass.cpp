@@ -46,41 +46,55 @@
 #include "SpecificationMergerPass.h"
 
 #include <libcasm-fe/Logger>
-#include <libcasm-fe/analyze/TypeCheckPass>
+#include <libcasm-fe/analyze/TemplatingPass>
 #include <libcasm-fe/import/LibraryLoaderPass>
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libcasm-fe/transform/CstToAstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char SpecificationMergerPass::id = 0;
 
 static libpass::PassRegistration< SpecificationMergerPass > PASS(
-    "ASTSpecificationMergerPass", "merges the imported CASM specifications", "ast-spec-merge", 0 );
+    "Specification Merger Pass", "merges the imported CASM specifications", "ast-merge", 0 );
+
+//
+//
+// SpecificationMergerPass
+//
 
 void SpecificationMergerPass::usage( libpass::PassUsage& pu )
 {
+    pu.require< CstToAstPass >();
     pu.require< LibraryLoaderPass >();
-    pu.scheduleAfter< TypeCheckPass >();
+    pu.scheduleAfter< TemplatingPass >();
 }
 
 u1 SpecificationMergerPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< LibraryLoaderPass >();
-    const auto specificationRepository = data->specificationRepository();
+    const auto& data = pr.output< LibraryLoaderPass >();
+    const auto& specificationRepository = data->specificationRepository();
 
-    const auto definitions = std::make_shared< Definitions >();
+    const auto& mergedDefinitions = std::make_shared< Definitions >();
     for( const auto& specification : specificationRepository->specifications() )
     {
-        for( const auto& definition : *specification->definitions() )
+        for( const auto& definition : *specification->ast()->definitions() )
         {
-            definitions->add( definition );
+            if( definition->id() == Node::ID::INIT_DEFINITION )
+            {
+                const auto& initDefinition = static_cast< const InitDefinition& >( *definition );
+                if( initDefinition.external() )
+                {
+                    continue;
+                }
+            }
+            mergedDefinitions->add( definition );
         }
     }
 
@@ -91,16 +105,14 @@ u1 SpecificationMergerPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    const auto parsedSpecification = pr.output< SourceToAstPass >()->specification();
-    const auto mergedSpecification = std::make_shared< Specification >();
-
+    const auto& parsedSpecification = pr.output< CstToAstPass >()->specification();
+    const auto& mergedSpecification = std::make_shared< Specification >();
     mergedSpecification->setAsmType( parsedSpecification->asmType() );
     mergedSpecification->setLocation( parsedSpecification->location() );
-    mergedSpecification->setHeader( parsedSpecification->header() );
-    mergedSpecification->setSpans( parsedSpecification->spans() );
     mergedSpecification->setSymboltable( parsedSpecification->symboltable() );
 
-    mergedSpecification->setDefinitions( definitions );
+    const auto& mergedAst = std::make_shared< AST::Root >( mergedDefinitions );
+    mergedSpecification->setAst( mergedAst );
 
     pr.setOutput< SpecificationMergerPass >( mergedSpecification );
     return true;

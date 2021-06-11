@@ -47,7 +47,7 @@
 #include "pass.h"
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 TEST( libcasm_fe_utf8, identifier_with_emoticons )
 {
@@ -77,7 +77,7 @@ rule test =
     TEST_FILE_CREATE( file, spec );
 
     // THEN
-    TEST_PASS( AstDumpSourcePass, file, true, );
+    TEST_PASS( CstEmitPass, file, true, );
 
     // CLEANUP
     TEST_FILE_REMOVE( file );

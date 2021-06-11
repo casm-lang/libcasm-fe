@@ -43,172 +43,194 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_DEFINITION_H_
-#define _LIBCASM_FE_DEFINITION_H_
+#ifndef _LIBCASM_FE_AST_DEFINITION_H_
+#define _LIBCASM_FE_AST_DEFINITION_H_
 
-#include <libcasm-fe/ast/Attribute>
-#include <libcasm-fe/ast/Helper>
 #include <libcasm-fe/ast/Node>
 #include <libcasm-fe/ast/Rule>
-#include <libcasm-fe/ast/Token>
 #include <libcasm-fe/ast/Type>
+#include <libcasm-fe/cst/Definition>
+
+#include <libcasm-ir/Value>
 
 namespace libcasm_fe
 {
-    namespace Ast
+    class Namespace;
+
+    namespace AST
     {
         class Expression;
         using Expressions = NodeList< Expression >;
+        class VariableDefinition;
+        using VariableDefinitions = NodeList< VariableDefinition >;
+        class ImplementDefinition;
+        class TypeDefinition;
 
         class Definition : public TypedPropertyNode
         {
           public:
             using Ptr = std::shared_ptr< Definition >;
 
-            Definition( Node::ID id, const Identifier::Ptr& identifier );
+            Definition( const Node::ID id, const Identifier::Ptr& identifier );
 
             const Identifier::Ptr& identifier( void ) const;
 
-            void setAttributes( const Attributes::Ptr& attributes );
-            const Attributes::Ptr& attributes( void ) const;
+            const std::shared_ptr< Namespace >& symboltable( void ) const;
 
-            void setDelimiterToken( const Token::Ptr& delimiterToken );
-            const Token::Ptr& delimiterToken( void ) const;
+            void setTemplateSymbols(
+                const std::shared_ptr< VariableDefinitions >& templateSymbols );
 
-            /**
-             * Sets the number of required frame local slots.
-             *
-             * @note Assigned by SymbolResolved and used during execution
-             */
-            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
-            std::size_t maximumNumberOfLocals( void ) const;
+            const std::shared_ptr< VariableDefinitions >& templateSymbols( void ) const;
+
+            u1 isTemplate( void ) const;
+
+            void setAbstract( const u1 abstract );
+
+            u1 abstract( void ) const;
 
             void setExported( const u1 exported );
+
             u1 exported( void ) const;
+
+            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
+
+            std::size_t maximumNumberOfLocals( void ) const;
+
+            virtual std::string typeDescription( void ) const = 0;
+
+          protected:
+            void clone( Definition& duplicate ) const;
 
           private:
             const Identifier::Ptr m_identifier;
-            Attributes::Ptr m_attributes;
-            Token::Ptr m_delimiterToken;
-            std::size_t m_maxNumberOfLocals;
+            const std::shared_ptr< Namespace > m_symboltable;
+            std::shared_ptr< VariableDefinitions > m_templateSymbols;
+            u1 m_abstract;
             u1 m_exported;
+            std::size_t m_maxNumberOfLocals;
         };
 
         using Definitions = NodeList< Definition >;
-
-        class HeaderDefinition final : public Definition
-        {
-          public:
-            using Ptr = std::shared_ptr< HeaderDefinition >;
-
-            HeaderDefinition( const Token::Ptr& headerToken );
-
-            void accept( Visitor& visitor ) override final;
-
-            const Token::Ptr& headerToken( void ) const;
-
-          private:
-            const Token::Ptr m_headerToken;
-        };
 
         class VariableDefinition final : public Definition
         {
           public:
             using Ptr = std::shared_ptr< VariableDefinition >;
 
-            VariableDefinition(
-                const Identifier::Ptr& identifier,
-                const Token::Ptr& colonToken,
-                const Type::Ptr& variableType );
+            VariableDefinition( const Identifier::Ptr& identifier, const Type::Ptr& variableType );
 
             const Type::Ptr& variableType( void ) const;
-
-            const Token::Ptr& colonToken( void ) const;
+            void setVariableType( const Type::Ptr& variableType );
 
             /**
-             * Sets the frame local index of the variable.
-             *
-             * @note Assigned by SymbolResolved and used during execution
+             Sets the frame local index of the variable.
              */
             void setLocalIndex( std::size_t localIndex );
             std::size_t localIndex( void ) const;
 
+            // used in SymbolResolver to point to the correct Behavior/Implement Definition
+            void setObjectDefinition( const std::shared_ptr< TypeDefinition >& objectDefinition );
+            const std::shared_ptr< TypeDefinition >& objectDefinition( void ) const;
+
+            std::string typeDescription( void ) const override;
+
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
-            const Type::Ptr m_variableType;
-            const Token::Ptr m_colonToken;
+            Type::Ptr m_variableType;
             std::size_t m_localIndex;
+            std::shared_ptr< TypeDefinition > m_objectDefinition;
         };
 
         using VariableDefinitions = NodeList< VariableDefinition >;
 
+        class TypeDefinition : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< TypeDefinition >;
+
+            TypeDefinition( const Node::ID id, const Type::Ptr& domainType );
+
+            const Type::Ptr& domainType( void ) const;
+
+            void setBasicBehavior( const std::shared_ptr< ImplementDefinition >& basicBehavior );
+
+            const std::shared_ptr< ImplementDefinition >& basicBehavior( void ) const;
+
+            void addExtendedBehavior(
+                const std::shared_ptr< ImplementDefinition >& extendedBehavior );
+
+            const std::unordered_map< std::string, std::shared_ptr< ImplementDefinition > >&
+            extendedBehaviors( void ) const;
+
+          protected:
+            void clone( TypeDefinition& duplicate ) const;
+
+          private:
+            const Type::Ptr m_domainType;
+            std::shared_ptr< ImplementDefinition > m_basicBehavior;
+            std::unordered_map< std::string, std::shared_ptr< ImplementDefinition > >
+                m_extendedBehaviors;
+        };
+
+        using TypeDefinitions = NodeList< TypeDefinition >;
+
         class FunctionDefinition final : public Definition
         {
           public:
-            enum class Classification
-            {
-                UNKNOWN,
-                IN,         /**< only read by an ASM, only written by its env. */
-                CONTROLLED, /**< read and written by an ASM */
-                SHARED,     /**< read and written by an ASM and its env. */
-                OUT,        /**< only written by an ASM, only read by its env. */
-                STATIC,
-                LOCAL
-            };
-
-            static std::string toString( const Classification classification );
+            using Classification = CST::FunctionDefinition::Classification;
 
           public:
             using Ptr = std::shared_ptr< FunctionDefinition >;
 
             FunctionDefinition(
-                const Token::Ptr& functionToken,
                 const Identifier::Ptr& identifier,
-                const Token::Ptr& colonToken,
                 const Types::Ptr& argumentTypes,
-                const Token::Ptr& mapsToken,
                 const Type::Ptr& returnType,
-                const Defined::Ptr& defined,
-                const Initially::Ptr& initially );
-
-            bool isProgram( void ) const;
-            bool isLocal( void ) const;
+                const Expression::Ptr& defined,
+                const MappedExpressions::Ptr& initially,
+                const Classification classification,
+                const u1 symbolic );
 
             const Types::Ptr& argumentTypes( void ) const;
 
             const Type::Ptr& returnType( void ) const;
 
-            const Token::Ptr& functionToken( void ) const;
+            const Expression::Ptr& defined( void ) const;
 
-            const Token::Ptr& colonToken( void ) const;
+            const MappedExpressions::Ptr& initially( void ) const;
 
-            const Token::Ptr& mapsToken( void ) const;
-
-            const Defined::Ptr& defined( void ) const;
-
-            const Initially::Ptr& initially( void ) const;
-
-            void setClassification( Classification classification );
             Classification classification( void ) const;
+
             std::string classificationName( void ) const;
 
-            void setSymbolic( u1 symbolic );
             u1 symbolic( void ) const;
 
+            u1 program( void ) const;
+
+            u1 local( void ) const;
+
+            void setInitiallyRule( const Rule::Ptr& initiallyRule );
+
+            const Rule::Ptr& initiallyRule( void ) const;
+
+            std::string typeDescription( void ) const override;
+
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           private:
             const Types::Ptr m_argumentTypes;
             const Type::Ptr m_returnType;
-            const Defined::Ptr m_defined;
-            const Token::Ptr m_functionToken;
-            const Token::Ptr m_colonToken;
-            const Token::Ptr m_mapsToken;
-            Classification m_classification;
-            u1 m_symbolic;
-            Initially::Ptr m_initially;
-            const bool m_isProgram;
+            const Expression::Ptr m_defined;
+            const MappedExpressions::Ptr m_initially;
+            const Classification m_classification;
+            const u1 m_symbolic;
+            const u1 m_program;
+            Rule::Ptr m_initiallyRule;
         };
 
         using FunctionDefinitions = NodeList< FunctionDefinition >;
@@ -219,42 +241,29 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< DerivedDefinition >;
 
             DerivedDefinition(
-                const Token::Ptr& derivedToken,
                 const Identifier::Ptr& identifier,
-                const NodeList< VariableDefinition >::Ptr& arguments,
-                const Token::Ptr& mapsToken,
+                const VariableDefinitions::Ptr& arguments,
                 const Type::Ptr& returnType,
-                const Token::Ptr& assignmentToken,
                 const Expression::Ptr& expression );
 
-            const NodeList< VariableDefinition >::Ptr& arguments( void ) const;
+            const VariableDefinitions::Ptr& arguments( void ) const;
 
             const Type::Ptr& returnType( void ) const;
+
+            void setReturnType( const Type::Ptr& returnType );
+
             const Expression::Ptr& expression( void ) const;
 
-            const Token::Ptr& derivedToken( void ) const;
-
-            const Token::Ptr& mapsToken( void ) const;
-
-            const Token::Ptr& assignmentToken( void ) const;
-
-            void setLeftBracketToken( const Token::Ptr& leftBracketToken );
-            const Token::Ptr& leftBracketToken( void ) const;
-
-            void setRightBracketToken( const Token::Ptr& rightBracketToken );
-            const Token::Ptr& rightBracketToken( void ) const;
+            std::string typeDescription( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
-            const NodeList< VariableDefinition >::Ptr m_arguments;
-            const Type::Ptr m_returnType;
+            const VariableDefinitions::Ptr m_arguments;
+            Type::Ptr m_returnType;
             const Expression::Ptr m_expression;
-            const Token::Ptr m_derivedToken;
-            const Token::Ptr m_mapsToken;
-            const Token::Ptr m_assignmentToken;
-            Token::Ptr m_leftBracketToken;
-            Token::Ptr m_rightBracketToken;
         };
 
         class RuleDefinition final : public Definition
@@ -263,42 +272,29 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< RuleDefinition >;
 
             RuleDefinition(
-                const Token::Ptr& ruleToken,
                 const Identifier::Ptr& identifier,
-                const NodeList< VariableDefinition >::Ptr& arguments,
-                const Token::Ptr& mapsToken,
+                const VariableDefinitions::Ptr& arguments,
                 const Type::Ptr& returnType,
-                const Token::Ptr& assignmentToken,
                 const Rule::Ptr& rule );
 
             const NodeList< VariableDefinition >::Ptr& arguments( void ) const;
 
             const Type::Ptr& returnType( void ) const;
+
+            void setReturnType( const Type::Ptr& returnType );
+
             const Rule::Ptr& rule( void ) const;
 
-            const Token::Ptr& ruleToken( void ) const;
-
-            const Token::Ptr& mapsToken( void ) const;
-
-            const Token::Ptr& assignmentToken( void ) const;
-
-            void setLeftBracketToken( const Token::Ptr& leftBracketToken );
-            const Token::Ptr& leftBracketToken( void ) const;
-
-            void setRightBracketToken( const Token::Ptr& rightBracketToken );
-            const Token::Ptr& rightBracketToken( void ) const;
+            std::string typeDescription( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
-            const NodeList< VariableDefinition >::Ptr m_arguments;
-            const Type::Ptr m_returnType;
+            const VariableDefinitions::Ptr m_arguments;
+            Type::Ptr m_returnType;
             const Rule::Ptr m_rule;
-            const Token::Ptr m_ruleToken;
-            const Token::Ptr m_mapsToken;
-            const Token::Ptr m_assignmentToken;
-            Token::Ptr m_leftBracketToken;
-            Token::Ptr m_rightBracketToken;
         };
 
         class EnumeratorDefinition final : public Definition
@@ -308,42 +304,33 @@ namespace libcasm_fe
 
             EnumeratorDefinition( const Identifier::Ptr& identifier );
 
+            std::string typeDescription( void ) const override;
+
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
         };
 
         using Enumerators = NodeList< EnumeratorDefinition >;
 
-        class EnumerationDefinition final : public Definition
+        class EnumerationDefinition final : public TypeDefinition
         {
           public:
             using Ptr = std::shared_ptr< EnumerationDefinition >;
 
             EnumerationDefinition(
-                const Token::Ptr& enumerationToken,
-                const Identifier::Ptr& identifier,
-                const Token::Ptr& assignmentToken,
-                const Token::Ptr& leftBraceToken,
-                const Enumerators::Ptr& enumerators,
-                const Token::Ptr& rightBraceToken );
+                const Identifier::Ptr& identifier, const Enumerators::Ptr& enumerators );
 
             const Enumerators::Ptr& enumerators( void ) const;
 
-            const Token::Ptr& enumerationToken( void ) const;
-
-            const Token::Ptr& assignmentToken( void ) const;
-
-            const Token::Ptr& leftBraceToken( void ) const;
-
-            const Token::Ptr& rightBraceToken( void ) const;
+            std::string typeDescription( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Enumerators::Ptr m_enumerators;
-            const Token::Ptr m_enumerationToken;
-            const Token::Ptr m_assignmentToken;
-            const Token::Ptr m_leftBraceToken;
-            const Token::Ptr m_rightBraceToken;
         };
 
         class UsingDefinition final : public Definition
@@ -351,24 +338,18 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< UsingDefinition >;
 
-            UsingDefinition(
-                const Token::Ptr& usingToken,
-                const Identifier::Ptr& identifier,
-                const Token::Ptr& assignmentToken,
-                const Type::Ptr& type );
+            UsingDefinition( const Identifier::Ptr& identifier, const Type::Ptr& aliasType );
 
-            const Type::Ptr& type( void ) const;
+            const Type::Ptr& aliasType( void ) const;
 
-            const Token::Ptr& usingToken( void ) const;
-
-            const Token::Ptr& assignmentToken( void ) const;
+            std::string typeDescription( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
-            const Type::Ptr m_type;
-            const Token::Ptr m_usingToken;
-            const Token::Ptr m_assignmentToken;
+            const Type::Ptr m_aliasType;
         };
 
         class UsingPathDefinition final : public Definition
@@ -376,31 +357,21 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< UsingPathDefinition >;
 
-            UsingPathDefinition(
-                const Token::Ptr& usingToken,
-                const IdentifierPath::Ptr& path,
-                const Token::Ptr& doubleColonToken,
-                const Token::Ptr& asterixToken );
-
-            UsingPathDefinition( const Token::Ptr& usingToken, const IdentifierPath::Ptr& path );
+            UsingPathDefinition( const IdentifierPath::Ptr& path, const u1 explicitSymbol );
 
             const IdentifierPath::Ptr& path( void ) const;
 
             u1 explicitSymbol( void ) const;
 
-            const Token::Ptr& usingToken( void ) const;
-
-            const Token::Ptr& doubleColonToken( void ) const;
-
-            const Token::Ptr& asterixToken( void ) const;
+            std::string typeDescription( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const IdentifierPath::Ptr m_path;
-            const Token::Ptr m_usingToken;
-            const Token::Ptr m_doubleColonToken;
-            const Token::Ptr m_asterixToken;
+            const u1 m_explicitSymbol;
         };
 
         class InvariantDefinition final : public Definition
@@ -409,23 +380,131 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< InvariantDefinition >;
 
             InvariantDefinition(
-                const Token::Ptr& invariantToken,
-                const Identifier::Ptr& identifier,
-                const Token::Ptr& assignmentToken,
-                const Expression::Ptr& expression );
+                const Identifier::Ptr& identifier, const Expression::Ptr& expression );
 
             const Expression::Ptr& expression( void ) const;
 
-            const Token::Ptr& invariantToken( void ) const;
-
-            const Token::Ptr& assignmentToken( void ) const;
+            std::string typeDescription( void ) const override;
 
             void accept( Visitor& visitor ) override;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const Expression::Ptr m_expression;
-            const Token::Ptr m_invariantToken;
-            const Token::Ptr m_assignmentToken;
+        };
+
+        class DomainDefinition final : public TypeDefinition
+        {
+          public:
+            using Ptr = std::shared_ptr< DomainDefinition >;
+
+            DomainDefinition( const Type::Ptr& domainType );
+
+            std::string typeDescription( void ) const override;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+        };
+
+        class StructureDefinition final : public TypeDefinition
+        {
+          public:
+            using Ptr = std::shared_ptr< StructureDefinition >;
+
+            StructureDefinition(
+                const Type::Ptr& domainType, const FunctionDefinitions::Ptr& functions );
+
+            const FunctionDefinitions::Ptr& functions( void ) const;
+
+            std::string typeDescription( void ) const override;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+
+          private:
+            const FunctionDefinitions::Ptr m_functions;
+        };
+
+        class BehaviorDefinition final : public TypeDefinition
+        {
+          public:
+            using Ptr = std::shared_ptr< BehaviorDefinition >;
+
+            BehaviorDefinition( const Type::Ptr& domainType, const Definitions::Ptr& definitions );
+
+            const Definitions::Ptr& definitions( void ) const;
+
+            std::string typeDescription( void ) const override;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+
+          private:
+            const Definitions::Ptr m_definitions;
+        };
+
+        class ImplementDefinition final : public TypeDefinition
+        {
+          public:
+            using Ptr = std::shared_ptr< ImplementDefinition >;
+
+            ImplementDefinition(
+                const Type::Ptr& behaviorType,
+                const Type::Ptr& domainType,
+                const Definitions::Ptr& definitions );
+
+            const Type::Ptr& behaviorType( void ) const;
+
+            const Definitions::Ptr& definitions( void ) const;
+
+            u1 forBehaviorType( void ) const;
+
+            std::string typeDescription( void ) const override;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+
+          private:
+            const Type::Ptr m_behaviorType;
+            const Definitions::Ptr m_definitions;
+        };
+
+        class BuiltinDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< BuiltinDefinition >;
+
+            BuiltinDefinition(
+                const Identifier::Ptr& identifier,
+                const Types::Ptr& argumentTypes,
+                const Type::Ptr& returnType );
+
+            const Types::Ptr& argumentTypes( void ) const;
+
+            const Type::Ptr& returnType( void ) const;
+
+            void setTargetId( const libcasm_ir::Value::ID targetId );
+
+            libcasm_ir::Value::ID targetId( void ) const;
+
+            u1 hasTargetId( void ) const;
+
+            std::string typeDescription( void ) const override;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+
+          private:
+            const Identifier::Ptr m_identifier;
+            const Types::Ptr m_argumentTypes;
+            const Type::Ptr m_returnType;
+            libcasm_ir::Value::ID m_targetId;
         };
 
         class InitDefinition final : public Definition
@@ -433,38 +512,26 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< InitDefinition >;
 
-            InitDefinition( const Token::Ptr& initToken, const IdentifierPath::Ptr& initPath );
+            InitDefinition( const MappedExpressions::Ptr& initializers, const u1 singleAgent );
 
-            InitDefinition(
-                const Token::Ptr& initToken,
-                const Token::Ptr& leftBraceToken,
-                const Initializers::Ptr& initializers,
-                const Token::Ptr& rightBraceToken );
+            const MappedExpressions::Ptr& initializers( void ) const;
 
-            const IdentifierPath::Ptr& initPath( void ) const;
+            u1 singleAgent( void ) const;
 
-            const Initializers::Ptr& initializers( void ) const;
+            void setExternal( void );
 
-            const Token::Ptr& initToken( void ) const;
+            u1 external( void ) const;
 
-            const Token::Ptr& leftBraceToken( void ) const;
-
-            const Token::Ptr& rightBraceToken( void ) const;
-
-            void setProgramFunction( const FunctionDefinition::Ptr& programFunction );
-            const FunctionDefinition::Ptr& programFunction( void ) const;
-
-            u1 isSingleAgent( void ) const;
+            std::string typeDescription( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
-            const IdentifierPath::Ptr m_initPath;
-            const Initializers::Ptr m_initializers;
-            const Token::Ptr m_initToken;
-            const Token::Ptr m_leftBraceToken;
-            const Token::Ptr m_rightBraceToken;
-            FunctionDefinition::Ptr m_programFunction;
+            const MappedExpressions::Ptr m_initializers;
+            const u1 m_singleAgent;
+            u1 m_external;
         };
 
         class ImportDefinition final : public Definition
@@ -472,30 +539,23 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ImportDefinition >;
 
-            ImportDefinition( const Token::Ptr& importToken, const IdentifierPath::Ptr& path );
-
-            ImportDefinition(
-                const Token::Ptr& importToken,
-                const IdentifierPath::Ptr& path,
-                const Token::Ptr& asToken,
-                const Identifier::Ptr& identifier );
+            ImportDefinition( const IdentifierPath::Ptr& path, const Identifier::Ptr& identifier );
 
             const IdentifierPath::Ptr& path( void ) const;
 
-            const Token::Ptr& importToken( void ) const;
-            const Token::Ptr& asToken( void ) const;
+            std::string typeDescription( void ) const override;
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
             const IdentifierPath::Ptr m_path;
-            const Token::Ptr m_importToken;
-            const Token::Ptr m_asToken;
         };
     }
 }
 
-#endif  // _LIBCASM_FE_DEFINITION_H_
+#endif  // _LIBCASM_FE_AST_DEFINITION_H_
 
 //
 //  Local variables:

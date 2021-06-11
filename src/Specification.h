@@ -47,12 +47,9 @@
 #define _LIBCASM_FE_SPECIFICATION_H_
 
 #include <libcasm-fe/Namespace>
-#include <libcasm-fe/ast/Definition>
-#include <libcasm-fe/ast/Expression>
-#include <libcasm-fe/ast/Literal>
-#include <libcasm-fe/ast/Node>
-#include <libcasm-fe/ast/Rule>
-#include <libcasm-fe/ast/Span>
+#include <libcasm-fe/ast/Root>
+#include <libcasm-fe/cst/Root>
+#include <libcasm-fe/lst/Root>
 
 #include <libstdhl/std/rfc3986>
 
@@ -83,17 +80,21 @@ namespace libcasm_fe
 
         const std::string& name( void ) const;
 
-        void setHeader( const Ast::HeaderDefinition::Ptr& header );
+        void setCst( const CST::Root::Ptr& cst );
 
-        const Ast::HeaderDefinition::Ptr& header( void ) const;
+        const CST::Root::Ptr& cst( void ) const;
 
-        void setDefinitions( const Ast::Definitions::Ptr& definitions );
+        void setAst( const AST::Root::Ptr& ast );
 
-        const Ast::Definitions::Ptr& definitions( void ) const;
+        const AST::Root::Ptr& ast( void ) const;
 
-        void setSpans( const Ast::Spans::Ptr& spans );
+        void setIst( const AST::Root::Ptr& ist );
 
-        const Ast::Spans::Ptr& spans( void ) const;
+        const AST::Root::Ptr& ist( void ) const;
+
+        void setLst( const LST::Root::Ptr& lst );
+
+        const LST::Root::Ptr& lst( void ) const;
 
         void setSymboltable( const Namespace::Ptr& symboltable );
 
@@ -103,9 +104,10 @@ namespace libcasm_fe
         AsmType m_asmType;
         std::string m_name;
         libstdhl::Standard::RFC3986::URI::Ptr m_location;
-        Ast::HeaderDefinition::Ptr m_header;
-        Ast::Definitions::Ptr m_definitions;
-        Ast::Spans::Ptr m_spans;
+        CST::Root::Ptr m_cst;
+        AST::Root::Ptr m_ast;
+        AST::Root::Ptr m_ist;
+        LST::Root::Ptr m_lst;
         Namespace::Ptr m_symboltable;
     };
 }

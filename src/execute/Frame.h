@@ -46,7 +46,7 @@
 #ifndef _LIBCASM_FE_FRAME_H_
 #define _LIBCASM_FE_FRAME_H_
 
-#include <libcasm-fe/ast/Expression>
+#include <libcasm-fe/lst/Expression>
 
 #include <libstdhl/SourceLocation>
 
@@ -57,10 +57,10 @@ namespace libcasm_fe
         static std::size_t id;
 
       public:
-        Frame( Ast::CallExpression* call, Ast::Node* callee, std::size_t numberOfLocals );
+        Frame( LST::CallExpression* call, LST::Node* callee, std::size_t numberOfLocals );
 
-        Ast::CallExpression* call( void ) const;
-        Ast::Node* callee( void ) const;
+        LST::CallExpression* call( void ) const;
+        LST::Node* callee( void ) const;
 
         void setLocal( std::size_t index, const libcasm_ir::Constant& local );
         const libcasm_ir::Constant& local( std::size_t index ) const;
@@ -70,8 +70,8 @@ namespace libcasm_fe
 
       private:
         const std::size_t m_frameId;
-        Ast::CallExpression* m_call;
-        Ast::Node* m_callee;
+        LST::CallExpression* m_call;
+        LST::Node* m_callee;
         std::vector< libcasm_ir::Constant > m_locals;
     };
 

@@ -70,12 +70,14 @@ namespace libcasm_fe
 
         using Linkage = std::pair< Namespace::Ptr, Visibility >;
 
-        using Symbol = std::pair< Ast::Definition::Ptr, u1 >;
+        using Symbol = std::pair< AST::Definition::Ptr, u1 >;
 
       public:
         explicit Namespace( void );
 
-        void registerSymbol( const std::string& name, const Ast::Definition::Ptr& definition );
+        void registerSymbol( const std::string& name, const AST::Definition::Ptr& definition );
+
+        void replaceSymbol( const std::string& name, const AST::Definition::Ptr& definition );
 
         void registerNamespace(
             const std::string& name,
@@ -88,14 +90,14 @@ namespace libcasm_fe
          * @return The symbol consisting of definition pointer (nullptr if absent) and accessible
          * flag.
          */
-        Symbol findSymbol( const Ast::IdentifierPath& path ) const;
+        Symbol findSymbol( const AST::IdentifierPath& path ) const;
 
         /**
          * Searches for a symbol named @p name in the current namespace.
          *
          * @return The symbol or nullptr if absent.
          */
-        Ast::Definition::Ptr findSymbol( const std::string& name ) const;
+        AST::Definition::Ptr findSymbol( const std::string& name ) const;
 
         /**
          * Searches for a sub-namespace named @p name in the current namespace.
@@ -104,20 +106,36 @@ namespace libcasm_fe
          */
         Namespace::Ptr findNamespace( const std::string& name ) const;
 
-        Namespace::Ptr findNamespace( const Ast::IdentifierPath& path ) const;
+        Namespace::Ptr findNamespace( const AST::IdentifierPath& path ) const;
 
-        const std::unordered_map< std::string, Ast::Definition::Ptr >& symbols( void ) const;
+        const std::unordered_map< std::string, AST::Definition::Ptr >& symbols( void ) const;
+
+        const std::unordered_map< std::string, Linkage >& namespaces( void ) const;
+
+        u1 empty( void ) const;
+
+        void registerTypeDefinition( AST::TypeDefinition& node );
+
+        AST::TypeDefinition::Ptr findTypeDefinition( const libcasm_ir::Type::ID typeID ) const;
+
+        AST::TypeDefinition::Ptr findTypeDefinition( const std::string& typeName ) const;
 
         std::string dump( const std::string& indention = "" ) const;
 
       private:
+        Namespace::Symbol findSymbol(
+            const std::string* path, const std::size_t size, const u1 externalImport ) const;
+
         std::string dump(
             const std::string& indention, std::unordered_set< const Namespace* >& stack ) const;
 
       private:
-        std::unordered_map< std::string, Ast::Definition::Ptr > m_symbols;
+        std::unordered_map< std::string, AST::Definition::Ptr > m_symbols;
 
         std::unordered_map< std::string, Linkage > m_namespaces;
+
+        std::unordered_map< libcasm_ir::Type::ID, AST::TypeDefinition::Ptr >
+            m_typeIdToTypeDefinition;
     };
 }
 

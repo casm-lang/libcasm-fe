@@ -47,21 +47,15 @@
 
 #include "../various/GrammarToken.h"
 
+#include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/ast/Definition>
-#include <libcasm-fe/ast/Token>
+#include <libcasm-fe/ast/Literal>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
-static IdentifierPath::Ptr asIdentifierPath( const std::string& name )
-{
-    const auto identifier = std::make_shared< Identifier >( name );
-    return std::make_shared< IdentifierPath >( identifier );
-}
-
-static const auto UnresolvedIdentifierPath = asIdentifierPath( "$unresolved$" );
-static const auto TupleTypeIdentifierPath = asIdentifierPath( "$tuple$" );
-static const auto RecordTypeIdentifierPath = asIdentifierPath( "$record$" );
+static const auto unresolvedIdentifierPath =
+    IdentifierPath::fromIdentifier( std::make_shared< Identifier >( "$unresolved$" ) );
 
 //
 //
@@ -71,7 +65,7 @@ static const auto RecordTypeIdentifierPath = asIdentifierPath( "$record$" );
 Type::Type( const Node::ID id, const IdentifierPath::Ptr& name )
 : TypedNode( id )
 , m_name( name )
-, m_delimiterToken( Token::unresolved() )
+, m_typeDefinition()
 {
 }
 
@@ -80,15 +74,35 @@ const IdentifierPath::Ptr& Type::name( void ) const
     return m_name;
 }
 
-void Type::setDelimiterToken( const Token::Ptr& delimiterToken )
+void Type::setTypeDefinition( const TypeDefinition::Ptr& typeDefinition )
 {
-    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
-    m_delimiterToken = delimiterToken;
+    m_typeDefinition = typeDefinition;
 }
 
-const Token::Ptr& Type::delimiterToken( void ) const
+const TypeDefinition::Ptr& Type::typeDefinition( void ) const
 {
-    return m_delimiterToken;
+    return m_typeDefinition;
+}
+
+IdentifierPath::Ptr Type::signaturePath( void ) const
+{
+    const auto& typeSignatureIdentifier = AST::make< Identifier >( sourceLocation(), signature() );
+
+    const auto path = IdentifierPath::fromIdentifier( name()->identifiers()->front() );
+    for( std::size_t i = 1; i < name()->identifiers()->size(); i++ )
+    {
+        const auto identifier = ( *name()->identifiers() )[ i ];
+        path->addIdentifier( identifier );
+    }
+
+    path->addIdentifier( typeSignatureIdentifier );
+    return path;
+}
+
+void Type::clone( Type& duplicate ) const
+{
+    TypedNode::clone( duplicate );
+    duplicate.setTypeDefinition( m_typeDefinition );
 }
 
 //
@@ -97,13 +111,26 @@ const Token::Ptr& Type::delimiterToken( void ) const
 //
 
 UnresolvedType::UnresolvedType( void )
-: Type( Node::ID::UNRESOLVED_TYPE, UnresolvedIdentifierPath )
+: Type( Node::ID::UNRESOLVED_TYPE, unresolvedIdentifierPath )
 {
+}
+
+std::string UnresolvedType::signature( void ) const
+{
+    return "?";
 }
 
 void UnresolvedType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr UnresolvedType::clone( void ) const
+{
+    auto duplicate = std::make_shared< UnresolvedType >();
+
+    Type::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -116,35 +143,22 @@ BasicType::BasicType( const IdentifierPath::Ptr& identifier )
 {
 }
 
+std::string BasicType::signature( void ) const
+{
+    return name()->baseName();
+}
+
 void BasicType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
-//
-//
-// EmbracedType
-//
-
-EmbracedType::EmbracedType(
-    const Node::ID id,
-    const IdentifierPath::Ptr& name,
-    const Token::Ptr& leftBraceToken,
-    const Token::Ptr& rightBraceToken )
-: Type( id, name )
-, m_leftBraceToken( leftBraceToken )
-, m_rightBraceToken( rightBraceToken )
+Node::Ptr BasicType::clone( void ) const
 {
-}
+    auto duplicate = std::make_shared< BasicType >( name()->duplicate< IdentifierPath >() );
 
-const Token::Ptr& EmbracedType::leftBraceToken( void ) const
-{
-    return m_leftBraceToken;
-}
-
-const Token::Ptr& EmbracedType::rightBraceToken( void ) const
-{
-    return m_rightBraceToken;
+    Type::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -152,11 +166,11 @@ const Token::Ptr& EmbracedType::rightBraceToken( void ) const
 // TupleType
 //
 
-TupleType::TupleType(
-    const Token::Ptr& leftBraceToken,
-    const Types::Ptr& subTypes,
-    const Token::Ptr& rightBraceToken )
-: EmbracedType( Node::ID::TUPLE_TYPE, TupleTypeIdentifierPath, leftBraceToken, rightBraceToken )
+TupleType::TupleType( const Types::Ptr& subTypes )
+: Type(
+      Node::ID::TUPLE_TYPE,
+      IdentifierPath::fromIdentifier(
+          AST::make< Identifier >( subTypes->sourceLocation(), TypeInfo::TYPE_NAME_TUPLE ) ) )
 , m_subTypes( subTypes )
 {
 }
@@ -166,9 +180,33 @@ const Types::Ptr& TupleType::subTypes( void ) const
     return m_subTypes;
 }
 
+std::string TupleType::signature( void ) const
+{
+    std::stringstream stream;
+    stream << "(";
+
+    for( const auto& subType : *subTypes() )
+    {
+        stream << " " << subType->signature() << ",";
+    }
+
+    stream.seekp( -1, stream.cur );
+    stream << " )";
+
+    return stream.str();
+}
+
 void TupleType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr TupleType::clone( void ) const
+{
+    auto duplicate = std::make_shared< TupleType >( subTypes()->duplicate< Types >() );
+
+    Type::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -176,11 +214,11 @@ void TupleType::accept( Visitor& visitor )
 // RecordType
 //
 
-RecordType::RecordType(
-    const Token::Ptr& leftBraceToken,
-    const VariableDefinitions::Ptr& namedSubTypes,
-    const Token::Ptr& rightBraceToken )
-: EmbracedType( Node::ID::RECORD_TYPE, RecordTypeIdentifierPath, leftBraceToken, rightBraceToken )
+RecordType::RecordType( const VariableDefinitions::Ptr& namedSubTypes )
+: Type(
+      Node::ID::RECORD_TYPE,
+      IdentifierPath::fromIdentifier(
+          AST::make< Identifier >( namedSubTypes->sourceLocation(), TypeInfo::TYPE_NAME_RECORD ) ) )
 , m_namedSubTypes( namedSubTypes )
 {
 }
@@ -190,9 +228,34 @@ const VariableDefinitions::Ptr& RecordType::namedSubTypes( void ) const
     return m_namedSubTypes;
 }
 
+std::string RecordType::signature( void ) const
+{
+    std::stringstream stream;
+    stream << "{";
+
+    for( const auto& subType : *namedSubTypes() )
+    {
+        stream << " " << subType->variableType()->signature() << ",";
+    }
+
+    stream.seekp( -1, stream.cur );
+    stream << " }";
+
+    return stream.str();
+}
+
 void RecordType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr RecordType::clone( void ) const
+{
+    auto duplicate =
+        std::make_shared< RecordType >( namedSubTypes()->duplicate< VariableDefinitions >() );
+
+    Type::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -200,12 +263,8 @@ void RecordType::accept( Visitor& visitor )
 // TemplateType
 //
 
-TemplateType::TemplateType(
-    const IdentifierPath::Ptr& identifier,
-    const Token::Ptr& leftBraceToken,
-    const Types::Ptr& subTypes,
-    const Token::Ptr& rightBraceToken )
-: EmbracedType( Node::ID::TEMPLATE_TYPE, identifier, leftBraceToken, rightBraceToken )
+TemplateType::TemplateType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes )
+: Type( Node::ID::TEMPLATE_TYPE, identifier )
 , m_subTypes( subTypes )
 {
 }
@@ -215,9 +274,51 @@ const Types::Ptr& TemplateType::subTypes( void ) const
     return m_subTypes;
 }
 
+void TemplateType::setSubTypes( const Types::Ptr& subTypes )
+{
+    m_subTypes = subTypes;
+}
+
+u1 TemplateType::varadic( void ) const
+{
+    return subTypes()->size() == 0;
+}
+
+std::string TemplateType::signature( void ) const
+{
+    std::stringstream stream;
+    stream << name()->baseName();
+
+    if( varadic() )
+    {
+        return stream.str();
+    }
+
+    stream << "<";
+
+    for( const auto& subType : *subTypes() )
+    {
+        stream << " " << subType->signature() << ",";
+    }
+
+    stream.seekp( -1, stream.cur );
+    stream << " >";
+
+    return stream.str();
+}
+
 void TemplateType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr TemplateType::clone( void ) const
+{
+    auto duplicate = std::make_shared< TemplateType >(
+        name()->duplicate< IdentifierPath >(), subTypes()->duplicate< Types >() );
+
+    Type::clone( *duplicate );
+    return duplicate;
 }
 
 //
@@ -227,15 +328,11 @@ void TemplateType::accept( Visitor& visitor )
 
 RelationType::RelationType(
     const IdentifierPath::Ptr& identifier,
-    const Token::Ptr& leftBraceToken,
     const Types::Ptr& argumentTypes,
-    const Token::Ptr& mapsToken,
-    const Type::Ptr& returnType,
-    const Token::Ptr& rightBraceToken )
-: EmbracedType( Node::ID::RELATION_TYPE, identifier, leftBraceToken, rightBraceToken )
+    const Type::Ptr& returnType )
+: Type( Node::ID::RELATION_TYPE, identifier )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
-, m_mapsToken( mapsToken )
 {
 }
 
@@ -249,9 +346,30 @@ const Type::Ptr& RelationType::returnType( void ) const
     return m_returnType;
 }
 
-const Token::Ptr& RelationType::mapsToken( void ) const
+u1 RelationType::mapping( void ) const
 {
-    return m_mapsToken;
+    return name()->path() == "";
+}
+
+std::string RelationType::signature( void ) const
+{
+    std::stringstream stream;
+    stream << name()->baseName();
+    stream << "< ";
+
+    for( const auto& subType : *argumentTypes() )
+    {
+        stream << subType->signature() << " * ";
+    }
+
+    if( argumentTypes()->size() > 0 )
+    {
+        stream.seekp( -2, stream.cur );
+    }
+
+    stream << "-> " << returnType()->signature() << " >";
+
+    return stream.str();
 }
 
 void RelationType::accept( Visitor& visitor )
@@ -259,18 +377,25 @@ void RelationType::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+Node::Ptr RelationType::clone( void ) const
+{
+    auto duplicate = std::make_shared< RelationType >(
+        name()->duplicate< IdentifierPath >(),
+        argumentTypes()->duplicate< Types >(),
+        returnType()->duplicate< Type >() );
+
+    Type::clone( *duplicate );
+    return duplicate;
+}
+
 //
 //
-// FixedSizeType
+// FixedSizedType
 //
 
-FixedSizedType::FixedSizedType(
-    const IdentifierPath::Ptr& identifier,
-    const Token::Ptr& markToken,
-    const Expression::Ptr& size )
+FixedSizedType::FixedSizedType( const IdentifierPath::Ptr& identifier, const Expression::Ptr& size )
 : Type( Node::ID::FIXED_SIZED_TYPE, identifier )
 , m_size( size )
-, m_markToken( markToken )
 {
 }
 
@@ -279,14 +404,102 @@ const Expression::Ptr& FixedSizedType::size( void ) const
     return m_size;
 }
 
-const Token::Ptr& FixedSizedType::markToken( void ) const
+std::string FixedSizedType::signature( void ) const
 {
-    return m_markToken;
+    std::stringstream stream;
+
+    const auto& property = *size();
+
+    if( not type() )
+    {
+        stream << name()->baseName() << "'";
+
+        if( property.id() == Node::ID::DIRECT_CALL_EXPRESSION )
+        {
+            const auto& directCallExpression =
+                static_cast< const DirectCallExpression& >( property );
+            stream << directCallExpression.identifier()->path();
+        }
+        else if( property.id() == Node::ID::VALUE_LITERAL and property.type()->isInteger() )
+        {
+            const auto& valueLiteral = static_cast< const ValueLiteral& >( property );
+            stream << valueLiteral.toString();
+        }
+        else if( property.id() == Node::ID::RANGE_LITERAL )
+        {
+            const auto& rangeLiteral = static_cast< const RangeLiteral& >( property );
+            stream << "[";
+
+            auto lhs = rangeLiteral.left();
+            if( lhs->id() == Node::ID::UNARY_EXPRESSION )
+            {
+                const auto& lhsUnaryExpression = static_cast< const UnaryExpression& >( *lhs );
+                lhs = lhsUnaryExpression.expression();
+                if( lhsUnaryExpression.operationToken() == Grammar::Token::MINUS )
+                {
+                    stream << "-";
+                }
+            }
+            if( lhs->id() == Node::ID::VALUE_LITERAL and lhs->type()->isInteger() )
+            {
+                const auto& valueLiteral = static_cast< const ValueLiteral& >( *lhs );
+                stream << valueLiteral.toString();
+            }
+            else
+            {
+                stream << "?";
+            }
+
+            stream << "..";
+
+            auto rhs = rangeLiteral.right();
+            if( rhs->id() == Node::ID::UNARY_EXPRESSION )
+            {
+                const auto& rhsUnaryExpression = static_cast< const UnaryExpression& >( *rhs );
+                rhs = rhsUnaryExpression.expression();
+                if( rhsUnaryExpression.operationToken() == Grammar::Token::MINUS )
+                {
+                    stream << "-";
+                }
+            }
+            if( rhs->id() == Node::ID::VALUE_LITERAL and rhs->type()->isInteger() )
+            {
+                const auto& valueLiteral = static_cast< const ValueLiteral& >( *rhs );
+                stream << valueLiteral.toString();
+            }
+            else
+            {
+                stream << "?";
+            }
+
+            stream << "]";
+        }
+        else
+        {
+            stream << "?";
+        }
+    }
+    else
+    {
+        stream << name()->baseDir();
+        stream << type()->description();
+    }
+
+    return stream.str();
 }
 
 void FixedSizedType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+Node::Ptr FixedSizedType::clone( void ) const
+{
+    auto duplicate = std::make_shared< FixedSizedType >(
+        name()->duplicate< IdentifierPath >(), size()->duplicate< Expression >() );
+
+    Type::clone( *duplicate );
+    return duplicate;
 }
 
 //

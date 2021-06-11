@@ -1,0 +1,1010 @@
+//
+//  Copyright (C) 2014-2020 CASM Organization <https://casm-lang.org>
+//  All rights reserved.
+//
+//  Developed by: Philipp Paulweber
+//                Emmanuel Pescosta
+//                Florian Hahn
+//                Ioan Molnar
+//                <https://github.com/casm-lang/libcasm-fe>
+//
+//  This file is part of libcasm-fe.
+//
+//  libcasm-fe is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  libcasm-fe is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
+//
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
+
+// Corinthian Abstract State Machine
+
+CASM init greeting
+
+    /* The origin of the name Corinthian is unclear, whether it is taken from
+           "the letters, the pillars, the leather, the place, or the mode of behavior"
+	       according to the character "Puck" in "The Sandman" by Neil Gaiman. */
+
+                   rule greeting = println( "Hello World!" )
+
+//
+//
+// Prelude Function and Rules
+//
+
+[ export ]
+function program : Agent -> RuleRef< -> Void >
+
+[ export ]
+derived self -> Agent =
+    SelfInstruction
+
+[ export ]
+rule abort =
+    AbortInstruction
+
+[ export ]
+rule assert( value : Boolean ) =
+    AssertInstruction( value )
+
+[ export ]
+rule assure( value : Boolean ) =
+    AssureInstruction( value )
+
+[ export ]
+rule print( text : String ) =
+    PrintInstruction( text )
+
+[ export ]
+rule println( text : String ) =
+    if text = undef then
+        print( "undef\n" )
+    else
+        print( text + "\n" )
+
+//
+//
+// Agent Domain
+//
+
+[ export ]
+[ abstract ]
+domain Agent
+
+implement Agent = {
+    rule terminate( this ) =
+        program( this ) := undef
+}
+
+// rule exampleTermination =
+//      forall agent in Agent do
+//          agent.terminate // <=> program( agent ) := undef
+
+
+
+
+implement Equality for Agent = {
+    [ pure ]
+    derived equal( this, other : Agent ) -> Boolean =
+        EquInstruction( this, other )
+}
+
+implement TypeCasting< String > for Agent = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        StrInstruction( this )
+}
+
+
+//
+//
+// Boolean Domain
+//
+
+[ export ]
+domain Boolean
+
+implement Equality for Boolean = {
+    [ pure ]
+    derived equal( this, other : Boolean ) -> Boolean =
+        EquInstruction( this, other )
+}
+
+implement Negation for Boolean = {
+    [ pure ]
+    derived negate( this ) -> Boolean =
+        NotInstruction( this )
+}
+
+implement Logical for Boolean = {
+    [ pure ]
+    derived disjunction( this, other : Boolean ) -> Boolean =
+        OrInstruction( this, other )
+
+    [ pure ]
+    derived exclusiveDisjunction( this, other : Boolean ) -> Boolean =
+	 ( this and ( not other ) ) or ( ( not this ) and other )
+
+    [ pure ]
+    derived conjunction( this, other : Boolean ) -> Boolean =
+	not ( not this or not other )
+
+    [ pure ]
+    derived implication( this, other : Boolean ) -> Boolean =
+	( not this ) or other
+}
+
+implement TypeCasting< String > for Boolean = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        if this = undef then
+	    "undef"
+	else if this then
+	    "true"
+	else
+	    "false"
+}
+
+implement TypeCasting< Boolean > for Boolean = {
+    [ pure ]
+    derived convertTo( this ) -> Boolean =
+        this
+}
+
+implement TypeCasting< Integer > for Boolean = {
+    [ pure ]
+    derived convertTo( this ) -> Integer =
+        if this = undef then
+	    undef
+	else if this then
+	    1
+	else
+	    0
+}
+
+implement Symbolic for Boolean = {
+    [ pure ]
+    derived isSymbolic( this ) -> Boolean =
+        SymInstruction( this )
+}
+
+//
+//
+// Integer Domain
+//
+
+[ export ]
+domain Integer
+
+implement Equality for Integer = {
+    [ pure ]
+    derived equal( this, other : Integer ) -> Boolean =
+        EquInstruction( this, other )
+}
+
+implement PartialOrder for Integer = {
+    [ pure ]
+    derived lessThan( this, other : Integer ) -> Boolean =
+        LthInstruction( this, other )
+
+    [ pure ]
+    derived greaterThan( this, other : Integer) -> Boolean =
+        GthInstruction( this, other )
+}
+
+implement TotalOrder for Integer = {
+    [ pure ]
+    derived lessThanOrEqual( this, other : Integer ) -> Boolean =
+        (this < other) or (this = other)
+
+    [ pure ]
+    derived greaterThanOrEqual( this, other : Integer) -> Boolean =
+        (this > other) or (this = other)
+}
+
+implement Addition for Integer = {
+    [ pure ]
+    derived add( this, other : Integer ) -> Integer =
+        AddInstruction( this, other )
+}
+
+implement Subtraction for Integer = {
+    [ pure ]
+    derived subtract( this, other : Integer ) -> Integer =
+        SubInstruction( this, other )
+}
+
+implement Multiplication for Integer  = {
+    [ pure ]
+    derived multiply( this, other : Integer ) -> Integer =
+        MulInstruction( this, other )
+}
+
+implement Division for Integer = {
+    [ pure ]
+    derived divide( this, other : Integer ) -> Integer =
+        DivInstruction( this, other )
+}
+
+implement Modulus for Integer = {
+    [ pure ]
+    derived modulo( this, other : Integer ) -> Integer =
+        ModInstruction( this, other )
+}
+
+implement Exponentiation for Integer = {
+    [ pure ]
+    derived power( this, other : Integer ) -> Integer =
+        PowInstruction( this, other )
+}
+
+implement Positive for Integer = {
+    [ pure ]
+    derived sign( this ) -> Integer = this
+}
+
+implement Inversion for Integer = {
+    [ pure ]
+    derived invert( this ) -> Integer = 0 - this
+}
+
+implement Cardinality for Integer = {
+    [ pure ]
+    derived size( this ) -> Integer = 1
+}
+
+implement TypeCasting< Integer > for Integer = {
+    [ pure ]
+    derived convertTo( this ) -> Integer =
+        this
+}
+
+implement TypeCasting< Boolean > for Integer = {
+    derived convertTo( this ) -> Boolean =
+        if this = undef then
+	    undef
+	else if this != 0 then
+	    true
+	else
+	    false
+}
+
+implement TypeCasting< String > for Integer = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        StrInstruction( this )
+}
+
+// TODO: FIXME: @ppaulweber
+// template< N : Integer >
+// implement TypeCasting< Binary'N > for Integer = {
+//     [ pure ]
+//     derived toBinary( this ) -> Binary =
+//         AsBinaryInstruction( this )
+// }
+
+implement Stringify for Integer = {
+    [ pure ]
+    derived bin( this ) -> String =
+        BinInstruction( this )
+
+    [ pure ]
+    derived oct( this ) -> String =
+        OctInstruction( this )
+
+    [ pure ]
+    derived dec( this ) -> String =
+        this as String
+
+    [ pure ]
+    derived hex( this ) -> String =
+        HexInstruction( this )
+}
+
+implement Symbolic for Integer = {
+    [ pure ]
+    derived isSymbolic( this ) -> Boolean =
+        SymInstruction( this )
+}
+
+//
+//
+// Binary Domain
+//
+
+[ export ]
+[ template Size : Integer ]
+domain Binary'Size
+
+// implement Equality for Binary'Size = {
+//     [ pure ]
+//     derived equal( this, other : Binary'Size ) -> Boolean =
+//         EquInstruction( this, other )
+// }
+
+// implement Cardinality for Binary'Size = {
+//     [ pure ]
+//     derived size( this ) -> Integer =
+//         SizeInstruction( this )
+// }
+
+// implement TypeCasting< String > for Binary'Size = {
+//     [ pure ]
+//     derived convertTo( this ) -> String =
+//         StrInstruction( this )
+// }
+
+// implement Symbolic for Binary'Size = {
+//     [ pure ]
+//     derived isSymbolic( this ) -> Boolean =
+//         SymInstruction( this )
+// }
+
+//
+//
+// Rational Domain
+//
+
+[ export ]
+domain Rational
+
+implement Equality for Rational = {
+    [ pure ]
+    derived equal( this, other : Rational ) -> Boolean =
+        EquInstruction( this, other )
+}
+
+implement PartialOrder for Rational = {
+    [ pure ]
+    derived lessThan( this, other : Rational ) -> Boolean =
+        false // LthInstruction( this, other )
+
+    [ pure ]
+    derived greaterThan( this, other : Rational ) -> Boolean =
+        false // GthInstruction( this, other )
+}
+
+implement TotalOrder for Rational = {
+    [ pure ]
+    derived lessThanOrEqual( this, other : Rational ) -> Boolean =
+        (this < other) or (this = other)
+
+    [ pure ]
+    derived greaterThanOrEqual( this, other : Rational ) -> Boolean =
+        (this > other) or (this = other)
+}
+
+// implement Addition for Rational = {
+//     [ pure ]
+//     derived add( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+// implement Subtraction for Rational = {
+//     [ pure ]
+//     derived subtract( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+// implement Multiplication for Rational  = {
+//     [ pure ]
+//     derived multiply( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+// implement Division for Rational = {
+//     [ pure ]
+//     derived divide( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+// implement Modulus for Rational = {
+//     [ pure ]
+//     derived modulo( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+// implement Exponentiation for Rational = {
+//     [ pure ]
+//     derived power( this, other : Rational ) -> Rational =
+//         TODO
+// }
+
+implement Positive for Rational = {
+    [ pure ]
+    derived sign( this ) -> Rational = this
+}
+
+// implement Inversion for Rational = {
+//     [ pure ]
+//     derived invert( this ) -> Rational = 0r0/1 - this
+// }
+
+implement TypeCasting< String > for Rational = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        StrInstruction( this )
+}
+
+implement Cardinality for Rational = {
+    [ pure ]
+    derived size( this ) -> Integer = 1
+}
+
+implement Symbolic for Rational = {
+    [ pure ]
+    derived isSymbolic( this ) -> Boolean =
+        SymInstruction( this )
+}
+
+//
+//
+// Decimal Domain
+//
+
+[ export ]
+domain Decimal
+
+//
+//
+// String Domain
+//
+
+[ export ]
+domain String
+
+implement Equality for String = {
+    [ pure ]
+    derived equal( this, other : String ) -> Boolean =
+        EquInstruction( this, other )
+}
+
+implement Addition for String = {
+    [ pure ]
+    derived add( this, other : String ) -> String =
+        ConcatInstruction( this, other )
+}
+
+implement TypeCasting< String > for String = {
+    [ pure ]
+    derived convertTo( this ) -> String = this
+}
+
+implement Symbolic for String = {
+    [ pure ]
+    derived isSymbolic( this ) -> Boolean =
+        SymInstruction( this )
+}
+
+//
+//
+// Range Domain
+//
+
+[ export ]
+[ template Type : Object ]
+domain Range< Type >
+
+implement Cardinality for Range< Type > = {
+    [ pure ]
+    derived size( this ) -> Integer =
+        SizeInstruction( this )
+}
+
+//
+//
+// Set Domain
+//
+
+// [ export ]
+// [ template Type : Object ]
+// domain Set< Type >
+
+//
+//
+// List Domain
+//
+
+// [ export ]
+// [ template Type : Object ]
+// domain List< Type >
+
+//
+//
+// Record Domain
+//
+
+// [ export ]
+// [ template Arguments : Object ]
+// [ template Types : Arguments... ]
+// domain Record< Types >
+
+//
+//
+// Tuple Domain
+//
+
+// [ export ]
+// [ template Arguments : Object ]
+// [ template Types : Arguments... ]
+// domain Tuple< Types >
+
+// implement TypeCasting< String > for Tuple< Types > = {
+//     [ pure ]
+//     derived convertTo( this ) -> String =
+//         StrInstruction( this )
+// }
+
+// implement ElementAccess< Boolean > for Tuple< Types > = {
+//     [ pure ]
+//     derived at( this, position : Integer ) -> Boolean =
+//         NthInstruction( this, position )
+// }
+
+// implement ElementAccess< Integer > for Tuple< Types > = {
+//     [ pure ]
+//     derived at( this, position : Integer ) -> Integer =
+//         NthInstruction( this, position )
+// }
+
+// implement ElementAccess< String > for Tuple< Types > = {
+//     [ pure ]
+//     derived at( this, position : Integer ) -> String =
+//         NthInstruction( this, position )
+// }
+
+// implement ElementAccess< Agent > for Tuple< Types > = {
+//     [ pure ]
+//     derived at( this, position : Integer ) -> Agent =
+//         NthInstruction( this, position )
+// }
+
+// implement ElementAccess< enumeration > for Tuple< Types > = {
+//     [ pure ]
+//     derived at( this, position : Integer ) -> enumeration =
+//         NthInstruction( this, position )
+// }
+
+//
+//
+// Rule Reference Domain
+//
+
+[ export ]
+[ template Arguments : Object ]
+[ template Result : Object ]
+[ template Signature : < Arguments... -> Result > ]
+domain RuleRef< Signature >
+
+implement Equality for RuleRef< Signature > = {
+    [ pure ]
+    derived equal( this, other : RuleRef< Signature > ) -> Boolean =
+    // derived equal( this, other : RuleRef< -> Void > ) -> Boolean =
+        EquInstruction( this, other )
+}
+
+implement TypeCasting< String > for RuleRef< Signature > = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        StrInstruction( this )
+}
+
+//
+//
+// Function Reference Domain
+//
+
+[ export ]
+[ template Arguments : Object ]
+[ template Result : Object ]
+[ template Signature : < Arguments... -> Result > ]
+domain FuncRef< Signature >
+
+// implement Equality for FuncRef< Signature > = {
+//     [ pure ]
+//     derived equal( this, other : FuncRef< Signature > ) -> Boolean =
+//         EquInstruction( this, other )
+// }
+
+// implement TypeCasting< String > for FuncRef< Signature > = {
+//     [ pure ]
+//     derived convertTo( this ) -> String =
+//         StrInstruction( this )
+// }
+
+//
+//
+// Port Domain
+//
+
+[ export ]
+[ template Type : Object ]
+domain Port< Type >
+
+//
+//
+// File Domain
+//
+
+[ export ]
+[ template Type : Object ]
+domain File< Type >
+
+//
+//
+// Void Domain
+//
+
+[ export ]
+[ abstract ]
+domain Void
+
+//
+//
+// Object Domain
+//
+
+[ export ]
+[ abstract ]
+domain Object
+
+//
+//
+// Enumeration Domain
+//
+
+[ export ]
+[ abstract ]
+domain enumeration
+
+implement Equality for enumeration = {
+    [ pure ]
+    derived equal( this, other : enumeration ) -> Boolean =
+        EquInstruction( this, other )
+}
+
+implement Cardinality for enumeration = {
+    [ pure ]
+    derived size( this ) -> Integer =
+        SizeInstruction( this )
+}
+
+implement TypeCasting< enumeration > for enumeration = {
+    [ pure ]
+    derived convertTo( this ) -> enumeration =
+        this
+}
+
+implement TypeCasting< String > for enumeration = {
+    [ pure ]
+    derived convertTo( this ) -> String =
+        StrInstruction( this )
+}
+
+implement Symbolic for enumeration = {
+    [ pure ]
+    derived isSymbolic( this ) -> Boolean =
+        SymInstruction( this )
+}
+
+//
+//
+// Structure Domain
+//
+
+[ export ]
+[ abstract ]
+domain structure
+
+//
+//
+// Comparison Behaviors
+//
+
+[ export ]
+behavior Equality = {
+    [ operator "=" ]
+    derived equal : Object * Object -> Boolean
+
+    [ operator "!=" ]
+    derived unequal( this, other : Equality ) -> Boolean =
+       not this.equal( other )
+}
+
+[ export ]
+behavior PartialOrder = {
+    [ operator "<" ]
+    derived less : Equality * Equality -> Boolean
+
+    [ operator ">" ]
+    derived greater : Equality * Equality -> Boolean
+}
+
+[ export ]
+behavior TotalOrder = {
+    [ operator "<=" ]
+    derived lessOrEqual : PartialOrder * PartialOrder -> Boolean
+
+    [ operator ">=" ]
+    derived greaterOrEqual : PartialOrder * PartialOrder -> Boolean
+}
+
+//
+//
+// Arithmetic Behaviors
+//
+
+[ export ]
+behavior Addition = {
+    [ operator "+" ]
+    derived add : Object * Object -> Object
+}
+
+[ export ]
+behavior Subtraction = {
+    [ operator "-" ]
+    derived subtract : Object * Object -> Object
+}
+
+[ export ]
+behavior Multiplication  = {
+    [ operator "*" ]
+    derived multiply : Object * Object -> Object
+}
+
+[ export ]
+behavior Division = {
+    [ operator "/" ]
+    derived divide : Object * Object -> Object
+}
+
+[ export ]
+behavior Modulus = {
+    [ operator "%" ]
+    derived modulo : Object * Object -> Object
+}
+
+[ export ]
+behavior Exponentiation = {
+    [ operator "^" ]
+    derived power : Object * Object -> Object
+}
+
+//
+//
+// Logical Behaviors
+//
+
+[ export ]
+behavior Negation = {
+    [ operator "not" ]
+    derived negate : Object -> Object
+}
+
+[ export ]
+behavior Logical = {
+    [ operator "or" ]
+    derived disjunction : Object * Object -> Object
+
+    [ operator "xor" ]
+    derived exclusiveDisjunction : Object * Object -> Object
+
+    [ operator "and" ]
+    derived conjunction : Object * Object -> Object
+
+    [ operator "implies" ] // alias "->"
+    derived implication : Object * Object -> Object
+}
+
+//
+//
+// Sign Behaviors
+//
+
+[ export ]
+behavior Positive = {
+    [ operator "+" ]
+    derived sign : Object -> Object
+}
+
+[ export ]
+behavior Inversion = {
+    [ operator "-" ]
+    derived invert : Object -> Object
+}
+
+
+//
+//
+// Cardinality Behavior
+//
+
+[ export ]
+behavior Cardinality = {
+//  [ syntax "'|' <expr> '|'" ]
+    derived size : Object -> Integer
+}
+
+//
+//
+// Type Casting Behavior
+//
+
+[ export ]
+[ template Domain : Object ]
+behavior TypeCasting< Domain > = {
+//  [ syntax "<expr> 'as' <type>" ]
+    derived convertTo : Object -> Domain
+}
+
+//
+//
+// Literal Call Behavior
+//
+
+[ export ]
+[ template Element : Object ]
+behavior ElementAccess< Element > = {
+//  [ syntax "<expr> '.' <literal>" ]
+    derived at : Object * Integer -> Element
+}
+
+
+//
+//
+// Symbolic Behavior
+//
+
+[ export ]
+behavior Symbolic = {
+    derived isSymbolic : Object -> Boolean
+}
+
+//
+//
+// Stringify Behavior
+//
+
+[ export ]
+behavior Stringify = {
+    derived bin : Object -> String
+
+    derived oct : Object -> String
+
+    derived dec : Object -> String
+
+    derived hex : Object -> String
+}
+
+//
+//
+// Built-in Definitions
+//
+
+[ export ]
+builtin SelfInstruction< -> Agent >
+
+[ export ]
+builtin AbortInstruction< -> Void >
+
+[ export ]
+builtin AssertInstruction< Boolean -> Void >
+
+[ export ]
+builtin AssureInstruction< Boolean -> Void >
+
+[ export ]
+builtin PrintInstruction< String -> Void >
+
+[ export ]
+[ pure ]
+builtin EquInstruction< Object * Object -> Boolean >
+
+[ export ]
+[ pure ]
+builtin NotInstruction< Boolean -> Boolean >
+
+[ export ]
+[ pure ]
+builtin OrInstruction< Boolean * Boolean -> Boolean >
+
+[ export ]
+[ pure ]
+builtin LthInstruction< Integer * Integer -> Boolean >
+
+[ export ]
+[ pure ]
+builtin GthInstruction< Integer * Integer -> Boolean >
+
+[ export ]
+[ pure ]
+builtin AddInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin SubInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin MulInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin ModInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin DivInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin PowInstruction< Integer * Integer -> Integer >
+
+[ export ]
+[ pure ]
+builtin ConcatInstruction< String * String -> String >
+
+[ export ]
+[ pure ]
+builtin SizeInstruction< Object -> Integer >
+
+[ export ]
+[ pure ]
+builtin StrInstruction< Object -> String >
+
+[ export ]
+[ pure ]
+builtin BinInstruction< Object -> String >
+
+[ export ]
+[ pure ]
+builtin OctInstruction< Object -> String >
+
+[ export ]
+[ pure ]
+builtin HexInstruction< Object -> String >
+
+[ export ]
+[ pure ]
+builtin SymInstruction< Object -> Boolean >
+
+[ export ]
+[ pure ]
+[ template SequenceType : Object ]
+[ template ElementType : Object ]
+builtin NthInstruction< SequenceType * Integer -> ElementType >
+
+//
+//  Local variables:
+//  mode: casm
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

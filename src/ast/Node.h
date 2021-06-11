@@ -43,21 +43,19 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_NODE_H_
-#define _LIBCASM_FE_NODE_H_
+#ifndef _LIBCASM_FE_AST_NODE_H_
+#define _LIBCASM_FE_AST_NODE_H_
 
 #include <libcasm-fe/CasmFE>
 #include <libcasm-fe/ast/Visitor>
-
 #include <libcasm-ir/Property>
 #include <libcasm-ir/Type>
-
 #include <libstdhl/List>
 #include <libstdhl/SourceLocation>
 
 namespace libcasm_fe
 {
-    namespace Ast
+    namespace AST
     {
         /**
          * @extends CasmFE
@@ -67,8 +65,9 @@ namespace libcasm_fe
           public:
             enum class ID
             {
+                ROOT,
+
                 // definitions
-                HEADER_DEFINITION,
                 INIT_DEFINITION,
                 INITIALLY,
                 VARIABLE_DEFINITION,
@@ -81,19 +80,27 @@ namespace libcasm_fe
                 USING_PATH_DEFINITION,
                 INVARIANT_DEFINITION,
                 IMPORT_DEFINITION,
+                DOMAIN_DEFINITION,
+                STRUCTURE_DEFINITION,
+                BEHAVIOR_DEFINITION,
+                IMPLEMENT_DEFINITION,
+                BUILTIN_DEFINITION,
+                DECLARATION,
 
                 // literals
                 UNDEF_LITERAL,
                 VALUE_LITERAL,
                 REFERENCE_LITERAL,
+                SET_LITERAL,
                 LIST_LITERAL,
                 RANGE_LITERAL,
                 TUPLE_LITERAL,
                 RECORD_LITERAL,
 
                 // expressions
-                EMBRACED_EXPRESSION,
+                ABSTRACT_EXPRESSION,
                 NAMED_EXPRESSION,
+                MAPPED_EXPRESSION,
                 DIRECT_CALL_EXPRESSION,
                 METHOD_CALL_EXPRESSION,
                 LITERAL_CALL_EXPRESSION,
@@ -121,7 +128,6 @@ namespace libcasm_fe
                 SEQUENCE_RULE,
                 UPDATE_RULE,
                 CALL_RULE,
-                WHILE_RULE,
 
                 // types
                 UNRESOLVED_TYPE,
@@ -132,14 +138,6 @@ namespace libcasm_fe
                 FIXED_SIZED_TYPE,
                 RELATION_TYPE,
 
-                // attributes
-                BASIC_ATTRIBUTE,
-                EXPRESSION_ATTRIBUTE,
-
-                // helper
-                DEFINED,
-                INITIALIZER,
-
                 // other
                 NODE_LIST,
                 IDENTIFIER,
@@ -147,8 +145,6 @@ namespace libcasm_fe
                 EXPRESSION_CASE,
                 DEFAULT_CASE,
                 VARIABLE_BINDING,
-                TOKEN,
-                SPAN,
             };
 
           public:
@@ -174,6 +170,17 @@ namespace libcasm_fe
             }
 
             virtual void accept( Visitor& visitor ) = 0;
+
+            template < typename T >
+            typename T::Ptr duplicate( void ) const
+            {
+                return std::static_pointer_cast< T >( clone() );
+            }
+
+          protected:
+            virtual Node::Ptr clone( void ) const = 0;
+
+            void clone( Node& duplicate ) const;
 
           private:
             const ID m_id;
@@ -206,6 +213,18 @@ namespace libcasm_fe
                     node->accept( visitor );
                 }
             }
+
+            Node::Ptr clone( void ) const override final
+            {
+                auto duplicate = std::make_shared< NodeList< T > >();
+                for( const auto& element : *this )
+                {
+                    const auto duplicateElement = element->template duplicate< T >();
+                    duplicate->add( duplicateElement );
+                }
+                Node::clone( *duplicate );
+                return duplicate;
+            }
         };
 
         class TypedNode : public Node
@@ -217,6 +236,9 @@ namespace libcasm_fe
 
             void setType( const libcasm_ir::Type::Ptr& type );
             const libcasm_ir::Type::Ptr& type( void ) const;
+
+          protected:
+            void clone( TypedNode& duplicate ) const;
 
           private:
             libcasm_ir::Type::Ptr m_type;
@@ -233,13 +255,24 @@ namespace libcasm_fe
             void setProperties( const libcasm_ir::Properties& properties );
             const libcasm_ir::Properties& properties( void ) const;
 
+          protected:
+            void clone( TypedPropertyNode& duplicate ) const;
+
           private:
             libcasm_ir::Properties m_properties;
         };
+
+        template < typename T, typename... Args >
+        typename T::Ptr make( const libstdhl::SourceLocation& sourceLocation, Args&&... args )
+        {
+            auto node = std::make_shared< T >( std::forward< Args >( args )... );
+            node->setSourceLocation( sourceLocation );
+            return node;
+        }
     }
 }
 
-#endif  // _LIBCASM_FE_NODE_H_
+#endif  // _LIBCASM_FE_AST_NODE_H_
 
 //
 //  Local variables:

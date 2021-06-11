@@ -46,7 +46,9 @@
 #ifndef _LIBCASM_FE_LEXER_H_
 #define _LIBCASM_FE_LEXER_H_
 
-#include <libcasm-fe/ast/Span>
+#include <libcasm-fe/cst/Declaration>
+#include <libcasm-fe/cst/Literal>
+#include <libcasm-fe/cst/Span>
 
 #include <libstdhl/SourceLocation>
 

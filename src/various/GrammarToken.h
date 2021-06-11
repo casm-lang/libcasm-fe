@@ -1,5 +1,5 @@
 //  
-//  Copyright (C) 2014-2021 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2020 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //  
 //  Developed by: Philipp Paulweber
@@ -64,372 +64,417 @@ namespace libcasm_fe
             /*  6 */ USING,
             /*  7 */ INVARIANT,
             /*  8 */ IMPORT,
-            /*  9 */ FUNCTION,
-            /* 10 */ DEFINED,
-            /* 11 */ SEQ,
-            /* 12 */ ENDSEQ,
-            /* 13 */ PAR,
-            /* 14 */ ENDPAR,
-            /* 15 */ SKIP,
-            /* 16 */ LET,
-            /* 17 */ LOCAL,
-            /* 18 */ IN,
-            /* 19 */ FORALL,
-            /* 20 */ CHOOSE,
-            /* 21 */ ITERATE,
-            /* 22 */ DO,
-            /* 23 */ IF,
-            /* 24 */ THEN,
-            /* 25 */ ELSE,
-            /* 26 */ CASE,
-            /* 27 */ OF,
-            /* 28 */ DEFAULT,
-            /* 29 */ HOLDS,
-            /* 30 */ EXISTS,
-            /* 31 */ WITH,
-            /* 32 */ AS,
-            /* 33 */ WHILE,
-            /* 34 */ UNDEF,
-            /* 35 */ FALSE,
-            /* 36 */ TRUE,
-            /* 37 */ AND,
-            /* 38 */ OR,
-            /* 39 */ XOR,
-            /* 40 */ IMPLIES,
-            /* 41 */ NOT,
-            /* 42 */ PLUS,
-            /* 43 */ MINUS,
-            /* 44 */ EQUAL,
-            /* 45 */ LPAREN,
-            /* 46 */ RPAREN,
-            /* 47 */ LSQPAREN,
-            /* 48 */ RSQPAREN,
-            /* 49 */ LCURPAREN,
-            /* 50 */ RCURPAREN,
-            /* 51 */ COLON,
-            /* 52 */ DOUBLECOLON,
-            /* 53 */ UNDERLINE,
-            /* 54 */ VERTICAL_BAR,
-            /* 55 */ AT,
-            /* 56 */ COMMA,
-            /* 57 */ LESSER,
-            /* 58 */ GREATER,
-            /* 59 */ ASTERIX,
-            /* 60 */ SLASH,
-            /* 61 */ PERCENT,
-            /* 62 */ CARET,
-            /* 63 */ MARK,
-            /* 64 */ DOTDOT,
-            /* 65 */ DOT,
-            /* 66 */ MAPS,
-            /* 67 */ ARROW,
-            /* 68 */ UPDATE,
-            /* 69 */ NEQUAL,
-            /* 70 */ LESSEQ,
-            /* 71 */ GREATEREQ,
-            /* 72 */ SEQ_BRACKET,
-            /* 73 */ ENDSEQ_BRACKET,
+            /*  9 */ STRUCTURE,
+            /* 10 */ BEHAVIOR,
+            /* 11 */ IMPLEMENT,
+            /* 12 */ FOR,
+            /* 13 */ SELF,
+            /* 14 */ THIS,
+            /* 15 */ DOMAINTYPE,
+            /* 16 */ BUILTIN,
+            /* 17 */ FUNCTION,
+            /* 18 */ DEFINED,
+            /* 19 */ SEQ,
+            /* 20 */ ENDSEQ,
+            /* 21 */ PAR,
+            /* 22 */ ENDPAR,
+            /* 23 */ SKIP,
+            /* 24 */ LET,
+            /* 25 */ LOCAL,
+            /* 26 */ IN,
+            /* 27 */ FORALL,
+            /* 28 */ CHOOSE,
+            /* 29 */ ITERATE,
+            /* 30 */ DO,
+            /* 31 */ IF,
+            /* 32 */ THEN,
+            /* 33 */ ELSE,
+            /* 34 */ CASE,
+            /* 35 */ OF,
+            /* 36 */ DEFAULT,
+            /* 37 */ HOLDS,
+            /* 38 */ EXISTS,
+            /* 39 */ WITH,
+            /* 40 */ AS,
+            /* 41 */ WHILE,
+            /* 42 */ UNDEF,
+            /* 43 */ FALSE,
+            /* 44 */ TRUE,
+            /* 45 */ AND,
+            /* 46 */ OR,
+            /* 47 */ XOR,
+            /* 48 */ IMPLIES,
+            /* 49 */ NOT,
+            /* 50 */ PLUS,
+            /* 51 */ MINUS,
+            /* 52 */ EQUAL,
+            /* 53 */ LPAREN,
+            /* 54 */ RPAREN,
+            /* 55 */ LSQPAREN,
+            /* 56 */ RSQPAREN,
+            /* 57 */ LCURPAREN,
+            /* 58 */ RCURPAREN,
+            /* 59 */ COLON,
+            /* 60 */ DOUBLECOLON,
+            /* 61 */ UNDERLINE,
+            /* 62 */ VERTICAL_BAR,
+            /* 63 */ AT,
+            /* 64 */ COMMA,
+            /* 65 */ LESSER,
+            /* 66 */ GREATER,
+            /* 67 */ ASTERIX,
+            /* 68 */ SLASH,
+            /* 69 */ PERCENT,
+            /* 70 */ CARET,
+            /* 71 */ MARK,
+            /* 72 */ MAPS,
+            /* 73 */ ARROW,
+            /* 74 */ UPDATE,
+            /* 75 */ NEQUAL,
+            /* 76 */ LESSEQ,
+            /* 77 */ GREATEREQ,
+            /* 78 */ SEQ_BRACKET,
+            /* 79 */ ENDSEQ_BRACKET,
+            /* 80 */ DOT,
+            /* 81 */ DOTDOT,
+            /* 82 */ DOTDOTDOT,
         };
         
-        static std::string tokenAsString( const Token token )
+        static std::string tokenAsString( const Grammar::Token token )
         {
             switch( token )
             {
-                case /*  0 */ Token::UNRESOLVED:
+                case /*  0 */ Grammar::Token::UNRESOLVED:
                 {
                     return "$unresolved$";
                 }
-                case /*  1 */ Token::CASM:
+                case /*  1 */ Grammar::Token::CASM:
                 {
                     return "CASM";
                 }
-                case /*  2 */ Token::INIT:
+                case /*  2 */ Grammar::Token::INIT:
                 {
                     return "init";
                 }
-                case /*  3 */ Token::DERIVED:
+                case /*  3 */ Grammar::Token::DERIVED:
                 {
                     return "derived";
                 }
-                case /*  4 */ Token::ENUMERATION:
+                case /*  4 */ Grammar::Token::ENUMERATION:
                 {
                     return "enumeration";
                 }
-                case /*  5 */ Token::RULE:
+                case /*  5 */ Grammar::Token::RULE:
                 {
                     return "rule";
                 }
-                case /*  6 */ Token::USING:
+                case /*  6 */ Grammar::Token::USING:
                 {
                     return "using";
                 }
-                case /*  7 */ Token::INVARIANT:
+                case /*  7 */ Grammar::Token::INVARIANT:
                 {
                     return "invariant";
                 }
-                case /*  8 */ Token::IMPORT:
+                case /*  8 */ Grammar::Token::IMPORT:
                 {
                     return "import";
                 }
-                case /*  9 */ Token::FUNCTION:
+                case /*  9 */ Grammar::Token::STRUCTURE:
+                {
+                    return "structure";
+                }
+                case /* 10 */ Grammar::Token::BEHAVIOR:
+                {
+                    return "behavior";
+                }
+                case /* 11 */ Grammar::Token::IMPLEMENT:
+                {
+                    return "implement";
+                }
+                case /* 12 */ Grammar::Token::FOR:
+                {
+                    return "for";
+                }
+                case /* 13 */ Grammar::Token::SELF:
+                {
+                    return "self";
+                }
+                case /* 14 */ Grammar::Token::THIS:
+                {
+                    return "this";
+                }
+                case /* 15 */ Grammar::Token::DOMAINTYPE:
+                {
+                    return "domain";
+                }
+                case /* 16 */ Grammar::Token::BUILTIN:
+                {
+                    return "builtin";
+                }
+                case /* 17 */ Grammar::Token::FUNCTION:
                 {
                     return "function";
                 }
-                case /* 10 */ Token::DEFINED:
+                case /* 18 */ Grammar::Token::DEFINED:
                 {
                     return "defined";
                 }
-                case /* 11 */ Token::SEQ:
+                case /* 19 */ Grammar::Token::SEQ:
                 {
                     return "seq";
                 }
-                case /* 12 */ Token::ENDSEQ:
+                case /* 20 */ Grammar::Token::ENDSEQ:
                 {
                     return "endseq";
                 }
-                case /* 13 */ Token::PAR:
+                case /* 21 */ Grammar::Token::PAR:
                 {
                     return "par";
                 }
-                case /* 14 */ Token::ENDPAR:
+                case /* 22 */ Grammar::Token::ENDPAR:
                 {
                     return "endpar";
                 }
-                case /* 15 */ Token::SKIP:
+                case /* 23 */ Grammar::Token::SKIP:
                 {
                     return "skip";
                 }
-                case /* 16 */ Token::LET:
+                case /* 24 */ Grammar::Token::LET:
                 {
                     return "let";
                 }
-                case /* 17 */ Token::LOCAL:
+                case /* 25 */ Grammar::Token::LOCAL:
                 {
                     return "local";
                 }
-                case /* 18 */ Token::IN:
+                case /* 26 */ Grammar::Token::IN:
                 {
                     return "in";
                 }
-                case /* 19 */ Token::FORALL:
+                case /* 27 */ Grammar::Token::FORALL:
                 {
                     return "forall";
                 }
-                case /* 20 */ Token::CHOOSE:
+                case /* 28 */ Grammar::Token::CHOOSE:
                 {
                     return "choose";
                 }
-                case /* 21 */ Token::ITERATE:
+                case /* 29 */ Grammar::Token::ITERATE:
                 {
                     return "iterate";
                 }
-                case /* 22 */ Token::DO:
+                case /* 30 */ Grammar::Token::DO:
                 {
                     return "do";
                 }
-                case /* 23 */ Token::IF:
+                case /* 31 */ Grammar::Token::IF:
                 {
                     return "if";
                 }
-                case /* 24 */ Token::THEN:
+                case /* 32 */ Grammar::Token::THEN:
                 {
                     return "then";
                 }
-                case /* 25 */ Token::ELSE:
+                case /* 33 */ Grammar::Token::ELSE:
                 {
                     return "else";
                 }
-                case /* 26 */ Token::CASE:
+                case /* 34 */ Grammar::Token::CASE:
                 {
                     return "case";
                 }
-                case /* 27 */ Token::OF:
+                case /* 35 */ Grammar::Token::OF:
                 {
                     return "of";
                 }
-                case /* 28 */ Token::DEFAULT:
+                case /* 36 */ Grammar::Token::DEFAULT:
                 {
                     return "default";
                 }
-                case /* 29 */ Token::HOLDS:
+                case /* 37 */ Grammar::Token::HOLDS:
                 {
                     return "holds";
                 }
-                case /* 30 */ Token::EXISTS:
+                case /* 38 */ Grammar::Token::EXISTS:
                 {
                     return "exists";
                 }
-                case /* 31 */ Token::WITH:
+                case /* 39 */ Grammar::Token::WITH:
                 {
                     return "with";
                 }
-                case /* 32 */ Token::AS:
+                case /* 40 */ Grammar::Token::AS:
                 {
                     return "as";
                 }
-                case /* 33 */ Token::WHILE:
+                case /* 41 */ Grammar::Token::WHILE:
                 {
                     return "while";
                 }
-                case /* 34 */ Token::UNDEF:
+                case /* 42 */ Grammar::Token::UNDEF:
                 {
                     return "undef";
                 }
-                case /* 35 */ Token::FALSE:
+                case /* 43 */ Grammar::Token::FALSE:
                 {
                     return "false";
                 }
-                case /* 36 */ Token::TRUE:
+                case /* 44 */ Grammar::Token::TRUE:
                 {
                     return "true";
                 }
-                case /* 37 */ Token::AND:
+                case /* 45 */ Grammar::Token::AND:
                 {
                     return "and";
                 }
-                case /* 38 */ Token::OR:
+                case /* 46 */ Grammar::Token::OR:
                 {
                     return "or";
                 }
-                case /* 39 */ Token::XOR:
+                case /* 47 */ Grammar::Token::XOR:
                 {
                     return "xor";
                 }
-                case /* 40 */ Token::IMPLIES:
+                case /* 48 */ Grammar::Token::IMPLIES:
                 {
                     return "implies";
                 }
-                case /* 41 */ Token::NOT:
+                case /* 49 */ Grammar::Token::NOT:
                 {
                     return "not";
                 }
-                case /* 42 */ Token::PLUS:
+                case /* 50 */ Grammar::Token::PLUS:
                 {
                     return "+";
                 }
-                case /* 43 */ Token::MINUS:
+                case /* 51 */ Grammar::Token::MINUS:
                 {
                     return "-";
                 }
-                case /* 44 */ Token::EQUAL:
+                case /* 52 */ Grammar::Token::EQUAL:
                 {
                     return "=";
                 }
-                case /* 45 */ Token::LPAREN:
+                case /* 53 */ Grammar::Token::LPAREN:
                 {
                     return "(";
                 }
-                case /* 46 */ Token::RPAREN:
+                case /* 54 */ Grammar::Token::RPAREN:
                 {
                     return ")";
                 }
-                case /* 47 */ Token::LSQPAREN:
+                case /* 55 */ Grammar::Token::LSQPAREN:
                 {
                     return "[";
                 }
-                case /* 48 */ Token::RSQPAREN:
+                case /* 56 */ Grammar::Token::RSQPAREN:
                 {
                     return "]";
                 }
-                case /* 49 */ Token::LCURPAREN:
+                case /* 57 */ Grammar::Token::LCURPAREN:
                 {
                     return "{";
                 }
-                case /* 50 */ Token::RCURPAREN:
+                case /* 58 */ Grammar::Token::RCURPAREN:
                 {
                     return "}";
                 }
-                case /* 51 */ Token::COLON:
+                case /* 59 */ Grammar::Token::COLON:
                 {
                     return ":";
                 }
-                case /* 52 */ Token::DOUBLECOLON:
+                case /* 60 */ Grammar::Token::DOUBLECOLON:
                 {
                     return "::";
                 }
-                case /* 53 */ Token::UNDERLINE:
+                case /* 61 */ Grammar::Token::UNDERLINE:
                 {
                     return "_";
                 }
-                case /* 54 */ Token::VERTICAL_BAR:
+                case /* 62 */ Grammar::Token::VERTICAL_BAR:
                 {
                     return "|";
                 }
-                case /* 55 */ Token::AT:
+                case /* 63 */ Grammar::Token::AT:
                 {
                     return "@";
                 }
-                case /* 56 */ Token::COMMA:
+                case /* 64 */ Grammar::Token::COMMA:
                 {
                     return ",";
                 }
-                case /* 57 */ Token::LESSER:
+                case /* 65 */ Grammar::Token::LESSER:
                 {
                     return "<";
                 }
-                case /* 58 */ Token::GREATER:
+                case /* 66 */ Grammar::Token::GREATER:
                 {
                     return ">";
                 }
-                case /* 59 */ Token::ASTERIX:
+                case /* 67 */ Grammar::Token::ASTERIX:
                 {
                     return "*";
                 }
-                case /* 60 */ Token::SLASH:
+                case /* 68 */ Grammar::Token::SLASH:
                 {
                     return "/";
                 }
-                case /* 61 */ Token::PERCENT:
+                case /* 69 */ Grammar::Token::PERCENT:
                 {
                     return "%";
                 }
-                case /* 62 */ Token::CARET:
+                case /* 70 */ Grammar::Token::CARET:
                 {
                     return "^";
                 }
-                case /* 63 */ Token::MARK:
+                case /* 71 */ Grammar::Token::MARK:
                 {
                     return "'";
                 }
-                case /* 64 */ Token::DOTDOT:
-                {
-                    return "..";
-                }
-                case /* 65 */ Token::DOT:
-                {
-                    return ".";
-                }
-                case /* 66 */ Token::MAPS:
+                case /* 72 */ Grammar::Token::MAPS:
                 {
                     return "->";
                 }
-                case /* 67 */ Token::ARROW:
+                case /* 73 */ Grammar::Token::ARROW:
                 {
                     return "=>";
                 }
-                case /* 68 */ Token::UPDATE:
+                case /* 74 */ Grammar::Token::UPDATE:
                 {
                     return ":=";
                 }
-                case /* 69 */ Token::NEQUAL:
+                case /* 75 */ Grammar::Token::NEQUAL:
                 {
                     return "!=";
                 }
-                case /* 70 */ Token::LESSEQ:
+                case /* 76 */ Grammar::Token::LESSEQ:
                 {
                     return "<=";
                 }
-                case /* 71 */ Token::GREATEREQ:
+                case /* 77 */ Grammar::Token::GREATEREQ:
                 {
                     return ">=";
                 }
-                case /* 72 */ Token::SEQ_BRACKET:
+                case /* 78 */ Grammar::Token::SEQ_BRACKET:
                 {
                     return "{|";
                 }
-                case /* 73 */ Token::ENDSEQ_BRACKET:
+                case /* 79 */ Grammar::Token::ENDSEQ_BRACKET:
                 {
                     return "|}";
+                }
+                case /* 80 */ Grammar::Token::DOT:
+                {
+                    return ".";
+                }
+                case /* 81 */ Grammar::Token::DOTDOT:
+                {
+                    return "..";
+                }
+                case /* 82 */ Grammar::Token::DOTDOTDOT:
+                {
+                    return "...";
                 }
             }
             assert( !"internal error" );

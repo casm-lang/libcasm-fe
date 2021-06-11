@@ -48,9 +48,8 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/RecursiveVisitor>
-
 #include <libcasm-fe/analyze/PropertyResolverPass>
+#include <libcasm-fe/ast/Visitor>
 #include <libcasm-fe/import/SpecificationMergerPass>
 
 #include <libcasm-ir/Annotation>
@@ -60,51 +59,49 @@
 #include <libpass/PassUsage>
 
 using namespace libcasm_fe;
-using namespace Ast;
+using namespace AST;
 
 char PropertyRevisePass::id = 0;
 
 static libpass::PassRegistration< PropertyRevisePass > PASS(
-    "ASTPropertyRevisePass",
-    "property revise (checking) of AST representation",
-    "ast-prop-rev",
-    0 );
+    "Property Revise Pass", "property revise (checking) of AST representation", "ast-prop-rev", 0 );
 
-class PropertyReviseVisitor final : public RecursiveVisitor
+namespace libcasm_fe
 {
-  public:
-    PropertyReviseVisitor( libcasm_fe::Logger& log );
+    namespace AST
+    {
+        class PropertyReviseVisitor final : public RecursiveVisitor
+        {
+          public:
+            PropertyReviseVisitor( libcasm_fe::Logger& log );
 
-    void visit( Specification& node );
+            void visit( FunctionDefinition& node ) override;
+            void visit( DerivedDefinition& node ) override;
+            void visit( InvariantDefinition& node ) override;
 
-    void visit( Initializer& node ) override;
+            void visit( ConditionalRule& node ) override;
+            void visit( CaseRule& node ) override;
+            void visit( ForallRule& node ) override;
+            void visit( ChooseRule& node ) override;
+            void visit( UpdateRule& node ) override;
+            void visit( CallRule& node ) override;
 
-    void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( InvariantDefinition& node ) override;
+            void visit( FixedSizedType& node ) override;
 
-    void visit( ConditionalRule& node ) override;
-    void visit( CaseRule& node ) override;
-    void visit( ForallRule& node ) override;
-    void visit( ChooseRule& node ) override;
-    void visit( UpdateRule& node ) override;
-    void visit( CallRule& node ) override;
-    void visit( WhileRule& node ) override;
+            void visit( ExpressionCase& node ) override;
 
-    void visit( FixedSizedType& node ) override;
+          private:
+            void checkIfPropertiesHold(
+                const TypedPropertyNode& node,
+                const libcasm_ir::Properties& requiredProperties,
+                const std::string& errorDescription,
+                const Code errorCode ) const;
 
-    void visit( ExpressionCase& node ) override;
-
-  private:
-    void checkIfPropertiesHold(
-        const TypedPropertyNode& node,
-        const libcasm_ir::Properties& requiredProperties,
-        const std::string& errorDescription,
-        const Code errorCode ) const;
-
-  private:
-    libcasm_fe::Logger& m_log;
-};
+          private:
+            libcasm_fe::Logger& m_log;
+        };
+    }
+}
 
 //
 //
@@ -118,41 +115,12 @@ PropertyReviseVisitor::PropertyReviseVisitor( libcasm_fe::Logger& log )
 {
 }
 
-void PropertyReviseVisitor::visit( Specification& node )
-{
-    node.header()->accept( *this );
-    node.definitions()->accept( *this );
-}
-
-void PropertyReviseVisitor::visit( Initializer& node )
-{
-    RecursiveVisitor::visit( node );
-
-    for( const auto& argument : *node.arguments() )
-    {
-        checkIfPropertiesHold(
-            *argument,
-            { Property::SIDE_EFFECT_FREE },
-            "function argument",
-            Code::UpdateRuleFunctionArgumentInvalidProperty );
-    }
-
-    if( not node.function()->isLocal() )
-    {
-        checkIfPropertiesHold(
-            *node.value(),
-            { Property::SIDE_EFFECT_FREE },
-            "update expression",
-            Code::UpdateRuleUpdateExpressionInvalidProperty );
-    }
-}
-
 void PropertyReviseVisitor::visit( FunctionDefinition& node )
 {
     RecursiveVisitor::visit( node );
 
     checkIfPropertiesHold(
-        *node.defined()->expression(),
+        *node.defined(),
         { Property::SIDE_EFFECT_FREE, Property::PURE },
         "default value of " + node.description() + " '" + node.identifier()->name() + "'",
         Code::FunctionDefinitionDefaultValueInvalidProperty );
@@ -264,17 +232,6 @@ void PropertyReviseVisitor::visit( CallRule& node )
     }
 }
 
-void PropertyReviseVisitor::visit( WhileRule& node )
-{
-    RecursiveVisitor::visit( node );
-
-    checkIfPropertiesHold(
-        *node.condition(),
-        { Property::SIDE_EFFECT_FREE },
-        "condition",
-        Code::WhileRuleConditionInvalidProperty );
-}
-
 void PropertyReviseVisitor::visit( FixedSizedType& node )
 {
     checkIfPropertiesHold(
@@ -333,7 +290,7 @@ u1 PropertyRevisePass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     PropertyReviseVisitor visitor( log );
-    visitor.visit( *specification );
+    specification->ast()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )

@@ -43,108 +43,70 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_IDENTIFIER_H_
-#define _LIBCASM_FE_IDENTIFIER_H_
+#ifndef _LIBCASM_FE_AST_IDENTIFIER_H_
+#define _LIBCASM_FE_AST_IDENTIFIER_H_
 
 #include <libcasm-fe/ast/Node>
-#include <libcasm-fe/ast/Token>
 
 namespace libcasm_fe
 {
-    namespace Ast
+    namespace AST
     {
         class Identifier final : public Node
         {
           public:
             using Ptr = std::shared_ptr< Identifier >;
 
-            explicit Identifier( void );
             explicit Identifier( const std::string& name );
 
             const std::string& name( void ) const;
-            bool empty( void ) const;
-
-            void setDoubleColon( const Token::Ptr& doubleColon );
-            const Token::Ptr& doubleColon( void ) const;
-
-            void setSpans( const Spans::Ptr& spans );
-            const Spans::Ptr& spans( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
+            Node::Ptr clone( void ) const override final;
+
           private:
-            std::string m_name;
-            Token::Ptr m_doubleColon;
-            Spans::Ptr m_spans;
+            const std::string m_name;
         };
 
         using Identifiers = NodeList< Identifier >;
 
         /**
-         * @brief An identifier path is an identifier + namespaces.
-         *
-         * The identifier path can either be absolute or relative. The string of
-         * a relative identifier path starts with a double colon. All relative identifier
-         * paths will later be resolved and converted into absolute paths.
-         *
-         * An absolute path "Color::Red" will be splitted into the namespaces
-         * ["Color"] and identifier "Red". Furthermore the node will be marked
-         * as NamespaceType.ABSOLUTE.
-         *
-         * A relative path "::Red" will be splitted into the namespaces [] and
-         * identifier "Red". Furthermore the node will be marked as
-         * NamespaceType.RELATIVE.
+           @brief An identifier path is an identifier + namespaces.
          */
         class IdentifierPath final : public Node
         {
           public:
-            enum class Type
-            {
-                ABSOLUTE, /**< absolute namespace + identifier path */
-                RELATIVE, /**< path started with a dot, needs to be resolved */
-            };
-
-          public:
             using Ptr = std::shared_ptr< IdentifierPath >;
 
-            IdentifierPath( const Identifier::Ptr& identifier, Type type = Type::ABSOLUTE );
+            IdentifierPath( const Identifier::Ptr& identifier );
 
-            /**
-             * @param identifiers A list of identifiers (must not be empty)
-             * @param type The type of the identifier path (default is ABSOLUTE)
-             */
-            IdentifierPath( const Identifiers::Ptr& identifiers, Type type = Type::ABSOLUTE );
+            IdentifierPath( const Identifiers::Ptr& identifiers );
 
             void addIdentifier( const Identifier::Ptr& identifier );
 
             Identifiers::Ptr identifiers( void ) const;
-            Type type( void ) const;
 
             const std::string& baseName( void ) const;
+
             std::string baseDir( void ) const;
+
             std::string path( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
 
           public:
             static IdentifierPath::Ptr fromIdentifier( const Identifier::Ptr& identifier );
 
           private:
             const Identifiers::Ptr m_identifiers;
-            const Type m_type;
         };
-
-        template < typename T, typename... Args >
-        typename T::Ptr make( const libstdhl::SourceLocation& sourceLocation, Args&&... args )
-        {
-            auto node = std::make_shared< T >( std::forward< Args >( args )... );
-            node->setSourceLocation( sourceLocation );
-            return node;
-        }
     }
 }
 
-#endif  // _LIBCASM_FE_IDENTIFIER_H_
+#endif  // _LIBCASM_FE_AST_IDENTIFIER_H_
 
 //
 //  Local variables:

@@ -61,21 +61,43 @@ add_library( ${PROJECT}-cpp OBJECT
   Specification.cpp
   TypeInfo.cpp
 
-  ast/Attribute.cpp
+  cst/Attribute.cpp
+  cst/Declaration.cpp
+  cst/Definition.cpp
+  cst/Expression.cpp
+  cst/Helper.cpp
+  cst/Identifier.cpp
+  cst/Literal.cpp
+  cst/Node.cpp
+  cst/Rule.cpp
+  cst/Root.cpp
+  cst/Span.cpp
+  cst/Token.cpp
+  cst/Type.cpp
+  cst/Visitor.cpp
+
+  ast/Declaration.cpp
   ast/Definition.cpp
-  ast/EmptyVisitor.cpp
   ast/Expression.cpp
-  ast/Helper.cpp
   ast/Identifier.cpp
   ast/Literal.cpp
   ast/Node.cpp
-  ast/RecursiveVisitor.cpp
   ast/Rule.cpp
-  ast/Span.cpp
-  ast/Token.cpp
+  ast/Root.cpp
   ast/Type.cpp
+  ast/Visitor.cpp
+
+  lst/Definition.cpp
+  lst/Expression.cpp
+  lst/Identifier.cpp
+  lst/Literal.cpp
+  lst/Node.cpp
+  lst/Rule.cpp
+  lst/Root.cpp
+  lst/Visitor.cpp
 
   analyze/ConsistencyCheckPass.cpp
+  analyze/TemplatingPass.cpp
   analyze/TypeCheckPass.cpp
   analyze/TypeInferencePass.cpp
   analyze/AttributionPass.cpp
@@ -85,6 +107,25 @@ add_library( ${PROJECT}-cpp OBJECT
   analyze/ProjectResolverPass.cpp
   analyze/PropertyResolverPass.cpp
   analyze/PropertyRevisePass.cpp
+
+  import/FileLoadingStrategy.cpp
+  import/PathLoadingStrategy.cpp
+  import/SpecificationLoader.cpp
+  import/SpecificationRepository.cpp
+  import/ImportError.cpp
+  import/LibraryLoaderPass.cpp
+  import/SpecificationMergerPass.cpp
+
+  transform/AstDumpPass.cpp
+  transform/AstToLstPass.cpp
+  transform/CstDumpPass.cpp
+  transform/CstEmitPass.cpp
+  transform/CstToAstPass.cpp
+  transform/LstDumpPass.cpp
+  transform/LstToIrPass.cpp
+  transform/SourceToCstPass.cpp
+
+  various/GrammarParser.cpp
 
   execute/Agent.cpp
   execute/ExecutionVisitor.cpp
@@ -97,21 +138,6 @@ add_library( ${PROJECT}-cpp OBJECT
   execute/Frame.cpp
   execute/RuntimeException.cpp
   execute/UpdateException.cpp
-
-  import/FileLoadingStrategy.cpp
-  import/PathLoadingStrategy.cpp
-  import/SpecificationLoader.cpp
-  import/SpecificationRepository.cpp
-  import/ImportError.cpp
-  import/LibraryLoaderPass.cpp
-  import/SpecificationMergerPass.cpp
-
-  transform/AstDumpDotPass.cpp
-  transform/AstDumpSourcePass.cpp
-  transform/AstToCasmIRPass.cpp
-  transform/SourceToAstPass.cpp
-
-  various/GrammarParser.cpp
   )
 
 
@@ -168,6 +194,7 @@ ecm_generate_headers( ${PROJECT}_ANALYZE_HEADERS_CPP
     ConsistencyCheckPass
     SymbolRegistrationPass
     SymbolResolverPass
+    TemplatingPass
     TypeCheckPass
     TypeInferencePass
     FrameSizeDeterminationPass
@@ -260,10 +287,14 @@ ecm_generate_headers( ${PROJECT}_TRANSFORM_HEADERS_CPP
   ORIGINAL
     CAMELCASE
   HEADER_NAMES
-    AstDumpDotPass
-    AstDumpSourcePass
-    AstToCasmIRPass
-    SourceToAstPass
+    AstDumpPass
+    AstToLstPass
+    CstDumpPass
+    CstEmitPass
+    CstToAstPass
+    LstDumpPass
+    LstToIrPass
+    SourceToCstPass
   PREFIX
     ${PROJECT}/transform
   RELATIVE
@@ -302,22 +333,52 @@ install(
   )
 
 
-ecm_generate_headers( ${PROJECT}_AST_HEADERS_CPP
+ecm_generate_headers( ${PROJECT}_CST_HEADERS_CPP
   ORIGINAL
     CAMELCASE
   HEADER_NAMES
     Attribute
+    Declaration
     Definition
-    EmptyVisitor
     Expression
     Helper
     Identifier
     Literal
     Node
-    RecursiveVisitor
     Rule
+    Root
     Span
     Token
+    Type
+    Visitor
+  PREFIX
+    ${PROJECT}/cst
+  RELATIVE
+    cst
+  REQUIRED_HEADERS
+    ${PROJECT}_CST_HEADERS
+  )
+install(
+  FILES
+    ${${PROJECT}_CST_HEADERS}
+    ${${PROJECT}_CST_HEADERS_CPP}
+  DESTINATION
+    "include/${PROJECT}/cst"
+  )
+
+
+ecm_generate_headers( ${PROJECT}_AST_HEADERS_CPP
+  ORIGINAL
+    CAMELCASE
+  HEADER_NAMES
+    Declaration
+    Definition
+    Expression
+    Identifier
+    Literal
+    Node
+    Rule
+    Root
     Type
     Visitor
   PREFIX
@@ -333,4 +394,32 @@ install(
     ${${PROJECT}_AST_HEADERS_CPP}
   DESTINATION
     "include/${PROJECT}/ast"
+  )
+
+
+ecm_generate_headers( ${PROJECT}_LST_HEADERS_CPP
+  ORIGINAL
+    CAMELCASE
+  HEADER_NAMES
+    Definition
+    Expression
+    Identifier
+    Literal
+    Node
+    Rule
+    Root
+    Visitor
+  PREFIX
+    ${PROJECT}/lst
+  RELATIVE
+    lst
+  REQUIRED_HEADERS
+    ${PROJECT}_LST_HEADERS
+  )
+install(
+  FILES
+    ${${PROJECT}_LST_HEADERS}
+    ${${PROJECT}_LST_HEADERS_CPP}
+  DESTINATION
+    "include/${PROJECT}/lst"
   )
