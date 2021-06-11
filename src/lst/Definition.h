@@ -129,6 +129,11 @@ namespace libcasm_fe
 
             u1 symbolic( void ) const;
 
+            void setSymbolic( u1 symbolic )
+            {
+                this->m_symbolic = symbolic;
+            }
+
             u1 program( void ) const;
 
             u1 local( void ) const;
@@ -138,7 +143,7 @@ namespace libcasm_fe
           private:
             const Expression::Ptr m_defined;
             const SequenceRule::Ptr m_initially;
-            const u1 m_symbolic;
+            u1 m_symbolic;  // TODO: @ppaulweber: move 'setSymbolic' to AST
             const u1 m_program;
             const u1 m_local;
         };
