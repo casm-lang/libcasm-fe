@@ -563,8 +563,22 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
     }
 
     const auto& objectType = node.object()->type();
-    const auto& typeDefinition = m_symboltable.findTypeDefinition( objectType->id() );
-    assert( typeDefinition and " inconsistent state @ TypeCheckPass " );
+    auto typeDefinition = m_symboltable.findTypeDefinition( objectType->id() );
+    // assert( typeDefinition and (" inconsistent state @ TypeCheckPass: " +
+    // objectType->description()) );
+    if( not typeDefinition )
+    {
+        typeDefinition = m_symboltable.findTypeDefinition( objectType->description() );
+    }
+
+    if( not typeDefinition )
+    {
+        m_log.error(
+            { sourceLocation },
+            "internal: inconsistent state @ MethodCallExpression:" + objectType->description() );
+        m_log.warning( "internal: \n" + m_symboltable.dump() );
+        return;
+    }
 
     const auto& objectTypeName = typeDefinition->domainType()->signature();
     // const auto& objectTypePath = typeDefinition->domainType()->signaturePath();
@@ -1829,7 +1843,12 @@ void TypeInferenceVisitor::resolveDomainTypeBehaviorImplementSymbol(
     const std::string& symbolName,
     const libcasm_ir::Type::Ptr& resultType )
 {
-    const auto& typeDefinition = m_symboltable.findTypeDefinition( domainType->id() );
+    auto typeDefinition = m_symboltable.findTypeDefinition( domainType->id() );
+    if( not typeDefinition )
+    {
+        typeDefinition = m_symboltable.findTypeDefinition( domainType->description() );
+    }
+
     if( not typeDefinition )
     {
         m_log.error(
