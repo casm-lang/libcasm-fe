@@ -167,7 +167,7 @@ bool SCVisitor::BuiltinRule::contains( const IR::Value::ID& id ) const
         m_ids.begin(), m_ids.end(), [ & ]( const auto& _id ) { return _id == id; } );
 }
 
-SCVisitor::RuleDependency::RuleDependency( const Ast::RuleDefinition::Ptr& rule )
+SCVisitor::RuleDependency::RuleDependency( const LST::RuleDefinition::Ptr& rule )
 : m_rule( rule )
 , m_dependsOn()
 , m_usedBy()
@@ -181,7 +181,7 @@ SCVisitor::RuleDependency::RuleDependency( const Ast::RuleDefinition::Ptr& rule 
     }
 }
 
-const Ast::RuleDefinition::Ptr& SCVisitor::RuleDependency::rule( void ) const
+const LST::RuleDefinition::Ptr& SCVisitor::RuleDependency::rule( void ) const
 {
     return m_rule;
 }
@@ -259,7 +259,7 @@ bool SCVisitor::RuleDependency::inStatus( std::vector< Status > status ) const
     return std::any_of( status.begin(), status.end(), [ & ]( auto s ) { return s == m_status; } );
 }
 
-SCVisitor::RuleDependency::Ptr SCVisitor::findOrInsert( const Ast::RuleDefinition::Ptr& rule )
+SCVisitor::RuleDependency::Ptr SCVisitor::findOrInsert( const LST::RuleDefinition::Ptr& rule )
 {
     auto ruleIt = std::find_if( m_dependencies.begin(), m_dependencies.end(), [ & ]( auto& r ) {
         return r->rule() == rule;
@@ -275,7 +275,7 @@ SCVisitor::RuleDependency::Ptr SCVisitor::findOrInsert( const Ast::RuleDefinitio
 }
 
 SCVisitor::Conflict::Conflict(
-    const Ast::FunctionDefinition::Ptr& function,
+    const LST::FunctionDefinition::Ptr& function,
     const std::vector< libstdhl::SourceLocation >& locations,
     Cause cause )
 : Conflict( description( function, cause ), function, locations, cause )
@@ -284,7 +284,7 @@ SCVisitor::Conflict::Conflict(
 
 SCVisitor::Conflict::Conflict(
     const std::string& msg,
-    const Ast::FunctionDefinition::Ptr& function,
+    const LST::FunctionDefinition::Ptr& function,
     const std::vector< libstdhl::SourceLocation >& locations,
     Cause cause )
 : Exception( locations, msg, Code::Unspecified )
@@ -293,13 +293,13 @@ SCVisitor::Conflict::Conflict(
 {
 }
 
-Ast::FunctionDefinition::Ptr& SCVisitor::Conflict::conflictingFunction( void )
+LST::FunctionDefinition::Ptr& SCVisitor::Conflict::conflictingFunction( void )
 {
     return m_function;
 }
 
 std::string SCVisitor::Conflict::description(
-    const Ast::FunctionDefinition::Ptr& function, Cause cause )
+    const LST::FunctionDefinition::Ptr& function, Cause cause )
 {
     std::stringstream str;
     str << "Promoting function '" << function->identifier()->name() << "' to be symbolic."
@@ -332,13 +332,13 @@ SCVisitor::Abort::Abort( void )
 {
 }
 
-SCVisitor::Frame::Frame( Ast::Node* callee, std::size_t numberOfLocals )
+SCVisitor::Frame::Frame( LST::Node* callee, std::size_t numberOfLocals )
 : m_callee( callee )
 , m_locals( numberOfLocals, FunctionType::UNKNOWN )
 {
 }
 
-Ast::Node* SCVisitor::Frame::callee( void ) const
+LST::Node* SCVisitor::Frame::callee( void ) const
 {
     return m_callee;
 }
@@ -400,11 +400,11 @@ void SymbolicConsistencyVisitor::visit( Specification& specification )
         {
             const auto& literal = ruleRef.value();
             assert(
-                ( literal->referenceType() == Ast::ReferenceLiteral::ReferenceType::RULE ) &&
+                ( literal->reference()->id() == LST::Node::ID::RULE_DEFINITION ) &&
                 "Must be a rule reference" );
 
             const auto& rule =
-                std::static_pointer_cast< Ast::RuleDefinition >( literal->reference() );
+                std::static_pointer_cast< LST::RuleDefinition >( literal->reference() );
             assert(
                 ( rule->arguments()->size() == 0 ) && "Only parameter-less rules are supported" );
             m_dependencies.insert( std::make_shared< RuleDependency >( rule ) );
@@ -469,82 +469,85 @@ void SymbolicConsistencyVisitor::visit( Specification& specification )
     }
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::Initially& node )
-{
-    // just evaluate the encapsulated initializers
-    node.initializers()->accept( *this );
-}
+// void SymbolicConsistencyVisitor::visit( LST::Initially& node )
+// {
+//     // just evaluate the encapsulated initializers
+//     node.initializers()->accept( *this );
+// }
 
-void SymbolicConsistencyVisitor::visit( Ast::Initializer& node )
-{
-    ScopedOverwrite< Ast::FunctionDefinition::Ptr > withUpdateLocation( m_updateLocation, nullptr );
-    {
-        ScopedOverwrite< bool > withLocationEvaluation( m_evaluateUpdateLocation, true );
-        node.function()->accept( *this );
+// void SymbolicConsistencyVisitor::visit( LST::Initializer& node )
+// {
+//     ScopedOverwrite< LST::FunctionDefinition::Ptr > withUpdateLocation( m_updateLocation, nullptr
+//     );
+//     {
+//         ScopedOverwrite< bool > withLocationEvaluation( m_evaluateUpdateLocation, true );
+//         node.function()->accept( *this );
 
-        assert( m_updateLocation != nullptr && "update location must be defined" );
-    }
-    auto args = typeOfList( node.arguments() );
+//         assert( m_updateLocation != nullptr && "update location must be defined" );
+//     }
+//     auto args = typeOfList( node.arguments() );
 
-    auto function = m_stack.pop();
+//     auto function = m_stack.pop();
 
-    node.value()->accept( *this );
-    auto value = m_stack.pop();
+//     node.value()->accept( *this );
+//     auto value = m_stack.pop();
 
-    if( function == FunctionType::NUMERIC )
-    {
-        if( value == FunctionType::SYMBOLIC )
-        {
-            throw Conflict( m_updateLocation, { node.sourceLocation() }, Conflict::Cause::UPDATE );
-        }
-        if( args == FunctionType::SYMBOLIC )
-        {
-            throw Conflict( m_updateLocation, { node.sourceLocation() }, Conflict::Cause::CALLED );
-        }
-        if( value == FunctionType::UNKNOWN || args == FunctionType::UNKNOWN )
-        {
-            m_unknownUpdate = true;
-            return;
-        }
-        if( m_context.top() == Context::CONDITIONAL )
-        {
-            throw Conflict(
-                m_updateLocation, { node.sourceLocation() }, Conflict::Cause::CONDITION );
-        }
-    }
-    if( function == FunctionType::UNKNOWN )
-    {
-        m_logger.warning(
-            { node.sourceLocation() }, "update location is unknown if symbolic or numeric" );
-        if( value == FunctionType::SYMBOLIC )
-        {
-            m_logger.warning(
-                { node.sourceLocation() }, "function may be numeric with symbolic update" );
-        }
-        m_unknownUpdate = true;
-    }
-}
+//     if( function == FunctionType::NUMERIC )
+//     {
+//         if( value == FunctionType::SYMBOLIC )
+//         {
+//             throw Conflict( m_updateLocation, { node.sourceLocation() }, Conflict::Cause::UPDATE
+//             );
+//         }
+//         if( args == FunctionType::SYMBOLIC )
+//         {
+//             throw Conflict( m_updateLocation, { node.sourceLocation() }, Conflict::Cause::CALLED
+//             );
+//         }
+//         if( value == FunctionType::UNKNOWN || args == FunctionType::UNKNOWN )
+//         {
+//             m_unknownUpdate = true;
+//             return;
+//         }
+//         if( m_context.top() == Context::CONDITIONAL )
+//         {
+//             throw Conflict(
+//                 m_updateLocation, { node.sourceLocation() }, Conflict::Cause::CONDITION );
+//         }
+//     }
+//     if( function == FunctionType::UNKNOWN )
+//     {
+//         m_logger.warning(
+//             { node.sourceLocation() }, "update location is unknown if symbolic or numeric" );
+//         if( value == FunctionType::SYMBOLIC )
+//         {
+//             m_logger.warning(
+//                 { node.sourceLocation() }, "function may be numeric with symbolic update" );
+//         }
+//         m_unknownUpdate = true;
+//     }
+// }
 
-void SymbolicConsistencyVisitor::visit( Ast::VariableDefinition& node )
+void SymbolicConsistencyVisitor::visit( LST::VariableDefinition& node )
 {
     m_stack.push( m_frame->local( node.localIndex() ) );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::FunctionDefinition& node )
+void SymbolicConsistencyVisitor::visit( LST::FunctionDefinition& node )
 {
     if( m_evaluateUpdateLocation )
     {
-        m_updateLocation = node.ptr< Ast::FunctionDefinition >();
+        m_updateLocation = node.ptr< LST::FunctionDefinition >();
     }
     m_stack.push( node.symbolic() ? FunctionType::SYMBOLIC : FunctionType::NUMERIC );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::DerivedDefinition& node )
+void SymbolicConsistencyVisitor::visit( LST::DerivedDefinition& node )
 {
     node.expression()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::RuleDefinition& node )
+void SymbolicConsistencyVisitor::visit( LST::RuleDefinition& node )
 {
     node.rule()->accept( *this );
 
@@ -565,39 +568,39 @@ void SymbolicConsistencyVisitor::visit( Ast::RuleDefinition& node )
     }
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::EnumeratorDefinition& node )
+void SymbolicConsistencyVisitor::visit( LST::EnumeratorDefinition& node )
 {
     m_stack.push( FunctionType::NUMERIC );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::InvariantDefinition& node )
+void SymbolicConsistencyVisitor::visit( LST::InvariantDefinition& node )
 {
     node.expression()->accept( *this );
     m_stack.pop();
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::UndefLiteral& node )
+// void SymbolicConsistencyVisitor::visit( LST::UndefLiteral& node )
+// {
+//     m_stack.push( FunctionType::NUMERIC );
+// }
+
+void SymbolicConsistencyVisitor::visit( LST::ValueLiteral& node )
 {
     m_stack.push( FunctionType::NUMERIC );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::ValueLiteral& node )
+void SymbolicConsistencyVisitor::visit( LST::ReferenceLiteral& node )
 {
     m_stack.push( FunctionType::NUMERIC );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::ReferenceLiteral& node )
-{
-    m_stack.push( FunctionType::NUMERIC );
-}
-
-void SymbolicConsistencyVisitor::visit( Ast::ListLiteral& node )
+void SymbolicConsistencyVisitor::visit( LST::ListLiteral& node )
 {
     auto type = typeOfList( node.expressions() );
     m_stack.push( type );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::RangeLiteral& node )
+void SymbolicConsistencyVisitor::visit( LST::RangeLiteral& node )
 {
     node.left()->accept( *this );
     auto left = m_stack.pop();
@@ -608,44 +611,44 @@ void SymbolicConsistencyVisitor::visit( Ast::RangeLiteral& node )
     m_stack.push( left && right );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::TupleLiteral& node )
+void SymbolicConsistencyVisitor::visit( LST::TupleLiteral& node )
 {
     auto type = typeOfList( node.expressions() );
     m_stack.push( type );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::RecordLiteral& node )
+void SymbolicConsistencyVisitor::visit( LST::RecordLiteral& node )
 {
     auto type = typeOfList( node.namedExpressions() );
     m_stack.push( type );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::BasicType& node )
-{
-    m_stack.push( FunctionType::NUMERIC );
-}
+// void SymbolicConsistencyVisitor::visit( LST::BasicType& node )
+// {
+//     m_stack.push( FunctionType::NUMERIC );
+// }
 
-void SymbolicConsistencyVisitor::visit( Ast::EmbracedExpression& node )
+// void SymbolicConsistencyVisitor::visit( LST::EmbracedExpression& node )
+// {
+//     // just evaluate the named expression and push it to the stack
+//     node.expression()->accept( *this );
+// }
+
+void SymbolicConsistencyVisitor::visit( LST::NamedExpression& node )
 {
     // just evaluate the named expression and push it to the stack
     node.expression()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::NamedExpression& node )
+void SymbolicConsistencyVisitor::visit( LST::DirectCallExpression& node )
 {
-    // just evaluate the named expression and push it to the stack
-    node.expression()->accept( *this );
-}
-
-void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
-{
-    using TargetType = Ast::DirectCallExpression::TargetType;
+    using TargetType = LST::DirectCallExpression::TargetType;
     switch( node.targetType() )
     {
         case TargetType::FUNCTION:
         {
             const auto& function =
-                std::static_pointer_cast< Ast::FunctionDefinition >( node.targetDefinition() );
+                std::static_pointer_cast< LST::FunctionDefinition >( node.targetDefinition() );
             function->accept( *this );
             auto functionType = m_stack.pop();
 
@@ -690,10 +693,10 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
         }
         case TargetType::RULE:
         {
-            assert( node.targetDefinition()->id() == Ast::Node::ID::RULE_DEFINITION );
+            assert( node.targetDefinition()->id() == LST::Node::ID::RULE_DEFINITION );
 
             const auto rule =
-                std::static_pointer_cast< Ast::RuleDefinition >( node.targetDefinition() );
+                std::static_pointer_cast< LST::RuleDefinition >( node.targetDefinition() );
             auto args = toTypeList( node.arguments() );
             auto result = callRule( rule, args );
             if( not node.type()->result().isVoid() )
@@ -704,31 +707,31 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
         }
         case TargetType::BUILTIN:
         {
-            const auto& id = node.targetBuiltinId();
-            const auto& type = node.targetBuiltinType();
-            if( not type->result().isVoid() )
-            {
-                bool found = false;
-                for( const auto& rule : m_builtins )
-                {
-                    if( rule.contains( id ) )
-                    {
-                        auto args = toTypeList( node.arguments() );
-                        m_stack.push( rule.evaluate( args ) );
-                        found = true;
-                        break;
-                    }
-                }
-                if( not found )
-                {
-                    m_logger.error( "Unknown Builtin '" + IR::Value::token( id ) + "'." );
-                    m_stack.push(
-                        m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
-                }
-            }
+            // const auto& id = node.targetDefinition()->id();
+            // const auto& type = node.targetDefinition()->type();
+            // if( not type->result().isVoid() )
+            // {
+            //     bool found = false;
+            //     for( const auto& rule : m_builtins )
+            //     {
+            //         if( rule.contains( id ) )
+            //         {
+            //             auto args = toTypeList( node.arguments() );
+            //             m_stack.push( rule.evaluate( args ) );
+            //             found = true;
+            //             break;
+            //         }
+            //     }
+            //     if( not found )
+            //     {
+            //         m_logger.error( "Unknown Builtin '" + IR::Value::token( id ) + "'." );
+            //         m_stack.push(
+            //             m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
+            //     }
+            // }
             break;
         }
-        case TargetType::TYPE_DOMAIN:
+        case TargetType::DOMAINTYPE:
         {
             // no symbolic types
             m_stack.push( FunctionType::NUMERIC );
@@ -740,11 +743,11 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
             node.targetDefinition()->accept( *this );
             break;
         }
-        case TargetType::SELF:
-        {
-            m_stack.push( FunctionType::NUMERIC );
-            break;
-        }
+        // case TargetType::SELF:
+        // {
+        //     m_stack.push( FunctionType::NUMERIC );
+        //     break;
+        // }
         case TargetType::UNKNOWN:
         {
             assert( !"cannot call an unknown target" );
@@ -753,97 +756,97 @@ void SymbolicConsistencyVisitor::visit( Ast::DirectCallExpression& node )
     }
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::MethodCallExpression& node )
-{
-    node.object()->accept( *this );
-    auto object = m_stack.pop();
+// void SymbolicConsistencyVisitor::visit( LST::MethodCallExpression& node )
+// {
+//     node.object()->accept( *this );
+//     auto object = m_stack.pop();
 
-    switch( node.methodType() )
-    {
-        case Ast::MethodCallExpression::MethodType::FUNCTION:  // [[fallthrough]]
-        case Ast::MethodCallExpression::MethodType::DERIVED:
-        {
-            const auto& function =
-                std::static_pointer_cast< Ast::FunctionDefinition >( node.targetDefinition() );
-            function->accept( *this );
-            auto functionType = m_stack.pop();
+//     switch( node.methodType() )
+//     {
+//         case LST::MethodCallExpression::MethodType::FUNCTION:  // [[fallthrough]]
+//         case LST::MethodCallExpression::MethodType::DERIVED:
+//         {
+//             const auto& function =
+//                 std::static_pointer_cast< LST::FunctionDefinition >( node.targetDefinition() );
+//             function->accept( *this );
+//             auto functionType = m_stack.pop();
 
-            assert(
-                functionType != FunctionType::UNKNOWN &&
-                "function type of definition must be symbolic or numeric" );
+//             assert(
+//                 functionType != FunctionType::UNKNOWN &&
+//                 "function type of definition must be symbolic or numeric" );
 
-            if( functionType == FunctionType::SYMBOLIC )
-            {
-                m_stack.push( FunctionType::SYMBOLIC );
-                return;
-            }
+//             if( functionType == FunctionType::SYMBOLIC )
+//             {
+//                 m_stack.push( FunctionType::SYMBOLIC );
+//                 return;
+//             }
 
-            auto type = object && typeOfList( node.arguments() );
-            if( type == FunctionType::SYMBOLIC )
-            {
-                throw SCVisitor::Conflict(
-                    function, { node.sourceLocation() }, Conflict::Cause::CALLED );
-            }
-            m_stack.push( type );
-            break;
-        }
-        case Ast::MethodCallExpression::MethodType::RULE:
-        {
-            assert( node.targetDefinition()->id() == Ast::Node::ID::RULE_DEFINITION );
+//             auto type = object && typeOfList( node.arguments() );
+//             if( type == FunctionType::SYMBOLIC )
+//             {
+//                 throw SCVisitor::Conflict(
+//                     function, { node.sourceLocation() }, Conflict::Cause::CALLED );
+//             }
+//             m_stack.push( type );
+//             break;
+//         }
+//         case LST::MethodCallExpression::MethodType::RULE:
+//         {
+//             assert( node.targetDefinition()->id() == LST::Node::ID::RULE_DEFINITION );
 
-            const auto rule =
-                std::static_pointer_cast< Ast::RuleDefinition >( node.targetDefinition() );
-            auto args = toTypeList( node.arguments() );
-            args.insert( args.begin(), object );
+//             const auto rule =
+//                 std::static_pointer_cast< LST::RuleDefinition >( node.targetDefinition() );
+//             auto args = toTypeList( node.arguments() );
+//             args.insert( args.begin(), object );
 
-            auto result = callRule( rule, args );
-            if( not node.type()->result().isVoid() )
-            {
-                m_stack.push( result );
-            }
-            break;
-        }
-        case Ast::MethodCallExpression::MethodType::BUILTIN:
-        {
-            const auto& id = node.targetBuiltinId();
-            const auto& type = node.targetBuiltinType();
-            if( not type->result().isVoid() )
-            {
-                bool found = false;
-                for( const auto& rule : m_builtins )
-                {
-                    if( rule.contains( id ) )
-                    {
-                        auto args = toTypeList( node.arguments() );
-                        args.insert( args.begin(), object );
-                        m_stack.push( rule.evaluate( args ) );
-                        found = true;
-                        break;
-                    }
-                }
-                if( not found )
-                {
-                    m_logger.error( "Unknown Builtin '" + IR::Value::token( id ) + "'." );
-                    m_stack.push(
-                        m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
-                }
-            }
-            break;
-        }
-        case Ast::MethodCallExpression::MethodType::UNKNOWN:
-        {
-            assert( !"cannot call an unknown method" );
-            break;
-        }
-    }
-}
+//             auto result = callRule( rule, args );
+//             if( not node.type()->result().isVoid() )
+//             {
+//                 m_stack.push( result );
+//             }
+//             break;
+//         }
+//         case LST::MethodCallExpression::MethodType::BUILTIN:
+//         {
+//             const auto& id = node.targetBuiltinId();
+//             const auto& type = node.targetBuiltinType();
+//             if( not type->result().isVoid() )
+//             {
+//                 bool found = false;
+//                 for( const auto& rule : m_builtins )
+//                 {
+//                     if( rule.contains( id ) )
+//                     {
+//                         auto args = toTypeList( node.arguments() );
+//                         args.insert( args.begin(), object );
+//                         m_stack.push( rule.evaluate( args ) );
+//                         found = true;
+//                         break;
+//                     }
+//                 }
+//                 if( not found )
+//                 {
+//                     m_logger.error( "Unknown Builtin '" + IR::Value::token( id ) + "'." );
+//                     m_stack.push(
+//                         m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
+//                 }
+//             }
+//             break;
+//         }
+//         case LST::MethodCallExpression::MethodType::UNKNOWN:
+//         {
+//             assert( !"cannot call an unknown method" );
+//             break;
+//         }
+//     }
+// }
 
-void SymbolicConsistencyVisitor::visit( Ast::LiteralCallExpression& node )
-{
-    node.object()->accept( *this );
-}
+// void SymbolicConsistencyVisitor::visit( LST::LiteralCallExpression& node )
+// {
+//     node.object()->accept( *this );
+// }
 
-void SymbolicConsistencyVisitor::visit( Ast::IndirectCallExpression& node )
+void SymbolicConsistencyVisitor::visit( LST::IndirectCallExpression& node )
 {
     // TODO: fix me: needs evaluation of reference
     m_logger.error(
@@ -852,36 +855,36 @@ void SymbolicConsistencyVisitor::visit( Ast::IndirectCallExpression& node )
         Code::Unspecified );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::TypeCastingExpression& node )
-{
-    // no symbolic types -> symbolic state of from expression is symbolic state of casted
-    // expression
-    node.fromExpression()->accept( *this );
-}
+// void SymbolicConsistencyVisitor::visit( LST::TypeCastingExpression& node )
+// {
+//     // no symbolic types -> symbolic state of from expression is symbolic state of casted
+//     // expression
+//     node.fromExpression()->accept( *this );
+// }
 
-void SymbolicConsistencyVisitor::visit( Ast::UnaryExpression& node )
-{
-    node.expression()->accept( *this );
-}
+// void SymbolicConsistencyVisitor::visit( LST::UnaryExpression& node )
+// {
+//     node.expression()->accept( *this );
+// }
 
-void SymbolicConsistencyVisitor::visit( Ast::BinaryExpression& node )
-{
-    node.left()->accept( *this );
-    auto left = m_stack.pop();
+// void SymbolicConsistencyVisitor::visit( LST::BinaryExpression& node )
+// {
+//     node.left()->accept( *this );
+//     auto left = m_stack.pop();
 
-    node.right()->accept( *this );
-    auto right = m_stack.pop();
+//     node.right()->accept( *this );
+//     auto right = m_stack.pop();
 
-    m_stack.push( left && right );
-}
+//     m_stack.push( left && right );
+// }
 
-void SymbolicConsistencyVisitor::visit( Ast::LetExpression& node )
+void SymbolicConsistencyVisitor::visit( LST::LetExpression& node )
 {
     node.variableBindings()->accept( *this );
     node.expression()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::ConditionalExpression& node )
+void SymbolicConsistencyVisitor::visit( LST::ConditionalExpression& node )
 {
     node.condition()->accept( *this );
     auto condition = m_stack.pop();
@@ -911,7 +914,7 @@ void SymbolicConsistencyVisitor::visit( Ast::ConditionalExpression& node )
     m_context.pop();
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::ChooseExpression& node )
+void SymbolicConsistencyVisitor::visit( LST::ChooseExpression& node )
 {
     node.universe()->accept( *this );
     m_stack.pop();
@@ -923,7 +926,7 @@ void SymbolicConsistencyVisitor::visit( Ast::ChooseExpression& node )
     node.expression()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::UniversalQuantifierExpression& node )
+void SymbolicConsistencyVisitor::visit( LST::UniversalQuantifierExpression& node )
 {
     node.universe()->accept( *this );
     auto universe = m_stack.pop();
@@ -934,7 +937,7 @@ void SymbolicConsistencyVisitor::visit( Ast::UniversalQuantifierExpression& node
     node.proposition()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::ExistentialQuantifierExpression& node )
+void SymbolicConsistencyVisitor::visit( LST::ExistentialQuantifierExpression& node )
 {
     node.universe()->accept( *this );
     auto universe = m_stack.pop();
@@ -945,15 +948,15 @@ void SymbolicConsistencyVisitor::visit( Ast::ExistentialQuantifierExpression& no
     node.proposition()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::CardinalityExpression& node )
-{
-    auto args = typeOfList( node.arguments() );
-    node.expression()->accept( *this );
-    auto expression = m_stack.pop();
-    m_stack.push( args && expression );
-}
+// void SymbolicConsistencyVisitor::visit( LST::CardinalityExpression& node )
+// {
+//     auto args = typeOfList( node.arguments() );
+//     node.expression()->accept( *this );
+//     auto expression = m_stack.pop();
+//     m_stack.push( args && expression );
+// }
 
-void SymbolicConsistencyVisitor::visit( Ast::ConditionalRule& node )
+void SymbolicConsistencyVisitor::visit( LST::ConditionalRule& node )
 {
     node.condition()->accept( *this );
     auto condition = m_stack.pop();
@@ -972,7 +975,7 @@ void SymbolicConsistencyVisitor::visit( Ast::ConditionalRule& node )
     m_context.pop();
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::CaseRule& node )
+void SymbolicConsistencyVisitor::visit( LST::CaseRule& node )
 {
     node.expression()->accept( *this );
     const auto expression = m_stack.pop();
@@ -988,14 +991,14 @@ void SymbolicConsistencyVisitor::visit( Ast::CaseRule& node )
     {
         switch( _case->id() )
         {
-            case Ast::Node::ID::DEFAULT_CASE:
+            case LST::Node::ID::DEFAULT_CASE:
             {
                 _case->rule()->accept( *this );
                 break;
             }
-            case Ast::Node::ID::EXPRESSION_CASE:
+            case LST::Node::ID::EXPRESSION_CASE:
             {
-                const auto& exprCase = std::static_pointer_cast< Ast::ExpressionCase >( _case );
+                const auto& exprCase = std::static_pointer_cast< LST::ExpressionCase >( _case );
                 exprCase->expression()->accept( *this );
                 m_stack.pop();
 
@@ -1013,13 +1016,13 @@ void SymbolicConsistencyVisitor::visit( Ast::CaseRule& node )
     m_context.pop();
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::LetRule& node )
+void SymbolicConsistencyVisitor::visit( LST::LetRule& node )
 {
     node.variableBindings()->accept( *this );
     node.rule()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::LocalRule& node )
+void SymbolicConsistencyVisitor::visit( LST::LocalRule& node )
 {
     for( const auto& localFunction : *node.localFunctions() )
     {
@@ -1028,7 +1031,7 @@ void SymbolicConsistencyVisitor::visit( Ast::LocalRule& node )
     node.rule()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::ForallRule& node )
+void SymbolicConsistencyVisitor::visit( LST::ForallRule& node )
 {
     node.universe()->accept( *this );
     auto universe = m_stack.pop();
@@ -1044,7 +1047,7 @@ void SymbolicConsistencyVisitor::visit( Ast::ForallRule& node )
     m_context.pop();
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::ChooseRule& node )
+void SymbolicConsistencyVisitor::visit( LST::ChooseRule& node )
 {
     node.universe()->accept( *this );
     m_stack.pop();
@@ -1056,24 +1059,24 @@ void SymbolicConsistencyVisitor::visit( Ast::ChooseRule& node )
     node.rule()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::IterateRule& node )
+void SymbolicConsistencyVisitor::visit( LST::IterateRule& node )
 {
     node.rule()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::BlockRule& node )
+void SymbolicConsistencyVisitor::visit( LST::BlockRule& node )
 {
     node.rules()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::SequenceRule& node )
+void SymbolicConsistencyVisitor::visit( LST::SequenceRule& node )
 {
     node.rules()->accept( *this );
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::UpdateRule& node )
+void SymbolicConsistencyVisitor::visit( LST::UpdateRule& node )
 {
-    ScopedOverwrite< Ast::FunctionDefinition::Ptr > withUpdateLocation( m_updateLocation, nullptr );
+    ScopedOverwrite< LST::FunctionDefinition::Ptr > withUpdateLocation( m_updateLocation, nullptr );
     {
         ScopedOverwrite< bool > withLocationEvaluation( m_evaluateUpdateLocation, true );
         node.function()->accept( *this );
@@ -1115,7 +1118,7 @@ void SymbolicConsistencyVisitor::visit( Ast::UpdateRule& node )
     }
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::CallRule& node )
+void SymbolicConsistencyVisitor::visit( LST::CallRule& node )
 {
     node.call()->accept( *this );
     const auto& returnType = node.call()->type()->result();
@@ -1125,24 +1128,24 @@ void SymbolicConsistencyVisitor::visit( Ast::CallRule& node )
     }
 }
 
-void SymbolicConsistencyVisitor::visit( Ast::WhileRule& node )
-{
-    node.condition()->accept( *this );
-    auto condition = m_stack.pop();
+// void SymbolicConsistencyVisitor::visit( LST::WhileRule& node )
+// {
+//     node.condition()->accept( *this );
+//     auto condition = m_stack.pop();
 
-    if( not createContext( condition ) )
-    {
-        m_logger.warning(
-            { node.sourceLocation() },
-            "Couldn't determine if condition is symbolic or numeric. Assumed symbolic." );
-    }
+//     if( not createContext( condition ) )
+//     {
+//         m_logger.warning(
+//             { node.sourceLocation() },
+//             "Couldn't determine if condition is symbolic or numeric. Assumed symbolic." );
+//     }
 
-    node.rule()->accept( *this );
+//     node.rule()->accept( *this );
 
-    m_context.pop();
-}
+//     m_context.pop();
+// }
 
-void SymbolicConsistencyVisitor::visit( Ast::VariableBinding& node )
+void SymbolicConsistencyVisitor::visit( LST::VariableBinding& node )
 {
     node.expression()->accept( *this );
     const auto value = m_stack.pop();
@@ -1189,7 +1192,7 @@ bool SymbolicConsistencyVisitor::createContext( const FunctionType condition )
 }
 
 SymbolicConsistencyVisitor::FunctionType SymbolicConsistencyVisitor::callRule(
-    const Ast::RuleDefinition::Ptr& rule, std::vector< FunctionType > args )
+    const LST::RuleDefinition::Ptr& rule, std::vector< FunctionType > args )
 {
     auto currentDeps = findOrInsert( m_currentRule );
 
@@ -1302,26 +1305,26 @@ void SCStateInitializationVisitor::visit( Specification& node )
 {
     m_updateSetManager.fork( Semantics::Sequential, 100 );
 
-    node.header()->accept( *this );
-    node.definitions()->accept( *this );
+    // node.header()->accept( *this );
+    node.lst()->definitions()->accept( *this );
 
     auto updateSet = m_updateSetManager.currentUpdateSet();
     m_globalState.fireUpdateSet( updateSet );
     m_updateSetManager.clear();
 }
 
-void SCStateInitializationVisitor::visit( Ast::InitDefinition& node )
-{
-    assert( node.programFunction() and "checked during frame size determination pass!" );
-    node.programFunction()->accept( *this );
-}
+// void SCStateInitializationVisitor::visit( LST::InitDefinition& node )
+// {
+//     assert( node.programFunction() and "checked during frame size determination pass!" );
+//     node.programFunction()->accept( *this );
+// }
 
-void SCStateInitializationVisitor::visit( Ast::FunctionDefinition& node )
+void SCStateInitializationVisitor::visit( LST::FunctionDefinition& node )
 {
-    assert( not node.isLocal() );
+    assert( not node.local() );
 
     Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
-    if( node.isProgram() )
+    if( node.program() )
     {
         ExecutionVisitor executionVisitor(
             m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant() );

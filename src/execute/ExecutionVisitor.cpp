@@ -1268,7 +1268,7 @@ void InvariantChecker::check( const Specification& specification )
     ExecutionVisitor visitor(
         m_locationRegistry, m_globalState, updateSetManager, ReferenceConstant() );
 
-    for( const auto& definition : *specification.definitions() )
+    for( const auto& definition : *specification.lst()->definitions() )
     {
         if( definition->id() != Node::ID::INVARIANT_DEFINITION )
         {
@@ -1323,7 +1323,7 @@ void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
                 return;
             }
 
-            if( not node.isLocal() )
+            if( not node.local() )
             {
                 const auto function = m_globalState.get( *location );
                 if( node.symbolic() )
@@ -1347,7 +1347,7 @@ void SymbolicExecutionVisitor::visit( FunctionDefinition& node )
             }
         }
 
-        node.defined()->expression()->accept( *this );  // return value already on stack
+        node.defined()->accept( *this );  // return value already on stack
     }
 }
 
@@ -1356,30 +1356,30 @@ void SymbolicExecutionVisitor::visit( DirectCallExpression& node )
     ExecutionVisitor::visit( node );
 }
 
-void SymbolicExecutionVisitor::visit( MethodCallExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
+// void SymbolicExecutionVisitor::visit( MethodCallExpression& node )
+// {
+//     ExecutionVisitor::visit( node );
+// }
 
-void SymbolicExecutionVisitor::visit( LiteralCallExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
+// void SymbolicExecutionVisitor::visit( LiteralCallExpression& node )
+// {
+//     ExecutionVisitor::visit( node );
+// }
 
 void SymbolicExecutionVisitor::visit( IndirectCallExpression& node )
 {
     ExecutionVisitor::visit( node );
 }
 
-void SymbolicExecutionVisitor::visit( UnaryExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
+// void SymbolicExecutionVisitor::visit( UnaryExpression& node )
+// {
+//     ExecutionVisitor::visit( node );
+// }
 
-void SymbolicExecutionVisitor::visit( BinaryExpression& node )
-{
-    ExecutionVisitor::visit( node );
-}
+// void SymbolicExecutionVisitor::visit( BinaryExpression& node )
+// {
+//     ExecutionVisitor::visit( node );
+// }
 
 void SymbolicExecutionVisitor::visit( LetExpression& node )
 {
@@ -1454,11 +1454,11 @@ void SymbolicExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     ExecutionVisitor::visit( node );
 }
 
-void SymbolicExecutionVisitor::visit( CardinalityExpression& node )
-{
-    // TODO: fix me
-    ExecutionVisitor::visit( node );
-}
+// void SymbolicExecutionVisitor::visit( CardinalityExpression& node )
+// {
+//     // TODO: fix me
+//     ExecutionVisitor::visit( node );
+// }
 
 void SymbolicExecutionVisitor::visit( ConditionalRule& node )
 {
@@ -1706,11 +1706,11 @@ void SymbolicExecutionVisitor::visit( UpdateRule& node )
     }
 }
 
-void SymbolicExecutionVisitor::visit( WhileRule& node )
-{
-    // TODO: fix me
-    ExecutionVisitor::visit( node );
-}
+// void SymbolicExecutionVisitor::visit( WhileRule& node )
+// {
+//     // TODO: fix me
+//     ExecutionVisitor::visit( node );
+// }
 
 IR::SymbolicExecutionEnvironment& SymbolicExecutionVisitor::environment()
 {
@@ -1733,8 +1733,7 @@ void SymbolicStateInitializationVisitor::visit( Specification& node )
 {
     m_updateSetManager.fork( Semantics::Sequential, 100 );
 
-    node.header()->accept( *this );
-    node.definitions()->accept( *this );
+    node.lst()->definitions()->accept( *this );
 
     // for( const auto& definition : *specification.lst()->definitions() )
     // {
@@ -1748,11 +1747,11 @@ void SymbolicStateInitializationVisitor::visit( Specification& node )
     m_updateSetManager.clear();
 }
 
-void SymbolicStateInitializationVisitor::visit( InitDefinition& node )
-{
-    assert( node.programFunction() and "checked during frame size determination pass!" );
-    node.programFunction()->accept( *this );
-}
+// void SymbolicStateInitializationVisitor::visit( InitDefinition& node )
+// {
+//     assert( node.programFunction() and "checked during frame size determination pass!" );
+//     node.programFunction()->accept( *this );
+// }
 
 void SymbolicStateInitializationVisitor::visit( FunctionDefinition& node )
 {

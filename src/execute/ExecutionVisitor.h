@@ -357,30 +357,30 @@ namespace libcasm_fe
             const IR::Constant& agentId,
             IR::SymbolicExecutionEnvironment& environment );
 
-        void visit( Ast::FunctionDefinition& node ) override;
+        void visit( LST::FunctionDefinition& node ) override;
 
-        void visit( Ast::DirectCallExpression& node ) override;
-        void visit( Ast::MethodCallExpression& node ) override;
-        void visit( Ast::LiteralCallExpression& node ) override;
-        void visit( Ast::IndirectCallExpression& node ) override;
-        void visit( Ast::UnaryExpression& node ) override;
-        void visit( Ast::BinaryExpression& node ) override;
-        void visit( Ast::LetExpression& node ) override;
-        void visit( Ast::ConditionalExpression& node ) override;
-        void visit( Ast::ChooseExpression& node ) override;
-        void visit( Ast::UniversalQuantifierExpression& node ) override;
-        void visit( Ast::ExistentialQuantifierExpression& node ) override;
-        void visit( Ast::CardinalityExpression& node ) override;
+        void visit( LST::DirectCallExpression& node ) override;
+        // void visit( LST::MethodCallExpression& node ) override;
+        // void visit( LST::LiteralCallExpression& node ) override;
+        void visit( LST::IndirectCallExpression& node ) override;
+        // void visit( LST::UnaryExpression& node ) override;
+        // void visit( LST::BinaryExpression& node ) override;
+        void visit( LST::LetExpression& node ) override;
+        void visit( LST::ConditionalExpression& node ) override;
+        void visit( LST::ChooseExpression& node ) override;
+        void visit( LST::UniversalQuantifierExpression& node ) override;
+        void visit( LST::ExistentialQuantifierExpression& node ) override;
+        // void visit( LST::CardinalityExpression& node ) override;
 
-        void visit( Ast::ConditionalRule& node ) override;
-        void visit( Ast::CaseRule& node ) override;
-        void visit( Ast::ForallRule& node ) override;
-        void visit( Ast::ChooseRule& node ) override;
-        void visit( Ast::IterateRule& node ) override;
-        void visit( Ast::BlockRule& node ) override;
-        void visit( Ast::SequenceRule& node ) override;
-        void visit( Ast::UpdateRule& node ) override;
-        void visit( Ast::WhileRule& node ) override;
+        void visit( LST::ConditionalRule& node ) override;
+        void visit( LST::CaseRule& node ) override;
+        void visit( LST::ForallRule& node ) override;
+        void visit( LST::ChooseRule& node ) override;
+        void visit( LST::IterateRule& node ) override;
+        void visit( LST::BlockRule& node ) override;
+        void visit( LST::SequenceRule& node ) override;
+        void visit( LST::UpdateRule& node ) override;
+        // void visit( LST::WhileRule& node ) override;
 
       private:
         IR::SymbolicExecutionEnvironment& m_environment;
@@ -388,7 +388,7 @@ namespace libcasm_fe
         IR::SymbolicExecutionEnvironment& environment();
     };
 
-    class SymbolicStateInitializationVisitor final : public Ast::EmptyVisitor
+    class SymbolicStateInitializationVisitor final : public LST::EmptyVisitor
     {
       public:
         SymbolicStateInitializationVisitor(
@@ -397,8 +397,8 @@ namespace libcasm_fe
             IR::SymbolicExecutionEnvironment& environment );
 
         void visit( Specification& node );
-        void visit( Ast::InitDefinition& node ) override;
-        void visit( Ast::FunctionDefinition& node ) override;
+        // void visit( LST::InitDefinition& node ) override;
+        void visit( LST::FunctionDefinition& node ) override;
 
       private:
         Storage& m_globalState;

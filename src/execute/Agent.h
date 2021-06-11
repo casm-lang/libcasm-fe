@@ -48,8 +48,6 @@
 
 #include <libcasm-fe/Codes>
 #include <libcasm-fe/Specification>
-#include <libcasm-fe/ast/Definition>
-#include <libcasm-fe/ast/EmptyVisitor>
 #include <libcasm-fe/execute/ExecutionVisitor>
 #include <libcasm-fe/execute/Frame>
 #include <libcasm-fe/execute/FunctionState>
@@ -58,6 +56,8 @@
 #include <libcasm-fe/execute/Stack>
 #include <libcasm-fe/execute/SymbolicExecutionPass>
 #include <libcasm-fe/execute/UpdateSet>
+#include <libcasm-fe/lst/Definition>
+#include <libcasm-fe/lst/Visitor>
 
 #include <libstdhl/Enum>
 #include <libstdhl/Hash>
