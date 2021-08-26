@@ -54,12 +54,12 @@ using namespace AST;
     {                                                                                             \
         libpass::PassManager pm;                                                                  \
         pm.setDefaultPass< PASS >();                                                              \
-        pm.set< libcasm_fe::PASS >( [&]( libcasm_fe::PASS& pass ) { CONFIG } );                   \
+        pm.set< libcasm_fe::PASS >( [ & ]( libcasm_fe::PASS& pass ) { CONFIG } );                 \
                                                                                                   \
         libstdhl::Logger log( pm.stream() );                                                      \
         log.setSource( libstdhl::Memory::make< libstdhl::Log::Source >( TEST_NAME, TEST_NAME ) ); \
                                                                                                   \
-        auto flush = [&pm]() {                                                                    \
+        auto flush = [ &pm ]() {                                                                  \
             libstdhl::Log::ApplicationFormatter f( TEST_NAME );                                   \
             libstdhl::Log::OutputStreamSink c( std::cerr, f );                                    \
             pm.stream().flush( c );                                                               \

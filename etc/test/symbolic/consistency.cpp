@@ -829,14 +829,7 @@ rule test =
 )***";
 
 SOURCE_TEST(
-    symbolic_derived_calls,
-    SymbolicConsistencyPass,
-    source_derived_call,
-    true,
-    ,
-    ,
-    "b",
-    "~c" );
+    symbolic_derived_calls, SymbolicConsistencyPass, source_derived_call, true, , , "b", "~c" );
 //
 //  Local variables:
 //  mode: c++

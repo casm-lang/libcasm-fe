@@ -48,7 +48,8 @@ using namespace libcasm_fe;
 class CheckIterator
 {
     using iter = std::string::const_iterator;
-	public:
+
+  public:
     CheckIterator( const std::string& str )
     : m_it( str.begin() )
     , m_inSQuotes( false )
@@ -56,39 +57,45 @@ class CheckIterator
     {
     }
 
-    bool inSQuotes(void)
+    bool inSQuotes( void )
     {
         return m_inSQuotes;
     }
 
-	void toggleSQuotes(void) {
-		m_inSQuotes = !m_inSQuotes;
-	}
+    void toggleSQuotes( void )
+    {
+        m_inSQuotes = !m_inSQuotes;
+    }
 
-    bool inDQuotes(void)
+    bool inDQuotes( void )
     {
         return m_inDQuotes;
     }
 
-	void toggleDQuotes(void) {
-		m_inDQuotes = !m_inDQuotes;
-	}
+    void toggleDQuotes( void )
+    {
+        m_inDQuotes = !m_inDQuotes;
+    }
 
-	CheckIterator operator++(void) {
-		++m_it;
-		return *this;
-	}
+    CheckIterator operator++( void )
+    {
+        ++m_it;
+        return *this;
+    }
 
-	bool operator!=(const iter it) {
-		return !(m_it == it);
-	}
+    bool operator!=( const iter it )
+    {
+        return !( m_it == it );
+    }
 
-	bool operator==(const iter it) {
-		return m_it == it;
-	}
-	char operator*(void) {
-		return *m_it;
-	}
+    bool operator==( const iter it )
+    {
+        return m_it == it;
+    }
+    char operator*( void )
+    {
+        return *m_it;
+    }
 
   private:
     iter m_it;
@@ -96,8 +103,7 @@ class CheckIterator
     bool m_inDQuotes;
 };
 
-CheckIterator&
-nextChar( const std::string& str, CheckIterator& offset )
+CheckIterator& nextChar( const std::string& str, CheckIterator& offset )
 {
     bool inComment = false;
     for( ; offset != str.end(); ++offset )
@@ -105,11 +111,11 @@ nextChar( const std::string& str, CheckIterator& offset )
         char c = *offset;
         if( c == '\'' && !offset.inDQuotes() && !inComment )
         {
-			offset.toggleSQuotes();
+            offset.toggleSQuotes();
         }
         if( c == '"' && !offset.inSQuotes() && !inComment )
         {
-			offset.toggleDQuotes();
+            offset.toggleDQuotes();
         }
         if( c == '%' && !offset.inSQuotes() && !offset.inDQuotes() )
         {
@@ -130,21 +136,22 @@ nextChar( const std::string& str, CheckIterator& offset )
 
 bool TestHelper::compareTPTPFiles( const std::string& expected, const std::string& actual )
 {
-	auto expected_offset = CheckIterator(expected);
-    //size_t expected_offset = nextChar( expected, 0 );
+    auto expected_offset = CheckIterator( expected );
+    // size_t expected_offset = nextChar( expected, 0 );
     auto actual_offset = CheckIterator( actual );
 
-    while( nextChar(expected, expected_offset) != expected.end() && nextChar(actual, actual_offset) != actual.end() )
+    while( nextChar( expected, expected_offset ) != expected.end() &&
+           nextChar( actual, actual_offset ) != actual.end() )
     {
         if( *expected_offset != *actual_offset )
         {
             return false;
         }
-		++expected_offset;
-		++actual_offset;
+        ++expected_offset;
+        ++actual_offset;
     }
-	//consume whitespace and comments at the end
-	expected_offset = nextChar( expected, expected_offset );
-	actual_offset = nextChar( actual, actual_offset );
+    // consume whitespace and comments at the end
+    expected_offset = nextChar( expected, expected_offset );
+    actual_offset = nextChar( actual, actual_offset );
     return expected_offset == expected.end() && actual_offset == actual.end();
 }
