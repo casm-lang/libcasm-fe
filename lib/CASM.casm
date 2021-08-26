@@ -489,7 +489,11 @@ implement Addition for String = {
 
 implement TypeCasting< String > for String = {
     [ pure ]
-    derived convertTo( this ) -> String = this
+    derived convertTo( this ) -> String =
+        if this = undef then
+	        "undef"
+	    else
+	        this
 }
 
 implement Symbolic for String = {
