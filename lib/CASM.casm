@@ -294,7 +294,10 @@ implement TypeCasting< Boolean > for Integer = {
 implement TypeCasting< String > for Integer = {
     [ pure ]
     derived convertTo( this ) -> String =
-        StrInstruction( this )
+        if this = undef then
+	        "undef"
+	    else
+	        StrInstruction( this )
 }
 
 // TODO: FIXME: @ppaulweber
