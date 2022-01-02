@@ -326,7 +326,7 @@ Grammar
   233                   | Type
 
   234 MaybeFunctionParameters: FunctionParameters
-  235                        | %empty
+  235                        | ε
 
   236 MethodParameters: MethodParameters "," TypedAttributedVariable
   237                 | "this"
@@ -335,11 +335,11 @@ Grammar
   239           | TypedAttributedVariable
 
   240 MaybeDefined: "defined" "{" Term "}"
-  241             | %empty
+  241             | ε
 
   242 MaybeInitially: "=" "{" Expression "}"
   243               | "=" "{" MappedExpressions "}"
-  244               | %empty
+  244               | ε
 
   245 Identifier: "identifier"
   246           | "in"
