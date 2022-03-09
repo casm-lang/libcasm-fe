@@ -499,6 +499,12 @@ implement TypeCasting< String > for String = {
 	        this
 }
 
+implement ElementAccess< String > for String = {
+    [ pure ]
+    derived at( this, position : Integer ) -> String =
+        NthInstruction( this, position )
+}
+
 implement Symbolic for String = {
     [ pure ]
     derived isSymbolic( this ) -> Boolean =
@@ -999,9 +1005,10 @@ builtin SymInstruction< Object -> Boolean >
 
 [ export ]
 [ pure ]
-[ template SequenceType : Object ]
-[ template ElementType : Object ]
-builtin NthInstruction< SequenceType * Integer -> ElementType >
+// [ template SequenceType : Object ]
+// [ template ElementType : Object ]
+// builtin NthInstruction< SequenceType * Integer -> ElementType >
+builtin NthInstruction< String * Integer -> String >
 
 //
 //  Local variables:
