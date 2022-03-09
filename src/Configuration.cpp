@@ -142,9 +142,10 @@ Configuration Configuration::fromString( const std::string& fileName )
                         std::to_string( dependencyIndex + 1 ) + "' of 'imports' is not a map" );
                 }
 
-                dependency.foreach( [&]( const std::string& dependencyName,
-                                         const libstdhl::Yaml::Content& dependencyLocation,
-                                         u1& ) {
+                dependency.foreach( [ & ](
+                                        const std::string& dependencyName,
+                                        const libstdhl::Yaml::Content& dependencyLocation,
+                                        u1& ) {
                     if( dependencyLocation.type() != libstdhl::Yaml::Type::STRING )
                     {
                         throw ConfigurationException(
@@ -188,6 +189,13 @@ Configuration::Configuration(
 , m_filePath( filePath )
 , m_execute( execute )
 , m_imports()
+, m_inFunctions()
+, m_outFunctions()
+{
+}
+
+Configuration::Configuration( const std::string& specificationFileName )
+: Configuration( specificationFileName, "", specificationFileName )
 {
 }
 
@@ -245,6 +253,59 @@ libstdhl::Optional< libstdhl::Standard::RFC3986::URI > Configuration::import(
     }
 
     return libstdhl::nullopt;
+}
+
+void Configuration::setInFunction( const std::string& location, const std::string& value )
+{
+    const auto result = m_inFunctions.emplace( location, value );
+    const auto& uri = result.first->second;
+
+    if( not result.second )
+    {
+        throw ConfigurationException(
+            "in function '" + location + "' already defined with value '" + value + "'" );
+    }
+
+    // TODO: @ppaulweber: validate 'location'
+
+    // TODO: @ppaulweber: validate 'value'
+}
+
+// libstdhl::Optional< std::string > Configuration::inFunction( const std::string& location ) const
+// {
+//     const auto it = m_inFunctions.find( location );
+//     if( it != m_inFunctions.cend() )
+//     {
+//         return it->second;
+//     }
+
+//     return libstdhl::nullopt;
+// }
+
+const std::unordered_map< std::string, std::string >& Configuration::inFunctions( void ) const
+{
+    return m_inFunctions;
+}
+
+void Configuration::setOutFunction( const std::string& location, const std::string& value )
+{
+    const auto result = m_outFunctions.emplace( location, value );
+    const auto& uri = result.first->second;
+
+    if( not result.second )
+    {
+        throw ConfigurationException(
+            "out function '" + location + "' already defined with value '" + value + "'" );
+    }
+
+    // TODO: @ppaulweber: validate 'location'
+
+    // TODO: @ppaulweber: validate 'value'
+}
+
+const std::unordered_map< std::string, std::string >& Configuration::outFunctions( void ) const
+{
+    return m_outFunctions;
 }
 
 //

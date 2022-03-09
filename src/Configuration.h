@@ -65,6 +65,8 @@ namespace libcasm_fe
             const std::string& fileName, const std::string& filePath, const std::string& execute );
 
       public:
+        explicit Configuration( const std::string& specificationFileName );
+
         const std::string& fileName( void ) const;
 
         const std::string& filePath( void ) const;
@@ -78,12 +80,20 @@ namespace libcasm_fe
         libstdhl::Optional< libstdhl::Standard::RFC3986::URI > import(
             const std::string& dependencyName ) const;
 
+        void setInFunction( const std::string& location, const std::string& value );
+        const std::unordered_map< std::string, std::string >& inFunctions( void ) const;
+
+        void setOutFunction( const std::string& location, const std::string& value );
+        const std::unordered_map< std::string, std::string >& outFunctions( void ) const;
+
       private:
         const std::string m_fileName;
         const std::string m_filePath;
         const std::string m_execute;
 
         std::unordered_map< std::string, libstdhl::Standard::RFC3986::URI > m_imports;
+        std::unordered_map< std::string, std::string > m_inFunctions;
+        std::unordered_map< std::string, std::string > m_outFunctions;
     };
 }
 
