@@ -60,6 +60,13 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
+        void setInFunctions( const std::unordered_map< std::string, std::string >& inFunctions );
+        void setOutFunctions( const std::unordered_map< std::string, std::string >& outFunctions );
+
+      private:
+        std::unordered_map< std::string, std::string > m_inFunctions;
+        std::unordered_map< std::string, std::string > m_outFunctions;
+
       public:
         class Output : public libpass::PassData
         {

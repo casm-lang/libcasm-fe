@@ -131,11 +131,28 @@ u1 ProjectResolverPass::run( libpass::PassResult& pr )
                 "' has an unknown file extension, assume a CASM specification" );
         }
 
-        project = std::make_shared< Project >( specification );
+        const auto configuration = std::make_shared< Configuration >( specificationFileName );
+        project = std::make_shared< Project >( specification, configuration );
     }
 
     assert( project != nullptr );
     log.debug( "input filename '" + project->specification()->filename() + "'" );
+
+    for( const auto& entry : m_inFunctions )
+    {
+        const auto& location = entry.first;
+        const auto& value = entry.second;
+
+        project->configuration()->setInFunction( location, value );
+    }
+
+    for( const auto& entry : m_outFunctions )
+    {
+        const auto& location = entry.first;
+        const auto& value = entry.second;
+
+        project->configuration()->setOutFunction( location, value );
+    }
 
     const auto errors = log.errors();
     if( errors > 0 )
@@ -147,6 +164,18 @@ u1 ProjectResolverPass::run( libpass::PassResult& pr )
     pr.setOutput< ProjectResolverPass >( project );
 
     return true;
+}
+
+void ProjectResolverPass::setInFunctions(
+    const std::unordered_map< std::string, std::string >& inFunctions )
+{
+    m_inFunctions = inFunctions;
+}
+
+void ProjectResolverPass::setOutFunctions(
+    const std::unordered_map< std::string, std::string >& outFunctions )
+{
+    m_outFunctions = outFunctions;
 }
 
 //
