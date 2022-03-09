@@ -149,11 +149,22 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
             log.warning( "no init definition found in this specification" );
         }
 
+        // StatePrologVisitor statePrologVisitor( locationRegistry, globalState );
+        StateEpilogVisitor stateEpilogVisitor( log, locationRegistry, globalState );
+
         while( not scheduler.done() )
         {
+            // statePrologVisitor.visit( *specification );
+
             scheduler.step();
             invariantChecker.check( *specification );
+
+            log.warning( "step " + std::to_string( scheduler.numberOfSteps() ) + " epilog" );
+
+            // log.warning( "step " + std::to_string( scheduler.numberOfSteps() ) + " epilog end" );
         }
+
+        stateEpilogVisitor.visit( *specification );
 
         if( scheduler.numberOfSteps() == 0 )
         {
@@ -161,7 +172,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
                 "Could not perform a single step because no agent was initially available. This "
                 "may happen when no valid initial rule has been specified (see InitRule)." );
         }
-
+#
         log.info(
             "Finished execution after " + std::to_string( scheduler.numberOfSteps() ) + " steps" );
     }
