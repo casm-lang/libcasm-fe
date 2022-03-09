@@ -576,6 +576,7 @@ void AstToLstVisitor::visit( TypeCastingExpression& node )
 void AstToLstVisitor::visit( UnaryExpression& node )
 {
     const auto& targetDefinition = fetch< LST::Definition >( node.targetDefinition() );
+	// TODO: @ppaulweber, @moosbruggerj tree simplification not equal -> neq
     const auto& arguments =
         fetch< LST::Expressions, LST::Expression, AST::Expression >( node.arguments() );
     store< LST::DirectCallExpression >(

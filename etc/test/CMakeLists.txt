@@ -67,8 +67,8 @@ add_library( ${PROJECT}-test OBJECT
 #  symbolic/branch.cpp                # TODO: @ppaulweber: @mossbruggerj: please reenable and fix
 #  symbolic/consistency.cpp	      # TODO: @ppaulweber: @mossbruggerj: please reenable and fix
 #  symbolic/numeric_execution.cpp     # TODO: @ppaulweber: @mossbruggerj: please reenable and fix
-#  symbolic/testhelper.cpp	      # TODO: @ppaulweber: @mossbruggerj: please reenable and fix
-#  symbolic/transformation.cpp	      # TODO: @ppaulweber: @mossbruggerj: please reenable and fix
+  symbolic/testhelper.cpp	      # TODO: @ppaulweber: @mossbruggerj: please reenable and fix
+  symbolic/transformation.cpp	      # TODO: @ppaulweber: @mossbruggerj: please reenable and fix
   updateset/UpdateSetManagerTest.cpp  # TODO: @ppaulweber: @mossbruggerj: please reenable and fix
   updateset/UpdateSetTest.cpp
   )

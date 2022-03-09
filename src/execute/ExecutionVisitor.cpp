@@ -1131,11 +1131,10 @@ void ExecutionVisitor::validateValue(
 
     if( value.symbolic() )
     {
-        auto& sym = static_cast< const IR::SymbolicConstant& >( value );
-        if( sym.type() != type )
-        {
-            throw IR::ValidationException( "types do not match" );
-        }
+        // cannot easily call Type::validate(Constant&), since no appropriate constant is available
+        // types should match from TypeInferencePass
+        // if they don't the SAT solver should report that as an error, since there is a type
+        // mismatch
         return;
     }
 
@@ -1726,35 +1725,30 @@ SymbolicStateInitializationVisitor::SymbolicStateInitializationVisitor(
 , m_locationRegistry( locationRegistry )
 , m_updateSetManager()
 , m_environment( environment )
+, m_functionDefinitions()
 {
 }
 
 void SymbolicStateInitializationVisitor::visit( Specification& node )
 {
-    // m_updateSetManager.fork( Semantics::Sequential, 100 );
+    m_updateSetManager.fork( Semantics::Sequential, 100 );
 
-    // node.lst()->definitions()->accept( *this );
+    node.lst()->definitions()->accept( *this );
 
-    // // for( const auto& definition : *specification.lst()->definitions() )
-    // // {
-    // //     if( definition->id() != Node::ID::INVARIANT_DEFINITION )
-    // //     {
-    // //         continue;
-    // //     }
-
-    // auto updateSet = m_updateSetManager.currentUpdateSet();
-    // m_globalState.fireUpdateSet( updateSet );
-    // m_updateSetManager.clear();
+    auto updateSet = m_updateSetManager.currentUpdateSet();
+    m_globalState.fireUpdateSet( updateSet );
+    m_updateSetManager.clear();
 }
-
-// void SymbolicStateInitializationVisitor::visit( InitDefinition& node )
-// {
-//     assert( node.programFunction() and "checked during frame size determination pass!" );
-//     node.programFunction()->accept( *this );
-// }
 
 void SymbolicStateInitializationVisitor::visit( FunctionDefinition& node )
 {
+    // TODO: @moosbruggerj @ppaulweber: remove after fixing double FunctionDefinition in LST
+    auto inserted = m_functionDefinitions.insert( node.identifier()->name() );
+    if( !inserted.second )
+    {
+        return;  // already declared
+    }
+
     Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
     if( node.symbolic() )
     {

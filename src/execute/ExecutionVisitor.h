@@ -397,7 +397,6 @@ namespace libcasm_fe
             IR::SymbolicExecutionEnvironment& environment );
 
         void visit( Specification& node );
-        // void visit( LST::InitDefinition& node ) override;
         void visit( LST::FunctionDefinition& node ) override;
 
       private:
@@ -405,6 +404,7 @@ namespace libcasm_fe
         ExecutionLocationRegistry& m_locationRegistry;
         IR::SymbolicExecutionEnvironment& m_environment;
         UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
+        std::set< std::string > m_functionDefinitions;
     };
 
 }

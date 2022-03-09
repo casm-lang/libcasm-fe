@@ -48,15 +48,17 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/execute/ExecutionVisitor>
 
-#include <libcasm-fe/Exception.h>
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
 #include <libcasm-fe/execute/Agent>
-#include <libcasm-fe/import/SpecificationMergerPass>
+#include <libcasm-fe/execute/RuntimeException>
+#include <libcasm-fe/execute/UpdateException>
+#include <libcasm-fe/transform/AstToLstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
+#include <libstdhl/String>
 #include <libstdhl/Enum>
 #include <libstdhl/Hash>
 #include <libstdhl/Random>
@@ -87,15 +89,37 @@ static libpass::PassRegistration< SymbolicExecutionPass > PASS(
 
 void SymbolicExecutionPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SpecificationMergerPass >();
+    pu.require< AstToLstPass >();
     pu.scheduleAfter< SymbolicConsistencyPass >();
 }
 
+static std::string updateInfoToString( const UpdateException::UpdateInfo& updateInfo )
+{
+    auto locationStr = updateInfo.function->identifier()->name();
+
+    if( not updateInfo.arguments.empty() )
+    {
+        locationStr += "(";
+        bool isFirst = true;
+        for( const auto& arg : updateInfo.arguments )
+        {
+            if( not isFirst )
+            {
+                locationStr += ", ";
+            }
+            locationStr += arg.name();
+            isFirst = false;
+        }
+        locationStr += ")";
+    }
+
+    return locationStr + " := " + updateInfo.value.name();
+}
 u1 SymbolicExecutionPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.output< SpecificationMergerPass >();
+    const auto data = pr.output< AstToLstPass >();
     const auto specification = data->specification();
 
     static u1 constantHandlerFlag = false;
@@ -167,9 +191,22 @@ u1 SymbolicExecutionPass::run( libpass::PassResult& pr )
         log.info(
             "Finished execution after " + std::to_string( scheduler.numberOfSteps() ) + " steps" );
     }
+    catch( const UpdateException& e )
+    {
+        log.error( e );
+        log.info( "Backtrace:\n" + libstdhl::String::join( e.backtrace(), "\n" ) );
+        for( const auto& update : e.updateInfos() )
+        {
+            log.info(
+                { update.producer->sourceLocation() },
+                "Produced update '" + updateInfoToString( update ) + "'" );
+        }
+        return false;
+    }
     catch( const RuntimeException& e )
     {
         log.error( e );
+        log.info( "Backtrace:\n" + libstdhl::String::join( e.backtrace(), "\n" ) );
         return false;
     }
 
