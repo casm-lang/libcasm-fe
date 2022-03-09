@@ -265,7 +265,7 @@ void CstToAstVisitor::visit( Root& node )
 
 void CstToAstVisitor::visit( HeaderDefinition& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( InitDefinition& node )
@@ -346,7 +346,7 @@ void CstToAstVisitor::visit( FunctionDefinition& node )
     }
     else
     {
-        assert( not" inconsistent state @ GrammarParser " );
+        assert( not " inconsistent state @ GrammarParser " );
     }
 
     const auto& identifier = fetch< AST::Identifier >( node.identifier() );
@@ -972,37 +972,37 @@ void CstToAstVisitor::visit( VariableBinding& node )
 
 void CstToAstVisitor::visit( BasicAttribute& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( SymbolAttribute& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( ExpressionAttribute& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( Defined& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( Initially& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( Token& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( Span& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 //
