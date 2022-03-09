@@ -54,8 +54,8 @@ UpdateException::UpdateException(
 {
 }
 
-const std::vector< UpdateException::UpdateInfo >& UpdateException::updateInfos( void ) const
-    noexcept
+const std::vector< UpdateException::UpdateInfo >& UpdateException::updateInfos(
+    void ) const noexcept
 {
     return m_updateInfos;
 }
