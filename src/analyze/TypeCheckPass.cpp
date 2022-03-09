@@ -43,8 +43,6 @@
 
 #include "../various/GrammarToken.h"
 
-#include <libcasm-fe/Logger>
-#include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/analyze/TemplatingPass>
@@ -300,7 +298,7 @@ void TypeCheckVisitor::visit( DomainDefinition& node )
     node.setType( domainType->type() );
 
     const auto& result = m_symboltable.findTypeDefinition( node.type()->id() );
-    if( result ) // TODO: @ppaulweber: REMOVE?
+    if( result )  // TODO: @ppaulweber: REMOVE?
     {
         m_log.debug(
             { node.sourceLocation() },
@@ -1289,6 +1287,12 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
     }
 
     return true;
+}
+
+void TypeCheckPass::visit( AST::Node& node, libcasm_fe::Logger& log, Namespace& symboltable )
+{
+    TypeCheckVisitor visitor( log, symboltable );
+    node.accept( visitor );
 }
 
 //
