@@ -42,6 +42,9 @@
 #ifndef _LIBCASM_FE_TYPE_INFERENCE_PASS_H_
 #define _LIBCASM_FE_TYPE_INFERENCE_PASS_H_
 
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+
 #include <libpass/Pass>
 
 namespace libcasm_fe
@@ -57,6 +60,9 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
+
+      public:
+        static void visit( AST::Node& node, libcasm_fe::Logger& log, Namespace& symboltable );
     };
 }
 

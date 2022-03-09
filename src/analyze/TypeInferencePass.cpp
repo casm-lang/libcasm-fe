@@ -43,8 +43,6 @@
 
 #include "../various/GrammarToken.h"
 
-#include <libcasm-fe/Logger>
-#include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
@@ -2347,6 +2345,12 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     }
 
     return true;
+}
+
+void TypeInferencePass::visit( AST::Node& node, libcasm_fe::Logger& log, Namespace& symboltable )
+{
+    TypeInferenceVisitor visitor( log, symboltable );
+    node.accept( visitor );
 }
 
 //
