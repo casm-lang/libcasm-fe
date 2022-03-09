@@ -298,6 +298,10 @@ FunctionDefinition::FunctionDefinition(
 , m_symbolic( symbolic )
 , m_program( identifier->name() == "program" )
 , m_initiallyRule( AST::make< SkipRule >( initially->sourceLocation() ) )
+, m_prologRule( AST::make< SequenceRule >(
+      identifier->sourceLocation(), AST::make< Rules >( identifier->sourceLocation() ) ) )
+, m_epilogRule( AST::make< SequenceRule >(
+      identifier->sourceLocation(), AST::make< Rules >( identifier->sourceLocation() ) ) )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
 }
@@ -355,6 +359,16 @@ void FunctionDefinition::setInitiallyRule( const Rule::Ptr& initiallyRule )
 const Rule::Ptr& FunctionDefinition::initiallyRule( void ) const
 {
     return m_initiallyRule;
+}
+
+const SequenceRule::Ptr& FunctionDefinition::prologRule( void ) const
+{
+    return m_prologRule;
+}
+
+const SequenceRule::Ptr& FunctionDefinition::epilogRule( void ) const
+{
+    return m_epilogRule;
 }
 
 std::string FunctionDefinition::typeDescription( void ) const

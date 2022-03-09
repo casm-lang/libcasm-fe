@@ -212,6 +212,10 @@ namespace libcasm_fe
 
             const Rule::Ptr& initiallyRule( void ) const;
 
+            const SequenceRule::Ptr& prologRule( void ) const;
+
+            const SequenceRule::Ptr& epilogRule( void ) const;
+
             std::string typeDescription( void ) const override;
 
             void accept( Visitor& visitor ) override final;
@@ -227,6 +231,8 @@ namespace libcasm_fe
             const u1 m_symbolic;
             const u1 m_program;
             Rule::Ptr m_initiallyRule;
+            SequenceRule::Ptr m_prologRule;
+            SequenceRule::Ptr m_epilogRule;
         };
 
         using FunctionDefinitions = NodeList< FunctionDefinition >;
