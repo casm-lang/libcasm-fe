@@ -44,6 +44,7 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
+#include <libcasm-fe/analyze/EnvironmentResolverPass>
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
 #include <libcasm-fe/analyze/SymbolResolverPass>
 #include <libcasm-fe/ast/Declaration>
@@ -204,14 +205,27 @@ namespace libcasm_fe
                 return result;
             }
 
-            void set( AST::Node& node, const LST::Node::Ptr& result )
+            u1 set( AST::Node& node, const LST::Node::Ptr& result )
             {
                 const auto check = m_lst.emplace( &node, result );
                 if( not check.second )
                 {
                     const auto& msg = "already transformed '" + node.description() + "'";
                     m_log.debug( { node.sourceLocation() }, msg );  //, Code::Internal );
+                    return false;
                 }
+                return true;
+            }
+
+            u1 has( AST::Node& node )
+            {
+                auto search = m_lst.find( &node );
+                if( search == m_lst.end() )
+                {
+                    return false;
+                }
+
+                return true;
             }
 
           private:
@@ -278,11 +292,25 @@ void AstToLstVisitor::visit( VariableDefinition& node )
 
 void AstToLstVisitor::visit( FunctionDefinition& node )
 {
+    if( has( node ) )
+    {
+        return;
+    }
+
     const auto& identifier = fetch< LST::Identifier >( node.identifier() );
     const auto& defined = fetch< LST::Expression >( node.defined() );
+
     const auto& initiallyLocation = node.initially()->sourceLocation();
     const auto& initiallyRules = LST::make< LST::Rules >( initiallyLocation );
     const auto& initially = LST::make< LST::SequenceRule >( initiallyLocation, initiallyRules );
+
+    const auto& prologLocation = node.identifier()->sourceLocation();
+    const auto& prologRules = LST::make< LST::Rules >( prologLocation );
+    const auto& prolog = LST::make< LST::SequenceRule >( prologLocation, prologRules );
+
+    const auto& epilogLocation = node.identifier()->sourceLocation();
+    const auto& epilogRules = LST::make< LST::Rules >( epilogLocation );
+    const auto& epilog = LST::make< LST::SequenceRule >( epilogLocation, epilogRules );
 
     const auto& lstNode = store< LST::FunctionDefinition >(
         node,
@@ -292,6 +320,8 @@ void AstToLstVisitor::visit( FunctionDefinition& node )
         node.maximumNumberOfLocals(),
         defined,
         initially,
+        prolog,
+        epilog,
         node.symbolic(),
         node.program(),
         node.local() );
@@ -300,6 +330,18 @@ void AstToLstVisitor::visit( FunctionDefinition& node )
     for( const auto& lstInitiallyRule : *lstInitially->rules() )
     {
         initiallyRules->add( lstInitiallyRule );
+    }
+
+    const auto& lstProlog = fetch< LST::SequenceRule >( node.prologRule() );
+    for( const auto& lstPrologRule : *lstProlog->rules() )
+    {
+        prologRules->add( lstPrologRule );
+    }
+
+    const auto& lstEpilog = fetch< LST::SequenceRule >( node.epilogRule() );
+    for( const auto& lstEpilogRule : *lstEpilog->rules() )
+    {
+        epilogRules->add( lstEpilogRule );
     }
 
     m_lstDefinitions->add( lstNode );
@@ -826,6 +868,7 @@ void AstToLstPass::usage( libpass::PassUsage& pu )
     pu.require< SpecificationMergerPass >();
     pu.require< SymbolResolverPass >();
     pu.scheduleAfter< FrameSizeDeterminationPass >();
+    pu.scheduleAfter< EnvironmentResolverPass >();
 }
 
 u1 AstToLstPass::run( libpass::PassResult& pr )
