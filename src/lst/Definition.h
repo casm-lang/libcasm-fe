@@ -116,6 +116,8 @@ namespace libcasm_fe
                 const std::size_t maxNumberOfLocals,
                 const Expression::Ptr& defined,
                 const SequenceRule::Ptr& initially,
+                const SequenceRule::Ptr& prolog,
+                const SequenceRule::Ptr& epilog,
                 const u1 symbolic,
                 const u1 program,
                 const u1 local );
@@ -123,6 +125,10 @@ namespace libcasm_fe
             const Expression::Ptr& defined( void ) const;
 
             const SequenceRule::Ptr& initially( void ) const;
+
+            const SequenceRule::Ptr& prolog( void ) const;
+
+            const SequenceRule::Ptr& epilog( void ) const;
 
             u1 symbolic( void ) const;
 
@@ -140,6 +146,8 @@ namespace libcasm_fe
           private:
             const Expression::Ptr m_defined;
             const SequenceRule::Ptr m_initially;
+            const SequenceRule::Ptr m_prolog;
+            const SequenceRule::Ptr m_epilog;
             u1 m_symbolic;  // TODO: @ppaulweber: move 'setSymbolic' to AST
             const u1 m_program;
             const u1 m_local;

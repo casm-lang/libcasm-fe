@@ -112,12 +112,16 @@ FunctionDefinition::FunctionDefinition(
     const std::size_t maxNumberOfLocals,
     const Expression::Ptr& defined,
     const SequenceRule::Ptr& initially,
+    const SequenceRule::Ptr& prolog,
+    const SequenceRule::Ptr& epilog,
     const u1 symbolic,
     const u1 program,
     const u1 local )
 : Definition( Node::ID::FUNCTION_DEFINITION, type, properties, identifier, maxNumberOfLocals )
 , m_defined( defined )
 , m_initially( initially )
+, m_prolog( prolog )
+, m_epilog( epilog )
 , m_symbolic( symbolic )
 , m_program( program )
 , m_local( local )
@@ -132,6 +136,16 @@ const Expression::Ptr& FunctionDefinition::defined( void ) const
 const SequenceRule::Ptr& FunctionDefinition::initially( void ) const
 {
     return m_initially;
+}
+
+const SequenceRule::Ptr& FunctionDefinition::prolog( void ) const
+{
+    return m_prolog;
+}
+
+const SequenceRule::Ptr& FunctionDefinition::epilog( void ) const
+{
+    return m_epilog;
 }
 
 u1 FunctionDefinition::symbolic( void ) const
