@@ -44,6 +44,8 @@
 
 #include <libcasm-fe/ast/Node>
 
+#include <libstdhl/SourceLocation>
+
 namespace libcasm_fe
 {
     namespace AST
@@ -63,6 +65,10 @@ namespace libcasm_fe
 
           private:
             const std::string m_name;
+
+          public:
+            static Identifier::Ptr fromString(
+                const libstdhl::SourceLocation& sourceLocation, const std::string& name );
         };
 
         using Identifiers = NodeList< Identifier >;
@@ -95,6 +101,8 @@ namespace libcasm_fe
 
           public:
             static IdentifierPath::Ptr fromIdentifier( const Identifier::Ptr& identifier );
+            static IdentifierPath::Ptr fromString(
+                const libstdhl::SourceLocation& sourceLocation, const std::string& identifier );
 
           private:
             const Identifiers::Ptr m_identifiers;

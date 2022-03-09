@@ -43,6 +43,8 @@
 
 #include <libcasm-fe/Namespace>
 
+#include <libstdhl/String>
+
 #include <cassert>
 
 using namespace libcasm_fe;
@@ -75,6 +77,15 @@ Node::Ptr Identifier::clone( void ) const
 
     Node::clone( *duplicate );
     return duplicate;
+}
+
+Identifier::Ptr Identifier::fromString(
+    const libstdhl::SourceLocation& sourceLocation, const std::string& name )
+{
+    // TODO: @ppaulweber: s.find('[') != std::string::npos
+
+    auto identifier = AST::make< Identifier >( sourceLocation, name );
+    return identifier;
 }
 
 //
@@ -162,6 +173,24 @@ IdentifierPath::Ptr IdentifierPath::fromIdentifier( const Identifier::Ptr& ident
 {
     const auto& location = identifier->sourceLocation();
     return AST::make< IdentifierPath >( location, identifier );
+}
+
+IdentifierPath::Ptr IdentifierPath::fromString(
+    const libstdhl::SourceLocation& sourceLocation, const std::string& identifier )
+{
+    std::vector< std::string > identifierStrings;
+    libstdhl::String::split( identifier, Namespace::delimiter(), identifierStrings );
+
+    auto identifiers = AST::make< Identifiers >( sourceLocation );
+
+    for( auto&& identifierString : identifierStrings )
+    {
+        auto identifier = Identifier::fromString( sourceLocation, identifierString );
+        identifiers->add( identifier );
+    }
+
+    auto identifierPath = AST::make< IdentifierPath >( sourceLocation, identifiers );
+    return identifierPath;
 }
 
 //
