@@ -1321,8 +1321,6 @@ void StateEpilogVisitor::visit( Specification& node )
 
 void StateEpilogVisitor::visit( FunctionDefinition& node )
 {
-    m_log.error( "WTF: " + node.identifier()->name() );
-
     assert( not node.local() );
 
     Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
