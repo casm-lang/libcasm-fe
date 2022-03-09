@@ -43,8 +43,6 @@
 
 #include "../various/GrammarToken.h"
 
-#include <libcasm-fe/Logger>
-#include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
@@ -726,17 +724,17 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     const auto& sourceLocation = node.sourceLocation();
     const auto& symbolPath = node.identifier();
     const auto& symbolName = symbolPath->path();
-    const auto validateArgumentsCount = [&]( const std::string& description,
-                                             std::size_t expectedNumberOfArguments ) {
-        if( node.arguments()->size() != expectedNumberOfArguments )
-        {
-            m_log.error(
-                { sourceLocation },
-                "invalid argument size: " + description + " '" + symbolName + "' expects " +
-                    std::to_string( expectedNumberOfArguments ) + " arguments",
-                Code::SymbolArgumentSizeMismatch );
-        }
-    };
+    const auto validateArgumentsCount =
+        [ & ]( const std::string& description, std::size_t expectedNumberOfArguments ) {
+            if( node.arguments()->size() != expectedNumberOfArguments )
+            {
+                m_log.error(
+                    { sourceLocation },
+                    "invalid argument size: " + description + " '" + symbolName + "' expects " +
+                        std::to_string( expectedNumberOfArguments ) + " arguments",
+                    Code::SymbolArgumentSizeMismatch );
+            }
+        };
 
     std::size_t expectedNumberOfArguments = 0;
     const auto scopeSymbolIt = m_scopeSymbols.find( symbolName );
@@ -1205,6 +1203,12 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
 
     pr.setOutput< SymbolResolverPass >( visitor.templateTypes(), visitor.templateDefinitions() );
     return true;
+}
+
+void SymbolResolverPass::visit( AST::Node& node, libcasm_fe::Logger& log, Namespace& symboltable )
+{
+    SymbolResolveVisitor visitor( log, symboltable );
+    node.accept( visitor );
 }
 
 //

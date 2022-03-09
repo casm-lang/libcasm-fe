@@ -42,6 +42,8 @@
 #ifndef _LIBCASM_FE_SYMBOL_RESOLVER_PASS_H_
 #define _LIBCASM_FE_SYMBOL_RESOLVER_PASS_H_
 
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
 #include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Type>
 
@@ -92,6 +94,9 @@ namespace libcasm_fe
             const AST::Types::Ptr m_templateTypes;
             const AST::Definitions::Ptr m_templateDefinitions;
         };
+
+      public:
+        static void visit( AST::Node& node, libcasm_fe::Logger& log, Namespace& symboltable );
     };
 }
 
