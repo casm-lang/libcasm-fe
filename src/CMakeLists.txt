@@ -97,6 +97,7 @@ add_library( ${PROJECT}-cpp OBJECT
   analyze/TypeCheckPass.cpp
   analyze/TypeInferencePass.cpp
   analyze/AttributionPass.cpp
+  analyze/EnvironmentResolverPass.cpp
   analyze/SymbolRegistrationPass.cpp
   analyze/SymbolResolverPass.cpp
   analyze/FrameSizeDeterminationPass.cpp
@@ -188,6 +189,7 @@ ecm_generate_headers( ${PROJECT}_ANALYZE_HEADERS_CPP
   HEADER_NAMES
     AttributionPass
     ConsistencyCheckPass
+    EnvironmentResolverPass
     SymbolRegistrationPass
     SymbolResolverPass
     TemplatingPass
