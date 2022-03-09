@@ -722,7 +722,8 @@ void SymbolicConsistencyVisitor::visit( LST::DirectCallExpression& node )
             //     {
             //         m_logger.error( "Unknown Builtin '" + IR::Value::token( id ) + "'." );
             //         m_stack.push(
-            //             m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
+            //             m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN
+            //             );
             //     }
             // }
             break;
@@ -824,7 +825,8 @@ void SymbolicConsistencyVisitor::visit( LST::DirectCallExpression& node )
 //                 {
 //                     m_logger.error( "Unknown Builtin '" + IR::Value::token( id ) + "'." );
 //                     m_stack.push(
-//                         m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
+//                         m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN
+//                         );
 //                 }
 //             }
 //             break;
