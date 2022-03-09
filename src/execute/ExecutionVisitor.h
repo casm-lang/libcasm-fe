@@ -43,6 +43,7 @@
 #define _LIBCASM_FE_EXECUTION_VISITOR_H_
 
 #include <libcasm-fe/Codes>
+#include <libcasm-fe/Logger>
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/execute/Frame>
 #include <libcasm-fe/execute/FunctionState>
@@ -324,6 +325,36 @@ namespace libcasm_fe
         void visit( LST::FunctionDefinition& node ) override;
 
       private:
+        Storage& m_globalState;
+        ExecutionLocationRegistry& m_locationRegistry;
+        UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
+    };
+
+    class StatePrologVisitor final : public LST::EmptyVisitor
+    {
+      public:
+        StatePrologVisitor( ExecutionLocationRegistry& locationRegistry, Storage& globalState );
+
+        void visit( Specification& node );
+        void visit( LST::FunctionDefinition& node ) override;
+
+      private:
+        Storage& m_globalState;
+        ExecutionLocationRegistry& m_locationRegistry;
+        UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
+    };
+
+    class StateEpilogVisitor final : public LST::EmptyVisitor
+    {
+      public:
+        StateEpilogVisitor(
+            Logger& log, ExecutionLocationRegistry& locationRegistry, Storage& globalState );
+
+        void visit( Specification& node );
+        void visit( LST::FunctionDefinition& node ) override;
+
+      private:
+        Logger& m_log;
         Storage& m_globalState;
         ExecutionLocationRegistry& m_locationRegistry;
         UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;

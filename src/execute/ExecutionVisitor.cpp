@@ -41,7 +41,6 @@
 
 #include "ExecutionVisitor.h"
 
-#include <libcasm-fe/Logger>
 #include <libcasm-fe/execute/RuntimeException>
 #include <libcasm-fe/execute/UpdateException>
 #include <libcasm-fe/lst/Expression>
@@ -1220,6 +1219,11 @@ void ExecutionVisitor::foreachInUniverse(
     universe.foreach( chain );
 }
 
+//
+//
+// StateInitializationVisitor
+//
+
 StateInitializationVisitor::StateInitializationVisitor(
     ExecutionLocationRegistry& locationRegistry, Storage& globalState )
 : EmptyVisitor()
@@ -1248,8 +1252,91 @@ void StateInitializationVisitor::visit( FunctionDefinition& node )
     ExecutionVisitor executionVisitor(
         m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant() );
     node.initially()->accept( executionVisitor );
+
     transaction.merge();
 }
+
+//
+//
+// StatePrologVisitor
+//
+
+StatePrologVisitor::StatePrologVisitor(
+    ExecutionLocationRegistry& locationRegistry, Storage& globalState )
+: EmptyVisitor()
+, m_globalState( globalState )
+, m_locationRegistry( locationRegistry )
+, m_updateSetManager()
+{
+}
+
+void StatePrologVisitor::visit( Specification& node )
+{
+    m_updateSetManager.fork( Semantics::Sequential, 100 );
+
+    node.lst()->definitions()->accept( *this );
+
+    auto updateSet = m_updateSetManager.currentUpdateSet();
+    m_globalState.fireUpdateSet( updateSet );
+    m_updateSetManager.clear();
+}
+
+void StatePrologVisitor::visit( FunctionDefinition& node )
+{
+    assert( not node.local() );
+
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+    ExecutionVisitor executionVisitor(
+        m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant() );
+    node.prolog()->accept( executionVisitor );
+
+    transaction.merge();
+}
+
+//
+//
+// StateEpilogVisitor
+//
+
+StateEpilogVisitor::StateEpilogVisitor(
+    Logger& log, ExecutionLocationRegistry& locationRegistry, Storage& globalState )
+: EmptyVisitor()
+, m_log( log )
+, m_globalState( globalState )
+, m_locationRegistry( locationRegistry )
+, m_updateSetManager()
+{
+}
+
+void StateEpilogVisitor::visit( Specification& node )
+{
+    m_updateSetManager.fork( Semantics::Sequential, 100 );
+
+    node.lst()->definitions()->accept( *this );
+
+    auto updateSet = m_updateSetManager.currentUpdateSet();
+    m_globalState.fireUpdateSet( updateSet );
+    m_updateSetManager.clear();
+}
+
+void StateEpilogVisitor::visit( FunctionDefinition& node )
+{
+    m_log.error( "WTF: " + node.identifier()->name() );
+
+    assert( not node.local() );
+
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
+    ExecutionVisitor executionVisitor(
+        m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant() );
+    node.epilog()->accept( executionVisitor );
+
+    transaction.merge();
+}
+
+//
+//
+// InvariantChecker
+//
 
 InvariantChecker::InvariantChecker(
     ExecutionLocationRegistry& locationRegistry, Storage& globalState )
