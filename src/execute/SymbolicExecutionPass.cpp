@@ -65,6 +65,7 @@
 #include <libtptp/transform/AstDumpDotPass>
 #include <libtptp/transform/DumpSourcePass>
 
+#include <iostream>
 #include <mutex>
 #include "libtptp/transform/SourceToAstPass.h"
 
