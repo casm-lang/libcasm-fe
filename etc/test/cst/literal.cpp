@@ -198,18 +198,17 @@ TEST( CSTValueLiteral, toStringOfBinary )
         {
             const auto filename = std::make_shared< std::string >( TEST_NAME + ".casm" );
             auto file = libstdhl::File::open( *filename, std::fstream::out );
-            file << " 0x0feed00123401 ";
+            file << " 0xffffeeee ";
             file.close();
 
             const auto begin = SourcePosition( filename, 1, 2 );
-            const auto end = SourcePosition( filename, 1, 17 );
+            const auto end = SourcePosition( filename, 1, 12 );
             const auto loc = SourceLocation( begin, end );
 
-            const auto value =
-                libstdhl::Memory::get< libcasm_ir::BinaryConstant >( "0feed00123401", radix );
+            const auto value = std::make_shared< libcasm_ir::BinaryConstant >( "ffffeeee", radix );
             const auto literal = CST::make< ValueLiteral >( loc, value );
             literal->setRadix( radix );
-            EXPECT_EQ( literal->toString(), "0x0feed00123401" );
+            EXPECT_EQ( literal->toString(), "0xffffeeee" );
 
             libstdhl::File::remove( *filename );
         }
