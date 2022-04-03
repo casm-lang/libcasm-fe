@@ -44,7 +44,7 @@ set( PROJECT libcasm-fe )
 cmake_minimum_required( VERSION ${CMAKE_VERSION} )
 
 project( ${PROJECT} LANGUAGES CXX )
-set( CMAKE_CXX_STANDARD 14 )
+set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_EXTENSIONS OFF )
 set( CMAKE_VERSION 3.2 )
 set( CMAKE_MODULE_PATH ${${PROJECT}_SOURCE_DIR}/.cmake )
@@ -147,15 +147,16 @@ add_dependencies( ${PROJECT}-cpp
   ${PROJECT}-prelude
   )
 
+set_property( TARGET ${PROJECT}-cpp PROPERTY POSITION_INDEPENDENT_CODE 1 )
+
 #
 #
-# library
+# static library
 #
 
 set( ${PROJECT}_VERSION ${GIT_REVTAG} )
-set_property( TARGET ${PROJECT}-cpp PROPERTY POSITION_INDEPENDENT_CODE 1 )
 
-add_library( ${PROJECT} SHARED
+add_library( ${PROJECT} STATIC
   $<TARGET_OBJECTS:${PROJECT}-cpp>
   )
 
@@ -173,27 +174,38 @@ if( ${LIBCASM_IR_FOUND} )
     )
 endif()
 
-add_library( ${PROJECT}-ar STATIC
-  $<TARGET_OBJECTS:${PROJECT}-cpp>
-  )
+#
+#
+# shared library
+#
 
-set_property( TARGET ${PROJECT}-ar PROPERTY OUTPUT_NAME ${PROJECT} )
-set_property( TARGET ${PROJECT}-ar PROPERTY VERSION ${${PROJECT}_VERSION} )
-set_property( TARGET ${PROJECT}-ar PROPERTY PREFIX  "" )
+set( ${PROJECT}_SHARED "" )
+if( NOT CMAKE_CXX_EMSCRIPTEN )
+  set( ${PROJECT}_SHARED ${PROJECT}-so )
 
-if( ${LIBCASM_IR_FOUND} )
-  target_link_libraries( ${PROJECT}-ar
-    ${LIBCASM_IR_ARCHIVE}
-    ${LIBTPTP_ARCHIVE}
-    ${LIBPASS_ARCHIVE}
-    ${LIBSTDHL_ARCHIVE}
-    ${LIBZ3_ARCHIVE}
+  add_library( ${${PROJECT}_SHARED} SHARED
+    $<TARGET_OBJECTS:${PROJECT}-cpp>
+    )
+
+  set_property( TARGET ${${PROJECT}_SHARED} PROPERTY OUTPUT_NAME ${PROJECT} )
+  set_property( TARGET ${${PROJECT}_SHARED} PROPERTY VERSION ${${PROJECT}_VERSION} )
+  set_property( TARGET ${${PROJECT}_SHARED} PROPERTY PREFIX  "" )
+  set_property( TARGET ${${PROJECT}_SHARED} PROPERTY IMPORT_PREFIX  "" )
+
+  if( ${LIBCASM_IR_FOUND} )
+    target_link_libraries( ${${PROJECT}_SHARED}
+      ${LIBCASM_IR_LIBRARY}
+      ${LIBTPTP_LIBRARY}
+      ${LIBPASS_LIBRARY}
+      ${LIBSTDHL_LIBRARY}
+      ${LIBZ3_LIBRARY}
+      )
+  endif()
+
+  add_dependencies( ${PROJECT}
+    ${${PROJECT}_SHARED}
     )
 endif()
-
-add_dependencies( ${PROJECT}
-  ${PROJECT}-ar
-  )
 
 #
 #
@@ -207,11 +219,20 @@ add_executable( ${PROJECT}-check
 
 if( ${LIBGTEST_FOUND} )
   target_link_libraries( ${PROJECT}-check
-    ${PROJECT}-ar
+    ${PROJECT}
     ${LIBGTEST_LIBRARY}
     ${LIBGTEST_MAIN}
     Threads::Threads
     )
+endif()
+
+if( LIBSTDHL_FOUND AND CMAKE_CXX_EMSCRIPTEN )
+  set( EMCC_TARGET "${PROJECT}-check" )
+  configure_file(
+    ${LIBSTDHL_INCLUDE_DIR}/libstdhl/emcc.in.js
+    ${EMCC_TARGET}.js
+  )
+  set( EMCC_TARGET "" )
 endif()
 
 #
@@ -226,9 +247,18 @@ add_executable( ${PROJECT}-run
 
 if( ${LIBHAYAI_FOUND} )
   target_link_libraries( ${PROJECT}-run
-    ${PROJECT}-ar
+    ${PROJECT}
     ${LIBHAYAI_LIBRARY}
     )
+endif()
+
+if( LIBSTDHL_FOUND AND CMAKE_CXX_EMSCRIPTEN )
+  set( EMCC_TARGET "${PROJECT}-run" )
+  configure_file(
+    ${LIBSTDHL_INCLUDE_DIR}/libstdhl/emcc.in.js
+    ${EMCC_TARGET}.js
+  )
+  set( EMCC_TARGET "" )
 endif()
 
 #
@@ -237,7 +267,7 @@ endif()
 #
 
 install(
-  TARGETS  ${PROJECT} ${PROJECT}-ar
+  TARGETS  ${PROJECT} ${${PROJECT}_SHARED}
   EXPORT   ${PROJECT}Targets
   LIBRARY  DESTINATION lib
   ARCHIVE  DESTINATION lib
