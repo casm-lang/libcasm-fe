@@ -207,11 +207,11 @@ namespace libcasm_fe
             void set( AST::Node& node, const LST::Node::Ptr& result )
             {
                 const auto check = m_lst.emplace( &node, result );
-                if( not check.second )
-                {
-                    const auto& msg = "already transformed '" + node.description() + "'";
-                    m_log.debug( { node.sourceLocation() }, msg );  //, Code::Internal );
-                }
+                // if( not check.second )
+                // {
+                //     const auto& msg = "already transformed '" + node.description() + "'";
+                //     m_log.debug( { node.sourceLocation() }, msg );  //, Code::Internal );
+                // }
             }
 
           private:
@@ -402,7 +402,7 @@ void AstToLstVisitor::visit( DomainDefinition& node )
 {
     if( node.templateSymbols()->size() != 0 )
     {
-        m_log.debug( { node.sourceLocation() }, "omit transformation of " + node.description() );
+        // m_log.debug( { node.sourceLocation() }, "omit transformation of " + node.description() );
         return;
     }
 
@@ -417,7 +417,7 @@ void AstToLstVisitor::visit( StructureDefinition& node )
 {
     if( node.templateSymbols()->size() != 0 )
     {
-        m_log.debug( { node.sourceLocation() }, "omit transformation of " + node.description() );
+        // m_log.debug( { node.sourceLocation() }, "omit transformation of " + node.description() );
         return;
     }
 
@@ -445,7 +445,7 @@ void AstToLstVisitor::visit( BuiltinDefinition& node )
 {
     if( node.templateSymbols()->size() != 0 )
     {
-        m_log.debug( { node.sourceLocation() }, "omit transformation of " + node.description() );
+        // m_log.debug( { node.sourceLocation() }, "omit transformation of " + node.description() );
         return;
     }
 
