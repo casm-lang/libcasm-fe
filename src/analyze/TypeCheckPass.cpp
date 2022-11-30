@@ -302,9 +302,9 @@ void TypeCheckVisitor::visit( DomainDefinition& node )
     const auto& result = m_symboltable.findTypeDefinition( node.type()->id() );
     if( result ) // TODO: @ppaulweber: REMOVE?
     {
-        m_log.debug(
-            { node.sourceLocation() },
-            "already registered type/id/def '" + node.type()->description() + "'" );
+        // m_log.debug(
+        //     { node.sourceLocation() },
+        //     "already registered type/id/def '" + node.type()->description() + "'" );
         return;
     }
 
