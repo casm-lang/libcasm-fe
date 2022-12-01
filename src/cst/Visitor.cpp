@@ -465,6 +465,24 @@ void RecursiveVisitor::visit( CardinalityExpression& node )
     node.rightVerticalBarToken()->accept( *this );
 }
 
+void RecursiveVisitor::visit( MatchExpression& node )
+{
+    node.matchToken()->accept( *this );
+    node.scrutinee()->accept( *this );
+    node.withToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.matchArms()->accept( *this );
+    node.rightBraceToken()->accept( *this );
+}
+
+void RecursiveVisitor::visit( MatchArm& node )
+{
+    node.delimiterToken()->accept( *this );
+    node.pattern()->accept( *this );
+    node.arrowToken()->accept( *this );
+    node.expression()->accept( *this );
+}
+
 void RecursiveVisitor::visit( SkipRule& node )
 {
     node.skipToken()->accept( *this );
@@ -902,6 +920,14 @@ void EmptyVisitor::visit( ExistentialQuantifierExpression& )
 }
 
 void EmptyVisitor::visit( CardinalityExpression& )
+{
+}
+
+void EmptyVisitor::visit( MatchExpression& )
+{
+}
+
+void EmptyVisitor::visit( MatchArm& )
 {
 }
 
