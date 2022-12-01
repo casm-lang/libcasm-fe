@@ -136,6 +136,8 @@ namespace libcasm_fe
             void visit( UniversalQuantifierExpression& node ) override;
             void visit( ExistentialQuantifierExpression& node ) override;
             void visit( CardinalityExpression& node ) override;
+            void visit( MatchExpression& node ) override;
+            void visit( MatchArm& node ) override;
 
             void visit( SkipRule& node ) override;
             void visit( ConditionalRule& node ) override;
@@ -265,7 +267,7 @@ void CstToAstVisitor::visit( Root& node )
 
 void CstToAstVisitor::visit( HeaderDefinition& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( InitDefinition& node )
@@ -346,7 +348,7 @@ void CstToAstVisitor::visit( FunctionDefinition& node )
     }
     else
     {
-        assert( not" inconsistent state @ GrammarParser " );
+        assert( not " inconsistent state @ GrammarParser " );
     }
 
     const auto& identifier = fetch< AST::Identifier >( node.identifier() );
@@ -683,6 +685,69 @@ void CstToAstVisitor::visit( CardinalityExpression& node )
     store< AST::CardinalityExpression >( node, expression );
 }
 
+void CstToAstVisitor::visit( MatchExpression& node )
+{
+    // match scrutinee with
+    // { pattern0 => expression0
+    // , pattern1 => expression1
+    // , ...
+    // }
+    // <=>
+    // let s = scrutinee in
+    // if  s = pattern0 then expression0 else
+    // if  s = pattern1 then expression1 else
+    // if  s = ... else
+    // undef
+
+    const auto& sourceLocation = node.sourceLocation();
+    const auto& scrutinee = fetch< AST::Expression >( node.scrutinee() );
+
+    const void* identifierAddress = static_cast< const void* >( &node );
+    std::stringstream identifierStream;
+    identifierStream << identifierAddress;
+    std::string identifierName = "." + identifierStream.str();
+    const auto& identifier = AST::make< AST::Identifier >( sourceLocation, identifierName );
+    const auto& unresolvedType = AST::make< AST::UnresolvedType >( sourceLocation );
+
+    const auto& variable =
+        AST::make< AST::VariableDefinition >( sourceLocation, identifier, unresolvedType );
+    const auto& variableBinding =
+        AST::make< AST::VariableBinding >( sourceLocation, variable, scrutinee );
+    const auto& variableBindings = AST::make< AST::VariableBindings >( sourceLocation );
+    variableBindings->add( variableBinding );
+
+    const auto& s = AST::make< AST::DirectCallExpression >(
+        sourceLocation,
+        AST::make< AST::IdentifierPath >( sourceLocation, identifier ),
+        AST::make< AST::Expressions >( sourceLocation ) );
+
+    AST::Expression::Ptr expression = AST::make< AST::UndefLiteral >( sourceLocation );
+
+    const auto& begin = node.matchArms()->crbegin();
+    const auto& end = node.matchArms()->crend();
+    for( auto iterator = begin; iterator != end; iterator++ )
+    {
+        const auto& matchArm = *iterator;
+        const auto& pattern = fetch< AST::Expression >( matchArm->pattern() );
+        const auto& matchArmExpression = fetch< AST::Expression >( matchArm->expression() );
+
+        const auto& condition =
+            AST::make< AST::BinaryExpression >( sourceLocation, s, Grammar::Token::EQUAL, pattern );
+        const auto& thenExpression = matchArmExpression;
+        const auto& elseExpression = expression;
+
+        expression = AST::make< AST::ConditionalExpression >(
+            sourceLocation, condition, thenExpression, elseExpression );
+    }
+
+    store< AST::LetExpression >( node, variableBindings, expression );
+}
+
+void CstToAstVisitor::visit( MatchArm& node )
+{
+    assert( not " inconsistent state, invalid node to transform " );
+}
+
 void CstToAstVisitor::visit( IndirectCallExpression& node )
 {
     const auto& expression = fetch< AST::Expression >( node.expression() );
@@ -972,37 +1037,37 @@ void CstToAstVisitor::visit( VariableBinding& node )
 
 void CstToAstVisitor::visit( BasicAttribute& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( SymbolAttribute& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( ExpressionAttribute& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( Defined& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( Initially& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( Token& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 void CstToAstVisitor::visit( Span& node )
 {
-    assert( not" inconsistent state, invalid node to transform " );
+    assert( not " inconsistent state, invalid node to transform " );
 }
 
 //
