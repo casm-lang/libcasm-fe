@@ -93,6 +93,8 @@ namespace libcasm_fe
         class UniversalQuantifierExpression;
         class ExistentialQuantifierExpression;
         class CardinalityExpression;
+        class MatchExpression;
+        class MatchArm;
 
         class SkipRule;
         class ConditionalRule;
@@ -188,6 +190,8 @@ namespace libcasm_fe
             virtual void visit( UniversalQuantifierExpression& node ) = 0;
             virtual void visit( ExistentialQuantifierExpression& node ) = 0;
             virtual void visit( CardinalityExpression& node ) = 0;
+            virtual void visit( MatchExpression& node ) = 0;
+            virtual void visit( MatchArm& node ) = 0;
 
             virtual void visit( SkipRule& node ) = 0;
             virtual void visit( ConditionalRule& node ) = 0;
@@ -279,6 +283,8 @@ namespace libcasm_fe
             void visit( UniversalQuantifierExpression& node ) override;
             void visit( ExistentialQuantifierExpression& node ) override;
             void visit( CardinalityExpression& node ) override;
+            void visit( MatchExpression& node ) override;
+            void visit( MatchArm& node ) override;
 
             void visit( SkipRule& node ) override;
             void visit( ConditionalRule& node ) override;
@@ -370,6 +376,8 @@ namespace libcasm_fe
             void visit( UniversalQuantifierExpression& node ) override;
             void visit( ExistentialQuantifierExpression& node ) override;
             void visit( CardinalityExpression& node ) override;
+            void visit( MatchExpression& node ) override;
+            void visit( MatchArm& node ) override;
 
             void visit( SkipRule& node ) override;
             void visit( ConditionalRule& node ) override;

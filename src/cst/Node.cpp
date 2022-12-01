@@ -251,6 +251,14 @@ std::string Node::description( void ) const
         {
             return "cardinality expression";
         }
+        case ID::MATCH_EXPRESSION:
+        {
+            return "match expression";
+        }
+        case ID::MATCH_ARM:
+        {
+            return "match arm";
+        }
         case ID::SKIP_RULE:
         {
             return "skip";

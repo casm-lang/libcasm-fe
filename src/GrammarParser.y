@@ -180,6 +180,9 @@ END       0 "end of file"
 %type <UniversalQuantifierExpression::Ptr> UniversalQuantifierExpression
 %type <ExistentialQuantifierExpression::Ptr> ExistentialQuantifierExpression
 %type <CardinalityExpression::Ptr> CardinalityExpression
+%type <MatchExpression::Ptr> MatchExpression
+%type <MatchArms::Ptr> MatchArms
+%type <MatchArm::Ptr> MatchArm
 
 // rules
 %type <Rule::Ptr> Rule
@@ -1078,6 +1081,10 @@ Term
   {
       $$ = $1;
   }
+| MatchExpression
+  {
+      $$ = $1;
+  }
 ;
 
 
@@ -1346,6 +1353,37 @@ CardinalityExpression
       $$ = CST::make< CardinalityExpression >( @$, $1, $2, $3 );
   }
 ;
+
+MatchExpression
+: MATCH Term WITH LCURPAREN MatchArms RCURPAREN
+  {
+      $$ = CST::make< MatchExpression >( @$, $1, $2, $3, $4, $5, $6 );
+  }
+;
+
+MatchArms
+: MatchArms COMMA MatchArm
+  {
+      auto arms = $1;
+      $3->setDelimiterToken( $2 );
+      arms->add( $3 );
+      $$ = arms;
+  }
+| MatchArm
+  {
+      auto arms = CST::make< MatchArms >( @$ );
+      arms->add( $1 );
+      $$ = arms;
+  }
+;
+
+MatchArm
+: Term ARROW Term
+  {
+      $$ = CST::make< MatchArm >( @$, $1, $2, $3 );
+  }
+;
+
 
 //
 //

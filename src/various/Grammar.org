@@ -503,6 +503,7 @@ Term ::= Expression
        | UniversalQuantifierExpression
        | ExistentialQuantifierExpression
        | CardinalityExpression
+       | MatchExpression
 #+end_src
 
 #+html: {{page>.:grammar:Term&noheader&nofooter}}
@@ -662,6 +663,34 @@ CardinalityExpression ::= "|" Expression "|"
 #+end_src
 
 #+html: {{page>.:grammar:CardinalityExpression&noheader&nofooter}}
+
+
+** MatchExpression
+
+#+begin_src
+MatchExpression ::= "match" Term "with" "{" MatchArms "}"
+#+end_src
+
+#+html: {{page>.:grammar:MatchExpression&noheader&nofooter}}
+
+
+** MatchArms
+
+#+begin_src
+MatchArms ::= MatchArms "," MatchArm
+            | MatchArm
+#+end_src
+
+#+html: {{page>.:grammar:MatchArms&noheader&nofooter}}
+
+
+** MatchArm
+
+#+begin_src
+MatchArm ::= Term "=>" Term
+#+end_src
+
+#+html: {{page>.:grammar:MatchArm&noheader&nofooter}}
 
 
 ** Literal

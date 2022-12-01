@@ -1162,6 +1162,119 @@ Node::Ptr CardinalityExpression::clone( void ) const
 }
 
 //
+//
+// MatchArm & MatchExpression
+//
+
+MatchArm::MatchArm(
+    const Expression::Ptr& pattern,
+    const Token::Ptr& arrowToken,
+    const Expression::Ptr& expression )
+: Expression( Node::ID::MATCH_ARM )
+, m_pattern( pattern )
+, m_arrowToken( arrowToken )
+, m_expression( expression )
+{
+}
+
+const Expression::Ptr& MatchArm::pattern( void ) const
+{
+    return m_pattern;
+}
+
+const Token::Ptr& MatchArm::arrowToken( void ) const
+{
+    return m_arrowToken;
+}
+
+const Expression::Ptr& MatchArm::expression( void ) const
+{
+    return m_expression;
+}
+
+void MatchArm::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr MatchArm::clone( void ) const
+{
+    auto duplicate = std::make_shared< MatchArm >(
+        pattern()->duplicate< Expression >(),
+        arrowToken(),
+        expression()->duplicate< Expression >() );
+
+    Node::clone( *duplicate );
+    return duplicate;
+}
+
+MatchExpression::MatchExpression(
+    const Token::Ptr& matchToken,
+    const Expression::Ptr& scrutinee,
+    const Token::Ptr& withToken,
+    const Token::Ptr& leftBraceToken,
+    const MatchArms::Ptr& matchArms,
+    const Token::Ptr& rightBraceToken )
+: Expression( Node::ID::MATCH_EXPRESSION )
+, m_matchToken( matchToken )
+, m_scrutinee( scrutinee )
+, m_withToken( withToken )
+, m_leftBraceToken( leftBraceToken )
+, m_matchArms( matchArms )
+, m_rightBraceToken( rightBraceToken )
+{
+}
+
+const Token::Ptr& MatchExpression::matchToken( void ) const
+{
+    return m_matchToken;
+}
+
+const Expression::Ptr& MatchExpression::scrutinee( void ) const
+{
+    return m_scrutinee;
+}
+
+const Token::Ptr& MatchExpression::withToken( void ) const
+{
+    return m_withToken;
+}
+
+const Token::Ptr& MatchExpression::leftBraceToken( void ) const
+{
+    return m_leftBraceToken;
+}
+
+const MatchArms::Ptr& MatchExpression::matchArms( void ) const
+{
+    return m_matchArms;
+}
+
+const Token::Ptr& MatchExpression::rightBraceToken( void ) const
+{
+    return m_rightBraceToken;
+}
+
+void MatchExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr MatchExpression::clone( void ) const
+{
+    auto duplicate = std::make_shared< MatchExpression >(
+        matchToken(),
+        scrutinee()->duplicate< Expression >(),
+        withToken(),
+        leftBraceToken(),
+        matchArms()->duplicate< MatchArms >(),
+        rightBraceToken() );
+
+    Expression::clone( *duplicate );
+    return duplicate;
+}
+
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
