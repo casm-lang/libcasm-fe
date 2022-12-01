@@ -660,6 +660,65 @@ namespace libcasm_fe
             const Token::Ptr m_leftVerticalBarToken;
             const Token::Ptr m_rightVerticalBarToken;
         };
+
+        class MatchArm final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< MatchArm >;
+
+            MatchArm(
+                const Expression::Ptr& pattern,
+                const Token::Ptr& arrowToken,
+                const Expression::Ptr& expression );
+
+            const Expression::Ptr& pattern( void ) const;
+            const Token::Ptr& arrowToken( void ) const;
+            const Expression::Ptr& expression( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+
+          private:
+            const Expression::Ptr m_pattern;
+            const Token::Ptr m_arrowToken;
+            const Expression::Ptr m_expression;
+        };
+
+        using MatchArms = NodeList< MatchArm >;
+
+        class MatchExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< MatchExpression >;
+
+            MatchExpression(
+                const Token::Ptr& matchToken,
+                const Expression::Ptr& scrutinee,
+                const Token::Ptr& withToken,
+                const Token::Ptr& leftBraceToken,
+                const MatchArms::Ptr& matchArms,
+                const Token::Ptr& rightBraceToken );
+
+            const Token::Ptr& matchToken( void ) const;
+            const Expression::Ptr& scrutinee( void ) const;
+            const Token::Ptr& withToken( void ) const;
+            const Token::Ptr& leftBraceToken( void ) const;
+            const MatchArms::Ptr& matchArms( void ) const;
+            const Token::Ptr& rightBraceToken( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+
+          private:
+            const Token::Ptr m_matchToken;
+            const Expression::Ptr m_scrutinee;
+            const Token::Ptr m_withToken;
+            const Token::Ptr m_leftBraceToken;
+            const MatchArms::Ptr m_matchArms;
+            const Token::Ptr m_rightBraceToken;
+        };
     }
 }
 
