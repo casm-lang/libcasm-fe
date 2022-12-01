@@ -111,6 +111,8 @@ namespace libcasm_fe
                 UNIVERSAL_QUANTIFIER_EXPRESSION,
                 EXISTENTIAL_QUANTIFIER_EXPRESSION,
                 CARDINALITY_EXPRESSION,
+                MATCH_EXPRESSION,
+                MATCH_ARM,
 
                 // rules
                 SKIP_RULE,
