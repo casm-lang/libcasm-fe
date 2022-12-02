@@ -904,34 +904,100 @@ Node::Ptr ConditionalExpression::clone( void ) const
 
 //
 //
+// VariableSelection
+//
+
+VariableSelection::VariableSelection(
+    const VariableDefinition::Ptr& variable,
+    const Token::Ptr& inToken,
+    const Expression::Ptr& universe,
+    const Token::Ptr& withToken,
+    const Expression::Ptr& condition )
+: TypedNode( Node::ID::VARIABLE_SELECTION )
+, m_variable( variable )
+, m_inToken( inToken )
+, m_universe( universe )
+, m_withToken( withToken )
+, m_condition( condition )
+, m_delimiterToken( Token::unresolved() )
+{
+}
+
+const VariableDefinition::Ptr& VariableSelection::variable( void ) const
+{
+    return m_variable;
+}
+
+const Token::Ptr& VariableSelection::inToken( void ) const
+{
+    return m_inToken;
+}
+
+const Expression::Ptr& VariableSelection::universe( void ) const
+{
+    return m_universe;
+}
+
+const Token::Ptr& VariableSelection::withToken( void ) const
+{
+    return m_withToken;
+}
+
+const Expression::Ptr& VariableSelection::condition( void ) const
+{
+    return m_condition;
+}
+
+void VariableSelection::setDelimiterToken( const Token::Ptr& delimiterToken )
+{
+    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
+    m_delimiterToken = delimiterToken;
+}
+
+const Token::Ptr& VariableSelection::delimiterToken( void ) const
+{
+    return m_delimiterToken;
+}
+
+void VariableSelection::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr VariableSelection::clone( void ) const
+{
+    auto duplicate = std::make_shared< VariableSelection >(
+        variable()->duplicate< VariableDefinition >(),
+        inToken(),
+        universe()->duplicate< Expression >(),
+        withToken(),
+        condition()->duplicate< Expression >() );
+
+    TypedNode::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//
 // ChooseExpression
 //
 
 ChooseExpression::ChooseExpression(
     const Token::Ptr& chooseToken,
-    const VariableDefinitions::Ptr& variables,
-    const Token::Ptr& inToken,
-    const Expression::Ptr& universe,
+    const VariableSelections::Ptr& variableSelections,
     const Token::Ptr& doToken,
     const Expression::Ptr& expression )
 : Expression( Node::ID::CHOOSE_EXPRESSION )
-, m_variables( variables )
-, m_universe( universe )
+, m_variableSelections( variableSelections )
 , m_expression( expression )
 , m_chooseToken( chooseToken )
-, m_inToken( inToken )
 , m_doToken( doToken )
 {
 }
 
-const VariableDefinitions::Ptr& ChooseExpression::variables( void ) const
+const VariableSelections::Ptr& ChooseExpression::variableSelections( void ) const
 {
-    return m_variables;
-}
-
-const Expression::Ptr& ChooseExpression::universe( void ) const
-{
-    return m_universe;
+    return m_variableSelections;
 }
 
 const Expression::Ptr& ChooseExpression::expression( void ) const
@@ -942,11 +1008,6 @@ const Expression::Ptr& ChooseExpression::expression( void ) const
 const Token::Ptr& ChooseExpression::chooseToken( void ) const
 {
     return m_chooseToken;
-}
-
-const Token::Ptr& ChooseExpression::inToken( void ) const
-{
-    return m_inToken;
 }
 
 const Token::Ptr& ChooseExpression::doToken( void ) const
@@ -963,9 +1024,7 @@ Node::Ptr ChooseExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< ChooseExpression >(
         chooseToken(),
-        variables()->duplicate< VariableDefinitions >(),
-        inToken(),
-        universe()->duplicate< Expression >(),
+        variableSelections()->duplicate< VariableSelections >(),
         doToken(),
         expression()->duplicate< Expression >() );
 

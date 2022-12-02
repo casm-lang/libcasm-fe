@@ -526,6 +526,42 @@ namespace libcasm_fe
             const Token::Ptr m_elseToken;
         };
 
+        class VariableSelection final : public TypedNode
+        {
+          public:
+            using Ptr = std::shared_ptr< VariableSelection >;
+
+            VariableSelection(
+                const std::shared_ptr< VariableDefinition >& variable,
+                const Token::Ptr& inToken,
+                const Expression::Ptr& universe,
+                const Token::Ptr& withToken,
+                const Expression::Ptr& condition );
+
+            const std::shared_ptr< VariableDefinition >& variable( void ) const;
+            const Token::Ptr& inToken( void ) const;
+            const Expression::Ptr& universe( void ) const;
+            const Token::Ptr& withToken( void ) const;
+            const Expression::Ptr& condition( void ) const;
+
+            void setDelimiterToken( const Token::Ptr& delimiterToken );
+            const Token::Ptr& delimiterToken( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+
+          private:
+            const std::shared_ptr< VariableDefinition > m_variable;
+            const Token::Ptr m_inToken;
+            const Expression::Ptr m_universe;
+            const Token::Ptr m_withToken;
+            const Expression::Ptr m_condition;
+            Token::Ptr m_delimiterToken;
+        };
+
+        using VariableSelections = NodeList< VariableSelection >;
+
         class ChooseExpression final : public Expression
         {
           public:
@@ -533,32 +569,24 @@ namespace libcasm_fe
 
             ChooseExpression(
                 const Token::Ptr& chooseToken,
-                const std::shared_ptr< VariableDefinitions >& variables,
-                const Token::Ptr& inToken,
-                const Expression::Ptr& universe,
+                const VariableSelections::Ptr& variableSelections,
                 const Token::Ptr& doToken,
                 const Expression::Ptr& expression );
 
-            const Token::Ptr& chooseToken( void ) const;
-
-            const Token::Ptr& inToken( void ) const;
-
-            const Token::Ptr& doToken( void ) const;
-
-            const std::shared_ptr< VariableDefinitions >& variables( void ) const;
-            const Expression::Ptr& universe( void ) const;
+            const VariableSelections::Ptr& variableSelections( void ) const;
             const Expression::Ptr& expression( void ) const;
+
+            const Token::Ptr& chooseToken( void ) const;
+            const Token::Ptr& doToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
             Node::Ptr clone( void ) const override final;
 
           private:
-            const std::shared_ptr< VariableDefinitions > m_variables;
-            const Expression::Ptr m_universe;
+            const VariableSelections::Ptr m_variableSelections;
             const Expression::Ptr m_expression;
             const Token::Ptr m_chooseToken;
-            const Token::Ptr m_inToken;
             const Token::Ptr m_doToken;
         };
 
