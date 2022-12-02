@@ -330,7 +330,7 @@ void PropertyResolverVisitor::visit( ChooseExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    auto properties = node.universe()->properties() * node.expression()->properties();
+    auto properties = node.variableSelection()->universe()->properties() * node.expression()->properties();
     properties.unset( libcasm_ir::Property::PURE );  // randomness is in-pure
     node.setProperties( properties );
 }
