@@ -168,6 +168,7 @@ namespace libcasm_fe
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
             void visit( VariableBinding& node ) override;
+            void visit( VariableSelection& node ) override;
 
             void visit( BasicAttribute& node ) override;
             void visit( SymbolAttribute& node ) override;
@@ -795,12 +796,31 @@ void CstToAstVisitor::visit( ConditionalExpression& node )
 
 void CstToAstVisitor::visit( ChooseExpression& node )
 {
-    const auto& variables =
-        fetch< AST::VariableDefinitions, AST::VariableDefinition, CST::VariableDefinition >(
-            node.variables() );
-    const auto& universe = fetch< AST::Expression >( node.universe() );
-    const auto& expression = fetch< AST::Expression >( node.expression() );
-    store< AST::ChooseExpression >( node, variables, universe, expression );
+    //
+    // choose a in D with C0
+    //      , b in B with C1
+    //      , ...
+    //     do E
+    //<=>
+    // choose a in D with C0 do
+    // choose b in B with C1 do
+    // choose ...
+    //     do E
+
+    AST::Expression::Ptr expression = fetch< AST::Expression >( node.expression() );
+
+    const auto& begin = node.variableSelections()->crbegin();
+    const auto& end = node.variableSelections()->crend();
+    for( auto iterator = begin; iterator != end; iterator++ )
+    {
+        const auto& element = *iterator;
+        const auto& variableSelection = fetch< AST::VariableSelection >( element );
+
+        expression = AST::make< AST::ChooseExpression >(
+            node.sourceLocation(), variableSelection, expression );
+    }
+
+    set( node, expression );
 }
 
 void CstToAstVisitor::visit( UniversalQuantifierExpression& node )
@@ -883,8 +903,9 @@ void CstToAstVisitor::visit( ChooseRule& node )
         fetch< AST::VariableDefinitions, AST::VariableDefinition, CST::VariableDefinition >(
             node.variables() );
     const auto& universe = fetch< AST::Expression >( node.universe() );
+    const auto& condition = fetch< AST::Expression >( node.condition() );
     const auto& rule = fetch< AST::Rule >( node.rule() );
-    store< AST::ChooseRule >( node, variables, universe, rule );
+    store< AST::ChooseRule >( node, variables, universe, condition, rule );
 }
 
 void CstToAstVisitor::visit( IterateRule& node )
@@ -1033,6 +1054,14 @@ void CstToAstVisitor::visit( VariableBinding& node )
     const auto& variable = fetch< AST::VariableDefinition >( node.variable() );
     const auto& expression = fetch< AST::Expression >( node.expression() );
     store< AST::VariableBinding >( node, variable, expression );
+}
+
+void CstToAstVisitor::visit( VariableSelection& node )
+{
+    const auto& variable = fetch< AST::VariableDefinition >( node.variable() );
+    const auto& universe = fetch< AST::Expression >( node.universe() );
+    const auto& condition = fetch< AST::Expression >( node.condition() );
+    store< AST::VariableSelection >( node, variable, universe, condition );
 }
 
 void CstToAstVisitor::visit( BasicAttribute& node )
