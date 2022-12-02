@@ -149,6 +149,25 @@ rule bar = println( self as String )
 
 SOURCE_TEST( execute, NumericExecutionPass, source_with_multi_agent, true, _multiAgent, );
 
+static const auto source_expression_match = R"***(
+CASM
+
+init test
+
+enumeration Color = { Red, Blue, Green }
+
+rule test =
+  forall color in Color do
+    assert(
+      match color with
+      { Color::Red   => Color::Blue
+      , Color::Blue  => Color::Green
+      , Color::Green => Color::Red
+      } != color )
+)***";
+
+SOURCE_TEST( execute, NumericExecutionPass, source_expression_match, true, _expressionMatch, );
+
 static const auto source_add = R"***(
 CASM
 
