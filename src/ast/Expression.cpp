@@ -735,28 +735,68 @@ Node::Ptr ConditionalExpression::clone( void ) const
 
 //
 //
+// VariableSelection
+//
+
+VariableSelection::VariableSelection(
+    const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& universe,
+    const Expression::Ptr& condition )
+: TypedNode( Node::ID::VARIABLE_SELECTION )
+, m_variable( variable )
+, m_universe( universe )
+, m_condition( condition )
+{
+}
+
+const VariableDefinition::Ptr& VariableSelection::variable( void ) const
+{
+    return m_variable;
+}
+
+const Expression::Ptr& VariableSelection::universe( void ) const
+{
+    return m_universe;
+}
+
+const Expression::Ptr& VariableSelection::condition( void ) const
+{
+    return m_condition;
+}
+
+void VariableSelection::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+Node::Ptr VariableSelection::clone( void ) const
+{
+    auto duplicate = std::make_shared< VariableSelection >(
+        variable()->duplicate< VariableDefinition >(),
+        universe()->duplicate< Expression >(),
+        condition()->duplicate< Expression >() );
+
+    TypedNode::clone( *duplicate );
+    return duplicate;
+}
+
+//
+//
 // ChooseExpression
 //
 
 ChooseExpression::ChooseExpression(
-    const VariableDefinitions::Ptr& variables,
-    const Expression::Ptr& universe,
+    const VariableSelection::Ptr& variableSelection,
     const Expression::Ptr& expression )
 : Expression( Node::ID::CHOOSE_EXPRESSION )
-, m_variables( variables )
-, m_universe( universe )
+, m_variableSelection( variableSelection )
 , m_expression( expression )
 {
 }
 
-const VariableDefinitions::Ptr& ChooseExpression::variables( void ) const
+const VariableSelection::Ptr& ChooseExpression::variableSelection( void ) const
 {
-    return m_variables;
-}
-
-const Expression::Ptr& ChooseExpression::universe( void ) const
-{
-    return m_universe;
+    return m_variableSelection;
 }
 
 const Expression::Ptr& ChooseExpression::expression( void ) const
@@ -772,8 +812,7 @@ void ChooseExpression::accept( Visitor& visitor )
 Node::Ptr ChooseExpression::clone( void ) const
 {
     auto duplicate = std::make_shared< ChooseExpression >(
-        variables()->duplicate< VariableDefinitions >(),
-        universe()->duplicate< Expression >(),
+        variableSelection()->duplicate< VariableSelection >(),
         expression()->duplicate< Expression >() );
 
     Expression::clone( *duplicate );

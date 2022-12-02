@@ -422,18 +422,42 @@ namespace libcasm_fe
             const Expression::Ptr m_elseExpression;
         };
 
+        class VariableSelection final : public TypedNode
+        {
+          public:
+            using Ptr = std::shared_ptr< VariableSelection >;
+
+            VariableSelection(
+                const std::shared_ptr< VariableDefinition >& variable,
+                const Expression::Ptr& universe,
+                const Expression::Ptr& condition );
+
+            const std::shared_ptr< VariableDefinition >& variable( void ) const;
+            const Expression::Ptr& universe( void ) const;
+            const Expression::Ptr& condition( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+            Node::Ptr clone( void ) const override final;
+
+          private:
+            const std::shared_ptr< VariableDefinition > m_variable;
+            const Expression::Ptr m_universe;
+            const Expression::Ptr m_condition;
+        };
+
+        using VariableSelections = NodeList< VariableSelection >;
+
         class ChooseExpression final : public Expression
         {
           public:
             using Ptr = std::shared_ptr< ChooseExpression >;
 
             ChooseExpression(
-                const std::shared_ptr< VariableDefinitions >& variables,
-                const Expression::Ptr& universe,
+                const VariableSelection::Ptr& variableSelection,
                 const Expression::Ptr& expression );
 
-            const std::shared_ptr< VariableDefinitions >& variables( void ) const;
-            const Expression::Ptr& universe( void ) const;
+            const VariableSelection::Ptr& variableSelection( void ) const;
             const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
@@ -441,8 +465,7 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            const std::shared_ptr< VariableDefinitions > m_variables;
-            const Expression::Ptr m_universe;
+            const VariableSelection::Ptr m_variableSelection;
             const Expression::Ptr m_expression;
         };
 
