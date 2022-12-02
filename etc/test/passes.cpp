@@ -168,6 +168,26 @@ rule test =
 
 SOURCE_TEST( execute, NumericExecutionPass, source_expression_match, true, _expressionMatch, );
 
+static const auto source_expression_choose_with_condition = R"***(
+CASM
+
+init test
+
+enumeration Color = { Red, Blue, Green }
+
+rule test =
+  let c =
+    choose x in Color
+      with x != Color::Blue
+        do x
+  in {
+    println( c as String )
+    assert( c != Color::Blue )
+  }
+)***";
+
+SOURCE_TEST( execute, NumericExecutionPass, source_expression_choose_with_condition, true, _expressionChooseWithCondition, );
+
 static const auto source_add = R"***(
 CASM
 
