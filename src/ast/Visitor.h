@@ -118,6 +118,7 @@ namespace libcasm_fe
         class ExpressionCase;
         class DefaultCase;
         class VariableBinding;
+        class VariableSelection;
 
         /**
          * @extends CasmFE
@@ -199,6 +200,7 @@ namespace libcasm_fe
             virtual void visit( ExpressionCase& node ) = 0;
             virtual void visit( DefaultCase& node ) = 0;
             virtual void visit( VariableBinding& node ) = 0;
+            virtual void visit( VariableSelection& node ) = 0;
         };
 
         class RecursiveVisitor : public Visitor
@@ -276,6 +278,7 @@ namespace libcasm_fe
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
             void visit( VariableBinding& node ) override;
+            void visit( VariableSelection& node ) override;
         };
 
         class EmptyVisitor : public Visitor
@@ -353,6 +356,7 @@ namespace libcasm_fe
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
             void visit( VariableBinding& node ) override;
+            void visit( VariableSelection& node ) override;
         };
     }
 }
