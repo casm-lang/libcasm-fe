@@ -812,11 +812,17 @@ namespace libcasm_fe {
       // TypedVariables
       char dummy90[sizeof (VariableDefinitions::Ptr)];
 
+      // VariableSelection
+      char dummy91[sizeof (VariableSelection::Ptr)];
+
+      // VariableSelections
+      char dummy92[sizeof (VariableSelections::Ptr)];
+
       // WhileRule
-      char dummy91[sizeof (WhileRule::Ptr)];
+      char dummy93[sizeof (WhileRule::Ptr)];
 
       // Type
-      char dummy92[sizeof (libcasm_fe::CST::Type::Ptr)];
+      char dummy94[sizeof (libcasm_fe::CST::Type::Ptr)];
     };
 
     /// The size of the largest semantic type.
@@ -1189,14 +1195,16 @@ namespace libcasm_fe {
         S_TypedAttributedVariable = 204,         // TypedAttributedVariable
         S_VariableBindings = 205,                // VariableBindings
         S_VariableBinding = 206,                 // VariableBinding
-        S_LocalFunctionDefinitions = 207,        // LocalFunctionDefinitions
-        S_AttributedLocalFunctionDefinition = 208, // AttributedLocalFunctionDefinition
-        S_LocalFunctionDefinition = 209,         // LocalFunctionDefinition
-        S_Attributes = 210,                      // Attributes
-        S_Attribute = 211,                       // Attribute
-        S_BasicAttribute = 212,                  // BasicAttribute
-        S_SymbolAttribute = 213,                 // SymbolAttribute
-        S_ExpressionAttribute = 214              // ExpressionAttribute
+        S_VariableSelections = 207,              // VariableSelections
+        S_VariableSelection = 208,               // VariableSelection
+        S_LocalFunctionDefinitions = 209,        // LocalFunctionDefinitions
+        S_AttributedLocalFunctionDefinition = 210, // AttributedLocalFunctionDefinition
+        S_LocalFunctionDefinition = 211,         // LocalFunctionDefinition
+        S_Attributes = 212,                      // Attributes
+        S_Attribute = 213,                       // Attribute
+        S_BasicAttribute = 214,                  // BasicAttribute
+        S_SymbolAttribute = 215,                 // SymbolAttribute
+        S_ExpressionAttribute = 216              // ExpressionAttribute
       };
     };
 
@@ -1705,6 +1713,14 @@ namespace libcasm_fe {
       case symbol_kind::S_AttributedVariables: // AttributedVariables
       case symbol_kind::S_TypedVariables: // TypedVariables
         value.move< VariableDefinitions::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_VariableSelection: // VariableSelection
+        value.move< VariableSelection::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_VariableSelections: // VariableSelections
+        value.move< VariableSelections::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_WhileRule: // WhileRule
@@ -2999,6 +3015,34 @@ namespace libcasm_fe {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, VariableSelection::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const VariableSelection::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, VariableSelections::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const VariableSelections::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, WhileRule::Ptr&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
@@ -3522,6 +3566,14 @@ switch (yykind)
       case symbol_kind::S_AttributedVariables: // AttributedVariables
       case symbol_kind::S_TypedVariables: // TypedVariables
         value.template destroy< VariableDefinitions::Ptr > ();
+        break;
+
+      case symbol_kind::S_VariableSelection: // VariableSelection
+        value.template destroy< VariableSelection::Ptr > ();
+        break;
+
+      case symbol_kind::S_VariableSelections: // VariableSelections
+        value.template destroy< VariableSelections::Ptr > ();
         break;
 
       case symbol_kind::S_WhileRule: // WhileRule
@@ -5518,8 +5570,8 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 3387,     ///< Last index in yytable_.
-      yynnts_ = 117,  ///< Number of nonterminal symbols.
+      yylast_ = 3407,     ///< Last index in yytable_.
+      yynnts_ = 119,  ///< Number of nonterminal symbols.
       yyfinal_ = 18 ///< Termination state number.
     };
 
@@ -6072,6 +6124,14 @@ switch (yykind)
         value.copy< VariableDefinitions::Ptr > (YY_MOVE (that.value));
         break;
 
+      case symbol_kind::S_VariableSelection: // VariableSelection
+        value.copy< VariableSelection::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_VariableSelections: // VariableSelections
+        value.copy< VariableSelections::Ptr > (YY_MOVE (that.value));
+        break;
+
       case symbol_kind::S_WhileRule: // WhileRule
         value.copy< WhileRule::Ptr > (YY_MOVE (that.value));
         break;
@@ -6585,6 +6645,14 @@ switch (yykind)
         value.move< VariableDefinitions::Ptr > (YY_MOVE (s.value));
         break;
 
+      case symbol_kind::S_VariableSelection: // VariableSelection
+        value.move< VariableSelection::Ptr > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_VariableSelections: // VariableSelections
+        value.move< VariableSelections::Ptr > (YY_MOVE (s.value));
+        break;
+
       case symbol_kind::S_WhileRule: // WhileRule
         value.move< WhileRule::Ptr > (YY_MOVE (s.value));
         break;
@@ -6660,7 +6728,7 @@ switch (yykind)
 
 #line 47 "../../obj/src/GrammarParser.y"
 } // libcasm_fe
-#line 6664 "GrammarParser.tab.h"
+#line 6732 "GrammarParser.tab.h"
 
 
 

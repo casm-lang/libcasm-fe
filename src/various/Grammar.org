@@ -632,7 +632,7 @@ ConditionalExpression ::= "if" Term "then" Term "else" Term
 ** ChooseExpression
 
 #+begin_src
-ChooseExpression ::= "choose" AttributedVariables "in" Term "do" Term
+ChooseExpression ::= "choose" VariableSelections "do" Term
 #+end_src
 
 #+html: {{page>.:grammar:ChooseExpression&noheader&nofooter}}
@@ -1123,6 +1123,26 @@ VariableBinding ::= AttributedVariable "=" Term
 #+end_src
 
 #+html: {{page>.:grammar:VariableBinding&noheader&nofooter}}
+
+
+** VariableSelections
+
+#+begin_src
+VariableSelections ::= VariableSelections "," VariableSelection
+                     | VariableSelection
+#+end_src
+
+#+html: {{page>.:grammar:VariableSelections&noheader&nofooter}}
+
+
+** VariableSelection
+
+#+begin_src
+VariableSelection ::= AttributedVariable "in" Term "with" Term
+                    | AttributedVariable "in" Term
+#+end_src
+
+#+html: {{page>.:grammar:VariableSelection&noheader&nofooter}}
 
 
 ** LocalFunctionDefinitions
