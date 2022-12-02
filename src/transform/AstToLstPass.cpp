@@ -152,6 +152,7 @@ namespace libcasm_fe
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
             void visit( VariableBinding& node ) override;
+            void visit( VariableSelection& node ) override;
 
           private:
             template < typename T >
@@ -627,13 +628,12 @@ void AstToLstVisitor::visit( ConditionalExpression& node )
 
 void AstToLstVisitor::visit( ChooseExpression& node )
 {
-    const auto& variables =
-        fetch< LST::VariableDefinitions, LST::VariableDefinition, AST::VariableDefinition >(
-            node.variables() );
-    const auto& universe = fetch< LST::Expression >( node.universe() );
+    const auto& variable = fetch< LST::VariableDefinition >( node.variableSelection()->variable() );
+    const auto& universe = fetch< LST::Expression >( node.variableSelection()->universe() );
+    const auto& condition = fetch< LST::Expression >( node.variableSelection()->condition() );
     const auto& expression = fetch< LST::Expression >( node.expression() );
     store< LST::ChooseExpression >(
-        node, node.type(), node.properties(), variables, universe, expression );
+        node, node.type(), node.properties(), variable, universe, condition, expression );
 }
 
 void AstToLstVisitor::visit( UniversalQuantifierExpression& node )
@@ -814,6 +814,11 @@ void AstToLstVisitor::visit( VariableBinding& node )
     const auto& expression = fetch< LST::Expression >( node.expression() );
     store< LST::VariableBinding >(
         node, node.type(), libcasm_ir::Properties{}, variable, expression );
+}
+
+void AstToLstVisitor::visit( VariableSelection& node )
+{
+    m_log.error( { node.sourceLocation() }, "invalid transformation", Code::Internal );
 }
 
 //

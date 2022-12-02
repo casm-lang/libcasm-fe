@@ -141,6 +141,7 @@ namespace libcasm_fe
                 EXPRESSION_CASE,
                 DEFAULT_CASE,
                 VARIABLE_BINDING,
+                VARIABLE_SELECTION,
             };
 
           public:

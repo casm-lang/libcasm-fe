@@ -428,9 +428,7 @@ void RecursiveVisitor::visit( ChooseExpression& node )
 {
     node.delimiterToken()->accept( *this );
     node.chooseToken()->accept( *this );
-    node.variables()->accept( *this );
-    node.inToken()->accept( *this );
-    node.universe()->accept( *this );
+    node.variableSelections()->accept( *this );
     node.doToken()->accept( *this );
     node.expression()->accept( *this );
 }
@@ -731,6 +729,16 @@ void RecursiveVisitor::visit( VariableBinding& node )
     node.variable()->accept( *this );
     node.equalToken()->accept( *this );
     node.expression()->accept( *this );
+}
+
+void RecursiveVisitor::visit( VariableSelection& node )
+{
+    node.delimiterToken()->accept( *this );
+    node.variable()->accept( *this );
+    node.inToken()->accept( *this );
+    node.universe()->accept( *this );
+    node.withToken()->accept( *this );
+    node.condition()->accept( *this );
 }
 
 void RecursiveVisitor::visit( Token& node )
@@ -1056,6 +1064,10 @@ void EmptyVisitor::visit( DefaultCase& )
 }
 
 void EmptyVisitor::visit( VariableBinding& )
+{
+}
+
+void EmptyVisitor::visit( VariableSelection& )
 {
 }
 

@@ -347,11 +347,14 @@ namespace libcasm_fe
                 const std::shared_ptr< VariableDefinitions >& variables,
                 const Token::Ptr& inToken,
                 const Expression::Ptr& universe,
+                const Token::Ptr& withToken,
+                const Expression::Ptr& condition,
                 const Token::Ptr& doToken,
                 const Rule::Ptr& rule );
 
             const std::shared_ptr< VariableDefinitions >& variables( void ) const;
             const Expression::Ptr& universe( void ) const;
+            const Expression::Ptr& condition( void ) const;
             const Rule::Ptr& rule( void ) const;
 
             const Token::Ptr& chooseToken( void ) const;
@@ -360,6 +363,8 @@ namespace libcasm_fe
 
             const Token::Ptr& doToken( void ) const;
 
+            const Token::Ptr& withToken( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
             Node::Ptr clone( void ) const override final;
@@ -367,10 +372,12 @@ namespace libcasm_fe
           private:
             const std::shared_ptr< VariableDefinitions > m_variables;
             const Expression::Ptr m_universe;
+            const Expression::Ptr m_condition;
             const Rule::Ptr m_rule;
             const Token::Ptr m_chooseToken;
             const Token::Ptr m_inToken;
             const Token::Ptr m_doToken;
+            const Token::Ptr m_withToken;
         };
 
         class IterateRule final : public Rule

@@ -230,6 +230,8 @@ END       0 "end of file"
 %type <VariableDefinitions::Ptr> MethodParameters
 %type <VariableBinding::Ptr> VariableBinding
 %type <VariableBindings::Ptr> VariableBindings
+%type <VariableSelection::Ptr> VariableSelection
+%type <VariableSelections::Ptr> VariableSelections
 %type <FunctionDefinition::Ptr> LocalFunctionDefinition AttributedLocalFunctionDefinition
 %type <FunctionDefinitions::Ptr> LocalFunctionDefinitions
 
@@ -938,8 +940,15 @@ ForallRule
 ChooseRule
 : CHOOSE AttributedVariables IN Term DO Rule
   {
-      $$ = CST::make< ChooseRule >( @$, $1, $2, $3, $4, $5, $6 );
+      const auto withToken = Token::unresolved();
+      const auto alwaysTrue = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
+      const auto condition = CST::make< ValueLiteral >( @$, alwaysTrue );
+      $$ = CST::make< ChooseRule >( @$, $1, $2, $3, $4, withToken, condition, $5, $6 );
   }
+// | CHOOSE AttributedVariables IN Term WITH Term DO Rule // TODO: @ppaulweber
+//   {
+//       $$ = CST::make< ChooseRule >( @$, $1, $2, $3, $4, $5, $6, $7, $8 );
+//   }
 ;
 
 
@@ -1324,9 +1333,9 @@ ConditionalExpression
 
 
 ChooseExpression
-: CHOOSE AttributedVariables IN Term DO Term
+: CHOOSE VariableSelections DO Term
   {
-      $$ = CST::make< ChooseExpression >( @$, $1, $2, $3, $4, $5, $6 );
+      $$ = CST::make< ChooseExpression >( @$, $1, $2, $3, $4 );
   }
 ;
 
@@ -2069,6 +2078,42 @@ VariableBinding
 : AttributedVariable EQUAL Term
   {
       $$ = CST::make< VariableBinding >( @$, $1, $2, $3 );
+  }
+;
+
+//
+//
+// VariableSelection
+//
+
+VariableSelections
+: VariableSelections COMMA VariableSelection
+  {
+      auto variableSelections = $1;
+      $3->setDelimiterToken( $2 );
+      variableSelections->add( $3 );
+      $$ = variableSelections;
+  }
+| VariableSelection
+  {
+      auto variableSelections = CST::make< VariableSelections >( @$ );
+      variableSelections->add( $1 );
+      $$ = variableSelections;
+  }
+;
+
+VariableSelection
+: AttributedVariable IN Term WITH Term
+  {
+      $$ = CST::make< VariableSelection >( @$, $1, $2, $3, $4, $5 );
+  }
+| AttributedVariable IN Term
+  {
+      const auto withToken = Token::unresolved();
+      const auto alwaysTrue = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
+      const auto condition = CST::make< ValueLiteral >( @$, alwaysTrue );
+
+      $$ = CST::make< VariableSelection >( @$, $1, $2, $3, withToken, condition );
   }
 ;
 

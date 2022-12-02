@@ -252,10 +252,12 @@ namespace libcasm_fe
             ChooseRule(
                 const std::shared_ptr< VariableDefinitions >& variables,
                 const Expression::Ptr& universe,
+                const Expression::Ptr& condition,
                 const Rule::Ptr& rule );
 
             const std::shared_ptr< VariableDefinitions >& variables( void ) const;
             const Expression::Ptr& universe( void ) const;
+            const Expression::Ptr& condition( void ) const;
             const Rule::Ptr& rule( void ) const;
 
             void accept( Visitor& visitor ) override final;
@@ -265,6 +267,7 @@ namespace libcasm_fe
           private:
             const std::shared_ptr< VariableDefinitions > m_variables;
             const Expression::Ptr m_universe;
+            const Expression::Ptr m_condition;
             const Rule::Ptr m_rule;
         };
 

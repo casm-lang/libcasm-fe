@@ -134,6 +134,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( RelationType& node ) override;
 
     void visit( VariableBinding& node ) override;
+    void visit( VariableSelection& node ) override;
 
   private:
     void resolveDomainTypeBehaviorImplementSymbol(
@@ -1350,49 +1351,9 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
 
     m_typeIDs[ node.expression().get() ] = m_typeIDs[ &node ];
 
-    node.variables()->accept( *this );
-
-    for( const auto& variable : *node.variables() )
-    {
-        if( variable->type() )
-        {
-            m_typeIDs[ node.universe().get() ].emplace( variable->type()->id() );
-        }
-    }
-
-    node.universe()->accept( *this );
-
-    if( node.universe()->type() )
-    {
-        const auto universeTypeId = node.universe()->type()->ptr_result()->id();
-        annotateNodes( *node.variables(), universeTypeId );
-    }
-
-    node.variables()->accept( *this );
+    node.variableSelection()->accept( *this );
 
     node.expression()->accept( *this );
-
-    if( node.universe()->type() )
-    {
-        for( const auto& variable : *node.variables() )
-        {
-            if( not variable->type() )
-            {
-                continue;
-            }
-
-            if( *variable->type() != node.universe()->type()->result() )
-            {
-                m_log.error(
-                    { variable->sourceLocation(), node.universe()->sourceLocation() },
-                    node.description() + " variable '" + variable->identifier()->name() +
-                        "' of type '" + variable->type()->description() +
-                        "' does not match the universe of type '" +
-                        node.universe()->type()->description() + "'",
-                    Code::TypeInferenceInvalidChooseExpressionVariableTypeMismatch );
-            }
-        }
-    }
 
     node.setType( node.expression()->type() );
 }
@@ -1584,6 +1545,8 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
 
     node.variables()->accept( *this );
 
+    node.condition()->accept( *this );
+
     node.rule()->accept( *this );
 
     if( node.universe()->type() )
@@ -1749,6 +1712,78 @@ void TypeInferenceVisitor::visit( VariableBinding& node )
         "variable '" + node.variable()->identifier()->name() + "'",
         "expression",
         Code::TypeInferenceInvalidVariableBindingTypeMismatch );
+
+    node.setType( node.variable()->type() );
+    if( not node.type() )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unable to infer type of " + node.description() + " '" +
+                node.variable()->identifier()->name() + "'",
+            Code::Unspecified );
+    }
+}
+
+void TypeInferenceVisitor::visit( VariableSelection& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& variable = node.variable();
+
+    variable->accept( *this );
+    if( variable->type() )
+    {
+        const auto variableTypeId = variable->type()->ptr_result()->id();
+        m_typeIDs[ node.universe().get() ].emplace( variableTypeId );
+    }
+
+    node.universe()->accept( *this );
+    if( not node.universe()->type() )
+    {
+        m_log.error(
+            { node.universe()->sourceLocation() },
+            "unable to infer type of universe",
+            Code::Unspecified );
+        return;
+    }
+
+    const auto universeTypeId = node.universe()->type()->ptr_result()->id();
+    m_typeIDs[ node.variable().get() ].emplace( universeTypeId );
+
+    variable->accept( *this );
+    if( not variable->type() )
+    {
+        m_log.error(
+            { variable->sourceLocation() }, "unable to infer type of variable", Code::Unspecified );
+        return;
+    }
+
+    if( variable->type() and node.universe()->type() and
+        *variable->type() != node.universe()->type()->result() )
+    {
+        m_log.error(
+            { variable->sourceLocation(), node.universe()->sourceLocation() },
+            node.description() + " variable '" + variable->identifier()->name() + "' of type '" +
+                variable->type()->description() + "' does not match the universe of type '" +
+                node.universe()->type()->description() + "'",
+            Code::TypeInferenceInvalidChooseExpressionVariableTypeMismatch );
+    }
+
+    // variable->setType( node.universe()->type() );
+
+    node.condition()->accept( *this );
+    if( not node.condition()->type() )
+    {
+        m_log.error(
+            { node.condition()->sourceLocation() },
+            "unable to infer type of condition",
+            Code::Unspecified );
+    }
+    checkIfNodeHasTypeOfKind(
+        *node.condition(), libcasm_ir::Type::Kind::BOOLEAN, "condition", Code::Unspecified );
 
     node.setType( node.variable()->type() );
     if( not node.type() )

@@ -159,6 +159,7 @@ namespace libcasm_fe
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
             void visit( VariableBinding& node ) override;
+            void visit( VariableSelection& node ) override;
 
             const Definitions::Ptr& definitions( void ) const;
 
@@ -687,6 +688,10 @@ void TemplatingVisitor::visit( DefaultCase& node )
 }
 
 void TemplatingVisitor::visit( VariableBinding& node )
+{
+}
+
+void TemplatingVisitor::visit( VariableSelection& node )
 {
 }
 

@@ -726,17 +726,17 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     const auto& sourceLocation = node.sourceLocation();
     const auto& symbolPath = node.identifier();
     const auto& symbolName = symbolPath->path();
-    const auto validateArgumentsCount = [&]( const std::string& description,
-                                             std::size_t expectedNumberOfArguments ) {
-        if( node.arguments()->size() != expectedNumberOfArguments )
-        {
-            m_log.error(
-                { sourceLocation },
-                "invalid argument size: " + description + " '" + symbolName + "' expects " +
-                    std::to_string( expectedNumberOfArguments ) + " arguments",
-                Code::SymbolArgumentSizeMismatch );
-        }
-    };
+    const auto validateArgumentsCount =
+        [ & ]( const std::string& description, std::size_t expectedNumberOfArguments ) {
+            if( node.arguments()->size() != expectedNumberOfArguments )
+            {
+                m_log.error(
+                    { sourceLocation },
+                    "invalid argument size: " + description + " '" + symbolName + "' expects " +
+                        std::to_string( expectedNumberOfArguments ) + " arguments",
+                    Code::SymbolArgumentSizeMismatch );
+            }
+        };
 
     std::size_t expectedNumberOfArguments = 0;
     const auto scopeSymbolIt = m_scopeSymbols.find( symbolName );
@@ -843,11 +843,18 @@ void SymbolResolveVisitor::visit( LetExpression& node )
 
 void SymbolResolveVisitor::visit( ChooseExpression& node )
 {
-    node.universe()->accept( *this );
+    const auto& variableSelection = node.variableSelection();
+    const auto& variable = variableSelection->variable();
+    const auto& universe = variableSelection->universe();
 
-    pushSymbols< VariableDefinition >( node.variables() );
+    universe->accept( *this );
+
+    pushSymbol( variable );
+
+    variableSelection->condition()->accept( *this );
     node.expression()->accept( *this );
-    popSymbols< VariableDefinition >( node.variables() );
+
+    popSymbol( variable );
 }
 
 void SymbolResolveVisitor::visit( UniversalQuantifierExpression& node )
@@ -901,6 +908,7 @@ void SymbolResolveVisitor::visit( ChooseRule& node )
     node.universe()->accept( *this );
 
     pushSymbols< VariableDefinition >( node.variables() );
+    node.condition()->accept( *this );
     node.rule()->accept( *this );
     popSymbols< VariableDefinition >( node.variables() );
 }

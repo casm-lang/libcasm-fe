@@ -292,8 +292,7 @@ void RecursiveVisitor::visit( ConditionalExpression& node )
 
 void RecursiveVisitor::visit( ChooseExpression& node )
 {
-    node.variables()->accept( *this );
-    node.universe()->accept( *this );
+    node.variableSelection()->accept( *this );
     node.expression()->accept( *this );
 }
 
@@ -449,6 +448,13 @@ void RecursiveVisitor::visit( VariableBinding& node )
 {
     node.variable()->accept( *this );
     node.expression()->accept( *this );
+}
+
+void RecursiveVisitor::visit( VariableSelection& node )
+{
+    node.variable()->accept( *this );
+    node.universe()->accept( *this );
+    node.condition()->accept( *this );
 }
 
 //
@@ -717,6 +723,10 @@ void EmptyVisitor::visit( DefaultCase& )
 }
 
 void EmptyVisitor::visit( VariableBinding& )
+{
+}
+
+void EmptyVisitor::visit( VariableSelection& )
 {
 }
 

@@ -132,6 +132,7 @@ namespace libcasm_fe
         class ExpressionCase;
         class DefaultCase;
         class VariableBinding;
+        class VariableSelection;
         class Token;
         class Span;
 
@@ -229,6 +230,7 @@ namespace libcasm_fe
             virtual void visit( ExpressionCase& node ) = 0;
             virtual void visit( DefaultCase& node ) = 0;
             virtual void visit( VariableBinding& node ) = 0;
+            virtual void visit( VariableSelection& node ) = 0;
             virtual void visit( Token& node ) = 0;
             virtual void visit( Span& node ) = 0;
         };
@@ -322,6 +324,7 @@ namespace libcasm_fe
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
             void visit( VariableBinding& node ) override;
+            void visit( VariableSelection& node ) override;
             void visit( Token& node ) override;
             void visit( Span& node ) override;
         };
@@ -415,6 +418,7 @@ namespace libcasm_fe
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
             void visit( VariableBinding& node ) override;
+            void visit( VariableSelection& node ) override;
             void visit( Token& node ) override;
             void visit( Span& node ) override;
         };

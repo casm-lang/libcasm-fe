@@ -915,10 +915,8 @@ void SymbolicConsistencyVisitor::visit( LST::ChooseExpression& node )
     node.universe()->accept( *this );
     m_stack.pop();
 
-    for( const auto& variable : *node.variables() )
-    {
-        m_frame->setLocal( variable->localIndex(), FunctionType::SYMBOLIC );
-    }
+    m_frame->setLocal( node.variable()->localIndex(), FunctionType::SYMBOLIC );
+
     node.expression()->accept( *this );
 }
 

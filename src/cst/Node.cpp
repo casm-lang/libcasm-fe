@@ -397,6 +397,10 @@ std::string Node::description( void ) const
         {
             return "variable binding";
         }
+        case ID::VARIABLE_SELECTION:
+        {
+            return "variable selection";
+        }
         case ID::TOKEN:
         {
             return "token";

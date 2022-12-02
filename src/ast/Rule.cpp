@@ -375,10 +375,12 @@ Node::Ptr ForallRule::clone( void ) const
 ChooseRule::ChooseRule(
     const VariableDefinitions::Ptr& variables,
     const Expression::Ptr& universe,
+    const Expression::Ptr& condition,
     const Rule::Ptr& rule )
 : Rule( Node::ID::CHOOSE_RULE )
 , m_variables( variables )
 , m_universe( universe )
+, m_condition( condition )
 , m_rule( rule )
 {
 }
@@ -391,6 +393,11 @@ const VariableDefinitions::Ptr& ChooseRule::variables( void ) const
 const Expression::Ptr& ChooseRule::universe( void ) const
 {
     return m_universe;
+}
+
+const Expression::Ptr& ChooseRule::condition( void ) const
+{
+    return m_condition;
 }
 
 const Rule::Ptr& ChooseRule::rule( void ) const
@@ -408,6 +415,7 @@ Node::Ptr ChooseRule::clone( void ) const
     auto duplicate = std::make_shared< ChooseRule >(
         variables()->duplicate< VariableDefinitions >(),
         universe()->duplicate< Expression >(),
+        condition()->duplicate< Expression >(),
         rule()->duplicate< Rule >() );
 
     Rule::clone( *duplicate );
