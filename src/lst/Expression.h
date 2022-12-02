@@ -243,21 +243,25 @@ namespace libcasm_fe
             ChooseExpression(
                 const libcasm_ir::Type::Ptr& type,
                 const libcasm_ir::Properties& properties,
-                const std::shared_ptr< VariableDefinitions >& variables,
+                const std::shared_ptr< VariableDefinition >& variable,
                 const Expression::Ptr& universe,
+                const Expression::Ptr& condition,
                 const Expression::Ptr& expression );
 
-            const std::shared_ptr< VariableDefinitions >& variables( void ) const;
+            const std::shared_ptr< VariableDefinition >& variable( void ) const;
 
             const Expression::Ptr& universe( void ) const;
+
+            const Expression::Ptr& condition( void ) const;
 
             const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const std::shared_ptr< VariableDefinitions > m_variables;
+            const std::shared_ptr< VariableDefinition > m_variable;
             const Expression::Ptr m_universe;
+            const Expression::Ptr m_condition;
             const Expression::Ptr m_expression;
         };
 

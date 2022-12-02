@@ -294,24 +294,31 @@ void ConditionalExpression::accept( Visitor& visitor )
 ChooseExpression::ChooseExpression(
     const libcasm_ir::Type::Ptr& type,
     const libcasm_ir::Properties& properties,
-    const VariableDefinitions::Ptr& variables,
+    const VariableDefinition::Ptr& variable,
     const Expression::Ptr& universe,
+    const Expression::Ptr& condition,
     const Expression::Ptr& expression )
 : Expression( Node::ID::CHOOSE_EXPRESSION, type, properties )
-, m_variables( variables )
+, m_variable( variable )
 , m_universe( universe )
+, m_condition( condition )
 , m_expression( expression )
 {
 }
 
-const VariableDefinitions::Ptr& ChooseExpression::variables( void ) const
+const VariableDefinition::Ptr& ChooseExpression::variable( void ) const
 {
-    return m_variables;
+    return m_variable;
 }
 
 const Expression::Ptr& ChooseExpression::universe( void ) const
 {
     return m_universe;
+}
+
+const Expression::Ptr& ChooseExpression::condition( void ) const
+{
+    return m_condition;
 }
 
 const Expression::Ptr& ChooseExpression::expression( void ) const
