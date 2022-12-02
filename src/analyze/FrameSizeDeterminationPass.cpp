@@ -223,11 +223,13 @@ void FrameSizeDeterminationVisitor::visit( LocalRule& node )
 
 void FrameSizeDeterminationVisitor::visit( ChooseExpression& node )
 {
-    node.universe()->accept( *this );
+    const auto& variableSelection = node.variableSelection();
 
-    pushLocals( *node.variables() );
+    variableSelection->universe()->accept( *this );
+
+    pushLocal( *variableSelection->variable() );
     node.expression()->accept( *this );
-    popLocals( node.variables()->size() );
+    popLocals( 1 );
 }
 
 void FrameSizeDeterminationVisitor::visit( UniversalQuantifierExpression& node )
