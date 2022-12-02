@@ -177,7 +177,7 @@ void RecursiveVisitor::visit( ConditionalExpression& node )
 
 void RecursiveVisitor::visit( ChooseExpression& node )
 {
-    node.variables()->accept( *this );
+    node.variable()->accept( *this );
     node.universe()->accept( *this );
     node.expression()->accept( *this );
 }
