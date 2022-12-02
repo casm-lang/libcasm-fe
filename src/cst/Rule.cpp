@@ -567,15 +567,19 @@ ChooseRule::ChooseRule(
     const VariableDefinitions::Ptr& variables,
     const Token::Ptr& inToken,
     const Expression::Ptr& universe,
+    const Token::Ptr& withToken,
+    const Expression::Ptr& condition,
     const Token::Ptr& doToken,
     const Rule::Ptr& rule )
 : Rule( Node::ID::CHOOSE_RULE )
 , m_variables( variables )
 , m_universe( universe )
+, m_condition( condition )
 , m_rule( rule )
 , m_chooseToken( chooseToken )
 , m_inToken( inToken )
 , m_doToken( doToken )
+, m_withToken( withToken )
 {
 }
 
@@ -587,6 +591,11 @@ const VariableDefinitions::Ptr& ChooseRule::variables( void ) const
 const Expression::Ptr& ChooseRule::universe( void ) const
 {
     return m_universe;
+}
+
+const Expression::Ptr& ChooseRule::condition( void ) const
+{
+    return m_condition;
 }
 
 const Rule::Ptr& ChooseRule::rule( void ) const
@@ -609,6 +618,11 @@ const Token::Ptr& ChooseRule::doToken( void ) const
     return m_doToken;
 }
 
+const Token::Ptr& ChooseRule::withToken( void ) const
+{
+    return m_withToken;
+}
+
 void ChooseRule::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -621,6 +635,8 @@ Node::Ptr ChooseRule::clone( void ) const
         variables()->duplicate< VariableDefinitions >(),
         inToken(),
         universe()->duplicate< Expression >(),
+        withToken(),
+        condition()->duplicate< Expression >(),
         doToken(),
         rule()->duplicate< Rule >() );
 
