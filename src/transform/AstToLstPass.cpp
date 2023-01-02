@@ -709,12 +709,11 @@ void AstToLstVisitor::visit( ForallRule& node )
 
 void AstToLstVisitor::visit( ChooseRule& node )
 {
-    const auto& variables =
-        fetch< LST::VariableDefinitions, LST::VariableDefinition, AST::VariableDefinition >(
-            node.variables() );
-    const auto& universe = fetch< LST::Expression >( node.universe() );
+    const auto& variable = fetch< LST::VariableDefinition >( node.variableSelection()->variable() );
+    const auto& universe = fetch< LST::Expression >( node.variableSelection()->universe() );
+    const auto& condition = fetch< LST::Expression >( node.variableSelection()->condition() );
     const auto& rule = fetch< LST::Rule >( node.rule() );
-    store< LST::ChooseRule >( node, variables, universe, rule );
+    store< LST::ChooseRule >( node, variable, universe, condition, rule );
 }
 
 void AstToLstVisitor::visit( IterateRule& node )

@@ -722,7 +722,8 @@ void SymbolicConsistencyVisitor::visit( LST::DirectCallExpression& node )
             //     {
             //         m_logger.error( "Unknown Builtin '" + IR::Value::token( id ) + "'." );
             //         m_stack.push(
-            //             m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
+            //             m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN
+            //             );
             //     }
             // }
             break;
@@ -824,7 +825,8 @@ void SymbolicConsistencyVisitor::visit( LST::DirectCallExpression& node )
 //                 {
 //                     m_logger.error( "Unknown Builtin '" + IR::Value::token( id ) + "'." );
 //                     m_stack.push(
-//                         m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN );
+//                         m_forceContextCreation ? FunctionType::SYMBOLIC : FunctionType::UNKNOWN
+//                         );
 //                 }
 //             }
 //             break;
@@ -1046,10 +1048,8 @@ void SymbolicConsistencyVisitor::visit( LST::ChooseRule& node )
     node.universe()->accept( *this );
     m_stack.pop();
 
-    for( const auto& variable : *node.variables() )
-    {
-        m_frame->setLocal( variable->localIndex(), FunctionType::SYMBOLIC );
-    }
+    m_frame->setLocal( node.variable()->localIndex(), FunctionType::SYMBOLIC );
+
     node.rule()->accept( *this );
 }
 

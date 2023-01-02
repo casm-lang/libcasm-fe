@@ -938,17 +938,10 @@ ForallRule
 
 
 ChooseRule
-: CHOOSE AttributedVariables IN Term DO Rule
+: CHOOSE VariableSelections DO Rule
   {
-      const auto withToken = Token::unresolved();
-      const auto alwaysTrue = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
-      const auto condition = CST::make< ValueLiteral >( @$, alwaysTrue );
-      $$ = CST::make< ChooseRule >( @$, $1, $2, $3, $4, withToken, condition, $5, $6 );
+      $$ = CST::make< ChooseRule >( @$, $1, $2, $3, $4 );
   }
-// | CHOOSE AttributedVariables IN Term WITH Term DO Rule // TODO: @ppaulweber
-//   {
-//       $$ = CST::make< ChooseRule >( @$, $1, $2, $3, $4, $5, $6, $7, $8 );
-//   }
 ;
 
 

@@ -661,7 +661,8 @@ void ExecutionVisitor::visit( ChooseExpression& node )
         {
             throw RuntimeException(
                 { node.condition()->sourceLocation() },
-                "aborting after 10^6 unsuccessful attempts to choose a value under the given condition",
+                "aborting after 10^6 unsuccessful attempts to choose a value under the given "
+                "condition",
                 m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
                 Code::Unspecified );
         }
@@ -960,11 +961,38 @@ void ExecutionVisitor::visit( ChooseRule& node )
     }
 
     auto* frame = m_frameStack.top();
+    const auto variableIndex = node.variable()->localIndex();
 
-    for( const auto& variable : *node.variables() )
+    auto repeatChoose = true;
+    size_t repeatCount = 0;
+    while( repeatChoose )
     {
-        const auto variableIndex = variable->localIndex();
         frame->setLocal( variableIndex, universe.choose() );
+
+        node.condition()->accept( *this );
+        const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
+
+        if( not condition.defined() )
+        {
+            throw RuntimeException(
+                { node.condition()->sourceLocation() },
+                "condition cannot be undefined",
+                m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                Code::Unspecified );
+        }
+
+        repeatChoose = ( condition.value() != true );
+        repeatCount++;
+
+        if( repeatCount > 1000000 )
+        {
+            throw RuntimeException(
+                { node.condition()->sourceLocation() },
+                "aborting after 10^6 unsuccessful attempts to choose a value under the given "
+                "condition",
+                m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                Code::Unspecified );
+        }
     }
 
     node.rule()->accept( *this );

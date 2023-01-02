@@ -1120,51 +1120,124 @@ void TypeInferenceVisitor::visit( RangeLiteral& node )
         return;
     }
 
-    node.left()->accept( *this );
+    u1 valid = true;
+    u1 lhsNegative = false;
+    u1 rhsNegative = false;
 
-    if( node.left()->type() )
+    auto lhs = node.left();
+    if( lhs->id() == Node::ID::UNARY_EXPRESSION )
     {
-        m_typeIDs[ node.right().get() ].emplace( node.left()->type()->id() );
+        const auto& lhsUnaryExpression = static_cast< const UnaryExpression& >( *lhs );
+        lhs = lhsUnaryExpression.expression();
+        if( lhsUnaryExpression.operationToken() == Grammar::Token::MINUS )
+        {
+            lhsNegative = true;
+        }
     }
 
-    node.right()->accept( *this );
-
-    if( node.right()->type() and not node.left()->type() )
+    if( not( lhs->id() == Node::ID::VALUE_LITERAL and lhs->type()->isInteger() ) )
     {
-        m_typeIDs[ node.left().get() ].emplace( node.right()->type()->id() );
-        node.left()->accept( *this );
-    }
-
-    const auto& lhsType = node.left()->type();
-    const auto& rhsType = node.right()->type();
-    if( not( lhsType and rhsType ) )
-    {
-        return;
-    }
-
-    const auto& sourceLocation = node.sourceLocation();
-    if( *lhsType != *rhsType )
-    {
+        valid = false;
         m_log.error(
-            { sourceLocation },
-            "types of range does not match, " + lhsType->description() +
-                " != " + rhsType->description(),
-            Code::TypeInferenceRangeLiteralTypeMismatch );
+            { lhs->sourceLocation() },
+            "unsupported left-hand side expression '" + lhs->description() +
+                "', Integer literal constant expected",
+            Code::TypeAnnotationInvalidFixedSizeExpression );
+    }
+
+    auto rhs = node.right();
+    if( rhs->id() == Node::ID::UNARY_EXPRESSION )
+    {
+        const auto& rhsUnaryExpression = static_cast< const UnaryExpression& >( *rhs );
+        rhs = rhsUnaryExpression.expression();
+        if( rhsUnaryExpression.operationToken() == Grammar::Token::MINUS )
+        {
+            rhsNegative = true;
+        }
+    }
+
+    if( not( rhs->id() == Node::ID::VALUE_LITERAL and rhs->type()->isInteger() ) )
+    {
+        valid = false;
+        m_log.error(
+            { rhs->sourceLocation() },
+            "unsupported right-hand side expression '" + rhs->description() +
+                "', Integer literal constant expected",
+            Code::TypeAnnotationInvalidFixedSizeExpression );
+    }
+
+    if( not valid )
+    {
         return;
     }
 
-    const auto& subTypeDefinition = m_symboltable.findTypeDefinition( lhsType->id() );
-    assert( subTypeDefinition and " inconsistent state " );
-    subTypeDefinition->accept( *this );
+    auto lhsValue = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
+        static_cast< const ValueLiteral& >( *lhs ).value() );
+    if( lhsNegative )
+    {
+        lhsValue = std::make_shared< libcasm_ir::IntegerConstant >( -lhsValue->value() );
+    }
 
-    const auto& subType = subTypeDefinition->domainType()->duplicate< AST::Type >();
+    auto rhsValue = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
+        static_cast< const ValueLiteral& >( *rhs ).value() );
+    if( rhsNegative )
+    {
+        rhsValue = std::make_shared< libcasm_ir::IntegerConstant >( -rhsValue->value() );
+    }
 
-    const auto& domainSymbol = m_symboltable.findSymbol( TypeInfo::TYPE_NAME_RANGE );
-    assert( domainSymbol and " inconsistent state, checked during symbol registration " );
-    const auto& domainDefinition = domainSymbol->ptr< DomainDefinition >();
-    assert(
-        domainDefinition->domainType()->id() == Node::ID::TEMPLATE_TYPE and
-        " inconsistent state " );
+    const auto& range = libstdhl::Memory::make< libcasm_ir::Range >( lhsValue, rhsValue );
+    const auto& rangeType = libstdhl::Memory::get< libcasm_ir::RangeType >( range );
+    assert( not node.type() and " inconsistent state " );
+    node.setType( rangeType );
+
+    // TODO: @ppaulweber: rework of generic range literal type inference
+    // node.left()->accept( *this );
+    // node.right()->accept( *this );
+
+    // if( node.left()->type() )
+    // {
+    //     m_typeIDs[ node.right().get() ].emplace( node.left()->type()->id() );
+    // }
+
+    // if( node.right()->type() and not node.left()->type() )
+    // {
+    //     m_typeIDs[ node.left().get() ].emplace( node.right()->type()->id() );
+    //     // node.left()->accept( *this );
+    // }
+
+    // node.left()->accept( *this );
+    // node.right()->accept( *this );
+
+    // const auto& lhsType = node.left()->type();
+    // const auto& rhsType = node.right()->type();
+    // if( not( lhsType and rhsType ) )
+    // {
+    //     return;
+    // }
+
+    // const auto& sourceLocation = node.sourceLocation();
+    // if( *lhsType != *rhsType )
+    // {
+    //     m_log.error(
+    //         { sourceLocation },
+    //         "types of range does not match, " + lhsType->description() +
+    //             " != " + rhsType->description(),
+    //         Code::TypeInferenceRangeLiteralTypeMismatch );
+    //     return;
+    // }
+
+    // const auto& subTypeDefinition = m_symboltable.findTypeDefinition( lhsType->id() );
+    // assert( subTypeDefinition and " inconsistent state " );
+    // subTypeDefinition->accept( *this );
+
+    // const auto& subType = subTypeDefinition->domainType()->duplicate< AST::Type >();
+
+    // const auto& domainSymbol = m_symboltable.findSymbol( TypeInfo::TYPE_NAME_RANGE );
+    // assert( domainSymbol and " inconsistent state, checked during symbol registration " );
+    // const auto& domainDefinition = domainSymbol->ptr< DomainDefinition >();
+    // assert(
+    //     domainDefinition->domainType()->id() == Node::ID::TEMPLATE_TYPE and
+    //     " inconsistent state " );
 }
 
 void TypeInferenceVisitor::visit( TupleLiteral& node )
@@ -1525,51 +1598,9 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 
 void TypeInferenceVisitor::visit( ChooseRule& node )
 {
-    node.variables()->accept( *this );
-
-    for( const auto& variable : *node.variables() )
-    {
-        if( variable->type() )
-        {
-            m_typeIDs[ node.universe().get() ].emplace( variable->type()->id() );
-        }
-    }
-
-    node.universe()->accept( *this );
-
-    if( node.universe()->type() )
-    {
-        const auto universeTypeId = node.universe()->type()->ptr_result()->id();
-        annotateNodes( *node.variables(), universeTypeId );
-    }
-
-    node.variables()->accept( *this );
-
-    node.condition()->accept( *this );
+    node.variableSelection()->accept( *this );
 
     node.rule()->accept( *this );
-
-    if( node.universe()->type() )
-    {
-        for( const auto& variable : *node.variables() )
-        {
-            if( not variable->type() )
-            {
-                continue;
-            }
-
-            if( *variable->type() != node.universe()->type()->result() )
-            {
-                m_log.error(
-                    { variable->sourceLocation(), node.universe()->sourceLocation() },
-                    node.description() + " variable '" + variable->identifier()->name() +
-                        "' of type '" + variable->type()->description() +
-                        "' does not match the universe of type '" +
-                        node.universe()->type()->description() + "'",
-                    Code::TypeInferenceInvalidChooseRuleVariableTypeMismatch );
-            }
-        }
-    }
 }
 
 void TypeInferenceVisitor::visit( UpdateRule& node )

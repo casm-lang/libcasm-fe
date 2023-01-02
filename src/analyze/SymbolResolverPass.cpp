@@ -905,12 +905,18 @@ void SymbolResolveVisitor::visit( ForallRule& node )
 
 void SymbolResolveVisitor::visit( ChooseRule& node )
 {
-    node.universe()->accept( *this );
+    const auto& variableSelection = node.variableSelection();
+    const auto& variable = variableSelection->variable();
+    const auto& universe = variableSelection->universe();
 
-    pushSymbols< VariableDefinition >( node.variables() );
-    node.condition()->accept( *this );
+    universe->accept( *this );
+
+    pushSymbol( variable );
+
+    variableSelection->condition()->accept( *this );
     node.rule()->accept( *this );
-    popSymbols< VariableDefinition >( node.variables() );
+
+    popSymbol( variable );
 }
 
 void SymbolResolveVisitor::visit( BasicType& node )

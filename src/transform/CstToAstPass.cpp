@@ -899,13 +899,30 @@ void CstToAstVisitor::visit( ForallRule& node )
 
 void CstToAstVisitor::visit( ChooseRule& node )
 {
-    const auto& variables =
-        fetch< AST::VariableDefinitions, AST::VariableDefinition, CST::VariableDefinition >(
-            node.variables() );
-    const auto& universe = fetch< AST::Expression >( node.universe() );
-    const auto& condition = fetch< AST::Expression >( node.condition() );
-    const auto& rule = fetch< AST::Rule >( node.rule() );
-    store< AST::ChooseRule >( node, variables, universe, condition, rule );
+    //
+    // choose a in D with C0
+    //      , b in B with C1
+    //      , ...
+    //     do R
+    //<=>
+    // choose a in D with C0 do
+    // choose b in B with C1 do
+    // choose ...
+    //     do R
+
+    AST::Rule::Ptr rule = fetch< AST::Rule >( node.rule() );
+
+    const auto& begin = node.variableSelections()->crbegin();
+    const auto& end = node.variableSelections()->crend();
+    for( auto iterator = begin; iterator != end; iterator++ )
+    {
+        const auto& element = *iterator;
+        const auto& variableSelection = fetch< AST::VariableSelection >( element );
+
+        rule = AST::make< AST::ChooseRule >( node.sourceLocation(), variableSelection, rule );
+    }
+
+    set( node, rule );
 }
 
 void CstToAstVisitor::visit( IterateRule& node )

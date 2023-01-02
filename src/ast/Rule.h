@@ -249,15 +249,10 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ChooseRule >;
 
-            ChooseRule(
-                const std::shared_ptr< VariableDefinitions >& variables,
-                const Expression::Ptr& universe,
-                const Expression::Ptr& condition,
-                const Rule::Ptr& rule );
+            ChooseRule( const VariableSelection::Ptr& variableSelection, const Rule::Ptr& rule );
 
-            const std::shared_ptr< VariableDefinitions >& variables( void ) const;
-            const Expression::Ptr& universe( void ) const;
-            const Expression::Ptr& condition( void ) const;
+            const VariableSelection::Ptr& variableSelection( void ) const;
+
             const Rule::Ptr& rule( void ) const;
 
             void accept( Visitor& visitor ) override final;
@@ -265,9 +260,7 @@ namespace libcasm_fe
             Node::Ptr clone( void ) const override final;
 
           private:
-            const std::shared_ptr< VariableDefinitions > m_variables;
-            const Expression::Ptr m_universe;
-            const Expression::Ptr m_condition;
+            const VariableSelection::Ptr m_variableSelection;
             const Rule::Ptr m_rule;
         };
 

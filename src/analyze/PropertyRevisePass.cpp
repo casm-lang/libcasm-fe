@@ -188,7 +188,7 @@ void PropertyReviseVisitor::visit( ChooseRule& node )
     RecursiveVisitor::visit( node );
 
     checkIfPropertiesHold(
-        *node.universe(),
+        *node.variableSelection()->universe(),
         { Property::SIDE_EFFECT_FREE },
         "universe",
         Code::ChooseRuleConditionInvalidProperty );
@@ -254,7 +254,7 @@ void PropertyReviseVisitor::checkIfPropertiesHold(
     const std::string& errorDescription,
     const Code errorCode ) const
 {
-    requiredProperties.foreach( [&]( const libcasm_ir::Property property ) -> u1 {
+    requiredProperties.foreach( [ & ]( const libcasm_ir::Property property ) -> u1 {
         if( not node.properties().isSet( property ) )
         {
             m_log.error(
