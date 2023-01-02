@@ -179,6 +179,7 @@ void RecursiveVisitor::visit( ChooseExpression& node )
 {
     node.variable()->accept( *this );
     node.universe()->accept( *this );
+    node.condition()->accept( *this );
     node.expression()->accept( *this );
 }
 
@@ -246,8 +247,9 @@ void RecursiveVisitor::visit( ForallRule& node )
 
 void RecursiveVisitor::visit( ChooseRule& node )
 {
-    node.variables()->accept( *this );
+    node.variable()->accept( *this );
     node.universe()->accept( *this );
+    node.condition()->accept( *this );
     node.rule()->accept( *this );
 }
 
