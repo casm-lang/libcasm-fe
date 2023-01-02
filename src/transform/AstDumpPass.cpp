@@ -817,7 +817,7 @@ u1 AstDumpPass::run( libpass::PassResult& pr )
 
     const u1 dumpNodeLocation = true;  // TODO: add command-line switch
 
-    const auto printDotGraph = [&]( std::ostream& out ) {
+    const auto printDotGraph = [ & ]( std::ostream& out ) {
         ASTDumpVisitor visitor{ out, specification->name(), specification->location()->toString() };
         visitor.setDumpNodeLocation( dumpNodeLocation );
         specification->ast()->accept( visitor );
