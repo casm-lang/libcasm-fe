@@ -142,9 +142,10 @@ Configuration Configuration::fromString( const std::string& fileName )
                         std::to_string( dependencyIndex + 1 ) + "' of 'imports' is not a map" );
                 }
 
-                dependency.foreach( [&]( const std::string& dependencyName,
-                                         const libstdhl::Yaml::Content& dependencyLocation,
-                                         u1& ) {
+                dependency.foreach( [ & ](
+                                        const std::string& dependencyName,
+                                        const libstdhl::Yaml::Content& dependencyLocation,
+                                        u1& ) {
                     if( dependencyLocation.type() != libstdhl::Yaml::Type::STRING )
                     {
                         throw ConfigurationException(
