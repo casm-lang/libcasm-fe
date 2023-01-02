@@ -786,8 +786,7 @@ Node::Ptr VariableSelection::clone( void ) const
 //
 
 ChooseExpression::ChooseExpression(
-    const VariableSelection::Ptr& variableSelection,
-    const Expression::Ptr& expression )
+    const VariableSelection::Ptr& variableSelection, const Expression::Ptr& expression )
 : Expression( Node::ID::CHOOSE_EXPRESSION )
 , m_variableSelection( variableSelection )
 , m_expression( expression )
