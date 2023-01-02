@@ -564,38 +564,20 @@ Node::Ptr ForallRule::clone( void ) const
 
 ChooseRule::ChooseRule(
     const Token::Ptr& chooseToken,
-    const VariableDefinitions::Ptr& variables,
-    const Token::Ptr& inToken,
-    const Expression::Ptr& universe,
-    const Token::Ptr& withToken,
-    const Expression::Ptr& condition,
+    const VariableSelections::Ptr& variableSelections,
     const Token::Ptr& doToken,
     const Rule::Ptr& rule )
 : Rule( Node::ID::CHOOSE_RULE )
-, m_variables( variables )
-, m_universe( universe )
-, m_condition( condition )
+, m_variableSelections( variableSelections )
 , m_rule( rule )
 , m_chooseToken( chooseToken )
-, m_inToken( inToken )
 , m_doToken( doToken )
-, m_withToken( withToken )
 {
 }
 
-const VariableDefinitions::Ptr& ChooseRule::variables( void ) const
+const VariableSelections::Ptr& ChooseRule::variableSelections( void ) const
 {
-    return m_variables;
-}
-
-const Expression::Ptr& ChooseRule::universe( void ) const
-{
-    return m_universe;
-}
-
-const Expression::Ptr& ChooseRule::condition( void ) const
-{
-    return m_condition;
+    return m_variableSelections;
 }
 
 const Rule::Ptr& ChooseRule::rule( void ) const
@@ -608,19 +590,9 @@ const Token::Ptr& ChooseRule::chooseToken( void ) const
     return m_chooseToken;
 }
 
-const Token::Ptr& ChooseRule::inToken( void ) const
-{
-    return m_inToken;
-}
-
 const Token::Ptr& ChooseRule::doToken( void ) const
 {
     return m_doToken;
-}
-
-const Token::Ptr& ChooseRule::withToken( void ) const
-{
-    return m_withToken;
 }
 
 void ChooseRule::accept( Visitor& visitor )
@@ -632,11 +604,7 @@ Node::Ptr ChooseRule::clone( void ) const
 {
     auto duplicate = std::make_shared< ChooseRule >(
         chooseToken(),
-        variables()->duplicate< VariableDefinitions >(),
-        inToken(),
-        universe()->duplicate< Expression >(),
-        withToken(),
-        condition()->duplicate< Expression >(),
+        variableSelections()->duplicate< VariableSelections >(),
         doToken(),
         rule()->duplicate< Rule >() );
 
