@@ -554,9 +554,7 @@ void RecursiveVisitor::visit( ForallRule& node )
 void RecursiveVisitor::visit( ChooseRule& node )
 {
     node.chooseToken()->accept( *this );
-    node.variables()->accept( *this );
-    node.inToken()->accept( *this );
-    node.universe()->accept( *this );
+    node.variableSelections()->accept( *this );
     node.doToken()->accept( *this );
     node.rule()->accept( *this );
 }
