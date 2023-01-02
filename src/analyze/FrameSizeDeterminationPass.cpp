@@ -269,11 +269,13 @@ void FrameSizeDeterminationVisitor::visit( ForallRule& node )
 
 void FrameSizeDeterminationVisitor::visit( ChooseRule& node )
 {
-    node.universe()->accept( *this );
+    const auto& variableSelection = node.variableSelection();
 
-    pushLocals( *node.variables() );
+    variableSelection->universe()->accept( *this );
+
+    pushLocal( *variableSelection->variable() );
     node.rule()->accept( *this );
-    popLocals( node.variables()->size() );
+    popLocals( 1 );
 }
 
 void FrameSizeDeterminationVisitor::visit( VariableBinding& node )
