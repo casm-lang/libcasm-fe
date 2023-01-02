@@ -122,6 +122,7 @@ namespace libcasm_fe
 
             void visit( CaseRule& node ) override;
             void visit( UpdateRule& node ) override;
+            void visit( ChooseRule& node ) override;
 
             void visit( BasicType& node ) override;
             void visit( TupleType& node ) override;
@@ -509,6 +510,10 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
                 "', incorrect usage in line " +
                 std::to_string( function->sourceLocation().begin.line ) );
     }
+}
+
+void ConsistencyCheckVisitor::visit( ChooseRule& node )
+{
 }
 
 void ConsistencyCheckVisitor::visit( BasicType& node )
