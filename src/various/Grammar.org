@@ -418,7 +418,7 @@ ForallRule ::= "forall" AttributedVariables "in" Term "do" Rule
 ** ChooseRule
 
 #+begin_src
-ChooseRule ::= "choose" AttributedVariables "in" Term "do" Rule
+ChooseRule ::= "choose" VariableSelections "do" Rule
 #+end_src
 
 #+html: {{page>.:grammar:ChooseRule&noheader&nofooter}}
